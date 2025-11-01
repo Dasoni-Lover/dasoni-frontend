@@ -10,12 +10,14 @@ const BoxPostListItem = () => {
   )
 }
 
-const Img=styled.img`
-    width: 356px;
-height: 356px;
+const Img = styled.img`
+  width: 356px;
+  height: 356px;
+  border-radius: 5px;
+  border: 2px solid #E9E9E9;
 
-border-radius: 5px;
-border: 2px solid #E9E9E9;
+  box-sizing: border-box;
 `
+
 
 export default BoxPostListItem
