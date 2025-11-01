@@ -4,8 +4,8 @@ import { color, typo } from '../../../styles/tokens';
 
 const LinkShareModal = ({ onClose }) => {
   return (
-    <Wrapper>
-        <Box>
+    <Wrapper onClick={onClose}>
+        <Box onClick={(e) => e.stopPropagation()}>
             <TextWrapper>
                 <Text>추모관 링크가 복사되었어요</Text>
                 <Content>함께 추모하고 싶은 사람에게 공유해 주세요</Content>
@@ -31,6 +31,7 @@ const Wrapper=styled.div`
     align-items: center;
     z-index: 2000;
 `;
+
 const Box=styled.div`
     display: flex;
     padding: 5.25rem 4.75rem 2.75rem 4.75rem;
@@ -77,4 +78,3 @@ const Content=styled.div`
     color: ${color("black.80")};
     text-align: center;
 `;
-
