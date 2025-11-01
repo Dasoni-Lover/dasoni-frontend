@@ -20,7 +20,8 @@ const Wrapper=styled.div`
     width: 100%;
     flex-direction: column;
     align-items: center;
-    gap: 36px;
+    gap: 2.25rem;
+
 `
 const Box=styled.div`
     display: flex;
@@ -38,8 +39,9 @@ const Date=styled.div`
 `
 const Img=styled.img`
     display: flex;
-    width: 200px;
-    height: 200px;
+    width: 12.5rem;
+    height: 12.5rem;
+
     justify-content: flex-end;
     align-items: center;
     aspect-ratio: 1/1;

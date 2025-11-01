@@ -11,8 +11,9 @@ const BoxPostListItem = () => {
 }
 
 const Img = styled.img`
-  width: 356px;
-  height: 356px;
+  width: 22.25rem;
+  height: 22.25rem;
+
   border-radius: 5px;
   border: 2px solid #E9E9E9;
 

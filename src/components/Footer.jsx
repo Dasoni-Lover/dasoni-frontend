@@ -9,7 +9,7 @@ const Footer = () => {
 
 const Wrapper = styled.div`
   width: 100%;
-  height: 200px;
+  height: 12.5rem;
   background-color: #f5f5f5;
 `;
 

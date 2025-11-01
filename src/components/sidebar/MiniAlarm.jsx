@@ -18,8 +18,8 @@ const MiniAlarm = () => {
 const Container=styled.div`
     display: flex;
     width: 100%;
-    height: 47px;
-    padding: 10px;
+    height: 2.9375rem;
+    padding: 0.625rem;
     justify-content: space-between;
     align-items: center;
     box-sizing: border-box;
@@ -27,12 +27,12 @@ const Container=styled.div`
 const Box=styled.div`
     display: flex;
     align-items: center;
-    gap: 8px;
+    gap: 0.5rem;
     flex-shrink: 0;
 `
 const AlarmIcon=styled.img`
-    width: 17.266px;
-    height: 17.266px;
+    width: 1.079rem;
+    height: 1.079rem;
     flex-shrink: 0;
 `
 const Text=styled.div`
@@ -46,7 +46,7 @@ const Count=styled.p`
     font-size: 19.424px;
     font-style: normal;
     font-weight: 500;
-    line-height: 130%; /* 25.252px */
+    line-height: 130%; 
     
 `
 

@@ -20,21 +20,22 @@ export default MiniProfile;
 
 const Box = styled.div`
   display: flex;
-  padding: 0 8px;
+  padding: 0 0.5rem; 
 `;
 
 const ProfileContainer = styled.div`
-    display: flex;
-    align-items: center;
-    gap: 16px;
+  display: flex;
+  align-items: center;
+  gap: 1rem; 
 `;
 
 const ProfileImage = styled.img`
-  width: 50px;
-  height: 50px;
+  width: 3.125rem; 
+  height: 3.125rem; 
   border-radius: 3px;
   object-fit: cover;
 `;
+
 
 
 const Nickname = styled.span`

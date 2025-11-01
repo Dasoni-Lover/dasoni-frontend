@@ -22,15 +22,15 @@ const Container=styled.div`
   width: 100%;
   flex-direction: column;
   align-items: center;
-  gap: 36px;
+  gap: 2.25rem;
 
-  margin-bottom: 52px;
+  margin-bottom: 3.25rem;
 `
 const Wrapper=styled.div`
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 20px;
+  gap: 1.25rem;
 `
 const Content=styled.div`
   ${typo("bodym")};

@@ -14,9 +14,10 @@ const InfoListItem = ({ type, content }) => {
 const Wrapper = styled.div`
   display: flex;
   flex-direction: column;
-  width: 320px;
-  padding: 10px 36px;
-  gap: 4px;
+  width: 20rem;
+  padding: 0.625rem 2.25rem;
+  gap: 0.25rem;
+
   justify-content: space-between;
   align-items: flex-start;
 `

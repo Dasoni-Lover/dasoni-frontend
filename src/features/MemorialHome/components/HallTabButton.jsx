@@ -12,11 +12,11 @@ const HallTabButton = ({ text, isActive, onClick }) => {
 
 const Wrapper = styled.div`
   display: flex;
-  width: 184px;
-  padding: 10px;
+  width: 11.5rem;
+  padding: 0.625rem;
   justify-content: center;
   align-items: center;
-  gap: 10px;
+  gap: 0.625rem;
   flex-shrink: 0;
   background-color: ${({ isActive }) => (isActive ? 'black' : 'white')};
   cursor: pointer;

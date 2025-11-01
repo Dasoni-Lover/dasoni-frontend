@@ -15,7 +15,7 @@ const BarNavigate = () => {
 
 const Wrapper =styled.div`
   display: flex;
-  height: 28px;
+  height: 1.75rem;
   align-items: center;
   align-self: stretch;
 `
@@ -25,8 +25,9 @@ const Text=styled.div`
 `
 
 const Next=styled.img`
-  width: 28px;
-  height: 28px;
+  width: 1.75rem;
+  height: 1.75rem;
+
 `
 
 export default BarNavigate

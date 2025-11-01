@@ -1,28 +1,28 @@
-import React, { useState, useRef, useEffect } from 'react'
-import styled from 'styled-components'
-import dropdownicon from "../assets/dropdown-icon.png" // 화살표 이미지
-import { color,typo } from '../../../styles/tokens'
+import React, { useState, useRef, useEffect } from 'react';
+import styled from 'styled-components';
+import dropdownicon from "../assets/dropdown-icon.png"; // 화살표 이미지
+import { color, typo } from '../../../styles/tokens';
 
 const TabButtonDropdown = () => {
-  const [isOpen, setIsOpen] = useState(false)
-  const [selected, setSelected] = useState('업로드순')
-  const dropdownRef = useRef(null)
+  const [isOpen, setIsOpen] = useState(false);
+  const [selected, setSelected] = useState('업로드순');
+  const dropdownRef = useRef(null);
 
   // 드롭다운 외부 클릭 시 닫힘
   useEffect(() => {
     const handleClickOutside = (event) => {
       if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
-        setIsOpen(false)
+        setIsOpen(false);
       }
-    }
-    document.addEventListener('mousedown', handleClickOutside)
-    return () => document.removeEventListener('mousedown', handleClickOutside)
-  }, [])
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
 
   const handleSelect = (option) => {
-    setSelected(option)
-    setIsOpen(false)
-  }
+    setSelected(option);
+    setIsOpen(false);
+  };
 
   return (
     <Wrapper ref={dropdownRef}>
@@ -49,25 +49,29 @@ const TabButtonDropdown = () => {
         )}
       </DropdownContainer>
     </Wrapper>
-  )
-}
+  );
+};
+
+export default TabButtonDropdown;
+
+
 
 const Wrapper = styled.div`
   display: flex;
-  padding: 12px 4px 8px 4px;
-  height: 31px;
+  padding: 0.75rem 0.25rem 0.5rem 0.25rem;
+  height: 1.9375rem; 
   justify-content: space-between;
   align-items: center;
   position: relative;
-  margin: 8px 0;
-`
+  margin: 0.5rem 0; 
+`;
 
 const SimpleButton = styled.button`
   display: flex;
-  padding: 4px 10px;
+  padding: 0.25rem 0.625rem;
   justify-content: center;
   align-items: center;
-  gap: 10px;
+  gap: 0.625rem; 
 
   border-radius: 4px;
   border: 1px solid #DDD;
@@ -79,54 +83,51 @@ const SimpleButton = styled.button`
   &:hover {
     background-color: #f5f5f5;
   }
-`
+`;
 
 const DropdownContainer = styled.div`
   position: relative;
-`
+`;
 
 const Button = styled.button`
   display: flex;
   align-items: center;
-  gap: 4px;
+  gap: 0.25rem; 
   background: none;
   border: none;
   color: #7A7A7A;
-  font-size: 16px;
+  font-size: 1rem;
   cursor: pointer;
-  padding: 6px 10px;
+  padding: 0.375rem 0.625rem; 
   border-radius: 6px;
-
-`
+`;
 
 const Icon = styled.img`
-  width: 12px;
-  height: 12px;
+  width: 0.75rem; 
+  height: 0.75rem; 
   transition: transform 0.2s ease;
   transform: rotate(${(props) => (props.$isOpen ? '180deg' : '0deg')});
-`
+`;
 
 const DropdownMenu = styled.div`
   position: absolute;
-  top: 35px;
+  top: 2.1875rem; 
   right: 0;
   background: white;
   border: 1px solid #ddd;
   border-radius: 6px;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+  box-shadow: 0 0.125rem 0.5rem rgba(0,0,0,0.1); // 2px 8px -> rem
   z-index: 10;
-  min-width: 100px;
-`
+  min-width: 6.25rem; 
+`;
 
 const DropdownItem = styled.div`
-  padding: 8px 12px;
-  font-size: 14px;
+  padding: 0.5rem 0.75rem; 
+  font-size: 0.875rem; 
   color: #333;
   cursor: pointer;
 
   &:hover {
     background-color: #f0f0f0;
   }
-`
-
-export default TabButtonDropdown
+`;

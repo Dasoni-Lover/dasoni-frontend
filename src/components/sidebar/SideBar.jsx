@@ -65,13 +65,13 @@ const ToggleButton = styled.button`
     display: block;
 
     &.close {
-      width: 38.85px;
-      height: 38.85px;
+      width: 2.428rem; 
+      height: 2.428rem; 
     }
 
     &.open {
-      width: 32px;
-      height: 33px;
+      width: 2rem; 
+      height: 2.0625rem;
     }
   }
 
@@ -83,4 +83,5 @@ const ToggleButton = styled.button`
 const Menu = styled.div`
   width: 100%;
 `;
+
 

@@ -14,7 +14,7 @@ const InfoList = () => {
 
 const Wrapper = styled.div`
   display: flex;
-  padding: 12px 0;
+  padding: 0.75rem 0;
   justify-content: space-between;
   align-items: center;
   align-self: stretch;

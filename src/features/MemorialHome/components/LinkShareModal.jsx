@@ -31,14 +31,13 @@ const Wrapper=styled.div`
     align-items: center;
     z-index: 2000;
 `;
-
 const Box=styled.div`
     display: flex;
-    padding: 84px 76px 44px 76px;
+    padding: 5.25rem 4.75rem 2.75rem 4.75rem;
     flex-direction: column;
     justify-content: center;
     align-items: center;
-    gap: 88px;
+    gap: 5.5rem;
     border-radius: 20px;
     background-color: white;
     box-sizing: border-box;
@@ -48,8 +47,23 @@ const TextWrapper=styled.div`
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 11px;
+    gap: 0.6875rem;
     align-self: stretch;
+`;
+
+const Button=styled.div`
+    display: flex;
+    width: 24.5rem;
+    height: 3.25rem;
+    padding: 0.8125rem 1.875rem;
+    justify-content: center;
+    align-items: center;
+    border-radius: 8px;
+    box-sizing: border-box;
+    background: var(--70, #313131);
+    color: white;
+    cursor: pointer;
+    box-shadow: 0 0 0.625rem 0 rgba(0, 0, 0, 0.04);
 `;
 
 const Text=styled.div`
@@ -64,17 +78,3 @@ const Content=styled.div`
     text-align: center;
 `;
 
-const Button=styled.div`
-    display: flex;
-    width: 392px;
-    height: 52px;
-    padding: 13px 30px;
-    justify-content: center;
-    align-items: center;
-    border-radius: 8px;
-    box-sizing: border-box;
-    background: var(--70, #313131);
-    color: white;
-    cursor: pointer;
-    box-shadow: 0 0 10px 0 rgba(0, 0, 0, 0.04);
-`;

@@ -20,8 +20,9 @@ const BoxPostList = () => {
 const Wrapper = styled.div`
   display: grid;
   grid-template-columns: repeat(3, 1fr);
-  gap: 12px; 
-  margin-bottom: 293px;
+  gap: 0.75rem;
+  margin-bottom: 18.3125rem;
+
 `
 
 

@@ -27,13 +27,13 @@ const Container=styled.div`
     flex-direction: column;
     align-items: center;
     justify-content: flex-start;
-    gap: 32px;
+    gap: 2rem;
 
 `
 const Wrapper1=styled.div`
     display: flex;
     width: 100%;
-    padding: 8px 0;
+    padding: 0.5rem 0;
     flex-direction: column;
     align-items: flex-start;
     gap: 20px;
@@ -42,20 +42,20 @@ const Wrapper1=styled.div`
 `
 const Wrapper2=styled.div`
     display: flex;
-    height: 194px;
-    padding: 0 4.317px;
+    height: 12.125rem;
+    padding: 0 0.27rem;
     flex-direction: column;
     align-items: flex-start;
-    gap: 12px;
+    gap: 0.75rem;
     flex-shrink: 0;
     align-self: stretch;
 `
 const Text = styled.div`
   display: flex;
-  padding: 4px 16px;
+  padding: 0.25rem 1rem;
   flex-direction: column;
   align-items: flex-start;
-  gap: 12px;
+  gap: 0.75rem;
   cursor: pointer;
   ${typo("h3")};
   color: ${color("black.50")};

@@ -185,11 +185,11 @@ const FixedAddPostMenu = styled.div`
 
 const MenuButton = styled.button`
   display: flex;
-  padding: 0 13px;
+  padding: 0 0.8125rem;
   align-items: center;
   justify-content: center;
-  height: 44px;
-  width: 220px;
+  height: 2.75rem;
+  width: 13.75rem;
   border: 1px solid #313131;
   border-radius: 5px;
   background: #313131;
@@ -205,6 +205,6 @@ const MenuButton = styled.button`
 `;
 
 const MenuIcon = styled.img`
-  height: 33px;
+  height: 2.1rem;
   flex-shrink: 0;
 `;
