@@ -59,6 +59,7 @@ const Wrapper = styled.div`
   justify-content: space-between;
   align-items: center;
   position: relative;
+  margin: 8px 0;
 `
 
 const SimpleButton = styled.button`

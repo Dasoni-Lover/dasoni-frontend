@@ -14,10 +14,12 @@ import LetterAndLinkShare from "../features/MemorialHome/components/LetterAndLin
 import AddPostButtonImg from "../features/MemorialHome/assets/addpost-btn.png";
 import foldericon from "../features/MemorialHome/assets/folder-icon.png";
 import aiicon from "../features/MemorialHome/assets/ai-icon.png";
+import LinkShareModal from "../features/MemorialHome/components/LinkShareModal";
 
 const MemorialHomePage = () => {
   const [isOpen, setIsOpen] = useState(true);
   const [isAddMenuOpen, setIsAddMenuOpen] = useState(false);
+  const [isLinkShareModalOpen, setIsLinkShareModalOpen] = useState(false); // 모달 상태
 
   return (
     <Wrapper>
@@ -37,8 +39,11 @@ const MemorialHomePage = () => {
         </Content>
       </ContentWrapper>
 
+      {/* 우측 고정 버튼 */}
       <FixedShareButton>
-        <LetterAndLinkShare />
+        <LetterAndLinkShare
+          onLinkShareClick={() => setIsLinkShareModalOpen(true)} // 버튼 클릭 시 모달 열기
+        />
       </FixedShareButton>
 
       <FixedAddPostContainer>
@@ -60,13 +65,17 @@ const MemorialHomePage = () => {
         </FixedAddPostButton>
       </FixedAddPostContainer>
 
+      {/* 모달 */}
+      {isLinkShareModalOpen && (
+        <LinkShareModal onClose={() => setIsLinkShareModalOpen(false)} />
+      )}
+
       <Footer />
     </Wrapper>
   );
 };
 
 export default MemorialHomePage;
-
 
 const Wrapper = styled.div`
   display: flex;
@@ -109,8 +118,6 @@ const Content = styled.div`
   width: 1096px;
   transition: all 0.3s ease;
 `;
-
-// 우측 fixed 요소들
 
 const FixedShareButton = styled.div`
   position: fixed;
@@ -201,5 +208,3 @@ const MenuIcon = styled.img`
   height: 33px;
   flex-shrink: 0;
 `;
-
-
