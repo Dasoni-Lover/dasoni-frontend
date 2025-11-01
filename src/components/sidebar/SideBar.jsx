@@ -33,7 +33,7 @@ const Wrapper = styled.div`
   left: 0;
   width: ${({ isOpen }) => (isOpen ? "300px" : "60px")};
   height: calc(100vh - 6.25rem);
-  background: var(--0, #fff);
+  background: ${({ isOpen }) => (isOpen ? "var(--0, #fff)" : "transparent")};
   border-right: ${({ isOpen }) =>
     isOpen ? "1.079px solid var(--10, #DDD)" : "none"};
   transition: all 0.3s ease;
@@ -51,6 +51,7 @@ const Wrapper = styled.div`
   box-sizing: border-box;
   overflow: hidden;
 `;
+
 
 const ToggleButton = styled.button`
   align-self: ${({ isOpen }) => (isOpen ? "flex-end" : "center")};

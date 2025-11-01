@@ -19,8 +19,9 @@ const BoxPostList = () => {
 
 const Wrapper = styled.div`
   display: grid;
-  grid-template-columns: repeat(3, 1fr); /* 항상 3열 고정 */
-  gap: 12px; /* row-gap + column-gap */
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px; 
+  margin-bottom: 293px;
 `
 
 

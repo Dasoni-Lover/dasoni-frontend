@@ -3,6 +3,7 @@ import styled from "styled-components";
 import { typo } from "../styles/tokens";
 
 import Header from "../components/Header";
+import Footer from "../components/Footer";
 import BarNavigate from "../components/BarNavigate";
 import Profile from "../features/MemorialHome/components/Profile";
 import HallTab from "../features/MemorialHome/components/HallTab";
@@ -201,8 +202,4 @@ const MenuIcon = styled.img`
   flex-shrink: 0;
 `;
 
-const Footer = styled.div`
-  width: 100%;
-  height: 200px;
-  background-color: #f5f5f5;
-`;
+
