@@ -13,6 +13,7 @@ export const theme = {
     red: "#D74D4D",
     white: "#fff",
     transparent: "transparent",
+    main: "#FFBC67",
   },
   fonts: {
     h1: {

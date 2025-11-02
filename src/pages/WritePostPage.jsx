@@ -1,13 +1,15 @@
 import React from "react";
 import styled from "styled-components";
 import BarNavigate from "../components/BarNavigate";
+import WritePostForm from "../features/WritePost/components/WritePostForm";
 
 export default function WritePostPage() {
   return (
     <div>
       <BarWrapper>
-        <BarNavigate />
+        <BarNavigate title={"게시물 작성"} />
       </BarWrapper>
+      <WritePostForm />
     </div>
   );
 }

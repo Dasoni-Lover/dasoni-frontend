@@ -1,11 +1,9 @@
-import React from 'react'
-import styled from 'styled-components';
+import React from "react";
+import styled from "styled-components";
 
 const Footer = () => {
-  return (
-    <Wrapper>Footer</Wrapper>
-  )
-}
+  return <Wrapper>Footer</Wrapper>;
+};
 
 const Wrapper = styled.div`
   width: 100%;
@@ -13,4 +11,4 @@ const Wrapper = styled.div`
   background-color: #f5f5f5;
 `;
 
-export default Footer
+export default Footer;
