@@ -2,7 +2,7 @@ import React from "react";
 import styled from "styled-components";
 import closebtn from "../../assets/close-btn.png";
 import openbtn from "../../assets/open-btn.png";
-import SideBarList from "../sidebar/SideBarList"; 
+import SideBarList from "../sidebar/SideBarList";
 
 const SideBar = ({ isOpen, toggleSidebar }) => {
   return (
@@ -26,10 +26,9 @@ const SideBar = ({ isOpen, toggleSidebar }) => {
 
 export default SideBar;
 
-
 const Wrapper = styled.div`
   position: fixed;
-  top: 6.25rem; 
+  top: 6.25rem;
   left: 0;
   width: ${({ isOpen }) => (isOpen ? "300px" : "60px")};
   height: calc(100vh - 6.25rem);
@@ -52,7 +51,6 @@ const Wrapper = styled.div`
   overflow: hidden;
 `;
 
-
 const ToggleButton = styled.button`
   align-self: ${({ isOpen }) => (isOpen ? "flex-end" : "center")};
   background: none;
@@ -65,12 +63,12 @@ const ToggleButton = styled.button`
     display: block;
 
     &.close {
-      width: 2.428rem; 
-      height: 2.428rem; 
+      width: 2.428rem;
+      height: 2.428rem;
     }
 
     &.open {
-      width: 2rem; 
+      width: 2rem;
       height: 2.0625rem;
     }
   }
@@ -83,5 +81,3 @@ const ToggleButton = styled.button`
 const Menu = styled.div`
   width: 100%;
 `;
-
-
