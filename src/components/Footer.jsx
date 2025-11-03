@@ -12,3 +12,5 @@ const Wrapper = styled.div`
 `;
 
 export default Footer;
+
+//flex: 1; /* footer 위 공간 채우기 */

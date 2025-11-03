@@ -1,34 +1,15 @@
-import React, { useState, forwardRef } from "react";
+import React, { useState } from "react";
 import styled from "styled-components";
-import DatePicker, { registerLocale } from "react-datepicker";
 import { useNavigate } from "react-router-dom";
 
-import { ko } from "date-fns/locale";
-import "react-datepicker/dist/react-datepicker.css";
-
 import IconEssential from "../assets/icon-essential-eclipse.svg";
-import IconCalendar from "../features/WritePost/assets/icon-calendar.svg";
 import IconRadioBlank from "../assets/icon-radio-blank.svg";
 import IconRadioFilled from "../assets/icon-radio-filled.svg";
 
 import { color, typo } from "../styles/tokens";
 import { Column, Row } from "../styles/flex";
 import Button from "./Button";
-
-// react-datepicker 한글 적용
-registerLocale("ko", ko);
-
-/* ───────────── 커스텀 인풋 (react-datepicker용) ───────────── */
-const DateInput = forwardRef(({ value, onClick, placeholder }, ref) => {
-  return (
-    <DateField onClick={onClick} ref={ref}>
-      <input readOnly value={value || ""} placeholder={placeholder} />
-      <CalendarButton type="button" aria-label="날짜 선택">
-        <img src={IconCalendar} alt="calendar icon" />
-      </CalendarButton>
-    </DateField>
-  );
-});
+import DatePicker from "./DatePicker";
 
 export default function PostOptionForm() {
   const [scope, setScope] = useState("public");
@@ -49,18 +30,11 @@ export default function PostOptionForm() {
           </Row>
 
           {/* 날짜 선택 */}
-          <DatePickerWrapper>
-            <DatePicker
-              selected={date}
-              onChange={setDate}
-              dateFormat="yyyy/M/d"
-              placeholderText="YYYY/M/D"
-              customInput={<DateInput placeholder="YYYY/M/D" />}
-              popperPlacement="bottom-start"
-              locale="ko"
-              showPopperArrow={false}
-            />
-          </DatePickerWrapper>
+          <DatePicker
+            selected={date}
+            onChange={setDate}
+            placeholder="YYYY/M/D"
+          />
         </Column>
 
         {/* 공유 범위 */}
@@ -139,71 +113,6 @@ export default function PostOptionForm() {
 const Label = styled.div`
   ${typo("h3")};
   color: ${color("black.70")};
-`;
-
-/* DatePicker 스타일 */
-const DatePickerWrapper = styled.div`
-  width: 100%;
-  margin-bottom: 2.75rem;
-
-  .react-datepicker {
-    border: 1px solid ${color("black.10")};
-    border-radius: 10px;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
-    font-family: inherit;
-  }
-  .react-datepicker__header {
-    background: ${color("white")};
-    border-bottom: 1px solid ${color("black.10")};
-  }
-  .react-datepicker__day--selected,
-  .react-datepicker__day--keyboard-selected {
-    background: ${color("black.90")};
-  }
-`;
-
-/* 날짜 입력 필드 */
-const DateField = styled.button`
-  width: 100%;
-  height: 48px;
-  border-radius: 10px;
-  border: 1px solid ${color("black.10")};
-  background: ${color("white")};
-  display: grid;
-  grid-template-columns: 1fr 44px;
-  align-items: center;
-  padding: 0 0 0 12px;
-  text-align: left;
-  cursor: pointer;
-
-  input {
-    ${typo("bodym")};
-    color: ${color("black.70")};
-    border: 0;
-    outline: none;
-    background: transparent;
-    cursor: pointer;
-
-    &::placeholder {
-      color: ${color("black.40")};
-    }
-  }
-`;
-
-const CalendarButton = styled.span`
-  width: 44px;
-  height: 100%;
-  display: grid;
-  place-items: center;
-  border-left: 1px solid ${color("black.10")};
-  background: ${color("black.90")};
-  border-radius: 0 10px 10px 0;
-  color: ${color("white")};
-
-  img {
-    width: 18px;
-    height: 18px;
-  }
 `;
 
 /* 라디오 전체 박스 */

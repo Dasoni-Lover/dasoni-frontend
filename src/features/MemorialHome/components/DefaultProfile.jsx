@@ -1,53 +1,53 @@
-import React from 'react'
-import profileimg from "../../../assets/profile-img.png"
-import styled from 'styled-components'
-import {color,typo} from "../../../styles/tokens"
+import React from 'react';
+import profileimg from "../../../assets/profile-img.png";
+import styled from 'styled-components';
+import { color, typo } from "../../../styles/tokens";
+import { SmallPhotoBox } from "../../../components/photobox/SmallPhotoBox";
+import { EditSmallPhotoBox } from "../../../components/photobox/EditSmallPhotoBox";
 
-const DefaultProfile = () => {
+const DefaultProfile = ({ isEditable = false }) => {
   return (
     <Wrapper>
-        <Box>
-            <Name>박영수</Name>
-            <Date>1993. 2. 11 ~ 2021. 4. 24</Date>
-        </Box>
-        <Img src={profileimg}/>
+      <Box>
+        <Name>박영수</Name>
+        <Date>1993. 2. 11 ~ 2021. 4. 24</Date>
+      </Box>
+
+      {isEditable ? (
+        <EditSmallPhotoBox src={profileimg} />
+      ) : (
+        <SmallPhotoBox src={profileimg} />
+      )}
     </Wrapper>
-  )
-}
+  );
+};
 
-const Wrapper=styled.div`
-    display: flex;
-    width: 100%;
-    flex-direction: column;
-    align-items: center;
-    gap: 2.25rem;
+export default DefaultProfile;
 
-`
-const Box=styled.div`
-    display: flex;
-    flex-direction: column;
-    justify-content: flex-start;
-    align-items: center;
-`
-const Name=styled.div`
-    ${typo("h1")};
-    color: ${color("black.70")};
-`
-const Date=styled.div`
-    ${typo("h3")};
-    color: ${color("black.70")};
-`
-const Img=styled.img`
-    display: flex;
-    width: 12.5rem;
-    height: 12.5rem;
+const Wrapper = styled.div`
+  display: flex;
+  width: 100%;
+  flex-direction: column;
+  align-items: center;
+  gap: 2.25rem;
+`;
 
-    justify-content: flex-end;
-    align-items: center;
-    aspect-ratio: 1/1;
+const Box = styled.div`
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  align-items: center;
+`;
 
-    border-radius: 10px;
-    border: solid 2px #E9E9E9;
-    
-`
-export default DefaultProfile
+const Name = styled.div`
+  ${typo("h1")};
+  color: ${color("black.70")};
+`;
+
+const Date = styled.div`
+  ${typo("h3")};
+  color: ${color("black.70")};
+`;
+
+
+//수정버튼 있는 버전 : <DefaultProfile isEditable={true} /> 

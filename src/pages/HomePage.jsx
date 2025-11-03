@@ -14,6 +14,12 @@ export default function HomePage() {
       <button onClick={() => navigate("/memorial")}>
         추모관 홈화면 바로가기
       </button>
+      <button onClick={() => navigate("/memorial-my")}>
+        추모관 본인 홈화면 바로가기
+      </button>
+      <button onClick={() => navigate("/memorial-manager")}>
+        추모관 관리자 홈화면 바로가기
+      </button>
     </div>
   );
 }

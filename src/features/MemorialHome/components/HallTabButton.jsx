@@ -18,14 +18,14 @@ const Wrapper = styled.div`
   align-items: center;
   gap: 0.625rem;
   flex-shrink: 0;
-  background-color: ${({ isActive }) => (isActive ? 'black' : 'white')};
+  background-color: ${({ isActive }) => (isActive ? '#FFBC67' : 'white')};
   cursor: pointer;
   transition: background-color 0.2s ease;
 `
 
 const Text = styled.div`
   ${typo('h4')};
-  color: ${({ isActive }) => (isActive ? 'white' : color('black.30'))};
+  color: ${({ isActive }) => (isActive ? 'black.80' : color('black.30'))};
   transition: color 0.2s ease;
 `
 

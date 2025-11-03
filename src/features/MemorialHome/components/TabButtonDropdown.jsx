@@ -5,10 +5,9 @@ import { color, typo } from '../../../styles/tokens';
 
 const TabButtonDropdown = () => {
   const [isOpen, setIsOpen] = useState(false);
-  const [selected, setSelected] = useState('업로드순');
+  const [selected, setSelected] = useState('최신 업로드순');
   const dropdownRef = useRef(null);
 
-  // 드롭다운 외부 클릭 시 닫힘
   useEffect(() => {
     const handleClickOutside = (event) => {
       if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
@@ -36,14 +35,17 @@ const TabButtonDropdown = () => {
 
         {isOpen && (
           <DropdownMenu>
-            <DropdownItem onClick={() => handleSelect('업로드순')}>
-              업로드순
+            <DropdownItem onClick={() => handleSelect('최신 업로드순')}>
+              최신 업로드순
             </DropdownItem>
-            <DropdownItem onClick={() => handleSelect('최신순')}>
-              최신순
+            <DropdownItem onClick={() => handleSelect('오래된 업로드순')}>
+              오래된 업로드순
             </DropdownItem>
-            <DropdownItem onClick={() => handleSelect('오래된순')}>
-              오래된순
+            <DropdownItem onClick={() => handleSelect('최신 사진순')}>
+              최신 사진순
+            </DropdownItem>
+            <DropdownItem onClick={() => handleSelect('오래된 사진순')}>
+              오래된 사진순
             </DropdownItem>
           </DropdownMenu>
         )}
@@ -111,20 +113,22 @@ const Icon = styled.img`
 
 const DropdownMenu = styled.div`
   position: absolute;
-  top: 2.1875rem; 
+  top: 2.5rem; 
   right: 0;
   background: white;
   border: 1px solid #ddd;
   border-radius: 6px;
   box-shadow: 0 0.125rem 0.5rem rgba(0,0,0,0.1); // 2px 8px -> rem
   z-index: 10;
+  width: 9rem;
   min-width: 6.25rem; 
 `;
 
 const DropdownItem = styled.div`
-  padding: 0.5rem 0.75rem; 
-  font-size: 0.875rem; 
-  color: #333;
+  text-align: left;
+  padding: 0.6rem 0.75rem; 
+  font-size: 1rem; 
+  color: #7A7A7A;
   cursor: pointer;
 
   &:hover {

@@ -1,26 +1,34 @@
-import React, { useState } from 'react'
-import styled from 'styled-components'
-import HallTabButton from './HallTabButton'
+import React, { useState } from 'react';
+import styled from 'styled-components';
+import HallTabButton from './HallTabButton';
 
-const HallTab = () => {
-  const [activeIndex, setActiveIndex] = useState(0)
+const HallTab = ({ role = 'visitor' }) => { // ✅ 기본값 visitor
+  const [activeIndex, setActiveIndex] = useState(0);
+
+  // ✅ 역할에 따른 탭 구성
+  const tabConfig = {
+    visitor: ['공유앨범', '나와의 앨범'],
+    owner: ['나의 기록', '추모객 관리', '녹음 파일 관리'],
+    manager: ['공유앨범', '나와의 앨범', '추모객 관리'],
+  };
+
+  const tabs = tabConfig[role] || tabConfig.visitor; // 안전하게 visitor fallback
 
   return (
     <Wrapper>
-      <HallTabButton 
-        text="공유앨범" 
-        isActive={activeIndex === 0} 
-        onClick={() => setActiveIndex(0)} 
-      />
-      <HallTabButton 
-        text="나와의 앨범" 
-        isActive={activeIndex === 1} 
-        onClick={() => setActiveIndex(1)} 
-      />
+      {tabs.map((text, index) => (
+        <HallTabButton
+          key={index}
+          text={text}
+          isActive={activeIndex === index}
+          onClick={() => setActiveIndex(index)}
+        />
+      ))}
     </Wrapper>
-  )
-}
+  );
+};
 
+export default HallTab;
 
 const Wrapper = styled.div`
   display: flex;
@@ -28,6 +36,6 @@ const Wrapper = styled.div`
   justify-content: flex-start;
   align-items: center;
   border-top: 2px solid #313131;
-`
+`;
 
-export default HallTab
+// <HallTab role="visitor" />
