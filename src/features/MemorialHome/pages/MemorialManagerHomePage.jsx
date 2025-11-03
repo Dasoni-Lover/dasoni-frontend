@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import styled from "styled-components";
-import { color,typo } from "../../../styles/tokens";
+import { color, typo } from "../../../styles/tokens";
+import { useNavigate } from "react-router-dom"; // ✅ 추가
 
 import Header from "../../../components/Header";
 import Footer from "../../../components/Footer";
@@ -15,12 +16,17 @@ import AddPostButtonImg from "../assets/addpost-btn.png";
 import foldericon from "../assets/folder-icon.png";
 import aiicon from "../assets/ai-icon.png";
 import LinkShareModal from "../components/LinkShareModal";
-import modifyicon from "../../../assets/edit-btn.svg"
+import modifyicon from "../../../assets/edit-btn.svg";
 
 export const MemorialManagerHomePage = () => {
   const [isOpen, setIsOpen] = useState(true);
   const [isAddMenuOpen, setIsAddMenuOpen] = useState(false);
-  const [isLinkShareModalOpen, setIsLinkShareModalOpen] = useState(false); // 모달 상태
+  const [isLinkShareModalOpen, setIsLinkShareModalOpen] = useState(false);
+  const navigate = useNavigate(); // ✅ 네비게이트 훅 선언
+
+  const handleModifyClick = () => {
+    navigate("/memorial-manager/edit-profile"); // ✅ 페이지 이동
+  };
 
   return (
     <Wrapper>
@@ -33,9 +39,10 @@ export const MemorialManagerHomePage = () => {
         </BarWrapper>
 
         <Title>故 박영수의 추모관</Title>
-        <ModifyButton>
-            <ModifyIcon src={modifyicon}/>
-            <ModifyText>프로필 수정</ModifyText>
+
+        <ModifyButton onClick={handleModifyClick}> {/* ✅ 클릭 이벤트 추가 */}
+          <ModifyIcon src={modifyicon} />
+          <ModifyText>프로필 수정</ModifyText>
         </ModifyButton>
 
         <Content>
@@ -46,10 +53,9 @@ export const MemorialManagerHomePage = () => {
         </Content>
       </ContentWrapper>
 
-      {/* 우측 고정 버튼 */}
       <FixedShareButton>
         <LetterAndLinkShare
-          onLinkShareClick={() => setIsLinkShareModalOpen(true)} // 버튼 클릭 시 모달 열기
+          onLinkShareClick={() => setIsLinkShareModalOpen(true)}
         />
       </FixedShareButton>
 
@@ -72,7 +78,6 @@ export const MemorialManagerHomePage = () => {
         </FixedAddPostButton>
       </FixedAddPostContainer>
 
-      {/* 모달 */}
       {isLinkShareModalOpen && (
         <LinkShareModal onClose={() => setIsLinkShareModalOpen(false)} />
       )}
@@ -81,6 +86,7 @@ export const MemorialManagerHomePage = () => {
     </Wrapper>
   );
 };
+
 
 
 const Wrapper = styled.div`
@@ -132,23 +138,36 @@ const Title=styled.div`
 
 `
 
-const ModifyButton=styled.div`
-    width: 1096px;
-    display: flex;
-    flex-direction: row;
-    justify-content: flex-end;
-    align-items: center;
-`
-const ModifyIcon=styled.img`
-    width: 24px;
-    height: 24px;
-    padding: 6px;
-`
-const ModifyText=styled.div`
-    ${typo("h4")};
-    color: ${color("black.70")};
+const ModifyButton = styled.div`
+  width: 1096px;
+  display: flex;
+  flex-direction: row;
+  justify-content: flex-end;
+  align-items: center;
+  cursor: pointer; 
+  transition: all 0.2s ease; 
 
-`
+  &:hover {
+    transform: translateY(-1.5px); /* 살짝 위로 떠오르는 느낌 */
+  }
+
+`;
+
+const ModifyIcon = styled.img`
+  width: 24px;
+  height: 24px;
+  padding: 6px;
+`;
+
+const ModifyText = styled.div`
+  ${typo("h4")};
+  color: ${color("black.70")};
+
+  ${ModifyButton}:hover & {
+    color: ${color("black.100")}; 
+  }
+`;
+
 
 const Content = styled.div`
   width: 1096px;
