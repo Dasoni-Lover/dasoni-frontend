@@ -15,7 +15,7 @@ import AddPostButtonImg from "../assets/addpost-btn.png";
 import foldericon from "../assets/folder-icon.png";
 import aiicon from "../assets/ai-icon.png";
 import LinkShareModal from "../components/LinkShareModal";
-
+import { NoPost } from "../components/NoPost";
 
 const MemorialMyHomePage = () => {
   const [isOpen, setIsOpen] = useState(true);
@@ -39,7 +39,7 @@ const MemorialMyHomePage = () => {
           </ProfileBox>
           <HallTab />
           <TabButtonDropdown />
-          <BoxPostList />
+          <NoPost/>
         </Content>
       </ContentWrapper>
 
