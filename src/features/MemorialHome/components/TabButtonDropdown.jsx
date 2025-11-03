@@ -5,7 +5,7 @@ import { color, typo } from '../../../styles/tokens';
 
 const TabButtonDropdown = () => {
   const [isOpen, setIsOpen] = useState(false);
-  const [selected, setSelected] = useState('업로드순');
+  const [selected, setSelected] = useState('최신 업로드순');
   const dropdownRef = useRef(null);
 
   useEffect(() => {
