@@ -13,6 +13,7 @@ export default function HomePage() {
       <Example2>이렇게 쓰면 h2스타일 50%블랙</Example2>
       <Example3>이렇게 쓰면 body-bold스타일 100%블랙</Example3>
       <button onClick={() => navigate("/memorial")}>추모관 홈화면 바로가기</button>
+      <button onClick={() => navigate("/memorial-my")}>추모관 본인 홈화면 바로가기</button>
     </div>
   );
 }

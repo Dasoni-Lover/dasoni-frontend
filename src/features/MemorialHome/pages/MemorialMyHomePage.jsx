@@ -1,22 +1,23 @@
 import React, { useState } from "react";
 import styled from "styled-components";
-import { typo } from "../styles/tokens";
+import { typo } from "../../../styles/tokens";
 
-import Header from "../components/Header";
-import Footer from "../components/Footer";
-import BarNavigate from "../components/BarNavigate";
-import Profile from "../features/MemorialHome/components/Profile";
-import HallTab from "../features/MemorialHome/components/HallTab";
-import TabButtonDropdown from "../features/MemorialHome/components/TabButtonDropdown";
-import BoxPostList from "../features/MemorialHome/components/BoxPostList";
-import SideBar from "../components/sidebar/SideBar";
-import LetterAndLinkShare from "../features/MemorialHome/components/LetterAndLinkShare";
-import AddPostButtonImg from "../features/MemorialHome/assets/addpost-btn.png";
-import foldericon from "../features/MemorialHome/assets/folder-icon.png";
-import aiicon from "../features/MemorialHome/assets/ai-icon.png";
-import LinkShareModal from "../features/MemorialHome/components/LinkShareModal";
+import Header from "../../../components/Header";
+import Footer from "../../../components/Footer";
+import BarNavigate from "../../../components/BarNavigate";
+import DefaultProfile from "../components/DefaultProfile";
+import HallTab from "../components/HallTab";
+import TabButtonDropdown from "../components/TabButtonDropdown";
+import BoxPostList from "../components/BoxPostList";
+import SideBar from "../../../components/sidebar/SideBar";
+import LetterAndLinkShare from "../components/LetterAndLinkShare";
+import AddPostButtonImg from "../assets/addpost-btn.png";
+import foldericon from "../assets/folder-icon.png";
+import aiicon from "../assets/ai-icon.png";
+import LinkShareModal from "../components/LinkShareModal";
+import { NoPost } from "../components/NoPost";
 
-const MemorialHomePage = () => {
+const MemorialMyHomePage = () => {
   const [isOpen, setIsOpen] = useState(true);
   const [isAddMenuOpen, setIsAddMenuOpen] = useState(false);
   const [isLinkShareModalOpen, setIsLinkShareModalOpen] = useState(false); // 모달 상태
@@ -32,10 +33,13 @@ const MemorialHomePage = () => {
         </BarWrapper>
 
         <Content>
-          <Profile />
-          <HallTab />
+          <ProfileBox>
+            <DefaultProfile isEditable={true} />
+
+          </ProfileBox>
+          <HallTab role="owner" />
           <TabButtonDropdown />
-          <BoxPostList />
+          <NoPost/>
         </Content>
       </ContentWrapper>
 
@@ -75,7 +79,7 @@ const MemorialHomePage = () => {
   );
 };
 
-export default MemorialHomePage;
+export default MemorialMyHomePage;
 
 const Wrapper = styled.div`
   display: flex;
@@ -120,6 +124,10 @@ const Content = styled.div`
   width: 1096px;
   transition: all 0.3s ease;
 `;
+
+const ProfileBox=styled.div`
+  margin-bottom:52px ;
+`
 
 const FixedShareButton = styled.div`
   position: fixed;
