@@ -3,6 +3,7 @@ import App from "./App";
 import HomePage from "./pages/HomePage";
 import MemorialHomePage from "./pages/MemorialHomePage";
 import  MemorialMyHomePage from "./features/MemorialHome/pages/MemorialMyHomePage";
+import { MemorialManagerHomePage } from "./features/MemorialHome/pages/MemorialManagerHomePage";
 
 const router = createBrowserRouter([
     {
@@ -11,7 +12,8 @@ const router = createBrowserRouter([
         children:[
             {index:true,element:<HomePage/>},
             {path:"/memorial",element:<MemorialHomePage/>},
-            {path:"/memorial-my",element:<MemorialMyHomePage/>}
+            {path:"/memorial-my",element:<MemorialMyHomePage/>},
+            {path:"/memorial-manager",element:<MemorialManagerHomePage/>}
         ]
     }
 ])
