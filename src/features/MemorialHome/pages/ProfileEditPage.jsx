@@ -78,7 +78,7 @@ const Wrapper=styled.div`
 
 const ContentBox=styled.div`
     width: 1178px;
-    margin-top: 171px;
+    margin-top: 4.38rem;
 `
 
 const Title=styled.div`
