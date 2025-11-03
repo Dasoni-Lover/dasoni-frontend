@@ -2,6 +2,7 @@
 import React from "react";
 import styled from "styled-components";
 import { color, typo } from "../styles/tokens";
+import IconFolder from "../assets/icon-folder.svg";
 
 /**
  * <Button
@@ -10,7 +11,7 @@ import { color, typo } from "../styles/tokens";
  *   color="main"        // "main"(default) | "white"
  *   active={true}       // true(default) | false
  *   width="100%"        // px/rem/% 등 모두 가능 (default: "100%")
- *   onClick={() => {}}
+ *   icon={false}        // flase(default) | true
  * />
  */
 export default function Button({
@@ -19,7 +20,7 @@ export default function Button({
   color: variant = "main",
   active = true,
   width = "100%",
-  ...rest
+  icon = false,
 }) {
   return (
     <ButtonWrapper
@@ -27,8 +28,8 @@ export default function Button({
       $color={variant}
       $active={active}
       $width={width}
-      {...rest}
     >
+      {icon ? <Icon src={IconFolder} /> : null}
       {text}
     </ButtonWrapper>
   );
@@ -59,4 +60,8 @@ const ButtonWrapper = styled.div`
   }};
 
   color: ${({ $active }) => ($active ? color("black.70") : "#938675")};
+`;
+
+const Icon = styled.img`
+  margin-right: 0.5rem;
 `;
