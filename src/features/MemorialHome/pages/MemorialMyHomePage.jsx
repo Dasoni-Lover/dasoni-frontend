@@ -37,7 +37,7 @@ const MemorialMyHomePage = () => {
             <DefaultProfile isEditable={true} />
 
           </ProfileBox>
-          <HallTab />
+          <HallTab role="owner" />
           <TabButtonDropdown />
           <NoPost/>
         </Content>
