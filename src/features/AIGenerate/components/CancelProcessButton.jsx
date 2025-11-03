@@ -6,12 +6,12 @@ import { Row } from "../../../styles/flex";
 
 export default function CancelProcessButton() {
   return (
-    <div style={{ display: "flex", justifyContent: "end" }}>
+    <Row $justify={"end"}>
       <Wrapper>
         <img src={IconDelete} />
         <CancleText> 작성취소하기</CancleText>
       </Wrapper>
-    </div>
+    </Row>
   );
 }
 

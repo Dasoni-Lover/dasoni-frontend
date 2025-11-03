@@ -1,17 +1,19 @@
-import React from "react";
+import React, { useState } from "react";
 import AIGenerateForm from "../features/AIGenerate/components/AIGenerateForm";
 import BarNavigate from "../components/BarNavigate";
 import styled from "styled-components";
-import { color, typo } from "../styles/tokens";
+import GenerateComplete from "../features/AIGenerate/components/GenerateComplete";
 
 export default function AIGeneratePage() {
+  const [isGenerated, setIsGenerated] = useState(true);
+
   return (
     <div>
       <BarWrapper>
         <BarNavigate title={"AI 이미지 생성"} />
       </BarWrapper>
 
-      <AIGenerateForm />
+      {isGenerated ? <GenerateComplete /> : <AIGenerateForm />}
     </div>
   );
 }
