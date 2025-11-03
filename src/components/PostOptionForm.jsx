@@ -1,7 +1,8 @@
-// PostOptionForm.jsx
 import React, { useState, forwardRef } from "react";
 import styled from "styled-components";
 import DatePicker, { registerLocale } from "react-datepicker";
+import { useNavigate } from "react-router-dom";
+
 import { ko } from "date-fns/locale";
 import "react-datepicker/dist/react-datepicker.css";
 
@@ -12,7 +13,7 @@ import IconRadioFilled from "../assets/icon-radio-filled.svg";
 
 import { color, typo } from "../styles/tokens";
 import { Column, Row } from "../styles/flex";
-import ButtonL from "./ButtonL";
+import Button from "./Button";
 
 // react-datepicker 한글 적용
 registerLocale("ko", ko);
@@ -32,13 +33,17 @@ const DateInput = forwardRef(({ value, onClick, placeholder }, ref) => {
 export default function PostOptionForm() {
   const [scope, setScope] = useState("public");
   const [date, setDate] = useState(null);
+  const nav = useNavigate();
 
+  const goBack = () => {
+    nav(-1);
+  };
   return (
     <Column $justify={"space-between"}>
       <Column>
         {/* 제목 + 필수마크 */}
         <Column $gap={"0.75rem"}>
-          <Row $gap={"0.5rem"} $align="center">
+          <Row>
             <Label>사진 속 날짜</Label>
             <img src={IconEssential} alt="필수" />
           </Row>
@@ -124,8 +129,8 @@ export default function PostOptionForm() {
 
       {/* 버튼 */}
       <Column $gap={"1.25rem"}>
-        <ButtonL text={"작성하기"} />
-        <ButtonL text={"취소"} color={"white"} />
+        <Button text={"작성하기"} />
+        <Button text={"취소"} color={"white"} onClick={goBack} />
       </Column>
     </Column>
   );

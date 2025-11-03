@@ -1,30 +1,43 @@
+// src/components/Button.jsx
 import React from "react";
 import styled from "styled-components";
 import { color, typo } from "../styles/tokens";
 
 /**
- * <ButtonS
+ * <Button
  *   text="버튼명"
- *   color="white"        // 선택: "main"(기본) | "white"
- *   active={false}       // 선택: 기본 true, false 시 비활성 색상 적용
- *   width="200px"        // 선택: 기본 100%, px/rem/% 모두 가능
+ *   size="L"            // "L" | "M" | "S" (default: "L")
+ *   color="main"        // "main"(default) | "white"
+ *   active={true}       // true(default) | false
+ *   width="100%"        // px/rem/% 등 모두 가능 (default: "100%")
+ *   onClick={() => {}}
  * />
  */
-export default function ButtonM({
+export default function Button({
   text,
-  color = "main",
+  size = "L",
+  color: variant = "main",
   active = true,
   width = "100%",
+  ...rest
 }) {
   return (
-    <ButtonWrapper $color={color} $active={active} $width={width}>
+    <ButtonWrapper
+      $size={size}
+      $color={variant}
+      $active={active}
+      $width={width}
+      {...rest}
+    >
       {text}
     </ButtonWrapper>
   );
 }
 
 const ButtonWrapper = styled.div`
-  ${typo("h4")};
+  /* 타이포 사이즈 매핑 (L: h3, M/S: h4) */
+  ${({ $size }) => ($size === "L" ? typo("h3") : typo("h4"))}
+
   cursor: pointer;
   display: flex;
   justify-content: center;
@@ -33,7 +46,8 @@ const ButtonWrapper = styled.div`
 
   box-sizing: border-box;
   width: ${({ $width }) => $width};
-  padding: 5px 13px;
+  padding: ${({ $size }) =>
+    $size === "S" ? "5px 13px" : "0.8125rem 1.875rem"};
   border-radius: 0.5rem;
   border: 1px solid ${color("black.5")};
   box-shadow: 0 0 10px 0 rgba(0, 0, 0, 0.04);

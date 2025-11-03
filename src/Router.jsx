@@ -3,6 +3,7 @@ import App from "./App";
 import HomePage from "./pages/HomePage";
 import MemorialHomePage from "./pages/MemorialHomePage";
 import WritePostPage from "./pages/WritePostPage";
+import AIGeneratePage from "./pages/AIGeneratePage";
 
 const router = createBrowserRouter([
   {
@@ -12,6 +13,7 @@ const router = createBrowserRouter([
       { index: true, element: <HomePage /> },
       { path: "/memorial", element: <MemorialHomePage /> },
       { path: "/write", element: <WritePostPage /> },
+      { path: "/generate", element: <AIGeneratePage /> },
     ],
   },
 ]);

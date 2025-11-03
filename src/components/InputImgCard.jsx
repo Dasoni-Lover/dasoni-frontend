@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useId, useState } from "react";
 import styled from "styled-components";
 import { color, typo } from "../styles/tokens";
 import { Row } from "../styles/flex";
@@ -7,11 +7,11 @@ import IconEssential from "../assets/icon-essential-eclipse.svg";
 import IconBigPlus from "../features/WritePost/assets/icon-big-plus.svg";
 import IconEdit from "../features/WritePost/assets/icon-edit.svg";
 
-export default function InputImgCard({ label, essential }) {
+export default function InputImgCard({ label, essential, labeltypo }) {
   const [previewUrl, setPreviewUrl] = useState("");
+  const inputId = useId(); // ✅ 각 카드마다 고유 id 부여
 
   useEffect(() => {
-    // 컴포넌트 언마운트 시 URL 정리
     return () => {
       if (previewUrl) URL.revokeObjectURL(previewUrl);
     };
@@ -21,9 +21,7 @@ export default function InputImgCard({ label, essential }) {
     const file = e.target.files && e.target.files[0];
     if (!file) return;
 
-    // 기존 URL 정리
     if (previewUrl) URL.revokeObjectURL(previewUrl);
-
     const nextUrl = URL.createObjectURL(file);
     setPreviewUrl(nextUrl);
   };
@@ -31,20 +29,19 @@ export default function InputImgCard({ label, essential }) {
   return (
     <div>
       <Row style={{ marginBottom: "1rem" }}>
-        <Label>{label}</Label>
+        <Label $labeltypo={labeltypo}>{label}</Label>
         {essential ? <img src={IconEssential} alt="필수" /> : null}
       </Row>
 
-      {/* 숨겨진 파일 입력 */}
       <HiddenInput
         type="file"
-        id="fileInput"
+        id={inputId} // ✅ 고유 id
         accept="image/*"
         onChange={handleChange}
       />
 
-      {/* 클릭 시 파일 선택 */}
-      <LabelBox htmlFor="fileInput">
+      <LabelBox htmlFor={inputId}>
+        {/* ✅ 해당 input만 트리거 */}
         {previewUrl ? (
           <>
             <PreviewImg src={previewUrl} alt="업로드 이미지 미리보기" />
@@ -59,7 +56,8 @@ export default function InputImgCard({ label, essential }) {
 }
 
 const Label = styled.div`
-  ${typo("h3")};
+  ${({ $labeltypo }) =>
+    $labeltypo === "bodym2" ? typo("bodym2") : typo("h3")};
   color: ${color("black.70")};
 `;
 
@@ -99,6 +97,6 @@ const EditIcon = styled.img`
   position: absolute;
   bottom: 8px;
   right: 8px;
-  width: 2.25rem; /* 30px */
+  width: 2.25rem;
   padding: 0.3rem;
 `;

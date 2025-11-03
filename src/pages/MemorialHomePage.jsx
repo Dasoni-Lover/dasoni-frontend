@@ -12,10 +12,20 @@ import AddPostButtonImg from "../features/MemorialHome/assets/addpost-btn.png";
 import foldericon from "../features/MemorialHome/assets/folder-icon.png";
 import aiicon from "../features/MemorialHome/assets/ai-icon.png";
 import LinkShareModal from "../features/MemorialHome/components/LinkShareModal";
+import { useNavigate } from "react-router-dom";
 
 const MemorialHomePage = () => {
   const [isAddMenuOpen, setIsAddMenuOpen] = useState(false);
   const [isLinkShareModalOpen, setIsLinkShareModalOpen] = useState(false); // 모달 상태
+  const nav = useNavigate();
+
+  const goWritePage = () => {
+    nav("/write");
+  };
+
+  const goAIGeneratePage = () => {
+    nav("/generate");
+  };
 
   return (
     <>
@@ -39,11 +49,11 @@ const MemorialHomePage = () => {
       <FixedAddPostContainer>
         {isAddMenuOpen && (
           <FixedAddPostMenu>
-            <MenuButton>
+            <MenuButton onClick={goAIGeneratePage}>
               <MenuIcon src={aiicon} alt="AI 이미지 생성" />
               <span>AI 이미지 생성</span>
             </MenuButton>
-            <MenuButton>
+            <MenuButton onClick={goWritePage}>
               <MenuIcon src={foldericon} alt="사진 업로드" />
               <span>컴퓨터에서 불러오기</span>
             </MenuButton>
