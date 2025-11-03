@@ -1,18 +1,17 @@
 import React from 'react'
 import BoxPostListItem from './BoxPostListItem'
 import styled from 'styled-components'
+import {MediumPhotoBox} from "../../../components/photobox/MediumPhotoBox"
+import postimg from "../assets/post-img.png"
 
 const BoxPostList = () => {
   return (
     <Wrapper>
-      <BoxPostListItem />
-      <BoxPostListItem />
-      <BoxPostListItem />
-      <BoxPostListItem />
-      <BoxPostListItem />
-      <BoxPostListItem />
-      <BoxPostListItem />
-      <BoxPostListItem />
+     <MediumPhotoBox src={postimg}/>
+     <MediumPhotoBox src={postimg}/>
+     <MediumPhotoBox src={postimg}/>
+     <MediumPhotoBox src={postimg}/>
+     <MediumPhotoBox src={postimg}/>
     </Wrapper>
   )
 }
