@@ -17,9 +17,9 @@ const HeaderWrap = styled.header`
   top: 0;
   left: 0;
   right: 0;
-  height: 6.25rem;     
+  height: 6.25rem;
   background: #ffffff;
-  border-bottom: 1px solid #7A7A7A; 
+  border-bottom: 1px solid #7a7a7a;
   z-index: 1000;
   display: flex;
   align-items: center;

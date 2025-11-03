@@ -1,43 +1,43 @@
 import React, { useState } from "react";
 import styled from "styled-components";
 import { typo } from "../styles/tokens";
-
-import Header from "../components/Header";
 import Footer from "../components/Footer";
 import BarNavigate from "../components/BarNavigate";
 import Profile from "../features/MemorialHome/components/Profile";
 import HallTab from "../features/MemorialHome/components/HallTab";
 import TabButtonDropdown from "../features/MemorialHome/components/TabButtonDropdown";
 import BoxPostList from "../features/MemorialHome/components/BoxPostList";
-import SideBar from "../components/sidebar/SideBar";
 import LetterAndLinkShare from "../features/MemorialHome/components/LetterAndLinkShare";
 import AddPostButtonImg from "../features/MemorialHome/assets/addpost-btn.png";
 import foldericon from "../features/MemorialHome/assets/folder-icon.png";
 import aiicon from "../features/MemorialHome/assets/ai-icon.png";
 import LinkShareModal from "../features/MemorialHome/components/LinkShareModal";
+import { useNavigate } from "react-router-dom";
 
 const MemorialHomePage = () => {
-  const [isOpen, setIsOpen] = useState(true);
   const [isAddMenuOpen, setIsAddMenuOpen] = useState(false);
   const [isLinkShareModalOpen, setIsLinkShareModalOpen] = useState(false); // 모달 상태
+  const nav = useNavigate();
+
+  const goWritePage = () => {
+    nav("/write");
+  };
+
+  const goAIGeneratePage = () => {
+    nav("/generate");
+  };
 
   return (
-    <Wrapper>
-      <Header />
-      <SideBar isOpen={isOpen} toggleSidebar={() => setIsOpen(!isOpen)} />
-
-      <ContentWrapper isOpen={isOpen}>
-        <BarWrapper>
-          <BarNavigate />
-        </BarWrapper>
-
-        <Content>
-          <Profile />
-          <HallTab />
-          <TabButtonDropdown />
-          <BoxPostList />
-        </Content>
-      </ContentWrapper>
+    <>
+      <BarWrapper>
+        <BarNavigate />
+      </BarWrapper>
+      <Content>
+        <Profile />
+        <HallTab />
+        <TabButtonDropdown />
+        <BoxPostList />
+      </Content>
 
       {/* 우측 고정 버튼 */}
       <FixedShareButton>
@@ -49,11 +49,11 @@ const MemorialHomePage = () => {
       <FixedAddPostContainer>
         {isAddMenuOpen && (
           <FixedAddPostMenu>
-            <MenuButton>
+            <MenuButton onClick={goAIGeneratePage}>
               <MenuIcon src={aiicon} alt="AI 이미지 생성" />
               <span>AI 이미지 생성</span>
             </MenuButton>
-            <MenuButton>
+            <MenuButton onClick={goWritePage}>
               <MenuIcon src={foldericon} alt="사진 업로드" />
               <span>컴퓨터에서 불러오기</span>
             </MenuButton>
@@ -71,41 +71,16 @@ const MemorialHomePage = () => {
       )}
 
       <Footer />
-    </Wrapper>
+    </>
   );
 };
 
 export default MemorialHomePage;
 
-const Wrapper = styled.div`
-  display: flex;
-  position: relative;
-  flex-direction: column;
-  min-height: 100vh;
-`;
-
-const ContentWrapper = styled.div`
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  width: 100%;
-  transition: all 0.3s ease;
-  margin-top: 6.25rem;
-  flex: 1; /* footer 위 공간 채우기 */
-
-  @media (max-width: 1200px) {
-    align-items: flex-start;
-    margin-left: ${({ isOpen }) =>
-      isOpen ? "calc(300px + 40px)" : "calc(60px + 0px)"};
-  }
-`;
-
 const BarWrapper = styled.div`
-  width: 100%;
   margin-top: 30px;
   margin-bottom: 52px;
   display: flex;
-  justify-content: center;
 
   > * {
     width: 1096px;

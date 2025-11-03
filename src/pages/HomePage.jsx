@@ -4,7 +4,6 @@ import { color, typo } from "../styles/tokens";
 import { useNavigate } from "react-router-dom";
 
 export default function HomePage() {
-
   const navigate = useNavigate();
 
   return (
@@ -12,9 +11,15 @@ export default function HomePage() {
       <Example1>이렇게 쓰면 h1스타일 80%블랙</Example1>
       <Example2>이렇게 쓰면 h2스타일 50%블랙</Example2>
       <Example3>이렇게 쓰면 body-bold스타일 100%블랙</Example3>
-      <button onClick={() => navigate("/memorial")}>추모관 홈화면 바로가기</button>
-      <button onClick={() => navigate("/memorial-my")}>추모관 본인 홈화면 바로가기</button>
-      <button onClick={() => navigate("/memorial-manager")}>추모관 관리자 홈화면 바로가기</button>
+      <button onClick={() => navigate("/memorial")}>
+        추모관 홈화면 바로가기
+      </button>
+      <button onClick={() => navigate("/memorial-my")}>
+        추모관 본인 홈화면 바로가기
+      </button>
+      <button onClick={() => navigate("/memorial-manager")}>
+        추모관 관리자 홈화면 바로가기
+      </button>
     </div>
   );
 }

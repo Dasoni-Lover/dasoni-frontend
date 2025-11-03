@@ -2,12 +2,16 @@ import React from "react";
 import styled from "styled-components";
 import closebtn from "../../assets/close-btn.png";
 import openbtn from "../../assets/open-btn.png";
-import SideBarList from "../sidebar/SideBarList"; 
+import SideBarList from "../sidebar/SideBarList";
 
 const SideBar = ({ isOpen, toggleSidebar }) => {
   return (
-    <Wrapper isOpen={isOpen}>
-      <ToggleButton isOpen={isOpen} onClick={toggleSidebar}>
+    <Wrapper $isOpen={isOpen}>
+      <ToggleButton
+        $isOpen={isOpen}
+        onClick={toggleSidebar}
+        aria-label="사이드바 토글"
+      >
         <img
           src={isOpen ? closebtn : openbtn}
           alt="toggle"
@@ -26,35 +30,33 @@ const SideBar = ({ isOpen, toggleSidebar }) => {
 
 export default SideBar;
 
-
 const Wrapper = styled.div`
   position: fixed;
-  top: 6.25rem; 
+  top: 6.25rem;
   left: 0;
-  width: ${({ isOpen }) => (isOpen ? "300px" : "60px")};
+  width: ${({ $isOpen }) => ($isOpen ? "300px" : "60px")};
   height: calc(100vh - 6.25rem);
-  background: ${({ isOpen }) => (isOpen ? "var(--0, #fff)" : "transparent")};
-  border-right: ${({ isOpen }) =>
-    isOpen ? "1.079px solid var(--10, #DDD)" : "none"};
+  background: ${({ $isOpen }) => ($isOpen ? "var(--0, #fff)" : "transparent")};
+  border-right: ${({ $isOpen }) =>
+    $isOpen ? "1.079px solid var(--10, #DDD)" : "none"};
   transition: all 0.3s ease;
   z-index: 10;
 
   display: flex;
   flex-direction: column;
-  align-items: ${({ isOpen }) => (isOpen ? "flex-start" : "center")};
+  align-items: ${({ $isOpen }) => ($isOpen ? "flex-start" : "center")};
   justify-content: flex-start;
-  gap: ${({ isOpen }) => (isOpen ? "23.91px" : "0")};
+  gap: ${({ $isOpen }) => ($isOpen ? "23.91px" : "0")};
   flex-shrink: 0;
 
-  padding: ${({ isOpen }) =>
-    isOpen ? "44.244px 30.705px 582px 31.295px" : "30px 40px"};
+  padding: ${({ $isOpen }) =>
+    $isOpen ? "44.244px 30.705px 582px 31.295px" : "30px 40px"};
   box-sizing: border-box;
   overflow: hidden;
 `;
 
-
 const ToggleButton = styled.button`
-  align-self: ${({ isOpen }) => (isOpen ? "flex-end" : "center")};
+  align-self: ${({ $isOpen }) => ($isOpen ? "flex-end" : "center")};
   background: none;
   border: none;
   cursor: pointer;
@@ -65,12 +67,12 @@ const ToggleButton = styled.button`
     display: block;
 
     &.close {
-      width: 2.428rem; 
-      height: 2.428rem; 
+      width: 2.428rem;
+      height: 2.428rem;
     }
 
     &.open {
-      width: 2rem; 
+      width: 2rem;
       height: 2.0625rem;
     }
   }
@@ -83,5 +85,3 @@ const ToggleButton = styled.button`
 const Menu = styled.div`
   width: 100%;
 `;
-
-
