@@ -1,55 +1,128 @@
-import React, { useState } from "react";
+// PostOptionForm.jsx
+import React, { useState, forwardRef } from "react";
 import styled from "styled-components";
+import DatePicker, { registerLocale } from "react-datepicker";
+import { ko } from "date-fns/locale";
+import "react-datepicker/dist/react-datepicker.css";
+
 import IconEssential from "../assets/icon-essential-eclipse.svg";
+import IconCalendar from "../features/WritePost/assets/icon-calendar.svg";
+import IconRadioBlank from "../assets/icon-radio-blank.svg";
+import IconRadioFilled from "../assets/icon-radio-filled.svg";
+
 import { color, typo } from "../styles/tokens";
-import { Column } from "../styles/flex";
+import { Column, Row } from "../styles/flex";
 import ButtonL from "./ButtonL";
 
+// react-datepicker 한글 적용
+registerLocale("ko", ko);
+
+/* ───────────── 커스텀 인풋 (react-datepicker용) ───────────── */
+const DateInput = forwardRef(({ value, onClick, placeholder }, ref) => {
+  return (
+    <DateField onClick={onClick} ref={ref}>
+      <input readOnly value={value || ""} placeholder={placeholder} />
+      <CalendarButton type="button" aria-label="날짜 선택">
+        <img src={IconCalendar} alt="calendar icon" />
+      </CalendarButton>
+    </DateField>
+  );
+});
+
 export default function PostOptionForm() {
-  const [scope, setScope] = useState("public"); // 기본 선택값
+  const [scope, setScope] = useState("public");
+  const [date, setDate] = useState(null);
 
   return (
     <Column $justify={"space-between"}>
-      <HeaderRow>
-        <Label>사진 속 날짜</Label>
-        <img src={IconEssential} alt="필수" />
-      </HeaderRow>
+      <Column>
+        {/* 제목 + 필수마크 */}
+        <Column $gap={"0.75rem"}>
+          <Row $gap={"0.5rem"} $align="center">
+            <Label>사진 속 날짜</Label>
+            <img src={IconEssential} alt="필수" />
+          </Row>
 
-      <DateSelector type="date" placeholder="YYYY-MM-DD" />
+          {/* 날짜 선택 */}
+          <DatePickerWrapper>
+            <DatePicker
+              selected={date}
+              onChange={setDate}
+              dateFormat="yyyy/M/d"
+              placeholderText="YYYY/M/D"
+              customInput={<DateInput placeholder="YYYY/M/D" />}
+              popperPlacement="bottom-start"
+              locale="ko"
+              showPopperArrow={false}
+            />
+          </DatePickerWrapper>
+        </Column>
 
-      <Label>공유 범위</Label>
-      <RadioWrapper>
-        <OptionLabel>
-          <RadioButton
-            type="radio"
-            name="scope"
-            value="public"
-            checked={scope === "public"}
-            onChange={(e) => setScope(e.target.value)}
-          />
-          <Column $gap={"0.25rem"}>
-            <RadioMainText>공유 앨범</RadioMainText>
-            <RadioSubText>
-              추모관에 입장한 사람들이 게시물을 볼 수 있어요
-            </RadioSubText>
-          </Column>
-        </OptionLabel>
+        {/* 공유 범위 */}
+        <Column>
+          <Label>공유 범위</Label>
 
-        <OptionLabel>
-          <RadioButton
-            type="radio"
-            name="scope"
-            value="private"
-            checked={scope === "private"}
-            onChange={(e) => setScope(e.target.value)}
-          />
-          <Column $gap={"0.25rem"}>
-            <RadioMainText>나와의 앨범</RadioMainText>
-            <RadioSubText>나만 게시물을 볼 수 있어요</RadioSubText>
-          </Column>
-        </OptionLabel>
-      </RadioWrapper>
+          <RadioCard role="radiogroup" aria-label="공유 범위">
+            {/* 공개 */}
+            <RadioOption
+              role="radio"
+              tabIndex={0}
+              aria-checked={scope === "public"}
+              onClick={() => setScope("public")}
+              onKeyDown={(e) => {
+                if (e.key === "Enter" || e.key === " ") {
+                  e.preventDefault();
+                  setScope("public");
+                }
+                if (e.key === "ArrowRight" || e.key === "ArrowDown") {
+                  setScope("private");
+                }
+              }}
+            >
+              <RadioIcon
+                src={scope === "public" ? IconRadioFilled : IconRadioBlank}
+                alt={scope === "public" ? "선택됨" : "선택 안 됨"}
+                aria-hidden
+              />
+              <Column $gap={"0.25rem"}>
+                <RadioMainText>공유앨범</RadioMainText>
+                <RadioSubText>
+                  추모관에 입장한 사람들이 게시물을 볼 수 있어요
+                </RadioSubText>
+              </Column>
+            </RadioOption>
 
+            {/* 비공개 */}
+            <RadioOption
+              role="radio"
+              tabIndex={0}
+              aria-checked={scope === "private"}
+              onClick={() => setScope("private")}
+              onKeyDown={(e) => {
+                if (e.key === "Enter" || e.key === " ") {
+                  e.preventDefault();
+                  setScope("private");
+                }
+                if (e.key === "ArrowLeft" || e.key === "ArrowUp") {
+                  setScope("public");
+                }
+              }}
+            >
+              <RadioIcon
+                src={scope === "private" ? IconRadioFilled : IconRadioBlank}
+                alt={scope === "private" ? "선택됨" : "선택 안 됨"}
+                aria-hidden
+              />
+              <Column $gap={"0.25rem"}>
+                <RadioMainText>나와의 앨범</RadioMainText>
+                <RadioSubText>나만 게시물을 볼 수 있어요</RadioSubText>
+              </Column>
+            </RadioOption>
+          </RadioCard>
+        </Column>
+      </Column>
+
+      {/* 버튼 */}
       <Column $gap={"1.25rem"}>
         <ButtonL text={"작성하기"} />
         <ButtonL text={"취소"} color={"white"} />
@@ -58,76 +131,105 @@ export default function PostOptionForm() {
   );
 }
 
-/* ───────────── styled-components ───────────── */
-
-const HeaderRow = styled.div`
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  margin-bottom: 1rem;
-`;
-
 const Label = styled.div`
   ${typo("h3")};
   color: ${color("black.70")};
 `;
 
-const DateSelector = styled.input`
+/* DatePicker 스타일 */
+const DatePickerWrapper = styled.div`
   width: 100%;
-  height: 44px;
-  padding: 0 12px;
-  border-radius: 8px;
+  margin-bottom: 2.75rem;
+
+  .react-datepicker {
+    border: 1px solid ${color("black.10")};
+    border-radius: 10px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+    font-family: inherit;
+  }
+  .react-datepicker__header {
+    background: ${color("white")};
+    border-bottom: 1px solid ${color("black.10")};
+  }
+  .react-datepicker__day--selected,
+  .react-datepicker__day--keyboard-selected {
+    background: ${color("black.90")};
+  }
+`;
+
+/* 날짜 입력 필드 */
+const DateField = styled.button`
+  width: 100%;
+  height: 48px;
+  border-radius: 10px;
   border: 1px solid ${color("black.10")};
   background: ${color("white")};
-  ${typo("body2")};
-  color: ${color("black.80")};
-  outline: none;
-  margin-bottom: 2.75rem;
-  appearance: none;
+  display: grid;
+  grid-template-columns: 1fr 44px;
+  align-items: center;
+  padding: 0 0 0 12px;
+  text-align: left;
+  cursor: pointer;
 
-  &::placeholder {
-    color: ${color("black.40")};
-    opacity: 1;
-  }
-
-  &::-webkit-calendar-picker-indicator {
-    width: 28px;
-    height: 28px;
-    border-radius: 6px;
-    background: ${color("black.90")};
+  input {
+    ${typo("bodym")};
+    color: ${color("black.70")};
+    border: 0;
+    outline: none;
+    background: transparent;
     cursor: pointer;
-    padding: 4px;
-    margin-right: 6px;
-    filter: invert(1);
+
+    &::placeholder {
+      color: ${color("black.40")};
+    }
   }
 `;
 
-const RadioWrapper = styled.div`
+const CalendarButton = styled.span`
+  width: 44px;
+  height: 100%;
+  display: grid;
+  place-items: center;
+  border-left: 1px solid ${color("black.10")};
+  background: ${color("black.90")};
+  border-radius: 0 10px 10px 0;
+  color: ${color("white")};
+
+  img {
+    width: 18px;
+    height: 18px;
+  }
+`;
+
+/* 라디오 전체 박스 */
+const RadioCard = styled.div`
+  background: ${color("black.05")};
+  border-radius: 10px;
+  padding: 16px 18px;
   display: flex;
   flex-direction: column;
-  padding: 0.75rem;
-  gap: 1rem;
-  margin-bottom: 5.5rem;
+  gap: 14px;
 `;
 
-const OptionLabel = styled.label`
-  display: flex;
-  align-items: flex-start;
-  gap: 1rem;
+/* 라디오 한 줄 */
+const RadioOption = styled.label`
+  display: grid;
+  grid-template-columns: 22px 1fr;
+  align-items: start;
+  gap: 12px;
   cursor: pointer;
   user-select: none;
 `;
 
-const RadioButton = styled.input`
-  width: 1.25rem;
-  height: 1.25rem;
-  cursor: pointer;
-  accent-color: ${color("black.90")};
+/* 아이콘형 라디오 이미지 */
+const RadioIcon = styled.img`
+  width: 22px;
+  height: 22px;
 `;
 
 const RadioMainText = styled.div`
   ${typo("bodym")};
-  color: ${color("black.70")};
+  color: ${color("black.80")};
 `;
 
 const RadioSubText = styled.div`
