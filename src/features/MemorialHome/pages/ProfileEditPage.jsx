@@ -6,6 +6,7 @@ import { InputField } from '../../../components/InputField'
 import { EditSmallPhotoBox } from '../../../components/photobox/EditSmallPhotoBox'
 import photo from "../assets/post-img.png"
 import {PointText} from "../../../components/PointText"
+import Button from "../../../components/Button"
 
 export const ProfileEditPage = () => {
   return (
@@ -44,7 +45,10 @@ export const ProfileEditPage = () => {
                     <InputField placeholder="ex) 010-0000-0000" />
                     </InputWrapper>
                 </Box>
-                <ButtonWrapper>button</ButtonWrapper>
+                <ButtonWrapper>
+                    <Button text="저장하기" size="M"/>
+                    <Button text="취소" size="M" color="white" />
+                </ButtonWrapper>
             </Container>
         </ContentBox>
     </Wrapper>
@@ -68,7 +72,6 @@ const Text=styled.div`
 `
 
 const Wrapper=styled.div`
-    width: 100vw;
     height: 100vh;
     display: flex;
     flex-direction: column;
@@ -77,7 +80,6 @@ const Wrapper=styled.div`
 `
 
 const ContentBox=styled.div`
-    width: 1178px;
     margin-top: 4.38rem;
 `
 
@@ -97,6 +99,7 @@ const Container=styled.div`
     display: flex;
     justify-content: space-between;
     align-items: flex-start;
+    gap: 5rem;
 `
 
 const Box=styled.div`
@@ -107,6 +110,7 @@ const Box=styled.div`
     justify-content: center;
     align-items: flex-start;
     gap: 2rem;
+    box-sizing: border-box;
 
     border-radius: 20px;
     background: #FFF;
@@ -115,5 +119,11 @@ const Box=styled.div`
 
 
 const ButtonWrapper=styled.div`
-    
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: flex-start;
+    gap: 1rem;
+
+    width: 13.75rem;
 `
