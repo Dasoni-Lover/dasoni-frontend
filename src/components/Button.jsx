@@ -21,6 +21,7 @@ export default function Button({
   active = true,
   width = "100%",
   icon = false,
+  ...rest
 }) {
   return (
     <ButtonWrapper
@@ -28,6 +29,7 @@ export default function Button({
       $color={variant}
       $active={active}
       $width={width}
+      {...rest}
     >
       {icon ? <Icon src={IconFolder} /> : null}
       {text}

@@ -102,7 +102,6 @@ const ContentWrapper = styled.div`
   align-items: center;
   width: 100%;
   transition: all 0.3s ease;
-  margin-top: 6.25rem;
   flex: 1; /* footer 위 공간 채우기 */
 
   @media (max-width: 1200px) {

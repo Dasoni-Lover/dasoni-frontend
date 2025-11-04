@@ -80,7 +80,6 @@ export default DatePicker;
 /* DatePicker 스타일 */
 const DatePickerWrapper = styled.div`
   width: 100%;
-  margin-bottom: 2.75rem;
 
   .react-datepicker {
     border: 1px solid ${color("black.10")};
