@@ -2,10 +2,15 @@ import React from "react";
 import styled from "styled-components";
 import { color, typo } from "../styles/tokens";
 
-export const InputField = ({ placeholder }) => {
+export const InputField = ({ placeholder, value, onChange }) => {
   return (
     <Wrapper>
-      <StyledInput type="text" placeholder={placeholder} />
+      <StyledInput
+        type="text"
+        placeholder={placeholder}
+        value={value}
+        onChange={onChange}
+      />
     </Wrapper>
   );
 };
@@ -37,5 +42,3 @@ const StyledInput = styled.input`
     color: ${color("black.10")};
   }
 `;
-
-//<InputField placeholder="고인의 이름을 입력하세요" />
