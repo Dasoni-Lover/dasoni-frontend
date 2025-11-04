@@ -18,7 +18,9 @@ export default function ConfirmModal({
     <Overlay onClick={onCancel}>
       {/* 안쪽 클릭은 닫히지 않도록 */}
       <ModalContainer onClick={(e) => e.stopPropagation()}>
-        <Title>{title}</Title>
+        {/*  description 유무에 따라 margin-bottom 다르게 */}
+        <Title $hasDescription={!!description}>{title}</Title>
+
         {description && <Description>{description}</Description>}
 
         <ButtonGroup>
@@ -28,7 +30,6 @@ export default function ConfirmModal({
             color="main"
             onClick={onConfirm}
           />
-
           <Button text={cancelText} size="L" color="white" onClick={onCancel} />
         </ButtonGroup>
       </ModalContainer>
@@ -59,11 +60,13 @@ const ModalContainer = styled.div`
   box-sizing: border-box;
 `;
 
+/*  description 유무에 따라 margin-bottom 변경 */
 const Title = styled.h2`
   ${typo("h2")};
   color: ${color("black.80")};
   text-align: center;
-  margin-bottom: 0.7rem;
+  margin-bottom: ${({ $hasDescription }) =>
+    $hasDescription ? "0.7rem" : "5.25rem"};
 `;
 
 const Description = styled.p`

@@ -7,6 +7,7 @@ import AIGeneratePage from "./pages/AIGeneratePage";
 import MemorialMyHomePage from "./features/MemorialHome/pages/MemorialMyHomePage";
 import { MemorialManagerHomePage } from "./features/MemorialHome/pages/MemorialManagerHomePage";
 import { ProfileEditPage } from "./features/MemorialHome/pages/ProfileEditPage";
+import OpenMemorialHomePage from "./pages/OpenMemorialHomePage";
 
 const router = createBrowserRouter([
   {
@@ -20,6 +21,7 @@ const router = createBrowserRouter([
       { path: "/memorial-manager/edit-profile", element: <ProfileEditPage /> },
       { path: "/write", element: <WritePostPage /> },
       { path: "/generate", element: <AIGeneratePage /> },
+      { path: "/open", element: <OpenMemorialHomePage /> },
     ],
   },
 ]);

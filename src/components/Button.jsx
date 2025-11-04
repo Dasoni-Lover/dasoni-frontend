@@ -61,6 +61,10 @@ const ButtonWrapper = styled.div`
     return color("main"); // 기본값
   }};
 
+  /* 클릭 비활성화 */
+  pointer-events: ${({ $active }) => ($active ? "auto" : "none")};
+  white-space: nowrap;
+
   color: ${({ $active }) => ($active ? color("black.70") : "#938675")};
 `;
 
