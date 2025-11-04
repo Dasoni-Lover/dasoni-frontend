@@ -20,9 +20,15 @@ export default function HomePage() {
       <button onClick={() => navigate("/memorial-manager")}>
         추모관 관리자 홈화면 바로가기
       </button>
+      <br/>
+      <br/>
+      <button onClick={() => navigate("/homepage")}>
+        첫화면 바로가기
+      </button>
     </div>
   );
 }
+
 
 const Example1 = styled.div`
   ${typo("h1")};
