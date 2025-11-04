@@ -2,15 +2,10 @@ import React from "react";
 import styled from "styled-components";
 import { color, typo } from "../styles/tokens";
 
-export const InputField = ({ placeholder, value, onChange, width = "50%" }) => {
+export const InputFieldWhite = ({ placeholder, width = "50%" }) => {
   return (
     <Wrapper $width={width}>
-      <StyledInput
-        type="text"
-        placeholder={placeholder}
-        value={value}
-        onChange={onChange}
-      />
+      <StyledInput type="text" placeholder={placeholder} />
     </Wrapper>
   );
 };
@@ -19,13 +14,13 @@ const Wrapper = styled.div`
   display: flex;
   height: 3.25rem;
   width: ${({ $width }) => $width};
-  padding: 0.5rem 1rem;
+  padding: 0.8125rem 0.9375rem;
   align-items: center;
   gap: 0.625rem;
   flex: 1 0 0;
-  border-radius: 0.375rem;
-  border: 2px solid var(--5, #e9e9e9);
-  background: var(--Lightgrey, #f8f8f8);
+  border-radius: 0.25rem;
+  border: 1px solid #A8A8A8;
+  background: #FFF;
   box-sizing: border-box;
 `;
 
@@ -34,12 +29,12 @@ const StyledInput = styled.input`
   height: 100%;
   border: none;
   background: transparent;
-  ${typo("h4")};
-  color: ${color("black.70")};
+  ${typo("bodym")};
+  color: ${color("black.80")};
   outline: none;
 
   &::placeholder {
-    color: ${color("black.10")};
+    color: #7C7C7C;
   }
 `;
 

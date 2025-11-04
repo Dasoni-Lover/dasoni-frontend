@@ -1,39 +1,89 @@
 import React from "react";
 import styled from "styled-components";
-import { color, typo } from "../styles/tokens";
+import { useNavigate } from "react-router-dom";
 
-export default function Header() {
+export default function Header({ showAuthButtons }) {
+  const navigate = useNavigate();
+
   return (
-    <HeaderWrap role="banner">
-      <Inner>
-        <Title>다소니</Title>
-      </Inner>
-    </HeaderWrap>
+    <Wrapper>
+      <Logo onClick={() => navigate("/homepage")}>다소니</Logo>
+
+      {showAuthButtons && (
+        <ButtonGroup>
+          <LoginButton onClick={() => navigate("/loginpage")}>로그인</LoginButton>
+          <RegisterButton onClick={() => navigate("/registerpage")}>회원가입</RegisterButton>
+        </ButtonGroup>
+      )}
+    </Wrapper>
   );
 }
 
-const HeaderWrap = styled.header`
+const Wrapper = styled.header`
   position: fixed;
   top: 0;
   left: 0;
   right: 0;
   height: 6.25rem;
-  background: #ffffff;
-  border-bottom: 1px solid #7a7a7a;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0 3rem;
+  background: white;
+  border-bottom: 1px solid #eee;
   z-index: 1000;
-  display: flex;
-  align-items: center;
 `;
 
-const Inner = styled.div`
-  width: 100%;
-  margin: 0;
-  padding: 1rem 2rem 0 2rem;
-  display: flex;
-  align-items: center;
+const Logo = styled.h1`
+  font-size: 1.5rem;
+  font-weight: 700;
+  cursor: pointer;
 `;
 
-const Title = styled.div`
-  ${typo("h1")};
-  color: ${color("black.80")};
+const ButtonGroup = styled.div`
+  display: inline-flex;
+  align-items: center;
+  gap: 1.5rem;
+`;
+
+const LoginButton = styled.button`
+  display: flex;
+  width: 7.5rem;
+  height: 3.25rem;
+  justify-content: center;
+  align-items: center;
+  border-radius: 0.625rem;
+  border: 2px solid var(--5, #E9E9E9);
+  background: #FFF;
+
+  color: var(--80, #0E0E0E);
+  text-align: center;
+  font-family: Pretendard;
+  font-size: 1.25rem;
+  font-style: normal;
+  font-weight: 700;
+  line-height: 130%;
+
+  cursor: pointer;
+`;
+
+const RegisterButton = styled.button`
+  display: flex;
+  width: 7.5rem;
+  height: 3.25rem;
+  justify-content: center;
+  align-items: center;
+  border-radius: 0.625rem;
+  border: 2px solid var(--70, #313131);
+  background: var(--70, #313131);
+
+  color: #FFF;
+  text-align: center;
+  font-family: Pretendard;
+  font-size: 1.25rem;
+  font-style: normal;
+  font-weight: 700;
+  line-height: 130%;
+
+  cursor: pointer;
 `;
