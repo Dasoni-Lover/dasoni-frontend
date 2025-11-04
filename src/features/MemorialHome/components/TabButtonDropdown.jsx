@@ -1,11 +1,12 @@
 import React, { useState, useRef, useEffect } from 'react';
 import styled from 'styled-components';
-import dropdownicon from "../assets/dropdown-icon.png"; // 화살표 이미지
+import dropdownicon from "../assets/dropdown-icon.png";
 import { color, typo } from '../../../styles/tokens';
 
 const TabButtonDropdown = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [selected, setSelected] = useState('최신 업로드순');
+  const [isAIMode, setIsAIMode] = useState(false);
   const dropdownRef = useRef(null);
 
   useEffect(() => {
@@ -25,7 +26,11 @@ const TabButtonDropdown = () => {
 
   return (
     <Wrapper ref={dropdownRef}>
-      <SimpleButton>AI 이미지만 보기</SimpleButton>
+      {/* ✅ 토글 버튼 (글씨 포함) */}
+      <ToggleButton onClick={() => setIsAIMode((prev) => !prev)} $isOn={isAIMode}>
+        <ToggleCircle $isOn={isAIMode} />
+        <ToggleLabel $isOn={isAIMode}>AI이미지만 보기</ToggleLabel>
+      </ToggleButton>
 
       <DropdownContainer>
         <Button onClick={() => setIsOpen((prev) => !prev)}>
@@ -61,30 +66,50 @@ export default TabButtonDropdown;
 const Wrapper = styled.div`
   display: flex;
   padding: 0.75rem 0.25rem 0.5rem 0.25rem;
-  height: 1.9375rem; 
+  height: 1.9375rem;
   justify-content: space-between;
   align-items: center;
   position: relative;
-  margin: 0.5rem 0; 
+  margin: 0.5rem 0;
 `;
 
-const SimpleButton = styled.button`
+/* 글씨 포함 토글 */
+const ToggleButton = styled.button`
+  position: relative;
   display: flex;
-  padding: 0.25rem 0.625rem;
-  justify-content: center;
   align-items: center;
-  gap: 0.625rem; 
+  justify-content: ${(props) => (props.$isOn ? 'flex-start' : 'flex-end')};
+  width: 9rem;
+  height: 2rem;
+  padding: 0.9rem;
+  border-radius: 999px;
+  border: 1px solid ${(props) => (props.$isOn ? "#FFCC8C": color('black.50'))};
+  background-color: ${(props) => (props.$isOn ? "#FFF4E6": '#f2f2f2')};
+  cursor: pointer;
+  transition: all 0.3s ease;
+  overflow: hidden;
+`;
 
-  border-radius: 4px;
-  border: 1px solid #DDD;
+/* 동그라미 */
+const ToggleCircle = styled.div`
+  position: absolute;
+  top: 0.25rem;
+  left: ${(props) => (props.$isOn ? 'calc(100% - 1.8rem)' : '0.4rem')};
+  width: 1.5rem;
+  height: 1.5rem;
+  border-radius: 50%;
   background-color: white;
+  box-shadow: 0 0 3px rgba(0, 0, 0, 0.2);
+  transition: left 0.5s ease;
+  z-index: 2;
+`;
 
-  ${typo("bodyb")};
-  color: ${color("black.50")};
-
-  &:hover {
-    background-color: #f5f5f5;
-  }
+/* 글씨 (토글 안에 표시됨) */
+const ToggleLabel = styled.span`
+  ${typo('bodyb')};
+  color: ${(props) => (props.$isOn ? "#EF8F53": color('black.50'))};
+  font-size: 0.875rem;
+  z-index: 1;
 `;
 
 const DropdownContainer = styled.div`
@@ -94,40 +119,40 @@ const DropdownContainer = styled.div`
 const Button = styled.button`
   display: flex;
   align-items: center;
-  gap: 0.25rem; 
+  gap: 0.25rem;
   background: none;
   border: none;
   color: #7A7A7A;
   font-size: 1rem;
   cursor: pointer;
-  padding: 0.375rem 0.625rem; 
+  padding: 0.375rem 0.625rem;
   border-radius: 6px;
 `;
 
 const Icon = styled.img`
-  width: 0.75rem; 
-  height: 0.75rem; 
+  width: 0.75rem;
+  height: 0.75rem;
   transition: transform 0.2s ease;
   transform: rotate(${(props) => (props.$isOpen ? '180deg' : '0deg')});
 `;
 
 const DropdownMenu = styled.div`
   position: absolute;
-  top: 2.5rem; 
+  top: 2.5rem;
   right: 0;
   background: white;
   border: 1px solid #ddd;
   border-radius: 6px;
-  box-shadow: 0 0.125rem 0.5rem rgba(0,0,0,0.1); // 2px 8px -> rem
+  box-shadow: 0 0.125rem 0.5rem rgba(0,0,0,0.1);
   z-index: 10;
   width: 9rem;
-  min-width: 6.25rem; 
+  min-width: 6.25rem;
 `;
 
 const DropdownItem = styled.div`
   text-align: left;
-  padding: 0.6rem 0.75rem; 
-  font-size: 1rem; 
+  padding: 0.6rem 0.75rem;
+  font-size: 1rem;
   color: #7A7A7A;
   cursor: pointer;
 
