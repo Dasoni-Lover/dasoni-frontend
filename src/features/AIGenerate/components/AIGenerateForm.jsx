@@ -6,15 +6,20 @@ import { Row } from "../../../styles/flex";
 import TextField from "../../../components/TextField";
 import Button from "../../../components/Button";
 import { useNavigate } from "react-router-dom";
-import CancelProcessButton from "./CancelProcessButton";
+import CancelProcessButton from "../../../components/CancelProcessButton";
 
-export default function AIGenerateForm() {
+export default function AIGenerateForm({ setIsGenerated }) {
   const nav = useNavigate();
   const goBack = () => nav(-1);
 
+  const handleGenerate = () => {
+    setIsGenerated(true);
+  };
   return (
     <div>
-      <CancelProcessButton />
+      <Row $justify={"end"}>
+        <CancelProcessButton />
+      </Row>
       <Subtitle>이미지 생성에 참고할 사진을 올려주세요</Subtitle>
 
       <Row $gap={"1.5rem"} style={{ marginBottom: "4.5rem" }}>
@@ -36,7 +41,13 @@ export default function AIGenerateForm() {
           width="13.75rem"
           onClick={goBack}
         />
-        <Button size="M" text="생성하기" color="main" width="13.75rem" />
+        <Button
+          size="M"
+          text="생성하기"
+          color="main"
+          width="13.75rem"
+          onClick={handleGenerate}
+        />
       </Row>
     </div>
   );

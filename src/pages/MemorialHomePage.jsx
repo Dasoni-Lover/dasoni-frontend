@@ -13,18 +13,66 @@ import foldericon from "../features/MemorialHome/assets/folder-icon.png";
 import aiicon from "../features/MemorialHome/assets/ai-icon.png";
 import LinkShareModal from "../features/MemorialHome/components/LinkShareModal";
 import { useNavigate } from "react-router-dom";
+import PostDetailModal from "../features/MemorialHome/components/PostDetailModal";
 
 const MemorialHomePage = () => {
   const [isAddMenuOpen, setIsAddMenuOpen] = useState(false);
-  const [isLinkShareModalOpen, setIsLinkShareModalOpen] = useState(false); // 모달 상태
+  const [isLinkShareModalOpen, setIsLinkShareModalOpen] = useState(false);
+  const [selectedPost, setSelectedPost] = useState(null);
+  const [currentIndex, setCurrentIndex] = useState(null);
   const nav = useNavigate();
 
-  const goWritePage = () => {
-    nav("/write");
+  // 🔹 목데이터 (BoxPostList에도 동일하게 유지)
+  const posts = [
+    {
+      id: 1,
+      image: "/img1.jpg",
+      title: "2001년 3월 5일",
+      content: "오래된 앨범에서 영수 어린 시절 사진을 꺼내보았다...",
+      writtenDate: "2022년 2월 25일 작성함",
+      authorName: "박영진",
+    },
+    {
+      id: 2,
+      image: "/img2.jpg",
+      title: "다른 추억",
+      content: "또 다른 내용...",
+      writtenDate: "",
+    },
+    {
+      id: 3,
+      image: "/img3.jpg",
+      title: "소중한 하루",
+      content: "내용...",
+      writtenDate: "",
+    },
+    {
+      id: 4,
+      image: "/img4.jpg",
+      title: "기억",
+      content: "내용...",
+      writtenDate: "",
+    },
+    {
+      id: 5,
+      image: "/img5.jpg",
+      title: "행복했던 날",
+      content: "내용...",
+      writtenDate: "",
+    },
+  ];
+
+  const goWritePage = () => nav("/write");
+  const goAIGeneratePage = () => nav("/generate");
+
+  const handlePrev = () => {
+    setCurrentIndex((i) => (i > 0 ? i - 1 : posts.length - 1));
+    setSelectedPost(posts[(currentIndex - 1 + posts.length) % posts.length]);
   };
 
-  const goAIGeneratePage = () => {
-    nav("/generate");
+  const handleNext = () => {
+    setCurrentIndex((i) => (i < posts.length - 1 ? i + 1 : 0));
+    setSelectedPost(posts[(currentIndex + 1) % posts.length]);
   };
 
   return (
@@ -36,13 +84,18 @@ const MemorialHomePage = () => {
         <Profile />
         <HallTab />
         <TabButtonDropdown />
-        <BoxPostList />
+        <BoxPostList
+          onPostClick={(post) => {
+            const index = posts.findIndex((p) => p.id === post.id);
+            setSelectedPost(post);
+            setCurrentIndex(index);
+          }}
+        />
       </Content>
 
-      {/* 우측 고정 버튼 */}
       <FixedShareButton>
         <LetterAndLinkShare
-          onLinkShareClick={() => setIsLinkShareModalOpen(true)} // 버튼 클릭 시 모달 열기
+          onLinkShareClick={() => setIsLinkShareModalOpen(true)}
         />
       </FixedShareButton>
 
@@ -65,7 +118,15 @@ const MemorialHomePage = () => {
         </FixedAddPostButton>
       </FixedAddPostContainer>
 
-      {/* 모달 */}
+      {/* 🔹 좌우 이동 기능 포함된 모달 */}
+      <PostDetailModal
+        isOpen={!!selectedPost}
+        post={selectedPost}
+        onClose={() => setSelectedPost(null)}
+        onPrev={handlePrev}
+        onNext={handleNext}
+      />
+
       {isLinkShareModalOpen && (
         <LinkShareModal onClose={() => setIsLinkShareModalOpen(false)} />
       )}

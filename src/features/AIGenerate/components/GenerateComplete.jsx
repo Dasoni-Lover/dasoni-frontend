@@ -5,8 +5,19 @@ import IconDownload from "../../../assets/icon-download.svg";
 import PhotoBox from "../assets/photobox-big.png";
 import { Column, Row } from "../../../styles/flex";
 import Button from "../../../components/Button";
+import { useNavigate } from "react-router-dom";
 
-export default function GenerateComplete() {
+export default function GenerateComplete({ setIsGenerated }) {
+  const nav = useNavigate();
+
+  const goBack = () => {
+    nav(-1);
+  };
+
+  const goGenerate = () => {
+    setIsGenerated(false);
+  };
+
   return (
     <Row>
       <Column>
@@ -27,8 +38,14 @@ export default function GenerateComplete() {
                 color="main"
                 text="이 이미지로 게시물 작성하기"
               />
-              <Button size="L" color="white" text="다시 생성" />
-              <Button size="L" color="white" text="취소" />
+              <Button
+                size="L"
+                color="white"
+                text="다시 생성"
+                icon={true}
+                onClick={goGenerate}
+              />
+              <Button size="L" color="white" text="취소" onClick={goBack} />
             </Column>
           </Column>
         </Row>

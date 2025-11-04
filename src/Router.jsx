@@ -10,6 +10,7 @@ import { ProfileEditPage } from "./features/MemorialHome/pages/ProfileEditPage";
 import { FirstPage } from "./pages/FirstPage";
 import { LoginPage } from "./features/Login/pages/LoginPage";
 import { RegisterPage } from "./features/Login/pages/RegisterPage";
+import OpenMemorialHomePage from "./pages/OpenMemorialHomePage";
 
 const router = createBrowserRouter([
   {
@@ -26,6 +27,7 @@ const router = createBrowserRouter([
       { path: "/homepage", element:<HomePage/>},
       { path: "/loginpage", element: <LoginPage /> },
       { path: "/registerpage", element: <RegisterPage /> },
+      { path: "/open", element: <OpenMemorialHomePage /> },
     ],
   },
 ]);

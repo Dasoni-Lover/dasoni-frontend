@@ -5,7 +5,7 @@ import styled from "styled-components";
 import GenerateComplete from "../features/AIGenerate/components/GenerateComplete";
 
 export default function AIGeneratePage() {
-  const [isGenerated, setIsGenerated] = useState(true);
+  const [isGenerated, setIsGenerated] = useState(false);
 
   return (
     <div>
@@ -13,7 +13,11 @@ export default function AIGeneratePage() {
         <BarNavigate title={"AI 이미지 생성"} />
       </BarWrapper>
 
-      {isGenerated ? <GenerateComplete /> : <AIGenerateForm />}
+      {isGenerated ? (
+        <GenerateComplete setIsGenerated={setIsGenerated} />
+      ) : (
+        <AIGenerateForm setIsGenerated={setIsGenerated} />
+      )}
     </div>
   );
 }
