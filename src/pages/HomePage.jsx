@@ -1,46 +1,43 @@
-import React from "react";
-import styled from "styled-components";
-import { color, typo } from "../styles/tokens";
-import { useNavigate } from "react-router-dom";
+import React from 'react'
+import styled from 'styled-components'
+import HallTab from '../features/MemorialHome/components/HallTab'
+import { CardList } from '../features/Home/components/CardList'
+import { MemorialHallCount } from '../features/Home/components/MemorialHallCount'
+import { color,typo } from '../styles/tokens'
 
-export default function HomePage() {
-  const navigate = useNavigate();
-
+export const HomePage = () => {
   return (
-    <div>
-      <Example1>이렇게 쓰면 h1스타일 80%블랙</Example1>
-      <Example2>이렇게 쓰면 h2스타일 50%블랙</Example2>
-      <Example3>이렇게 쓰면 body-bold스타일 100%블랙</Example3>
-      <button onClick={() => navigate("/memorial")}>
-        추모관 홈화면 바로가기
-      </button>
-      <button onClick={() => navigate("/memorial-my")}>
-        추모관 본인 홈화면 바로가기
-      </button>
-      <button onClick={() => navigate("/memorial-manager")}>
-        추모관 관리자 홈화면 바로가기
-      </button>
-      <br/>
-      <br/>
-      <button onClick={() => navigate("/homepage")}>
-        첫화면 바로가기
-      </button>
-    </div>
-  );
+    <Wrapper>
+      <Text>홈</Text>
+      <HallTab role="home" />
+      <Content>
+        <MemorialHallCount/>
+        <CardList/>
+      </Content>
+    </Wrapper>
+  )
 }
 
 
-const Example1 = styled.div`
+const Wrapper=styled.div`
+  display: flex;
+  width: 68.5rem;
+  flex-direction: column;
+  align-items: flex-start;
+  width: 1096px;
+`
+const Text=styled.div`
   ${typo("h1")};
-  color: ${color("black.10")};
-`;
-
-const Example2 = styled.div`
-  ${typo("h2")};
-  color: ${color("black.10")};
-`;
-
-const Example3 = styled.div`
-  ${typo("bodyb")};
   color: ${color("black.100")};
-`;
+  margin-bottom: 6rem;
+  margin-top: 4.37rem;
+`
+const Content=styled.div`
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2rem;
+  align-self: stretch;
+  margin-top: 2.5rem;
+`
