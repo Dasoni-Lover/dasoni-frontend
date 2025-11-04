@@ -1,7 +1,8 @@
-import React from "react";
+import React, { useState } from "react";
 import styled from "styled-components";
 import { color, typo } from "../../../styles/tokens";
 import IconChevron from "../../../assets/icon-chevron.svg";
+import ConfirmModal from "../../../components/ConfirmModal";
 
 /**
  * 포스트 상세보기 모달
@@ -20,9 +21,27 @@ export default function PostDetailModal({
   onPrev,
   onNext,
 }) {
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+
   if (!isOpen || !post) return null;
 
   const { image, title, content, writtenDate, authorName = "작성자" } = post;
+
+  // 컴포넌트 내부
+
+  const handleDeleteClick = () => {
+    setIsDeleteModalOpen(true);
+  };
+
+  const handleConfirmDelete = () => {
+    // 실제 삭제 로직 실행
+    // ...
+    setIsDeleteModalOpen(false);
+  };
+
+  const handleCancelDelete = () => {
+    setIsDeleteModalOpen(false);
+  };
 
   return (
     <Overlay onClick={onClose}>
@@ -39,10 +58,21 @@ export default function PostDetailModal({
             </AuthorInfo>
 
             <HeaderActions>
-              <SmallButton>삭제</SmallButton>
+              <SmallButton onClick={handleDeleteClick}>삭제</SmallButton>
               <SmallButton>수정</SmallButton>
             </HeaderActions>
           </HeaderRow>
+
+          {/* 공용 삭제 확인 모달 */}
+          <ConfirmModal
+            isOpen={isDeleteModalOpen}
+            title="해당 게시물을 삭제할까요?"
+            description="영구적으로 삭제돼요"
+            confirmText="삭제"
+            cancelText="취소"
+            onConfirm={handleConfirmDelete}
+            onCancel={handleCancelDelete}
+          />
 
           <ContentRow>
             <ImageWrapper>
