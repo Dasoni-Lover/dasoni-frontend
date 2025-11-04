@@ -8,9 +8,9 @@ export default function GlobalStyle({ children }) {
   const [isOpen, setIsOpen] = useState(true);
   const location = useLocation();
 
-// 현재 경로가 '/homepage', '/loginpage', '/registerpage'일 때만 헤더 버튼 보이게
+// 현재 경로가 '/', '/loginpage', '/registerpage'일 때만 헤더 버튼 보이게
   const showAuthButtons =
-    location.pathname === "/homepage" ||
+    location.pathname === "/" ||
     location.pathname === "/loginpage" ||
     location.pathname === "/registerpage";
 
