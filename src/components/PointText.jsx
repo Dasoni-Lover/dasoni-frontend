@@ -15,7 +15,6 @@ export const PointText = ({question}) => {
 const Wrapper=styled.div`
     display: inline-flex;
     align-items: center;
-    width: 50%;
 `
 
 const Text=styled.div`
