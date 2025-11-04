@@ -1,10 +1,10 @@
 import React from "react";
 import styled from "styled-components";
-import { color,typo } from "../styles/tokens";
+import { color, typo } from "../styles/tokens";
 
-export const InputField = ({ placeholder }) => {
+export const InputField = ({ placeholder, width = "50%" }) => {
   return (
-    <Wrapper>
+    <Wrapper $width={width}>
       <StyledInput type="text" placeholder={placeholder} />
     </Wrapper>
   );
@@ -13,7 +13,7 @@ export const InputField = ({ placeholder }) => {
 const Wrapper = styled.div`
   display: flex;
   height: 3.25rem;
-  width: 50%;
+  width: ${({ $width }) => $width};
   padding: 0.5rem 1rem;
   align-items: center;
   gap: 0.625rem;
@@ -38,4 +38,6 @@ const StyledInput = styled.input`
   }
 `;
 
+
 //<InputField placeholder="고인의 이름을 입력하세요" />
+//<InputField placeholder="아이디를 입력하세요" width="100%" />
