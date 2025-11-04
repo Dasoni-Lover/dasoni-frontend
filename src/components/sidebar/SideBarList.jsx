@@ -3,26 +3,37 @@ import styled from "styled-components";
 import MiniAlarm from "./MiniAlarm";
 import MiniProflie from "./MiniProflie";
 import { color, typo } from "../../styles/tokens";
-import { useNavigate, useLocation } from "react-router-dom"; // ✅ useLocation 추가
+import { useNavigate, useLocation } from "react-router-dom";
 
-const SideBarList = () => {
+const SideBarList = ({ onAlarmClick, isAlarmOpen }) => {
   const navigate = useNavigate();
-  const location = useLocation(); // ✅ 현재 경로 가져오기
+  const location = useLocation();
 
-  // ✅ 사이드바 메뉴 리스트
   const menuItems = [
     { label: "홈", path: "/homepage" },
-    { label: "입장하기", path: "/memorial" },
-    { label: "개설하기", path: "/write" },
+    { label: "입장하기", path: "/memorial" }, //임시
+    { label: "개설하기", path: "/write" }, //임시
     { label: "나의 추모관", path: "/memorial-my" },
     { label: "로그아웃", path: "/" },
   ];
+
+  const getIsActive = (item) => {
+    if (item.label === "홈") {
+      //  "/" 또는 "/homepage"일 때 홈 활성화
+      return location.pathname === "/" || location.pathname === "/homepage";
+    }
+    if (item.label === "로그아웃") {
+      // 로그아웃은 active 표시 안 함
+      return false;
+    }
+    return location.pathname === item.path;
+  };
 
   return (
     <Container>
       <Wrapper1>
         <MiniProflie />
-        <MiniAlarm />
+        <MiniAlarm onClick={onAlarmClick} isActive={isAlarmOpen} />
       </Wrapper1>
 
       <Wrapper2>
@@ -30,7 +41,7 @@ const SideBarList = () => {
           <Text
             key={item.path}
             onClick={() => navigate(item.path)}
-            $active={location.pathname === item.path} // ✅ 현재 경로와 비교
+            $active={getIsActive(item)}
           >
             {item.label}
           </Text>
@@ -83,6 +94,7 @@ const Text = styled.div`
   border-radius: 0.25rem;
   width: 13.25rem;
   transition: all 0.2s ease;
+  box-sizing: border-box;
 
   &:hover {
     color: ${color("black.80")};
