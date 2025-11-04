@@ -7,12 +7,12 @@ export default function Header({ showAuthButtons }) {
 
   return (
     <Wrapper>
-      <Logo onClick={() => navigate("/")}>다소니</Logo>
+      <Logo onClick={() => navigate("/homepage")}>다소니</Logo>
 
       {showAuthButtons && (
         <ButtonGroup>
-          <Button onClick={() => navigate("/loginpage")}>로그인</Button>
-          <Button onClick={() => navigate("/registerpage")}>회원가입</Button>
+          <LoginButton onClick={() => navigate("/loginpage")}>로그인</LoginButton>
+          <RegisterButton onClick={() => navigate("/registerpage")}>회원가입</RegisterButton>
         </ButtonGroup>
       )}
     </Wrapper>
@@ -41,20 +41,49 @@ const Logo = styled.h1`
 `;
 
 const ButtonGroup = styled.div`
-  display: flex;
-  gap: 1rem;
+  display: inline-flex;
+  align-items: center;
+  gap: 1.5rem;
 `;
 
-const Button = styled.button`
-  background: #111;
-  color: #fff;
-  border: none;
-  padding: 0.6rem 1.2rem;
-  border-radius: 6px;
-  cursor: pointer;
-  font-size: 1rem;
+const LoginButton = styled.button`
+  display: flex;
+  width: 7.5rem;
+  height: 3.25rem;
+  justify-content: center;
+  align-items: center;
+  border-radius: 0.625rem;
+  border: 2px solid var(--5, #E9E9E9);
+  background: #FFF;
 
-  &:hover {
-    background: #333;
-  }
+  color: var(--80, #0E0E0E);
+  text-align: center;
+  font-family: Pretendard;
+  font-size: 1.25rem;
+  font-style: normal;
+  font-weight: 700;
+  line-height: 130%;
+
+  cursor: pointer;
+`;
+
+const RegisterButton = styled.button`
+  display: flex;
+  width: 7.5rem;
+  height: 3.25rem;
+  justify-content: center;
+  align-items: center;
+  border-radius: 0.625rem;
+  border: 2px solid var(--70, #313131);
+  background: var(--70, #313131);
+
+  color: #FFF;
+  text-align: center;
+  font-family: Pretendard;
+  font-size: 1.25rem;
+  font-style: normal;
+  font-weight: 700;
+  line-height: 130%;
+
+  cursor: pointer;
 `;
