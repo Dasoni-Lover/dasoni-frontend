@@ -3,20 +3,38 @@ import styled from "styled-components";
 import MiniAlarm from "./MiniAlarm";
 import MiniProflie from "./MiniProflie";
 import { color, typo } from "../../styles/tokens";
+import { useNavigate, useLocation } from "react-router-dom"; // ✅ useLocation 추가
 
 const SideBarList = () => {
+  const navigate = useNavigate();
+  const location = useLocation(); // ✅ 현재 경로 가져오기
+
+  // ✅ 사이드바 메뉴 리스트
+  const menuItems = [
+    { label: "홈", path: "/homepage" },
+    { label: "입장하기", path: "/memorial" },
+    { label: "개설하기", path: "/write" },
+    { label: "나의 추모관", path: "/memorial-my" },
+    { label: "로그아웃", path: "/" },
+  ];
+
   return (
     <Container>
       <Wrapper1>
         <MiniProflie />
         <MiniAlarm />
       </Wrapper1>
+
       <Wrapper2>
-        <Text>홈</Text>
-        <Text>입장하기</Text>
-        <Text>개설하기</Text>
-        <Text>박영진의 추모관</Text>
-        <Text>로그아웃</Text>
+        {menuItems.map((item) => (
+          <Text
+            key={item.path}
+            onClick={() => navigate(item.path)}
+            $active={location.pathname === item.path} // ✅ 현재 경로와 비교
+          >
+            {item.label}
+          </Text>
+        ))}
       </Wrapper2>
     </Container>
   );
@@ -29,6 +47,7 @@ const Container = styled.div`
   justify-content: flex-start;
   gap: 2rem;
 `;
+
 const Wrapper1 = styled.div`
   display: flex;
   width: 100%;
@@ -39,6 +58,7 @@ const Wrapper1 = styled.div`
   align-self: stretch;
   border-bottom: 1.079px solid #e9e9e9;
 `;
+
 const Wrapper2 = styled.div`
   display: flex;
   height: 12.125rem;
@@ -49,6 +69,7 @@ const Wrapper2 = styled.div`
   flex-shrink: 0;
   align-self: stretch;
 `;
+
 const Text = styled.div`
   display: flex;
   padding: 0.25rem 1rem;
@@ -57,13 +78,15 @@ const Text = styled.div`
   gap: 0.75rem;
   cursor: pointer;
   ${typo("h3")};
-  color: ${color("black.50")};
-  border-left: 3px solid transparent;
+  color: ${({ $active }) => ($active ? color("black.80") : color("black.50"))};
+  background-color: ${({ $active }) => ($active ? "#FFBC67" : "transparent")};
+  border-radius: 0.25rem;
+  width: 13.25rem;
   transition: all 0.2s ease;
 
   &:hover {
-    border-left: 3px solid ${color("black.80")};
     color: ${color("black.80")};
+    background-color: #ffbc67;
   }
 `;
 
