@@ -95,6 +95,11 @@ const DatePickerWrapper = styled.div`
   .react-datepicker__day--keyboard-selected {
     background: ${color("black.90")};
   }
+
+  .react-datepicker-wrapper, .react-datepicker__input-container {
+  width: 100%;
+  display: block;
+}
 `;
 
 /* 날짜 입력 필드 */
