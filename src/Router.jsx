@@ -8,6 +8,8 @@ import MemorialMyHomePage from "./features/MemorialHome/pages/MemorialMyHomePage
 import { MemorialManagerHomePage } from "./features/MemorialHome/pages/MemorialManagerHomePage";
 import { ProfileEditPage } from "./features/MemorialHome/pages/ProfileEditPage";
 import { FirstPage } from "./pages/FirstPage";
+import { LoginPage } from "./features/Login/pages/LoginPage";
+import { RegisterPage } from "./features/Login/pages/RegisterPage";
 
 const router = createBrowserRouter([
   {
@@ -22,6 +24,8 @@ const router = createBrowserRouter([
       { path: "/write", element: <WritePostPage /> },
       { path: "/generate", element: <AIGeneratePage /> },
       { path: "/homepage", element: <FirstPage /> },
+      { path: "/loginpage", element: <LoginPage /> },
+      { path: "/registerpage", element: <RegisterPage /> },
     ],
   },
 ]);
