@@ -40,9 +40,9 @@ import { color, typo } from "../styles/tokens";
 registerLocale("ko", ko);
 
 /* ───────────── 커스텀 인풋 (react-datepicker용) ───────────── */
-const DateInput = forwardRef(({ value, onClick, placeholder }, ref) => {
+const DateInput = forwardRef(({ value, onClick, placeholder, borderColor }, ref) => {
   return (
-    <DateField onClick={onClick} ref={ref}>
+    <DateField onClick={onClick} ref={ref} $borderColor={borderColor}>
       <input readOnly value={value || ""} placeholder={placeholder} />
       <CalendarButton type="button" aria-label="날짜 선택">
         <img src={IconCalendar} alt="calendar icon" />
@@ -56,6 +56,7 @@ function DatePicker({
   onChange,
   placeholder = "YYYY/M/D",
   dateFormat = "yyyy/M/d",
+  borderColor, // ✅ 새로 추가된 prop
   ...props
 }) {
   return (
@@ -65,7 +66,7 @@ function DatePicker({
         onChange={onChange}
         dateFormat={dateFormat}
         placeholderText={placeholder}
-        customInput={<DateInput placeholder={placeholder} />}
+        customInput={<DateInput placeholder={placeholder} borderColor={borderColor} />}
         popperPlacement="bottom-start"
         locale="ko"
         showPopperArrow={false}
@@ -77,7 +78,7 @@ function DatePicker({
 
 export default DatePicker;
 
-/* DatePicker 스타일 */
+/* ───────────── 스타일 ───────────── */
 const DatePickerWrapper = styled.div`
   width: 100%;
 
@@ -96,18 +97,18 @@ const DatePickerWrapper = styled.div`
     background: ${color("black.90")};
   }
 
-  .react-datepicker-wrapper, .react-datepicker__input-container {
-  width: 100%;
-  display: block;
-}
+  .react-datepicker-wrapper,
+  .react-datepicker__input-container {
+    width: 100%;
+    display: block;
+  }
 `;
 
-/* 날짜 입력 필드 */
 const DateField = styled.button`
   width: 100%;
   height: 48px;
-  border-radius: 10px;
-  border: 1px solid ${color("black.10")};
+  border-radius: 4px;
+  border: 1px solid ${({ $borderColor }) => $borderColor || color("black.10")}; /* ✅ 수정 부분 */
   background: ${color("white")};
   display: grid;
   grid-template-columns: 1fr 44px;
@@ -145,3 +146,5 @@ const CalendarButton = styled.span`
     height: 18px;
   }
 `;
+
+//<DatePicker selected={date} onChange={setDate} borderColor="#FF5B5B"  />
