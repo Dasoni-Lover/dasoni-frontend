@@ -49,10 +49,16 @@ export const RegisterPage = () => {
               <Half>
                 <InputBox>
                   <Type>아이디</Type>
-                  <InputFieldWhite
-                    placeholder="아이디를 설정해 주세요"
-                    width="100%"
-                  />
+                  <IdCheck>
+                    <InputFieldWhite
+                      placeholder="아이디를 설정해 주세요"
+                      width="auto"
+                    />
+                    <ButtonSize>
+                      <Button text="중복확인" size="S" />
+                    </ButtonSize>
+                    
+                  </IdCheck>
                 </InputBox>
                 <InputBox>
                   <Type>비밀번호</Type>
@@ -214,6 +220,20 @@ const SelectButton = styled.div`
   font-weight: 500;
   cursor: pointer;
 `;
+
+const IdCheck=styled.div`
+  display: flex;
+  flex-direction: row;
+  gap:0.44rem;
+`
+
+const ButtonSize=styled.div`
+  width: 6.25rem;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+`
 
 const MainWrapper = styled.div`
   display: flex;
