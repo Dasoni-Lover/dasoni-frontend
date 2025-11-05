@@ -7,7 +7,9 @@ import DatePicker from "../../../components/DatePicker"
 import searchicon from "../../../assets/search-icon.svg"
 
 export const SearchTab = () => {
-    const [date, setDate] = useState(null);
+    const [birthdate, setBirthDate] = useState(null);
+    const [deaddate, setDeadDate] = useState(null);
+
   return (
     <Wrapper>
         <Box>
@@ -16,11 +18,11 @@ export const SearchTab = () => {
         </Box>
         <Box>
             <Type>고인의 생일</Type>
-            <DatePicker selected={date} onChange={setDate} placeholder="1993/2/11" width="100%" height='2.65rem'/>
+            <DatePicker selected={birthdate} onChange={setBirthDate} placeholder="1993/2/11" width="100%" height='2.65rem'/>
         </Box>
         <Box>
             <Type>고인의 기일</Type>
-            <DatePicker selected={date} onChange={setDate} placeholder="2021/4/24" width="100%" height='2.65rem'/>
+            <DatePicker selected={deaddate} onChange={setDeadDate} placeholder="2021/4/24" width="100%" height='2.65rem'/>
         </Box>
         <ButtonBox>
             <Button text="작성하기" size="M" icon={searchicon} style={{ padding: "0.46rem" }}/>
