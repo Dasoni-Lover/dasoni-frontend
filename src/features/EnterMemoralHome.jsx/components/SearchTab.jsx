@@ -4,6 +4,7 @@ import { color,typo } from '../../../styles/tokens'
 import {InputField} from "../../../components/InputField"
 import Button from "../../../components/Button"
 import DatePicker from "../../../components/DatePicker"
+import searchicon from "../../../assets/search-icon.svg"
 
 export const SearchTab = () => {
     const [date, setDate] = useState(null);
@@ -15,14 +16,14 @@ export const SearchTab = () => {
         </Box>
         <Box>
             <Type>고인의 생일</Type>
-            <DatePicker selected={date} onChange={setDate} placeholder="YYYY/M/D" width="100%"/>
+            <DatePicker selected={date} onChange={setDate} placeholder="1993/2/11" width="100%" height='2.65rem'/>
         </Box>
         <Box>
             <Type>고인의 기일</Type>
-            <DatePicker selected={date} onChange={setDate} placeholder="YYYY/M/D" width="100%"/>
+            <DatePicker selected={date} onChange={setDate} placeholder="2021/4/24" width="100%" height='2.65rem'/>
         </Box>
         <ButtonBox>
-            <Button text="작성하기" size="M" icon={true} />
+            <Button text="작성하기" size="M" icon={searchicon} style={{ padding: "0.46rem" }}/>
         </ButtonBox>
     </Wrapper>
   )
@@ -48,12 +49,14 @@ const Box=styled.div`
     width: 15rem;
     box-sizing: border-box;
 `
+
 const ButtonBox=styled.div`
     display: flex;
     flex-direction: column;
     align-items: flex-start;
     box-sizing: border-box;
     width: 15rem;
+    
 `
 
 const Type=styled.div`
