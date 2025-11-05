@@ -8,7 +8,7 @@ export default function ConfirmModal({
   title,
   description,
   confirmText = "확인",
-  cancelText = "취소",
+  cancelText = null,
   onConfirm,
   onCancel,
 }) {
@@ -24,13 +24,15 @@ export default function ConfirmModal({
         {description && <Description>{description}</Description>}
 
         <ButtonGroup>
-          <Button
-            text={confirmText}
-            size="L"
-            color="main"
-            onClick={onConfirm}
-          />
-          <Button text={cancelText} size="L" color="white" onClick={onCancel} />
+          <Button text={confirmText} size="L" onClick={onConfirm} />
+          {cancelText ? (
+            <Button
+              text={cancelText}
+              size="L"
+              color="white"
+              onClick={onCancel}
+            />
+          ) : null}
         </ButtonGroup>
       </ModalContainer>
     </Overlay>
