@@ -11,8 +11,8 @@ const SideBarList = ({ onAlarmClick, isAlarmOpen }) => {
 
   const menuItems = [
     { label: "홈", path: "/homepage" },
-    { label: "입장하기", path: "/memorial" }, //임시
-    { label: "개설하기", path: "/open" },
+    { label: "입장하기", path: "/enter" }, 
+    { label: "개설하기", path: "/open" }, 
     { label: "나의 추모관", path: "/memorial-my" },
     { label: "로그아웃", path: "/" },
   ];

@@ -1,16 +1,14 @@
 import React from 'react'
 import styled from 'styled-components'
-import { Tag } from "../Tag"
+import {Tag} from "../Tag"
 
-export const SmallPhotoBox = ({ src, tagText, showTag = false }) => {
+export const SmallPhotoBoxWithTag = ({ src, tagText }) => {
   return (
     <Wrapper>
       <Img src={src} alt="photo" />
-      {showTag && (
-        <TagWrapper>
-          <Tag text={tagText} />
-        </TagWrapper>
-      )}
+      <TagWrapper>
+        <Tag text={tagText} />
+      </TagWrapper>
     </Wrapper>
   )
 }
@@ -36,4 +34,4 @@ const TagWrapper = styled.div`
   left: 0.94rem;
 `
 
-//<SmallPhotoBoxWithTag src="/images/sample.jpg" tagText="대표" showTag />
+//<SmallPhotoBoxWithTag src="/images/sample.jpg" tagText="대표" />

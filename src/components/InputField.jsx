@@ -39,6 +39,7 @@ const StyledInput = styled.input`
   outline: none;
 
   &::placeholder {
+    ${typo("bodym")};
     color: ${color("black.10")};
   }
 `;
