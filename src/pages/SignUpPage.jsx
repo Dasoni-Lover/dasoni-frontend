@@ -1,14 +1,14 @@
 import React, { useState, useRef, useEffect } from "react";
 import styled from "styled-components";
 import { useNavigate } from "react-router-dom";
-import { color, typo } from "../../../styles/tokens";
-import { InputFieldWhite } from "../../../components/InputFieldWhite";
-import Button from "../../../components/Button";
-import profileimg from "../assets/default-profile-img.svg";
-import DatePicker from "../../../components/DatePicker";
-import dropdownicon from "../../../assets/row-icon.svg";
+import { color, typo } from "../styles/tokens";
+import { InputFieldWhite } from "../components/InputFieldWhite";
+import Button from "../components/Button";
+import profileimg from "../features/Onboarding/assets/default-profile-img.svg";
+import DatePicker from "../components/DatePicker";
+import dropdownicon from "../assets/row-icon.svg";
 
-export const RegisterPage = () => {
+export default function SignUpPage() {
   const navigate = useNavigate();
   const [date, setDate] = useState(null);
   const [isOpen, setIsOpen] = useState(false);
@@ -57,7 +57,6 @@ export const RegisterPage = () => {
                     <ButtonSize>
                       <Button text="중복확인" size="S" />
                     </ButtonSize>
-                    
                   </IdCheck>
                 </InputBox>
                 <InputBox>
@@ -91,7 +90,11 @@ export const RegisterPage = () => {
                   <DropdownContainer>
                     <DropdownButton onClick={() => setIsOpen((prev) => !prev)}>
                       <span>{selectedGender}</span>
-                      <Icon src={dropdownicon} alt="dropdown icon" $isOpen={isOpen} />
+                      <Icon
+                        src={dropdownicon}
+                        alt="dropdown icon"
+                        $isOpen={isOpen}
+                      />
                     </DropdownButton>
 
                     {isOpen && (
@@ -120,10 +123,10 @@ export const RegisterPage = () => {
           </Container>
 
           <ClickBox>
-            <Button text="회원가입" onClick={() => navigate("/loginpage")} />
+            <Button text="회원가입" onClick={() => navigate("/sign-in")} />
             <MiniWrapper>
               <Question>이미 계정이 있으신가요?</Question>
-              <RegisterButton onClick={() => navigate("/loginpage")}>
+              <RegisterButton onClick={() => navigate("/sign-in")}>
                 로그인
               </RegisterButton>
             </MiniWrapper>
@@ -132,9 +135,7 @@ export const RegisterPage = () => {
       </OutBox>
     </Wrapper>
   );
-};
-
-export default RegisterPage;
+}
 
 /* ------------------- 스타일 ------------------- */
 
@@ -210,7 +211,7 @@ const ProfileImg = styled.img`
   height: 9.375rem;
   align-self: stretch;
   aspect-ratio: 1/1;
-  fill: #F2F2F2;
+  fill: #f2f2f2;
 `;
 
 const SelectButton = styled.div`
@@ -221,19 +222,19 @@ const SelectButton = styled.div`
   cursor: pointer;
 `;
 
-const IdCheck=styled.div`
+const IdCheck = styled.div`
   display: flex;
   flex-direction: row;
-  gap:0.44rem;
-`
+  gap: 0.44rem;
+`;
 
-const ButtonSize=styled.div`
+const ButtonSize = styled.div`
   width: 6.25rem;
   display: flex;
   flex-direction: column;
   justify-content: center;
   align-items: center;
-`
+`;
 
 const MainWrapper = styled.div`
   display: flex;
@@ -279,7 +280,7 @@ const DropdownButton = styled.button`
   height: 3rem;
   padding: 0 1rem;
   background: white;
-  border: 1px solid #A8A8A8;
+  border: 1px solid #a8a8a8;
   border-radius: 6px;
   color: ${color("black.70")};
   font-family: Pretendard;

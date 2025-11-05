@@ -1,19 +1,30 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Header from "../components/Header";
 import styled from "styled-components";
 import SideBar from "../components/sidebar/SideBar";
-import { useLocation } from "react-router-dom"; // ✅ 현재 경로 감지용
+import { useLocation } from "react-router-dom";
 
 export default function GlobalStyle({ children }) {
-  const [isOpen, setIsOpen] = useState(true);
   const location = useLocation();
 
-// 현재 경로가 '/', '/loginpage', '/registerpage'일 때만 헤더 버튼 보이게
+  // 특정 경로에서는 사이드바 닫기
+  const shouldSidebarBeClosed =
+    location.pathname === "/sign-in" ||
+    location.pathname === "/sign-up" ||
+    location.pathname === "/";
+
+  const [isOpen, setIsOpen] = useState(!shouldSidebarBeClosed);
+
+  // 경로가 바뀔 때마다 열림/닫힘 상태 업데이트
+  useEffect(() => {
+    setIsOpen(!shouldSidebarBeClosed);
+  }, [location.pathname]);
+
+  // 상단 로그인/회원가입 버튼 노출할 경로
   const showAuthButtons =
     location.pathname === "/" ||
-    location.pathname === "/loginpage" ||
-    location.pathname === "/registerpage";
-
+    location.pathname === "/sign-in" ||
+    location.pathname === "/sign-up";
 
   return (
     <Wrapper $isOpen={isOpen}>

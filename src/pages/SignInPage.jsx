@@ -1,13 +1,12 @@
-import React from 'react'
-import styled from 'styled-components'
-import { useNavigate } from "react-router-dom"
-import { color, typo } from '../../../styles/tokens'
-import { InputField } from "../../../components/InputField"
-import Button from "../../../components/Button"
+import React from "react";
+import styled from "styled-components";
+import { useNavigate } from "react-router-dom";
+import { color, typo } from "../styles/tokens";
+import { InputField } from "../components/InputField";
+import Button from "../components/Button";
 
-
-export const LoginPage = () => {
-  const navigate = useNavigate(); 
+export default function SignInPage() {
+  const navigate = useNavigate();
 
   return (
     <Wrapper>
@@ -34,7 +33,7 @@ export const LoginPage = () => {
 
             <MiniWrapper>
               <Question>다소니가 처음이신가요?</Question>
-              <RegisterButton onClick={() => navigate("/registerpage")}>
+              <RegisterButton onClick={() => navigate("/sign-up")}>
                 회원가입
               </RegisterButton>
             </MiniWrapper>
@@ -42,7 +41,7 @@ export const LoginPage = () => {
         </Box>
       </OutBox>
     </Wrapper>
-  )
+  );
 }
 
 const Wrapper = styled.div`
@@ -52,7 +51,7 @@ const Wrapper = styled.div`
   align-items: center;
   width: 100%;
   margin-top: 11.44rem;
-`
+`;
 
 const OutBox = styled.div`
   display: inline-flex;
@@ -63,7 +62,7 @@ const OutBox = styled.div`
   border-radius: 1rem;
   border: 1px solid #f4f4f4;
   background: #f8f8f8;
-`
+`;
 
 const Box = styled.div`
   display: flex;
@@ -71,7 +70,7 @@ const Box = styled.div`
   flex-direction: column;
   align-items: center;
   gap: 3.125rem;
-`
+`;
 
 const TextWrapper = styled.div`
   display: flex;
@@ -80,12 +79,12 @@ const TextWrapper = styled.div`
   align-items: flex-start;
   gap: 0.375rem;
   align-self: stretch;
-`
+`;
 
 const Title = styled.div`
   ${typo("h2")};
   color: ${color("black.70")};
-`
+`;
 
 const Content = styled.div`
   color: var(--50, #7a7a7a);
@@ -95,7 +94,7 @@ const Content = styled.div`
   font-style: normal;
   font-weight: 500;
   line-height: 130%;
-`
+`;
 
 const MainWrapper = styled.div`
   display: flex;
@@ -103,7 +102,7 @@ const MainWrapper = styled.div`
   flex-direction: column;
   align-items: flex-start;
   gap: 1.25rem;
-`
+`;
 
 const InputBox = styled.div`
   display: flex;
@@ -111,7 +110,7 @@ const InputBox = styled.div`
   align-items: flex-start;
   gap: 0.4375rem;
   align-self: stretch;
-`
+`;
 
 const Type = styled.div`
   color: var(--80, #0e0e0e);
@@ -121,7 +120,7 @@ const Type = styled.div`
   font-weight: 500;
   line-height: 130%;
   align-self: stretch;
-`
+`;
 
 const ClickBox = styled.div`
   display: flex;
@@ -129,13 +128,13 @@ const ClickBox = styled.div`
   flex-direction: column;
   align-items: center;
   gap: 1.25rem;
-`
+`;
 
 const MiniWrapper = styled.div`
   display: flex;
   align-items: center;
   gap: 0.375rem;
-`
+`;
 
 const Question = styled.div`
   color: var(--50, #7a7a7a);
@@ -144,10 +143,10 @@ const Question = styled.div`
   font-style: normal;
   font-weight: 500;
   line-height: 130%;
-`
+`;
 
 const RegisterButton = styled.div`
   ${typo("bodym")};
   color: #308dff;
   cursor: pointer;
-`
+`;
