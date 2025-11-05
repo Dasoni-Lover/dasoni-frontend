@@ -5,6 +5,7 @@ import { CardList } from '../features/Home/components/CardList'
 import { MemorialHallCount } from '../features/Home/components/MemorialHallCount'
 import { color,typo } from '../styles/tokens'
 import { SearchTab } from '../features/EnterMemoralHome.jsx/components/SearchTab'
+import { EnterModal } from '../features/EnterMemoralHome.jsx/components/EnterModal'
 
 export const EnterMemorialHomePage = () => {
     

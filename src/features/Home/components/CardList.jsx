@@ -5,9 +5,11 @@ import { CardListItem } from './CardListItem'
 export const CardList = () => {
   return (
     <Wrapper>
-      <CardListItem/>
-      <CardListItem/>
-      <CardListItem/>
+      <CardListItem tagText="요청중" showTag />
+      <CardListItem tagText="요청중" showTag />
+      <CardListItem /> 
+      <CardListItem /> 
+      <CardListItem /> 
     </Wrapper>
   )
 }
@@ -20,5 +22,3 @@ const Wrapper = styled.div`
   align-items: start;
   width: 100%;
 `;
-
-

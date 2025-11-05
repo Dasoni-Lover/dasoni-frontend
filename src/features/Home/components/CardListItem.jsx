@@ -1,20 +1,20 @@
 import React from 'react'
 import styled from 'styled-components'
-import { useNavigate } from 'react-router-dom'  // ✅ 추가
+import { useNavigate } from 'react-router-dom'  
 import { SmallPhotoBox } from "../../../components/photobox/SmallPhotoBox"
 import { color, typo } from '../../../styles/tokens'
 import profileimg from "../../../assets/profile-img.png"
 
-export const CardListItem = () => {
-  const navigate = useNavigate(); // ✅ 네비게이터 생성
+export const CardListItem = ({ tagText, showTag = false }) => {
+  const navigate = useNavigate();
 
   const handleClick = () => {
-    navigate('/memorial'); // ✅ 클릭 시 /memorial 이동
+    navigate('/memorial');
   };
 
   return (
-    <Wrapper onClick={handleClick}> {/* ✅ 클릭 이벤트 추가 */}
-      <SmallPhotoBox src={profileimg} />
+    <Wrapper onClick={handleClick}> 
+      <SmallPhotoBox src={profileimg} tagText={tagText} showTag={showTag}/>
       <Box>
         <Name>故 박영수</Name>
         <TextWrapper>
@@ -46,11 +46,9 @@ const Wrapper = styled.div`
   gap: 1.75rem;
   box-sizing: border-box;
   margin: 0;
-
   border-radius: 0.75rem;
   border: 2px solid #F2E8DF;
   background: var(--Background, #FFFDFB);
-
   cursor: pointer; 
   transition: all 0.2s ease;
 
