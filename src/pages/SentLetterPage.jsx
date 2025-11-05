@@ -34,7 +34,7 @@ export const SentLetterPage = () => {
   return (
     <Wrapper>
       <NavWrapper>
-        <BarNavigate />
+        <BarNavigate paths={["홈", "故 박영수의 추모관", "편지쓰기"]}/>
       </NavWrapper>
 
       <TextWrapper>

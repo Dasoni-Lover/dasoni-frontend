@@ -4,27 +4,31 @@ import styled from "styled-components";
 import { color, typo } from "../styles/tokens";
 import { Column } from "../styles/flex";
 
-const BarNavigate = ({ title }) => {
+
+const BarNavigate = ({ paths = ["홈", "故 박영수의 추모관"], title }) => {
   return (
-    <>
-      <Column>
-        <Wrapper>
-          <Text>홈</Text>
-          <Next src={nextbtn} />
-          <Text>故 박영수의 추모관</Text>
-        </Wrapper>
-        <Title>{title}</Title>
-      </Column>
-    </>
+    <Column>
+      <Wrapper>
+        {paths.map((path, index) => (
+          <React.Fragment key={index}>
+            <Text>{path}</Text>
+            {index < paths.length - 1 && <Next src={nextbtn} alt=">" />}
+          </React.Fragment>
+        ))}
+      </Wrapper>
+      <Title>{title}</Title>
+    </Column>
   );
 };
 
+// 💅 스타일
 const Wrapper = styled.div`
   display: flex;
   height: 1.75rem;
   align-items: center;
   align-self: stretch;
 `;
+
 const Text = styled.div`
   ${typo("bodym")};
   color: ${color("black.50")};
@@ -42,3 +46,5 @@ const Title = styled.div`
 `;
 
 export default BarNavigate;
+
+//<BarNavigate paths={["홈", "故 박영수의 추모관", "편지쓰기"]} title="편지쓰기"/>
