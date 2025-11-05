@@ -50,7 +50,7 @@ const Overlay = styled.div`
 `;
 
 const ModalContainer = styled.div`
-  width: 35rem;
+  width: 34rem;
   padding: 5.25rem 4.75rem 2.75rem 4.75rem;
   border-radius: 24px;
   background: #ffffff;
