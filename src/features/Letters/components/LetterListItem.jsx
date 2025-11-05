@@ -2,21 +2,20 @@ import React from 'react'
 import styled from 'styled-components'
 import { color, typo } from '../../../styles/tokens'
 
-export const LetterListItem = () => {
+export const LetterListItem = ({ onClick }) => {
   return (
-    <Container>
+    <Container onClick={onClick}>
       <Wrapper>
         <To>TO.박영수</To>
         <Date>&nbsp;· 2025/10/15</Date>
       </Wrapper>
       <Content>
-        영수야, 오늘은 네가 좋아하던 가을 날씨야. 하늘도 높고 바람도 맑아서 그런지, 문득 네가 더 그리워졌어. 
-        벌써 이렇게 시간이 흘렀는데도, 너와 함영수야, 오늘은 네가 좋아하던 가을 날씨야. 하늘도 높고 바람도 맑아서 
-        그런지, 문득 네가 더 그리워졌어. 벌써 이렇게 시간이 흘렀는데도, 너와 함
+        영수야, 오늘은 네가 좋아하던 가을 날씨야. 하늘도 높고 바람도 맑아서 ...
       </Content>
     </Container>
   )
 }
+
 
 const Container = styled.div`
   cursor: pointer;

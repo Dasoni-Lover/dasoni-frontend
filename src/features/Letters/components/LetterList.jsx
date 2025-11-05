@@ -2,15 +2,16 @@ import React from 'react'
 import styled from 'styled-components'
 import { LetterListItem } from './LetterListItem'
 
-export const LetterList = () => {
+export const LetterList = ({ onItemClick }) => {
   return (
     <Wrapper>
-        <LetterListItem/>
-        <LetterListItem/>
-        <LetterListItem/>
+        <LetterListItem onClick={onItemClick} />
+        <LetterListItem onClick={onItemClick} />
+        <LetterListItem onClick={onItemClick} />
     </Wrapper>
   )
 }
+
 
 const Wrapper=styled.div`
   display: inline-flex;

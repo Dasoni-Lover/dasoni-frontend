@@ -6,10 +6,11 @@ import { LetterList } from "../features/Letters/components/LetterList"
 import calendaricon from "../assets/calendar-icon.svg"
 import clickicon from "../assets/click-calendar-icon.svg"
 import { Calendar } from '../components/Calendar'
-import {LetterModal} from "../features/Letters/components/LetterModal"
+import LetterModal from "../features/Letters/components/LetterModal"
 
 export const SentLetterBoxPage = () => {
-  const [showCalendar, setShowCalendar] = useState(false)
+  const [showCalendar, setShowCalendar] = useState(false);
+  const [modalOpen, setModalOpen] = useState(false); // 모달 상태
 
   return (
     <Wrapper>
@@ -21,16 +22,16 @@ export const SentLetterBoxPage = () => {
       <Container>
         <CalendarWrapper 
           onClick={() => setShowCalendar(!showCalendar)}
-          showCalendar={showCalendar} // 상태 전달
+          showCalendar={showCalendar} 
         >
           <CalendarIconStyled src={showCalendar ? clickicon : calendaricon} />
         </CalendarWrapper>
-        </Container>
-
+      </Container>
 
       <ContentArea>
         <LetterArea showCalendar={showCalendar}>
-          <LetterList />
+          {/* LetterList에 모달 열기 함수 전달 */}
+          <LetterList onItemClick={() => setModalOpen(true)} />
         </LetterArea>
 
         {showCalendar && (
@@ -42,11 +43,14 @@ export const SentLetterBoxPage = () => {
           </>
         )}
       </ContentArea>
-    </Wrapper>
-  )
-}
 
-// Styled Components
+      {/* 모달 */}
+      <LetterModal isOpen={modalOpen} onCancel={() => setModalOpen(false)} />
+    </Wrapper>
+  );
+};
+
+
 const Wrapper = styled.div`
   display: flex;
   flex-direction: column;
