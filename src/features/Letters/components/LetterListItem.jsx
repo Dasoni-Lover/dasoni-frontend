@@ -19,6 +19,7 @@ export const LetterListItem = () => {
 }
 
 const Container = styled.div`
+  cursor: pointer;
   display: flex;
   width: 100%;
   padding: 1.25rem 1.375rem;
@@ -53,9 +54,8 @@ const Date = styled.div`
 const Content = styled.div`
   ${typo("bodym")};
   color: ${color("black.30")};
-
-  width: 56.4rem;
+  width: 100%; // 부모 폭에 맞춤
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-`
+`;
