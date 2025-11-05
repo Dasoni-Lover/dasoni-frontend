@@ -42,6 +42,7 @@ export default function RelationSelector({
 }
 
 const Chip = styled.button`
+  transition: all 0.2s ease;
   display: flex;
   width: 13.75rem;
   height: 2.75rem;

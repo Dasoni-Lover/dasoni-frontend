@@ -1,33 +1,26 @@
-// src/features/OpenMemorialHome/components/OpenMemorialHomeForm.jsx
+// src/features/RequestEntry/components/RequstEntryForm.jsx
 import React from "react";
 import styled from "styled-components";
 import { color } from "../../../styles/tokens";
 import { Row } from "../../../styles/flex";
+import RequestStep1 from "./RequestStep1";
+import RequestStep2 from "./RequestStep2";
+import RequestStep3 from "./RequestStep3";
 
-import OpenStep1 from "./OpenStep1";
-import OpenStep2 from "./OpenStep2";
-import OpenStep3 from "./OpenStep3";
-import OpenStep4 from "./OpenStep4";
-
-/**
- * step: 1~4
- * onStepValidChange: (boolean) => void
- */
-export default function OpenMemorialHomeForm({ step = 1, onStepValidChange }) {
+export default function RequstEntryForm({ step = 1, onStepValidChange }) {
   return (
     <WhiteBox>
       {/* 상단 진행바 */}
       <Row $gap={"0.58rem"}>
-        {[1, 2, 3, 4].map((i) => (
+        {[1, 2, 3].map((i) => (
           <ProgressBar key={i} $active={step >= i} />
         ))}
       </Row>
 
       {/* 단계별 내용 */}
-      {step === 1 && <OpenStep1 onValidChange={onStepValidChange} />}
-      {step === 2 && <OpenStep2 onValidChange={onStepValidChange} />}
-      {step === 3 && <OpenStep3 onValidChange={onStepValidChange} />}
-      {step === 4 && <OpenStep4 onValidChange={onStepValidChange} />}
+      {step === 1 && <RequestStep1 onValidChange={onStepValidChange} />}
+      {step === 2 && <RequestStep2 onValidChange={onStepValidChange} />}
+      {step === 3 && <RequestStep3 onValidChange={onStepValidChange} />}
     </WhiteBox>
   );
 }

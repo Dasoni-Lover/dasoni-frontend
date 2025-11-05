@@ -1,6 +1,6 @@
 import { createBrowserRouter, Router } from "react-router-dom";
 import App from "./App";
-import {HomePage} from "./pages/HomePage";
+import { HomePage } from "./pages/HomePage";
 import MemorialHomePage from "./pages/MemorialHomePage";
 import WritePostPage from "./pages/WritePostPage";
 import AIGeneratePage from "./pages/AIGeneratePage";
@@ -12,24 +12,26 @@ import { LoginPage } from "./features/Login/pages/LoginPage";
 import { RegisterPage } from "./features/Login/pages/RegisterPage";
 import { EnterMemorialHomePage } from "./pages/EnterMemorialHomePage";
 import OpenMemorialHomePage from "./pages/OpenMemorialHomePage";
+import RequestEntryPage from "./pages/RequestEntryPage";
 
 const router = createBrowserRouter([
   {
     path: "/",
     element: <App />,
     children: [
-      { index: true, element: <FirstPage />  },
+      { index: true, element: <FirstPage /> },
       { path: "/memorial", element: <MemorialHomePage /> },
       { path: "/memorial-my", element: <MemorialMyHomePage /> },
       { path: "/memorial-manager", element: <MemorialManagerHomePage /> },
       { path: "/memorial-manager/edit-profile", element: <ProfileEditPage /> },
       { path: "/write", element: <WritePostPage /> },
       { path: "/generate", element: <AIGeneratePage /> },
-      { path: "/homepage", element:<HomePage/>},
+      { path: "/homepage", element: <HomePage /> },
       { path: "/loginpage", element: <LoginPage /> },
       { path: "/registerpage", element: <RegisterPage /> },
       { path: "/open", element: <OpenMemorialHomePage /> },
       { path: "/enter", element: <EnterMemorialHomePage /> },
+      { path: "/request-entry", element: <RequestEntryPage /> },
     ],
   },
 ]);

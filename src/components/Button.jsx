@@ -41,7 +41,9 @@ export default function Button({
 }
 
 const ButtonWrapper = styled.div`
-  ${({ $size }) => ($size === "L" ? typo("h3") : typo("h4"))};
+  /* 타이포 사이즈 매핑 (L: h3, M/S: h4) */
+  ${({ $size }) => ($size === "L" ? typo("h3") : typo("h4"))}
+  transition: all 0.2s ease;
 
   cursor: pointer;
   display: flex;
