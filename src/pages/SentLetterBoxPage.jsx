@@ -5,12 +5,13 @@ import BarNavigate from "../components/BarNavigate"
 import { LetterList } from "../features/Letters/components/LetterList"
 import calendaricon from "../assets/calendar-icon.svg"
 import clickicon from "../assets/click-calendar-icon.svg"
+import { SideDrawer } from '../features/Letters/components/SideDrawer'
 import { Calendar } from '../components/Calendar'
 import LetterModal from "../features/Letters/components/LetterModal"
 
 export const SentLetterBoxPage = () => {
-  const [showCalendar, setShowCalendar] = useState(false);
-  const [modalOpen, setModalOpen] = useState(false); // 모달 상태
+  const [showCalendar, setShowCalendar] = useState(false)
+  const [modalOpen, setModalOpen] = useState(false)
 
   return (
     <Wrapper>
@@ -46,17 +47,21 @@ export const SentLetterBoxPage = () => {
 
       {/* 모달 */}
       <LetterModal isOpen={modalOpen} onCancel={() => setModalOpen(false)} />
+
+      {/* 고정 사이드 드로어 버튼 */}
+      <SideDrawer/>
     </Wrapper>
-  );
-};
+  )
+}
 
-
+// Styled Components
 const Wrapper = styled.div`
   display: flex;
   flex-direction: column;
   width: 68.5rem;
   align-items: center;
   margin-top: 1.81rem;
+  position: relative;
 `
 
 const Title = styled.div`
@@ -71,7 +76,7 @@ const NavWrapper = styled.div`
   margin-bottom: 4.5rem;
 `
 
-const Container=styled.div`
+const Container = styled.div`
   width: 100%;
   display: flex;
   flex-direction: row;
@@ -83,18 +88,15 @@ const CalendarWrapper = styled.div`
   cursor: pointer;
   padding: 0.5rem;
   border-radius: 0.25rem;
-
-  /* 클릭 상태에 따라 border & background 변경 */
   border: 1px solid ${({ showCalendar }) => (showCalendar ? '#FFCC8C' : '#DDD')};
   background: ${({ showCalendar }) => (showCalendar ? '#FFF4E6' : '#FFF')};
-`;
+`
 
 const CalendarIconStyled = styled.img`
   width: 1.5rem;
-height: 1.66669rem;
-flex-shrink: 0;
-`;
-
+  height: 1.66669rem;
+  flex-shrink: 0;
+`
 
 const ContentArea = styled.div`
   display: flex;

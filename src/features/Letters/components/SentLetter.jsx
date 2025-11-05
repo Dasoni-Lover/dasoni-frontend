@@ -71,7 +71,6 @@ export const SentLetter = ({ to, from, value, onToChange, onFromChange, onValueC
   )
 }
 
-// 💅 스타일
 const Container = styled.div`
   width: 56.25rem;
   height: 32rem;
