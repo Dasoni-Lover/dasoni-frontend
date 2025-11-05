@@ -5,16 +5,27 @@ import { SmallPhotoBox } from "../../../components/photobox/SmallPhotoBox"
 import { color, typo } from '../../../styles/tokens'
 import profileimg from "../../../assets/profile-img.png"
 
-export const CardListItem = ({ tagText, showTag = false }) => {
+export const CardListItem = ({ status = "입장완료", onOpenModal }) => {
   const navigate = useNavigate();
 
   const handleClick = () => {
-    navigate('/memorial');
+    if (status === "입장완료") {
+      navigate('/memorial');
+    } else if (status === "요청중" ) {
+      return;
+    } else if (status === "거절" || status === "요청안함"){
+      onOpenModal();
+    }
+
   };
 
   return (
     <Wrapper onClick={handleClick}> 
-      <SmallPhotoBox src={profileimg} tagText={tagText} showTag={showTag}/>
+      <SmallPhotoBox
+        src={profileimg}
+        tagText={status === "요청중" ? "요청중" : ""}
+        showTag={status === "요청중"}
+      />
       <Box>
         <Name>故 박영수</Name>
         <TextWrapper>
