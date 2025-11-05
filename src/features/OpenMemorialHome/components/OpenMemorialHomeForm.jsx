@@ -192,7 +192,7 @@ function Step3({ onValidChange }) {
 /* ───────────── 4단계: 관계 / 성격 태그 / 한 줄 소개 ───────────── */
 
 function Step4({ onValidChange }) {
-  const [selectedRelation, setSelectedRelation] = useState(null); // 관계 1개
+  const [relation, setRelation] = useState(null); // 관계 1개
   const [selectedTags, setSelectedTags] = useState([]); // 태그 최대 3개
   const [intro, setIntro] = useState("");
 
@@ -230,11 +230,9 @@ function Step4({ onValidChange }) {
   // ✅ 유효성: 관계 1개 선택 + 태그 정확히 3개 + 한 줄 소개 필수
   useEffect(() => {
     const isValid =
-      !!selectedRelation &&
-      selectedTags.length === 3 &&
-      intro.trim().length > 0;
+      !!relation && selectedTags.length === 3 && intro.trim().length > 0;
     onValidChange?.(isValid);
-  }, [selectedRelation, selectedTags, intro, onValidChange]);
+  }, [relation, selectedTags, intro, onValidChange]);
 
   return (
     <>
@@ -247,8 +245,8 @@ function Step4({ onValidChange }) {
       </Label>
       <RelationSelector
         options={relationOptions}
-        value={selectedRelation}
-        onChange={setSelectedRelation}
+        value={relation}
+        onChange={setRelation}
         gap="0.65rem"
         style={{ marginBottom: "4rem" }}
       />
