@@ -27,7 +27,7 @@ const Container = styled.div`
   align-items: center;
   box-sizing: border-box;
   cursor: pointer;
-  transition: background-color 0.2s ease;
+  transition: background 0.2s ease;
   border-radius: 0.1875rem;
   background: ${({ $isActive }) => ($isActive ? "#313131" : "transparent")};
 
@@ -36,7 +36,7 @@ const Container = styled.div`
   }
 
   /* 부모 hover 시 자식(Text) 색 변경 */
-  &:hover ${Text} {
+  &:hover ${() => Text} {
     color: ${color("white")};
   }
 `;

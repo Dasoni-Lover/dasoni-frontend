@@ -14,3 +14,9 @@ export const registerUser = async (body) => {
   const res = await client.post(`/api/users/register`, body);
   return res.data;
 };
+
+// 사이드바 정보 조회
+export const getSidebarInfo = async () => {
+  const res = await client.get("/api/halls/sidebar");
+  return res.data; // { name, myProfile, notiCount }
+};

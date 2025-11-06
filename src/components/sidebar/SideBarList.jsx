@@ -6,7 +6,7 @@ import MiniProflie from "./MiniProflie";
 import { color, typo } from "../../styles/tokens";
 import { useNavigate, useLocation } from "react-router-dom";
 import { logoutUser, clearAuthTokens, getAccessToken } from "../../api/auth";
-import { getSidebarInfo } from "../../api/hall";
+import { getSidebarInfo } from "../../api/user";
 
 const SideBarList = ({ onAlarmClick, isAlarmOpen }) => {
   const navigate = useNavigate();
