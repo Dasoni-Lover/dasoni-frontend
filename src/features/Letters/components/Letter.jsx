@@ -7,7 +7,7 @@ export const Letter = () => {
   return (
     <Container>
       <Row1>
-        <To>T0.박영수</To>
+        <To>T0. 박영수</To>
       </Row1>
 
       <InputBox>
@@ -47,7 +47,7 @@ export const Letter = () => {
       <Date>2025/10/04</Date>
 
       <Row2>
-        <From>From.박영진</From>
+        <From>From. 박영진</From>
       </Row2>
     </Container>
   );
