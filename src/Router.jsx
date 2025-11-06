@@ -10,8 +10,8 @@ import { ProfileEditPage } from "./features/MemorialHome/pages/ProfileEditPage";
 import { FirstPage } from "./pages/FirstPage";
 import OpenMemorialHomePage from "./pages/OpenMemorialHomePage";
 import RequestEntryPage from "./pages/RequestEntryPage";
-import SignInPage from "./pages/SignInPage";
-import SignUpPage from "./pages/SignUpPage";
+import LogInPage from "./pages/LogInPage";
+import RegisterPage from "./pages/RegisterPage";
 
 const router = createBrowserRouter([
   {
@@ -20,8 +20,8 @@ const router = createBrowserRouter([
     children: [
       /* 온보딩 관련 */
       { index: true, element: <FirstPage /> },
-      { path: "/sign-in", element: <SignInPage /> },
-      { path: "/sign-up", element: <SignUpPage /> },
+      { path: "/login", element: <LogInPage /> },
+      { path: "/register", element: <RegisterPage /> },
 
       /* 홈 관련 */
       { path: "/homepage", element: <HomePage /> },

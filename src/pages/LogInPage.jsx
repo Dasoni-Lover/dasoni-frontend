@@ -5,7 +5,7 @@ import { color, typo } from "../styles/tokens";
 import { InputField } from "../components/InputField";
 import Button from "../components/Button";
 
-export default function SignInPage() {
+export default function LogInPage() {
   const navigate = useNavigate();
 
   return (
@@ -33,7 +33,7 @@ export default function SignInPage() {
 
             <MiniWrapper>
               <Question>다소니가 처음이신가요?</Question>
-              <RegisterButton onClick={() => navigate("/sign-up")}>
+              <RegisterButton onClick={() => navigate("/register")}>
                 회원가입
               </RegisterButton>
             </MiniWrapper>
@@ -51,6 +51,10 @@ const Wrapper = styled.div`
   align-items: center;
   width: 100%;
   margin-top: 11.44rem;
+
+  @media (max-width: 1200px) {
+    justify-content: flex-start;
+  }
 `;
 
 const OutBox = styled.div`

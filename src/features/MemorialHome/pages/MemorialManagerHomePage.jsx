@@ -3,7 +3,6 @@ import styled from "styled-components";
 import { color, typo } from "../../../styles/tokens";
 import { useNavigate } from "react-router-dom"; // ✅ 추가
 
-import Header from "../../../components/Header";
 import Footer from "../../../components/Footer";
 import BarNavigate from "../../../components/BarNavigate";
 import Profile from "../components/Profile";
@@ -19,7 +18,6 @@ import LinkShareModal from "../components/LinkShareModal";
 import modifyicon from "../../../assets/edit-btn.svg";
 
 export const MemorialManagerHomePage = () => {
-  const [isOpen, setIsOpen] = useState(true);
   const [isAddMenuOpen, setIsAddMenuOpen] = useState(false);
   const [isLinkShareModalOpen, setIsLinkShareModalOpen] = useState(false);
   const navigate = useNavigate(); // ✅ 네비게이트 훅 선언
@@ -29,18 +27,15 @@ export const MemorialManagerHomePage = () => {
   };
 
   return (
-    <Wrapper>
-      <Header />
-      <SideBar isOpen={isOpen} toggleSidebar={() => setIsOpen(!isOpen)} />
-
-      <ContentWrapper isOpen={isOpen}>
-        <BarWrapper>
-          <BarNavigate />
-        </BarWrapper>
-
+    <>
+      <BarWrapper>
+        <BarNavigate />
         <Title>故 박영수의 추모관</Title>
+      </BarWrapper>
 
-        <ModifyButton onClick={handleModifyClick}> {/* ✅ 클릭 이벤트 추가 */}
+      <ContentWrapper>
+        <ModifyButton onClick={handleModifyClick}>
+          {/* ✅ 클릭 이벤트 추가 */}
           <ModifyIcon src={modifyicon} />
           <ModifyText>프로필 수정</ModifyText>
         </ModifyButton>
@@ -83,40 +78,28 @@ export const MemorialManagerHomePage = () => {
       )}
 
       <Footer />
-    </Wrapper>
+    </>
   );
 };
-
-
-
-const Wrapper = styled.div`
-  display: flex;
-  position: relative;
-  flex-direction: column;
-  min-height: 100vh;
-`;
 
 const ContentWrapper = styled.div`
   display: flex;
   flex-direction: column;
   align-items: center;
-  width: 100%;
   transition: all 0.3s ease;
   flex: 1; /* footer 위 공간 채우기 */
 
   @media (max-width: 1200px) {
     align-items: flex-start;
-    margin-left: ${({ isOpen }) =>
-      isOpen ? "calc(300px + 40px)" : "calc(60px + 0px)"};
   }
 `;
 
 const BarWrapper = styled.div`
-  width: 100%;
   margin-top: 30px;
   margin-bottom: 8px;
   display: flex;
   justify-content: center;
+  flex-direction: column;
 
   > * {
     width: 1096px;
@@ -127,29 +110,25 @@ const BarWrapper = styled.div`
   }
 `;
 
-const Title=styled.div`
-    ${typo("h2")};
+const Title = styled.div`
+  ${typo("h2")};
   color: ${color("black.70")};
-  width: 1096px;
   text-align: left;
   margin-bottom: 52px;
-  padding: 8px 20px 8px 16px;
-
-`
+`;
 
 const ModifyButton = styled.div`
-  width: 1096px;
+  width: 100%;
   display: flex;
   flex-direction: row;
   justify-content: flex-end;
   align-items: center;
-  cursor: pointer; 
-  transition: all 0.2s ease; 
+  cursor: pointer;
+  transition: all 0.2s ease;
 
   &:hover {
     transform: translateY(-1.5px); /* 살짝 위로 떠오르는 느낌 */
   }
-
 `;
 
 const ModifyIcon = styled.img`
@@ -163,10 +142,9 @@ const ModifyText = styled.div`
   color: ${color("black.70")};
 
   ${ModifyButton}:hover & {
-    color: ${color("black.100")}; 
+    color: ${color("black.100")};
   }
 `;
-
 
 const Content = styled.div`
   width: 1096px;

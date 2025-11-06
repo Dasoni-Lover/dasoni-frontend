@@ -8,7 +8,7 @@ import profileimg from "../features/Onboarding/assets/default-profile-img.svg";
 import DatePicker from "../components/DatePicker";
 import dropdownicon from "../assets/row-icon.svg";
 
-export default function SignUpPage() {
+export default function RegisterPage() {
   const navigate = useNavigate();
   const [date, setDate] = useState(null);
   const [isOpen, setIsOpen] = useState(false);
@@ -123,10 +123,10 @@ export default function SignUpPage() {
           </Container>
 
           <ClickBox>
-            <Button text="회원가입" onClick={() => navigate("/sign-in")} />
+            <Button text="회원가입" onClick={() => navigate("/login")} />
             <MiniWrapper>
               <Question>이미 계정이 있으신가요?</Question>
-              <RegisterButton onClick={() => navigate("/sign-in")}>
+              <RegisterButton onClick={() => navigate("/login")}>
                 로그인
               </RegisterButton>
             </MiniWrapper>
@@ -146,6 +146,9 @@ const Wrapper = styled.div`
   align-items: center;
   width: 100%;
   margin-top: 4.31rem;
+  @media (max-width: 1200px) {
+    align-items: flex-start;
+  }
 `;
 
 const OutBox = styled.div`

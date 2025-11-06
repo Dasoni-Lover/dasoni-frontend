@@ -10,8 +10,8 @@ export default function GlobalStyle({ children }) {
   // 1️경로별 콘텐츠 기준 너비 설정
   const CONTENT_MAX_WIDTH_BY_PATH = {
     "/": 600, // FirstPage 같이 좁은 랜딩
-    "/sign-in": 502,
-    "/sign-up": 918,
+    "/login": 502,
+    "/register": 918,
 
     // "/memorial-home": 1096,
     // "/something": 900,
@@ -24,8 +24,8 @@ export default function GlobalStyle({ children }) {
 
   // 특정 경로에서는 사이드바 닫기
   const shouldSidebarBeClosed =
-    location.pathname === "/sign-in" ||
-    location.pathname === "/sign-up" ||
+    location.pathname === "/login" ||
+    location.pathname === "/register" ||
     location.pathname === "/";
 
   const [isOpen, setIsOpen] = useState(!shouldSidebarBeClosed);
@@ -65,8 +65,8 @@ export default function GlobalStyle({ children }) {
   // 상단 로그인/회원가입 버튼 노출할 경로
   const showAuthButtons =
     location.pathname === "/" ||
-    location.pathname === "/sign-in" ||
-    location.pathname === "/sign-up";
+    location.pathname === "/login" ||
+    location.pathname === "/register";
 
   return (
     <Wrapper $isOpen={isOpen} $shouldShiftContent={shouldShiftContent}>
@@ -105,6 +105,5 @@ const ContentWrapper = styled.div`
   margin-top: 6.25rem;
 
   @media (max-width: 1200px) {
-    align-items: flex-start;
   }
 `;

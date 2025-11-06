@@ -11,8 +11,8 @@ export default function Header({ showAuthButtons }) {
 
       {showAuthButtons && (
         <ButtonGroup>
-          <LoginButton onClick={() => navigate("/sign-in")}>로그인</LoginButton>
-          <RegisterButton onClick={() => navigate("/sign-up")}>
+          <LoginButton onClick={() => navigate("/login")}>로그인</LoginButton>
+          <RegisterButton onClick={() => navigate("/register")}>
             회원가입
           </RegisterButton>
         </ButtonGroup>
