@@ -46,7 +46,7 @@ export const SentLetter = ({ to, from, value, onToChange, onFromChange, onValueC
           placeholder="50자 이상 입력해 주세요"
           value={value}
           onChange={(e) => onValueChange(e.target.value)}
-          maxLength={1000}
+          maxLength={999}
         />
         <Text>{value.length} / 1,000자</Text>
       </InputBox>
@@ -144,9 +144,19 @@ const InputBox = styled.div`
   margin-bottom: 0.75rem;
   display: flex;
   flex-direction: column;
+
+  /* 스크롤 가능하지만 스크롤바 숨기기 */
+  overflow-y: auto;
+  overflow-x: hidden;
+
+  scrollbar-width: none;       /* Firefox */
+  -ms-overflow-style: none;    /* IE 10+ */
+  &::-webkit-scrollbar {
+    display: none;             /* Chrome, Safari, Opera */
+  }
 `
 
-const Input = styled.textarea`
+const Input = styled.textarea.attrs({ maxLength: 1000 })`
   flex: 1;
   width: 100%;
   resize: none;
@@ -156,10 +166,19 @@ const Input = styled.textarea`
   ${typo("bodym2")};
   color: ${color("black.80")};
 
+  /* 스크롤 가능하지만 스크롤바 숨기기 */
+  overflow-y: auto;
+  scrollbar-width: none;       /* Firefox */
+  -ms-overflow-style: none;    /* IE 10+ */
+  &::-webkit-scrollbar {
+    display: none;             /* Chrome, Safari, Opera */
+  }
+
   &::placeholder {
     color: ${color("black.30")};
   }
 `
+
 
 const Text = styled.div`
   ${typo("bodym")};
