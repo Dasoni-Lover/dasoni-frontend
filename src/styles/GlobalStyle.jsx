@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from "react";
 import Header from "../components/Header";
-import styled from "styled-components";
+import styled, { createGlobalStyle } from "styled-components";
 import SideBar from "../components/sidebar/SideBar";
 import { useLocation } from "react-router-dom";
+import NanumOeHarMeoNiGeurSsi from "../assets/fonts/NanumOeHarMeoNiGeurSsi.ttf";
 
 export default function GlobalStyle({ children }) {
   const location = useLocation();
@@ -69,15 +70,30 @@ export default function GlobalStyle({ children }) {
     location.pathname === "/register";
 
   return (
-    <Wrapper $isOpen={isOpen} $shouldShiftContent={shouldShiftContent}>
-      <Header showAuthButtons={showAuthButtons} />
-      <SideBar isOpen={isOpen} toggleSidebar={() => setIsOpen(!isOpen)} />
-      <ContentWrapper $isOpen={isOpen} $shouldShiftContent={shouldShiftContent}>
-        {children}
-      </ContentWrapper>
-    </Wrapper>
+    <>
+      <FontGlobalStyle /> {/* ✅ 여기서 폰트 등록 */}
+      <Wrapper $isOpen={isOpen} $shouldShiftContent={shouldShiftContent}>
+        <Header showAuthButtons={showAuthButtons} />
+        <SideBar isOpen={isOpen} toggleSidebar={() => setIsOpen(!isOpen)} />
+        <ContentWrapper
+          $isOpen={isOpen}
+          $shouldShiftContent={shouldShiftContent}
+        >
+          {children}
+        </ContentWrapper>
+      </Wrapper>
+    </>
   );
 }
+
+const FontGlobalStyle = createGlobalStyle`
+  @font-face {
+    font-family: 'Nanum OeHarMeoNiGeurSsi';
+    src: url(${NanumOeHarMeoNiGeurSsi}) format('truetype');
+    font-weight: normal;
+    font-style: normal;
+  }
+`;
 
 const Wrapper = styled.div`
   display: flex;
