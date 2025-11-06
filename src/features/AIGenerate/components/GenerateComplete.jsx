@@ -10,26 +10,21 @@ import { useNavigate } from "react-router-dom";
 export default function GenerateComplete({ setIsGenerated }) {
   const nav = useNavigate();
 
-  const goBack = () => {
-    nav(-1);
-  };
-
-  const goGenerate = () => {
-    setIsGenerated(false);
-  };
+  const goBack = () => nav(-1);
+  const goGenerate = () => setIsGenerated(false);
 
   return (
     <Row>
       <Column>
         <Row $justify={"start"}>
           <DownloadButtonWrapper>
-            <img src={IconDownload} />
+            <img src={IconDownload} alt="download" />
             <DownloadText>다운로드</DownloadText>
           </DownloadButtonWrapper>
         </Row>
 
         <Row $gap={"2.8rem"} style={{ marginBottom: "13rem" }}>
-          <GeneratedImg img={PhotoBox} />
+          <GeneratedImg src={PhotoBox} alt="생성된 이미지" />
           <Column style={{ width: "24.5rem" }} $justify={"space-between"}>
             <InformText>{`요청하신 사항에 맞추어 \n이미지를 생성했어요`}</InformText>
             <Column $gap={"1.25rem"}>
@@ -72,7 +67,7 @@ const GeneratedImg = styled.img`
   height: 32.5rem;
   border-radius: 0.4375rem;
   border: 3px solid var(--5, #e9e9e9);
-  background: url(<path-to-image>) lightgray 50% / cover no-repeat;
+  background: lightgray 50% / cover no-repeat;
   box-shadow: 0 4px 32px 0 rgba(0, 0, 0, 0.25);
 `;
 

@@ -37,7 +37,7 @@ const Wrapper = styled.div`
   flex-direction: row;
   justify-content: flex-start;
   align-items: center;
-  border-top: 2px solid #FFBC67;
+  border-top: 2px solid var(--70, #313131);
 `;
 
 // <HallTab role="visitor" />

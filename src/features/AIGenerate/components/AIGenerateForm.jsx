@@ -8,13 +8,10 @@ import Button from "../../../components/Button";
 import { useNavigate } from "react-router-dom";
 import CancelProcessButton from "../../../components/CancelProcessButton";
 
-export default function AIGenerateForm({ setIsGenerated }) {
+export default function AIGenerateForm({ onGenerate }) {
   const nav = useNavigate();
   const goBack = () => nav(-1);
 
-  const handleGenerate = () => {
-    setIsGenerated(true);
-  };
   return (
     <div>
       <Row $justify={"end"}>
@@ -46,7 +43,7 @@ export default function AIGenerateForm({ setIsGenerated }) {
           text="생성하기"
           color="main"
           width="13.75rem"
-          onClick={handleGenerate}
+          onClick={onGenerate}
         />
       </Row>
     </div>

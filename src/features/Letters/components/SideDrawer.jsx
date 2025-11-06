@@ -69,11 +69,13 @@ const DrawerButton = styled.img`
 
 const DrawerItem = styled.img`
   position: absolute;
-  width: ${props => (props.isHovered ? '12rem' : '11.6875rem')};
-  height: ${props => (props.isHovered ? '3.8rem' : '2.9375rem')};
+  width: ${props => (props.isHovered ? '12.625rem' : '11.6875rem')};
+  height: ${props => (props.isHovered ? '4.5rem' : '2.9375rem')};
   top: ${props => props.top};
-  right: ${props => (props.isHovered ? '0.5rem' : props.right)};
+  left: 4.44rem;
   cursor: pointer;
   z-index: ${props => (props.isHovered ? 2000 : 1000)};
-  transition: width 0.1s, height 0.1s, right 0.1s, z-index 0s;
-`
+  transition: all 0.15s ease;
+  transform: ${({ isHovered }) => (isHovered ? 'translateY(-0.4rem)' : 'translateY(0)')};
+  
+`;
