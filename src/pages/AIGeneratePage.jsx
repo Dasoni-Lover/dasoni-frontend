@@ -10,7 +10,7 @@ export default function AIGeneratePage() {
   return (
     <div>
       <BarWrapper>
-        <BarNavigate title={"AI 이미지 생성"} />
+        <BarNavigate paths={["홈", "故 박영수의 추모관", "AI 이미지 생성"]} title="AI 이미지 생성"/>
       </BarWrapper>
 
       {isGenerated ? (

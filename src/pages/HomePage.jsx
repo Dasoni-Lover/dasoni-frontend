@@ -24,7 +24,6 @@ const Wrapper=styled.div`
   width: 68.5rem;
   flex-direction: column;
   align-items: flex-start;
-  width: 1096px;
 `
 const Text=styled.div`
   ${typo("h1")};

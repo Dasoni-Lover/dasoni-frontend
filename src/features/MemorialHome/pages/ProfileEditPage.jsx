@@ -28,7 +28,7 @@ export const ProfileEditPage = () => {
             {/* 이름 */}
             <InputWrapper>
               <Text>고인의 성함</Text>
-              <InputField placeholder="고인의 이름을 입력하세요" />
+              <InputField placeholder="성함을 입력해 주세요" />
             </InputWrapper>
 
             {/* 생일 */}
@@ -80,7 +80,9 @@ export const ProfileEditPage = () => {
 
           <ButtonWrapper>
             <Button text="저장하기" size="M" />
-            <Button text="취소" size="M" color="white" />
+            <Border>
+              <Button text="취소" size="M" color="white" />
+            </Border>
           </ButtonWrapper>
         </Container>
       </ContentBox>
@@ -173,3 +175,12 @@ const ButtonWrapper = styled.div`
 
   width: 13.75rem;
 `;
+
+const Border=styled.div`
+  width: 100%;
+  border-radius: 0.5rem;
+border: 2px solid var(--5, #E9E9E9);
+background: var(--0, #FFF);
+box-shadow: 0 0 5px 0 rgba(0, 0, 0, 0.04);
+box-sizing: border-box;
+`

@@ -40,9 +40,9 @@ import { color, typo } from "../styles/tokens";
 registerLocale("ko", ko);
 
 /* ───────────── 커스텀 인풋 (react-datepicker용) ───────────── */
-const DateInput = forwardRef(({ value, onClick, placeholder, borderColor }, ref) => {
+const DateInput = forwardRef(({ value, onClick, placeholder, borderColor, $height }, ref) => {
   return (
-    <DateField onClick={onClick} ref={ref} $borderColor={borderColor}>
+    <DateField onClick={onClick} ref={ref} $borderColor={borderColor} $height={$height}>
       <input readOnly value={value || ""} placeholder={placeholder} />
       <CalendarButton type="button" aria-label="날짜 선택">
         <img src={IconCalendar} alt="calendar icon" />
@@ -56,17 +56,20 @@ function DatePicker({
   onChange,
   placeholder = "YYYY/M/D",
   dateFormat = "yyyy/M/d",
-  borderColor, // ✅ 새로 추가된 prop
+  borderColor,
+  width = "100%",    // 부모에 맞춰 기본 100%
+  height = "48px",   // 기본 높이
   ...props
 }) {
   return (
-    <DatePickerWrapper>
+    <DatePickerWrapper $width={width}>
       <ReactDatePicker
         selected={selected}
         onChange={onChange}
         dateFormat={dateFormat}
         placeholderText={placeholder}
-        customInput={<DateInput placeholder={placeholder} borderColor={borderColor} />}
+        // customInput에 prop 전달: height는 $height로 전달
+        customInput={<DateInput placeholder={placeholder} borderColor={borderColor} $height={height} />}
         popperPlacement="bottom-start"
         locale="ko"
         showPopperArrow={false}
@@ -78,9 +81,24 @@ function DatePicker({
 
 export default DatePicker;
 
-/* ───────────── 스타일 ───────────── */
+/* 스타일 */
 const DatePickerWrapper = styled.div`
-  width: 100%;
+  width: ${({ $width }) => $width};
+  box-sizing: border-box;
+
+  /* react-datepicker 내부 wrapper 강제 고정 */
+  .react-datepicker-wrapper,
+  .react-datepicker__input-container {
+    width: 100% !important;
+    display: block !important;
+    box-sizing: border-box !important;
+  }
+
+  /* react-datepicker가 내부에 input을 렌더할 경우 대비 */
+  .react-datepicker__input-container input {
+    width: 100% !important;
+    box-sizing: border-box !important;
+  }
 
   .react-datepicker {
     border: 1px solid ${color("black.10")};
@@ -96,19 +114,14 @@ const DatePickerWrapper = styled.div`
   .react-datepicker__day--keyboard-selected {
     background: ${color("black.90")};
   }
-
-  .react-datepicker-wrapper,
-  .react-datepicker__input-container {
-    width: 100%;
-    display: block;
-  }
 `;
 
 const DateField = styled.button`
   width: 100%;
-  height: 48px;
+  box-sizing: border-box; /* 중요: padding/border 포함해 100% 계산 */
+  height: ${({ $height }) => $height || "48px"};
   border-radius: 4px;
-  border: 1px solid ${({ $borderColor }) => $borderColor || color("black.10")}; /* ✅ 수정 부분 */
+  border: 1px solid ${({ $borderColor }) => $borderColor || color("black.10")};
   background: ${color("white")};
   display: grid;
   grid-template-columns: 1fr 44px;
@@ -124,6 +137,8 @@ const DateField = styled.button`
     outline: none;
     background: transparent;
     cursor: pointer;
+    width: 100%;
+    box-sizing: border-box;
 
     &::placeholder {
       color: ${color("black.40")};
@@ -136,7 +151,6 @@ const CalendarButton = styled.span`
   height: 100%;
   display: grid;
   place-items: center;
-  border-left: 1px solid ${color("black.10")};
   background: ${color("black.90")};
   border-radius: 0 10px 10px 0;
   color: ${color("white")};
@@ -146,5 +160,3 @@ const CalendarButton = styled.span`
     height: 18px;
   }
 `;
-
-//<DatePicker selected={date} onChange={setDate} borderColor="#FF5B5B"  />
