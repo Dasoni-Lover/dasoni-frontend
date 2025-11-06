@@ -13,6 +13,8 @@ import { RegisterPage } from "./features/Login/pages/RegisterPage";
 import { EnterMemorialHomePage } from "./pages/EnterMemorialHomePage";
 import OpenMemorialHomePage from "./pages/OpenMemorialHomePage";
 import RequestEntryPage from "./pages/RequestEntryPage";
+import { SentLetterPage } from "./pages/SentLetterPage";
+import { SentLetterBoxPage } from "./pages/SentLetterBoxPage";
 
 const router = createBrowserRouter([
   {
@@ -32,6 +34,8 @@ const router = createBrowserRouter([
       { path: "/open", element: <OpenMemorialHomePage /> },
       { path: "/enter", element: <EnterMemorialHomePage /> },
       { path: "/request-entry", element: <RequestEntryPage /> },
+      { path: "/sent-letter", element: <SentLetterPage /> },
+      { path: "/sent-letterbox", element: <SentLetterBoxPage /> },
     ],
   },
 ]);

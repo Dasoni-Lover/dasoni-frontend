@@ -7,7 +7,7 @@ export default function WritePostPage() {
   return (
     <div>
       <BarWrapper>
-        <BarNavigate title={"게시물 작성"} />
+        <BarNavigate paths={["홈", "故 박영수의 추모관", "게시물 작성"]} title="게시물 작성"/>
       </BarWrapper>
       <WritePostForm />
     </div>
