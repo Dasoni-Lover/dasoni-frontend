@@ -22,6 +22,7 @@ import AIGeneratePage from "./pages/AIGeneratePage";
 import { SentLetterPage } from "./pages/SentLetterPage";
 import { SentLetterBoxPage } from "./pages/SentLetterBoxPage";
 
+
 const router = createBrowserRouter([
   {
     path: "/",

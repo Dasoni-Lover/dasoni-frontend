@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import styled from "styled-components";
 import { typo } from "../../../styles/tokens";
+import { useNavigate } from "react-router-dom";
 
 import Header from "../../../components/Header";
 import Footer from "../../../components/Footer";
@@ -18,8 +19,11 @@ import LinkShareModal from "../components/LinkShareModal";
 import { NoPost } from "../components/NoPost";
 
 const MemorialMyHomePage = () => {
+  const nav = useNavigate();
   const [isAddMenuOpen, setIsAddMenuOpen] = useState(false);
   const [isLinkShareModalOpen, setIsLinkShareModalOpen] = useState(false); // 모달 상태
+  const goWritePage = () => nav("/write");
+  const goAIGeneratePage = () => nav("/generate");
 
   return (
     <Container>
@@ -47,11 +51,11 @@ const MemorialMyHomePage = () => {
       <FixedAddPostContainer>
         {isAddMenuOpen && (
           <FixedAddPostMenu>
-            <MenuButton>
+            <MenuButton onClick={goAIGeneratePage}>
               <MenuIcon src={aiicon} alt="AI 이미지 생성" />
               <span>AI 이미지 생성</span>
             </MenuButton>
-            <MenuButton>
+            <MenuButton onClick={goWritePage}>
               <MenuIcon src={foldericon} alt="사진 업로드" />
               <span>컴퓨터에서 불러오기</span>
             </MenuButton>

@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import styled from "styled-components";
 import { color, typo } from "../../../styles/tokens";
-import { useNavigate } from "react-router-dom"; // ✅ 추가
+import { useNavigate } from "react-router-dom"; 
 
 import Footer from "../../../components/Footer";
 import BarNavigate from "../../../components/BarNavigate";
@@ -25,6 +25,9 @@ export const MemorialManagerHomePage = () => {
   const handleModifyClick = () => {
     navigate("/memorial-manager/edit-profile"); // ✅ 페이지 이동
   };
+
+  const goWritePage = () => navigate("/write");
+  const goAIGeneratePage = () => navigate("/generate");
 
   return (
     <Container>
@@ -57,11 +60,11 @@ export const MemorialManagerHomePage = () => {
       <FixedAddPostContainer>
         {isAddMenuOpen && (
           <FixedAddPostMenu>
-            <MenuButton>
+            <MenuButton onClick={goAIGeneratePage}>
               <MenuIcon src={aiicon} alt="AI 이미지 생성" />
               <span>AI 이미지 생성</span>
             </MenuButton>
-            <MenuButton>
+            <MenuButton onClick={goWritePage}>
               <MenuIcon src={foldericon} alt="사진 업로드" />
               <span>컴퓨터에서 불러오기</span>
             </MenuButton>
