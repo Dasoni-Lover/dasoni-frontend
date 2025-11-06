@@ -1,27 +1,33 @@
-import React, { useState, useRef, useEffect } from 'react'
-import styled from 'styled-components'
-import { color, typo } from '../../../styles/tokens'
-import letterbg from "../assets/letter-bg.svg"
+import React, { useState, useRef, useEffect } from "react";
+import styled from "styled-components";
+import { color, typo } from "../../../styles/tokens";
+import letterbg from "../assets/letter-bg.svg";
 
+export const SentLetter = ({
+  to,
+  from,
+  value,
+  onToChange,
+  onFromChange,
+  onValueChange,
+}) => {
+  const [toWidth, setToWidth] = useState(0);
+  const [fromWidth, setFromWidth] = useState(0);
 
-export const SentLetter = ({ to, from, value, onToChange, onFromChange, onValueChange }) => {
-  const [toWidth, setToWidth] = useState(0)
-  const [fromWidth, setFromWidth] = useState(0)
-
-  const toMeasureRef = useRef(null)
-  const fromMeasureRef = useRef(null)
+  const toMeasureRef = useRef(null);
+  const fromMeasureRef = useRef(null);
 
   useEffect(() => {
     if (toMeasureRef.current) {
-      setToWidth(toMeasureRef.current.offsetWidth + 8) 
+      setToWidth(toMeasureRef.current.offsetWidth + 8);
     }
-  }, [to])
+  }, [to]);
 
   useEffect(() => {
     if (fromMeasureRef.current) {
-      setFromWidth(fromMeasureRef.current.offsetWidth + 8)
+      setFromWidth(fromMeasureRef.current.offsetWidth + 8);
     }
-  }, [from])
+  }, [from]);
 
   return (
     <Container>
@@ -63,14 +69,14 @@ export const SentLetter = ({ to, from, value, onToChange, onFromChange, onValueC
             placeholder="이름을 입력해 주세요"
             value={from}
             onChange={(e) => onFromChange(e.target.value)}
-            style={{ width: `${fromWidth || 180}px`, textAlign: 'right' }}
+            style={{ width: `${fromWidth || 180}px`, textAlign: "right" }}
             maxLength={15}
           />
         </InputWrapper>
       </Row2>
     </Container>
-  )
-}
+  );
+};
 
 const Container = styled.div`
   width: 56.25rem;
@@ -87,32 +93,31 @@ const Container = styled.div`
   display: flex;
   flex-direction: column;
   justify-content: space-between;
-`
+`;
 
 const Row1 = styled.div`
   display: flex;
   align-items: center;
   gap: 0.3rem;
-`
+`;
 
 const Row2 = styled.div`
   display: flex;
   align-items: center;
   justify-content: flex-end;
-`
+`;
 
 const Label = styled.div`
-  color: var(--80, #0E0E0E);
+  color: var(--80, #0e0e0e);
   font-family: "Nanum OeHarMeoNiGeurSsi";
   font-size: 2rem;
   line-height: 145%;
-`
-
+`;
 
 const InputWrapper = styled.div`
   position: relative;
   display: inline-block;
-`
+`;
 
 // 실제 너비 계산용 숨겨진 span
 const MeasureSpan = styled.span`
@@ -121,7 +126,7 @@ const MeasureSpan = styled.span`
   white-space: pre;
   font-family: "Nanum OeHarMeoNiGeurSsi";
   font-size: 2rem;
-`
+`;
 
 const NameInput = styled.input`
   border: none;
@@ -129,17 +134,17 @@ const NameInput = styled.input`
   outline: none;
   font-family: "Nanum OeHarMeoNiGeurSsi";
   font-size: 2rem;
-  color: var(--80, #0E0E0E);
+  color: var(--80, #0e0e0e);
   transition: width 0.15s ease;
 
   &::placeholder {
     color: ${color("black.80")};
   }
-`
+`;
 
 const InputBox = styled.div`
-  border-top: 1px solid var(--50, #7A7A7A);
-  border-bottom: 1px solid var(--50, #7A7A7A);
+  border-top: 1px solid var(--50, #7a7a7a);
+  border-bottom: 1px solid var(--50, #7a7a7a);
   height: 23.125rem;
   padding: 0.94rem 0.5rem;
   margin-bottom: 0.75rem;
@@ -150,12 +155,12 @@ const InputBox = styled.div`
   overflow-y: auto;
   overflow-x: hidden;
 
-  scrollbar-width: none;       /* Firefox */
-  -ms-overflow-style: none;    /* IE 10+ */
+  scrollbar-width: none; /* Firefox */
+  -ms-overflow-style: none; /* IE 10+ */
   &::-webkit-scrollbar {
-    display: none;             /* Chrome, Safari, Opera */
+    display: none; /* Chrome, Safari, Opera */
   }
-`
+`;
 
 const Input = styled.textarea.attrs({ maxLength: 1000 })`
   flex: 1;
@@ -169,17 +174,16 @@ const Input = styled.textarea.attrs({ maxLength: 1000 })`
 
   /* 스크롤 가능하지만 스크롤바 숨기기 */
   overflow-y: auto;
-  scrollbar-width: none;       /* Firefox */
-  -ms-overflow-style: none;    /* IE 10+ */
+  scrollbar-width: none; /* Firefox */
+  -ms-overflow-style: none; /* IE 10+ */
   &::-webkit-scrollbar {
-    display: none;             /* Chrome, Safari, Opera */
+    display: none; /* Chrome, Safari, Opera */
   }
 
   &::placeholder {
     color: ${color("black.30")};
   }
-`
-
+`;
 
 const Text = styled.div`
   ${typo("bodym")};
@@ -187,5 +191,4 @@ const Text = styled.div`
   display: flex;
   justify-content: flex-end;
   margin-top: 0.62rem;
-`
-
+`;

@@ -18,28 +18,22 @@ import LinkShareModal from "../components/LinkShareModal";
 import { NoPost } from "../components/NoPost";
 
 const MemorialMyHomePage = () => {
-  const [isOpen, setIsOpen] = useState(true);
   const [isAddMenuOpen, setIsAddMenuOpen] = useState(false);
   const [isLinkShareModalOpen, setIsLinkShareModalOpen] = useState(false); // 모달 상태
 
   return (
-    <Wrapper>
-      <Header />
-      <SideBar isOpen={isOpen} toggleSidebar={() => setIsOpen(!isOpen)} />
-
-      <ContentWrapper isOpen={isOpen}>
-        <BarWrapper>
-          <BarNavigate />
-        </BarWrapper>
-
+    <>
+      <BarWrapper>
+        <BarNavigate />
+      </BarWrapper>
+      <ContentWrapper>
         <Content>
           <ProfileBox>
             <DefaultProfile isEditable={true} />
-
           </ProfileBox>
           <HallTab role="owner" />
           <TabButtonDropdown />
-          <NoPost/>
+          <NoPost />
         </Content>
       </ContentWrapper>
 
@@ -75,36 +69,25 @@ const MemorialMyHomePage = () => {
       )}
 
       <Footer />
-    </Wrapper>
+    </>
   );
 };
 
 export default MemorialMyHomePage;
 
-const Wrapper = styled.div`
-  display: flex;
-  position: relative;
-  flex-direction: column;
-  min-height: 100vh;
-`;
-
 const ContentWrapper = styled.div`
   display: flex;
   flex-direction: column;
   align-items: center;
-  width: 100%;
   transition: all 0.3s ease;
   flex: 1; /* footer 위 공간 채우기 */
 
   @media (max-width: 1200px) {
     align-items: flex-start;
-    margin-left: ${({ isOpen }) =>
-      isOpen ? "calc(300px + 40px)" : "calc(60px + 0px)"};
   }
 `;
 
 const BarWrapper = styled.div`
-  width: 100%;
   margin-top: 30px;
   margin-bottom: 52px;
   display: flex;
@@ -124,9 +107,9 @@ const Content = styled.div`
   transition: all 0.3s ease;
 `;
 
-const ProfileBox=styled.div`
-  margin-bottom:52px ;
-`
+const ProfileBox = styled.div`
+  margin-bottom: 52px;
+`;
 
 const FixedShareButton = styled.div`
   position: fixed;

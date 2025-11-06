@@ -11,8 +11,10 @@ export default function Header({ showAuthButtons }) {
 
       {showAuthButtons && (
         <ButtonGroup>
-          <LoginButton onClick={() => navigate("/loginpage")}>로그인</LoginButton>
-          <RegisterButton onClick={() => navigate("/registerpage")}>회원가입</RegisterButton>
+          <LoginButton onClick={() => navigate("/login")}>로그인</LoginButton>
+          <RegisterButton onClick={() => navigate("/register")}>
+            회원가입
+          </RegisterButton>
         </ButtonGroup>
       )}
     </Wrapper>
@@ -53,10 +55,10 @@ const LoginButton = styled.button`
   justify-content: center;
   align-items: center;
   border-radius: 0.625rem;
-  border: 2px solid var(--5, #E9E9E9);
-  background: #FFF;
+  border: 2px solid var(--5, #e9e9e9);
+  background: #fff;
 
-  color: var(--80, #0E0E0E);
+  color: var(--80, #0e0e0e);
   text-align: center;
   font-family: Pretendard;
   font-size: 1.25rem;
@@ -77,7 +79,7 @@ const RegisterButton = styled.button`
   border: 2px solid var(--70, #313131);
   background: var(--70, #313131);
 
-  color: #FFF;
+  color: #fff;
   text-align: center;
   font-family: Pretendard;
   font-size: 1.25rem;

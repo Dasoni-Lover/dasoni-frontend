@@ -1,9 +1,9 @@
-import React, { useState } from 'react'
-import styled from 'styled-components'
-import { CardList } from '../features/Home/components/CardList'
-import { SearchTab } from "../features/EnterMemorialHome/components/SearchTab"
-import { EnterModal } from '../features/EnterMemorialHome/components/EnterModal'
-import { color, typo } from '../styles/tokens'
+import React, { useState } from "react";
+import styled from "styled-components";
+import { CardList } from "../features/Home/components/CardList";
+import { SearchTab } from "../features/EnterMemorialHome/components/SearchTab";
+import { EnterModal } from "../features/EnterMemorialHome/components/EnterModal";
+import { color, typo } from "../styles/tokens";
 
 export const EnterMemorialHomePage = () => {
   const [modalVisible, setModalVisible] = useState(false);
@@ -26,8 +26,8 @@ export const EnterMemorialHomePage = () => {
 
       {modalVisible && <EnterModal onClose={handleCloseModal} />}
     </Wrapper>
-  )
-}
+  );
+};
 
 const Wrapper = styled.div`
   display: flex;
