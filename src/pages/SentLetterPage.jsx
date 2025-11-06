@@ -6,6 +6,7 @@ import { SentLetter } from '../features/Letters/components/SentLetter'
 import Button from '../components/Button'
 import ConfirmModal from '../components/ConfirmModal'
 import { useNavigate } from 'react-router-dom'
+import { SideDrawer } from '../features/Letters/components/SideDrawer'
 
 export const SentLetterPage = () => {
   const navigate = useNavigate()
@@ -87,11 +88,11 @@ export const SentLetterPage = () => {
         onConfirm={handleConfirm}
         onCancel={handleCloseModal}
       />
+      <SideDrawer/>
     </Wrapper>
   )
 }
 
-// 💅 스타일
 const Wrapper = styled.div`
   display: flex;
   flex-direction: column;
@@ -99,6 +100,7 @@ const Wrapper = styled.div`
   justify-content: flex-start;
   width: 68.5rem;
   margin-top: 1.81rem;
+  position: relative;
 `
 
 const NavWrapper = styled.div`

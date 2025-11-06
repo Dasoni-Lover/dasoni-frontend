@@ -12,7 +12,7 @@ const HallTabButton = ({ text, isActive, onClick }) => {
 
 const Wrapper = styled.div`
   display: flex;
-  width: 11.5rem;
+  flex: 1; /* ✅ 버튼이 균등하게 공간 차지 */
   padding: 0.625rem;
   justify-content: center;
   align-items: center;
@@ -21,7 +21,8 @@ const Wrapper = styled.div`
   background-color: ${({ isActive }) => (isActive ? '#FFBC67' : 'white')};
   cursor: pointer;
   transition: background-color 0.2s ease;
-`
+`;
+
 
 const Text = styled.div`
   ${typo('h4')};
