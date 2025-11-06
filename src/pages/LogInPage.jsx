@@ -1,12 +1,58 @@
-import React from "react";
+// src/pages/LogInPage.jsx
+import React, { useState } from "react";
 import styled from "styled-components";
 import { useNavigate } from "react-router-dom";
 import { color, typo } from "../styles/tokens";
-import { InputField } from "../components/InputField";
 import Button from "../components/Button";
+import { InputFieldWhite } from "../components/InputFieldWhite";
+import { loginUser, setAuthTokens } from "../api/auth";
 
 export default function LogInPage() {
   const navigate = useNavigate();
+
+  const [logId, setLogId] = useState("");
+  const [password, setPassword] = useState("");
+  const [isLoggingIn, setIsLoggingIn] = useState(false);
+
+  const handleLogin = async () => {
+    if (!logId.trim()) {
+      alert("아이디를 입력해 주세요.");
+      return;
+    }
+    if (!password) {
+      alert("비밀번호를 입력해 주세요.");
+      return;
+    }
+
+    const body = {
+      logId: logId.trim(),
+      password,
+    };
+
+    try {
+      setIsLoggingIn(true);
+
+      const data = await loginUser(body); // { access_token, refresh_token }
+      console.log("login response:", data);
+
+      // ✅ 토큰 저장 헬퍼 사용
+      setAuthTokens(data);
+
+      alert("로그인에 성공했습니다.");
+      navigate("/homepage");
+    } catch (error) {
+      console.error(error);
+      if (error.response?.status === 401) {
+        alert("아이디 또는 비밀번호가 올바르지 않습니다.");
+      } else if (error.response?.data?.message) {
+        alert(`로그인 실패: ${error.response.data.message}`);
+      } else {
+        alert("로그인 중 오류가 발생했습니다.");
+      }
+    } finally {
+      setIsLoggingIn(false);
+    }
+  };
 
   return (
     <Wrapper>
@@ -20,16 +66,31 @@ export default function LogInPage() {
           <MainWrapper>
             <InputBox>
               <Type>아이디</Type>
-              <InputField placeholder="아이디를 입력해 주세요" width="100%" />
+              <InputFieldWhite
+                placeholder="아이디를 입력해 주세요"
+                width="100%"
+                value={logId}
+                onChange={(e) => setLogId(e.target.value)}
+              />
             </InputBox>
             <InputBox>
               <Type>비밀번호</Type>
-              <InputField placeholder="비밀번호를 입력해 주세요" width="100%" />
+              <InputFieldWhite
+                placeholder="비밀번호를 입력해 주세요"
+                width="100%"
+                type="password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+              />
             </InputBox>
           </MainWrapper>
 
           <ClickBox>
-            <Button text="로그인" onClick={() => navigate("/homepage")} />
+            <Button
+              text={isLoggingIn ? "로그인 중..." : "로그인"}
+              onClick={handleLogin}
+              disabled={isLoggingIn}
+            />
 
             <MiniWrapper>
               <Question>다소니가 처음이신가요?</Question>

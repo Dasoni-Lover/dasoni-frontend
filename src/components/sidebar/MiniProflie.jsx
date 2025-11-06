@@ -1,15 +1,20 @@
+// src/components/sidebar/MiniProflie.jsx
 import React from "react";
 import styled from "styled-components";
-import profileimg from "../../assets/profile-img.png"; // 실제 경로에 맞게 수정 필요
-import { color,typo } from "../../styles/tokens";
+import profileimg from "../../assets/icon-profile-default.svg";
+import { color, typo } from "../../styles/tokens";
 
+// SideBarList 에서 name, profileImg 내려줌
+// 로그인 안 되어 있으면 기본값(name='로그인 해주세요', profileImg=null)
+const MiniProfile = ({ name, profileImg }) => {
+  const displayName = name || "로그인 해주세요";
+  const imgSrc = profileImg || profileimg;
 
-const MiniProfile = () => {
   return (
     <Box>
       <ProfileContainer>
-        <ProfileImage src={profileimg} alt="프로필 이미지" />
-        <Nickname>박영진</Nickname>
+        <ProfileImage src={imgSrc} alt="프로필 이미지" />
+        <Nickname>{displayName}</Nickname>
       </ProfileContainer>
     </Box>
   );
@@ -17,26 +22,23 @@ const MiniProfile = () => {
 
 export default MiniProfile;
 
-
 const Box = styled.div`
   display: flex;
-  padding: 0 0.5rem; 
+  padding: 0 0.5rem;
 `;
 
 const ProfileContainer = styled.div`
   display: flex;
   align-items: center;
-  gap: 1rem; 
+  gap: 1rem;
 `;
 
 const ProfileImage = styled.img`
-  width: 3.125rem; 
-  height: 3.125rem; 
+  width: 3.125rem;
+  height: 3.125rem;
   border-radius: 3px;
   object-fit: cover;
 `;
-
-
 
 const Nickname = styled.span`
   ${typo("h3")};
