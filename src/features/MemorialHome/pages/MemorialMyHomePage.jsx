@@ -86,7 +86,7 @@ const ContentWrapper = styled.div`
   align-items: center;
   transition: all 0.3s ease;
   flex: 1; /* footer 위 공간 채우기 */
-
+  min-height: 45rem;
   @media (max-width: 1200px) {
     align-items: flex-start;
   }
