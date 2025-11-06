@@ -7,6 +7,8 @@ import Button from "../components/Button";
 import profileimg from "../features/Onboarding/assets/default-profile-img.svg";
 import DatePicker from "../components/DatePicker";
 import dropdownicon from "../assets/row-icon.svg";
+import { checkDuplicateId, registerUser } from "../api/user";
+import client from "../api/client"; // ✅ presigned-url 요청용 axios 클라이언트
 
 export default function RegisterPage() {
   const navigate = useNavigate();
@@ -14,6 +16,25 @@ export default function RegisterPage() {
   const [isOpen, setIsOpen] = useState(false);
   const [selectedGender, setSelectedGender] = useState("성별을 선택해 주세요");
   const dropdownRef = useRef(null);
+
+  // ✅ 프로필 이미지 상태
+  const [profileImageFile, setProfileImageFile] = useState(null);
+  const [profilePreview, setProfilePreview] = useState(profileimg);
+  const fileInputRef = useRef(null);
+
+  // ✅ 입력값 상태
+  const [logId, setLogId] = useState("");
+  const [password, setPassword] = useState("");
+  const [passwordConfirm, setPasswordConfirm] = useState("");
+  const [name, setName] = useState("");
+
+  // ✅ ID 중복확인 상태
+  const [isCheckingId, setIsCheckingId] = useState(false);
+  const [hasCheckedId, setHasCheckedId] = useState(false);
+  const [isIdAvailable, setIsIdAvailable] = useState(null);
+
+  // ✅ 회원가입 진행 상태
+  const [isRegistering, setIsRegistering] = useState(false);
 
   useEffect(() => {
     const handleClickOutside = (event) => {
@@ -30,6 +51,201 @@ export default function RegisterPage() {
     setIsOpen(false);
   };
 
+  // 날짜 → "YYYY.MM.DD" 포맷
+  const formatDate = (d) => {
+    if (!d) return "";
+    const year = d.getFullYear();
+    const month = String(d.getMonth() + 1).padStart(2, "0");
+    const day = String(d.getDate()).padStart(2, "0");
+    return `${year}.${month}.${day}`;
+  };
+
+  // ✅ ID 입력 변경 시, 이전 중복확인 상태 초기화
+  const handleChangeLogId = (e) => {
+    setLogId(e.target.value);
+    setHasCheckedId(false);
+    setIsIdAvailable(null);
+  };
+
+  // ✅ 프로필 선택 핸들러
+  const handleProfileChange = (e) => {
+    const file = e.target.files && e.target.files[0];
+    if (!file) return;
+
+    setProfileImageFile(file);
+
+    // 미리보기용 URL
+    const previewUrl = URL.createObjectURL(file);
+    setProfilePreview(previewUrl);
+  };
+
+  // ✅ ID 중복확인 API
+  const handleCheckId = async () => {
+    if (!logId.trim()) {
+      alert("아이디를 먼저 입력해 주세요.");
+      return;
+    }
+
+    try {
+      setIsCheckingId(true);
+      const data = await checkDuplicateId(logId.trim()); // ← user.js 사용
+      // data: { isAvailable: true/false }
+
+      setHasCheckedId(true);
+      setIsIdAvailable(data.isAvailable);
+
+      if (data.isAvailable) {
+        alert("사용 가능한 아이디입니다.");
+      } else {
+        alert("이미 사용 중인 아이디입니다.");
+      }
+    } catch (error) {
+      console.error(error);
+      alert("ID 중복확인 중 오류가 발생했습니다.");
+    } finally {
+      setIsCheckingId(false);
+    }
+  };
+
+  // 파일 확장자 기준으로 안전한 Content-Type 정규화
+  const getImageContentType = (file) => {
+    if (!file) return "application/octet-stream";
+
+    // 1순위: 브라우저가 이미 타입을 알고 있으면 그걸 사용
+    if (file.type) {
+      return file.type;
+    }
+
+    // 2순위: 확장자로 추론
+    const ext = file.name.split(".").pop().toLowerCase();
+
+    switch (ext) {
+      case "jpg":
+      case "jpeg":
+        return "image/jpeg";
+      case "png":
+        return "image/png";
+      case "gif":
+        return "image/gif";
+      case "bmp":
+        return "image/bmp";
+      case "svg":
+      case "svg+xml":
+        return "image/svg+xml";
+      default:
+        // 백엔드랑 얘기해서 허용 안 할 거면 여기서 막아도 됨
+        return "application/octet-stream";
+    }
+  };
+
+  // ✅ 회원가입 API
+  const handleRegister = async () => {
+    if (!logId.trim()) {
+      alert("아이디를 입력해 주세요.");
+      return;
+    }
+    if (!hasCheckedId || isIdAvailable === false) {
+      alert("아이디 중복확인을 완료해 주세요.");
+      return;
+    }
+    if (!password) {
+      alert("비밀번호를 입력해 주세요.");
+      return;
+    }
+    if (password !== passwordConfirm) {
+      alert("비밀번호와 비밀번호 확인이 일치하지 않습니다.");
+      return;
+    }
+    if (!name.trim()) {
+      alert("이름을 입력해 주세요.");
+      return;
+    }
+    if (selectedGender !== "남성" && selectedGender !== "여성") {
+      alert("성별을 선택해 주세요.");
+      return;
+    }
+    if (!date) {
+      alert("생일을 선택해 주세요.");
+      return;
+    }
+
+    const birthday = formatDate(date);
+    // true: 여자, false: 남자
+    const genderBool = selectedGender === "여성";
+
+    setIsRegistering(true);
+
+    try {
+      // ✅ 1) 프로필 이미지가 있으면 presigned-url 발급 + S3 업로드
+      let myProfile = "";
+
+      if (profileImageFile) {
+        // ✔ 안전한 contentType 계산
+        const contentType = getImageContentType(profileImageFile);
+        console.log("upload contentType:", {
+          fileType: profileImageFile.type,
+          normalized: contentType,
+        });
+
+        // 1-1) presigned-url 요청
+        const presignRes = await client.post(
+          "/api/files/images/presigned-url",
+          {
+            filename: profileImageFile.name,
+            contentType, // ← 정규화된 타입 사용
+            fileSize: profileImageFile.size,
+          }
+        );
+
+        const { uploadUrl, fileUrl } = presignRes.data;
+
+        // 1-2) S3로 실제 업로드
+        const uploadRes = await fetch(uploadUrl, {
+          method: "PUT",
+          headers: {
+            "Content-Type": contentType, // presign 때와 완전히 동일해야 함
+          },
+          body: profileImageFile,
+        });
+
+        if (!uploadRes.ok) {
+          console.error("S3 upload failed status:", uploadRes.status);
+          throw new Error("이미지 업로드에 실패했습니다.");
+        }
+
+        myProfile = fileUrl;
+      }
+      // ✅ 2) 회원가입 요청
+      const body = {
+        name: name.trim(),
+        gender: genderBool,
+        birthday,
+        logId: logId.trim(),
+        password,
+        myProfile, // S3에 업로드된 이미지 URL (없으면 "")
+      };
+
+      const data = await registerUser(body); // ← user.js 사용
+      console.log("register response:", data);
+
+      alert("회원가입이 완료되었습니다. 로그인 페이지로 이동합니다.");
+      navigate("/login");
+    } catch (error) {
+      console.error(error);
+      if (error.message === "이미지 업로드에 실패했습니다.") {
+        alert(
+          "프로필 이미지 업로드에 실패했습니다. 잠시 후 다시 시도해 주세요."
+        );
+      } else if (error.response?.data?.message) {
+        alert(`회원가입 실패: ${error.response.data.message}`);
+      } else {
+        alert("회원가입 중 오류가 발생했습니다.");
+      }
+    } finally {
+      setIsRegistering(false);
+    }
+  };
+
   return (
     <Wrapper>
       <OutBox>
@@ -41,8 +257,19 @@ export default function RegisterPage() {
 
           <Container>
             <ProfileWrapper>
-              <ProfileImg src={profileimg} />
-              <SelectButton>프로필사진 설정하기</SelectButton>
+              {/* ✅ 기본 이미지는 그대로, 선택하면 preview로 변경 */}
+              <ProfileImg src={profilePreview} />
+              <SelectButton onClick={() => fileInputRef.current?.click()}>
+                프로필사진 설정하기
+              </SelectButton>
+              {/* ✅ 숨겨진 파일 input (UI 안 바뀜) */}
+              <input
+                type="file"
+                accept="image/*"
+                ref={fileInputRef}
+                style={{ display: "none" }}
+                onChange={handleProfileChange}
+              />
             </ProfileWrapper>
 
             <MainWrapper>
@@ -53,17 +280,30 @@ export default function RegisterPage() {
                     <InputFieldWhite
                       placeholder="아이디를 설정해 주세요"
                       width="auto"
+                      value={logId}
+                      onChange={handleChangeLogId}
                     />
                     <ButtonSize>
-                      <Button text="중복확인" size="S" />
+                      <Button
+                        text={isCheckingId ? "확인중..." : "중복확인"}
+                        size="S"
+                        active={!hasCheckedId}
+                        onClick={handleCheckId}
+                      />
                     </ButtonSize>
                   </IdCheck>
+                  {hasCheckedId ? (
+                    <CheckedMessage>사용할 수 있는 아이디에요</CheckedMessage>
+                  ) : null}
                 </InputBox>
                 <InputBox>
                   <Type>비밀번호</Type>
                   <InputFieldWhite
                     placeholder="비밀번호를 설정해 주세요"
                     width="100%"
+                    type="password"
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
                   />
                 </InputBox>
                 <InputBox>
@@ -71,6 +311,9 @@ export default function RegisterPage() {
                   <InputFieldWhite
                     placeholder="비밀번호를 다시 한 번 입력해 주세요"
                     width="100%"
+                    type="password"
+                    value={passwordConfirm}
+                    onChange={(e) => setPasswordConfirm(e.target.value)}
                   />
                 </InputBox>
               </Half>
@@ -81,6 +324,8 @@ export default function RegisterPage() {
                   <InputFieldWhite
                     placeholder="이름을 실명으로 입력해 주세요"
                     width="100%"
+                    value={name}
+                    onChange={(e) => setName(e.target.value)}
                   />
                 </InputBox>
 
@@ -123,7 +368,11 @@ export default function RegisterPage() {
           </Container>
 
           <ClickBox>
-            <Button text="회원가입" onClick={() => navigate("/login")} />
+            <Button
+              text={isRegistering ? "회원가입 중..." : "회원가입"}
+              onClick={handleRegister}
+              disabled={isRegistering}
+            />
             <MiniWrapper>
               <Question>이미 계정이 있으신가요?</Question>
               <RegisterButton onClick={() => navigate("/login")}>
@@ -231,6 +480,11 @@ const IdCheck = styled.div`
   gap: 0.44rem;
 `;
 
+const CheckedMessage = styled.div`
+  ${typo("bodym")};
+  color: ${color("black.30")};
+`;
+
 const ButtonSize = styled.div`
   width: 6.25rem;
   display: flex;
@@ -314,7 +568,7 @@ const DropdownItem = styled.div`
   text-align: left;
   padding: 0.6rem 0.7rem;
   ${typo("bodym")};
-  color: #7c7c7c;
+  color: #7a7a7c;
   cursor: pointer;
 
   &:hover {

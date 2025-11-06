@@ -1,16 +1,19 @@
+// src/components/sidebar/MiniAlarm.jsx
 import React from "react";
 import alarmicon from "../../assets/alarm-icon.png";
 import styled from "styled-components";
 import { color } from "../../styles/tokens";
 
-const MiniAlarm = ({ onClick, isActive }) => {
+const MiniAlarm = ({ onClick, isActive, count = 0 }) => {
+  const displayCount = typeof count === "number" && count > 0 ? count : 0;
+
   return (
     <Container onClick={onClick} $isActive={isActive}>
       <Box>
         <AlarmIcon src={alarmicon} alt="알림 아이콘" />
         <Text $isActive={isActive}>알림</Text>
       </Box>
-      <Count>0</Count>
+      <Count>{displayCount}</Count>
     </Container>
   );
 };
@@ -27,7 +30,6 @@ const Container = styled.div`
   transition: background 0.2s ease;
   border-radius: 0.1875rem;
   background: ${({ $isActive }) => ($isActive ? "#313131" : "transparent")};
-
 
   &:hover {
     background: #313131;
@@ -56,8 +58,7 @@ const Text = styled.div`
   font-size: 1.07913rem;
   font-weight: 500;
   line-height: 145%;
-  color: ${({ $isActive }) =>
-    $isActive ? color("white") : color("black.50")};
+  color: ${({ $isActive }) => ($isActive ? color("white") : color("black.50"))};
   transition: color 0.2s ease;
 `;
 

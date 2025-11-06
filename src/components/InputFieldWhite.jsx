@@ -2,10 +2,22 @@ import React from "react";
 import styled from "styled-components";
 import { color, typo } from "../styles/tokens";
 
-export const InputFieldWhite = ({ placeholder, width = "50%" }) => {
+export const InputFieldWhite = ({
+  placeholder,
+  width = "50%",
+  value,
+  onChange,
+  ...rest
+}) => {
   return (
     <Wrapper $width={width}>
-      <StyledInput type="text" placeholder={placeholder} />
+      <StyledInput
+        type="text"
+        placeholder={placeholder}
+        value={value}
+        onChange={onChange}
+        {...rest}
+      />
     </Wrapper>
   );
 };
@@ -19,8 +31,8 @@ const Wrapper = styled.div`
   gap: 0.625rem;
   flex: 1 0 0;
   border-radius: 0.25rem;
-  border: 1px solid #A8A8A8;
-  background: #FFF;
+  border: 1px solid #a8a8a8;
+  background: #fff;
   box-sizing: border-box;
 `;
 
@@ -34,10 +46,9 @@ const StyledInput = styled.input`
   outline: none;
 
   &::placeholder {
-    color: #7C7C7C;
+    color: #7c7c7c;
   }
 `;
-
 
 //<InputField placeholder="고인의 이름을 입력하세요" />
 //<InputField placeholder="아이디를 입력하세요" width="100%" />
