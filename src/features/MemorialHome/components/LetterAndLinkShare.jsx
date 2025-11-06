@@ -1,8 +1,9 @@
 import React, { useState } from 'react';
 import styled from 'styled-components';
-import { useNavigate } from 'react-router-dom'; // ✅ 추가
+import { useNavigate } from 'react-router-dom'; 
+import { color,typo } from '../../../styles/tokens';
 import letterbtn from "../assets/letter-btn.svg";
-import linksharebtn from "../assets/linkshare-btn.png";
+import linksharebtn from "../assets/linkshare-btn.svg";
 import letterhover from "../assets/letter-hover.svg";
 import linksharehover from "../assets/linkshare-hover.svg";
 
@@ -28,8 +29,9 @@ const LetterAndLinkShare = ({ onLinkShareClick }) => {
         src={isLetterHover ? letterhover : letterbtn}
         onMouseEnter={() => setIsLetterHover(true)}
         onMouseLeave={() => setIsLetterHover(false)}
-        onClick={handleLetterClick} // ✅ 클릭 시 이동
+        onClick={handleLetterClick} 
       />
+      <Text>마우스를 올려보세요!</Text>
     </Wrapper>
   );
 };
@@ -47,26 +49,27 @@ const Wrapper = styled.div`
 `;
 
 const LinkShare = styled.img`
-  width: 4.25rem;
-  height: 3.75rem;
+  width: 6.3125rem;
+  height: 4.875rem;
   padding-right: 0.82rem;
   filter: drop-shadow(2px 4px 2px rgba(0, 0, 0, 0.25));
   cursor: pointer;
-  transition: transform 0.2s ease;
-
-  &:hover {
-    transform: scale(1.02) translateY(-3px);
-  }
+  margin-bottom: 0.5rem;
 `;
 
 const Letter = styled.img`
-  width: 8.125rem;
-  height: 9.25rem;
+    width: 10.125rem;
+height: 9.5rem;
   filter: drop-shadow(1.5px 3px 2px rgba(0, 0, 0, 0.25));
   cursor: pointer;
-  transition: transform 0.15s ease;
 
-  &:hover {
-    transform: scale(1.02);
-  }
+
+
 `;
+
+
+const Text=styled.div`
+    ${typo("bodym")};
+  color: ${color("black.50")};
+  margin-top: 1.13rem;
+`

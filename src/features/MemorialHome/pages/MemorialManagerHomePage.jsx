@@ -27,7 +27,7 @@ export const MemorialManagerHomePage = () => {
   };
 
   return (
-    <>
+    <Container>
       <BarWrapper>
         <BarNavigate />
         <Title>故 박영수의 추모관</Title>
@@ -78,9 +78,13 @@ export const MemorialManagerHomePage = () => {
       )}
 
       <Footer />
-    </>
+    </Container>
   );
 };
+
+const Container=styled.div`
+  position: relative;
+`
 
 const ContentWrapper = styled.div`
   display: flex;
@@ -152,9 +156,9 @@ const Content = styled.div`
 `;
 
 const FixedShareButton = styled.div`
-  position: fixed;
-  right: 135px;
-  top: 192px;
+  position: absolute;
+  right: -380px;
+  top: 160px;
   z-index: 1000;
   cursor: pointer;
 
@@ -222,13 +226,13 @@ const MenuButton = styled.button`
   justify-content: center;
   height: 2.75rem;
   width: 13.75rem;
-  border: 1px solid #313131;
+  border: 1px solid var(--5, #E9E9E9);
   border-radius: 5px;
-  background: #313131;
-  color: white;
+  background: #FFBC67;
+  color: #313131;
   ${typo("h4")};
   cursor: pointer;
-  box-shadow: 0 0 10px rgba(0, 0, 0, 0.39);
+  box-shadow: 0 0 7.6px 0 rgba(0, 0, 0, 0.18);
 
   span {
     flex: 1;
