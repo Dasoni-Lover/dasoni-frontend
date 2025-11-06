@@ -3,6 +3,7 @@ import styled from 'styled-components'
 import { color, typo } from '../../../styles/tokens'
 import letterbg from "../assets/letter-bg.svg"
 
+
 export const SentLetter = ({ to, from, value, onToChange, onFromChange, onValueChange }) => {
   const [toWidth, setToWidth] = useState(0)
   const [fromWidth, setFromWidth] = useState(0)
@@ -12,7 +13,7 @@ export const SentLetter = ({ to, from, value, onToChange, onFromChange, onValueC
 
   useEffect(() => {
     if (toMeasureRef.current) {
-      setToWidth(toMeasureRef.current.offsetWidth + 8) // 여백 추가
+      setToWidth(toMeasureRef.current.offsetWidth + 8) 
     }
   }, [to])
 

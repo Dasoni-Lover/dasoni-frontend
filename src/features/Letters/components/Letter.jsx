@@ -3,6 +3,7 @@ import styled from 'styled-components'
 import { color, typo } from '../../../styles/tokens'
 import letterbg from "../assets/letter-bg.svg"
 
+
 export const Letter = () => {
 
 
