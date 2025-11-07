@@ -3,7 +3,7 @@ import styled from "styled-components";
 import { useNavigate } from "react-router-dom";
 import { SmallPhotoBox } from "../../../components/photobox/SmallPhotoBox";
 import { color, typo } from "../../../styles/tokens";
-import profileimg from "../../../assets/profile-img.png";
+import profileimg from "../../../assets/icon-profile-default.svg";
 
 export const CardListItem = ({ status = "입장완료", onOpenModal, hall }) => {
   const navigate = useNavigate();
