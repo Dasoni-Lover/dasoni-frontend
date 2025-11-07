@@ -1,18 +1,18 @@
-import React, { useState } from 'react';
-import styled from 'styled-components';
-import { useNavigate } from 'react-router-dom';
-import { color, typo } from '../../../styles/tokens';
+import React, { useState } from "react";
+import styled from "styled-components";
+import { useNavigate } from "react-router-dom";
+import { color, typo } from "../../../styles/tokens";
 import letterbtn from "../assets/letter-btn.svg";
 import linksharebtn from "../assets/linkshare-btn.svg";
 import letterhover from "../assets/letter-hover.svg";
 import linksharehover from "../assets/linkshare-hover.svg";
 
 /**
- * ✉️ LetterAndLinkShare
+ *  LetterAndLinkShare
  * @param {Function} onLinkShareClick - 링크 공유 버튼 클릭 시 실행할 함수
  * @param {"default" | "my" | "manager"} page - 네비게이션 동작을 결정하는 모드
  */
-const LetterAndLinkShare = ({ onLinkShareClick, page, hallId  }) => {
+const LetterAndLinkShare = ({ onLinkShareClick, page, hallId }) => {
   const [isLetterHover, setIsLetterHover] = useState(false);
   const [isLinkHover, setIsLinkHover] = useState(false);
   const navigate = useNavigate();
@@ -20,7 +20,7 @@ const LetterAndLinkShare = ({ onLinkShareClick, page, hallId  }) => {
   // Letter 클릭 시 페이지에 따라 네비게이트
   const handleLetterClick = () => {
     if (page === "default") {
-      navigate("/sent-letter", { state: { hallId }});
+      navigate("/sent-letter", { state: { hallId } });
     } else {
       console.log(`⚠️ ${page} 모드에서는 이동하지 않습니다.`);
     }
@@ -82,7 +82,7 @@ const Text = styled.div`
 
 // ### ✅ 상위 컴포넌트 사용 예시
 // ```jsx
-// <LetterAndLinkShare 
-//   onLinkShareClick={() => setIsLinkShareModalOpen(true)} 
+// <LetterAndLinkShare
+//   onLinkShareClick={() => setIsLinkShareModalOpen(true)}
 //   page="default" // "my" 또는 "manager"일 땐 이동 안 함
 // />

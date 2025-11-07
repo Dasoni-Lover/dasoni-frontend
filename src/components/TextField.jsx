@@ -9,8 +9,9 @@ export default function TextField({
   title = "제목",
   essential = false,
   placeholder = "내용을 입력해주세요",
-  value = "",
-  onChange = () => {},
+  // 🔥 여기서 value / onChange 기본값 제거
+  value,
+  onChange,
   titletypo = "h3",
   width = "45rem",
   height = "9.5rem",
@@ -24,10 +25,12 @@ export default function TextField({
       </Row>
       <Input
         placeholder={placeholder}
-        value={value}
-        onChange={onChange}
         $width={width}
         $height={height}
+        // ✅ value가 넘어온 경우에만 컨트롤드로 동작
+        {...(value !== undefined ? { value } : {})}
+        // ✅ onChange가 있을 때만 바인딩
+        {...(onChange ? { onChange } : {})}
         {...rest}
       />
     </Column>
