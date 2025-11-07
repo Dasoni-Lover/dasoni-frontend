@@ -1,17 +1,30 @@
+// src/components/TextField.jsx
 import React from "react";
 import styled from "styled-components";
 import { color, typo } from "../styles/tokens";
 import IconEssential from "../assets/icon-essential-eclipse.svg";
 import { Column, Row } from "../styles/flex";
 
-export default function TextField({ title, essential, placeholder }) {
+export default function TextField({
+  title,
+  essential,
+  placeholder,
+  value,
+  onChange,
+  ...rest
+}) {
   return (
     <Column>
       <Row style={{ marginBottom: "1.75rem" }}>
         <Label>{title}</Label>
         {essential ? <img src={IconEssential} alt="필수" /> : null}
       </Row>
-      <Input placeholder={placeholder} />
+      <Input
+        placeholder={placeholder}
+        value={value}
+        onChange={onChange}
+        {...rest}
+      />
     </Column>
   );
 }

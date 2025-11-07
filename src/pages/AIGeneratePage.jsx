@@ -1,22 +1,32 @@
+// src/pages/AIGeneratePage.jsx
 import React, { useState } from "react";
 import AIGenerateForm from "../features/AIGenerate/components/AIGenerateForm";
 import BarNavigate from "../components/BarNavigate";
 import styled from "styled-components";
 import GenerateComplete from "../features/AIGenerate/components/GenerateComplete";
 import Loding from "../features/AIGenerate/components/Loding";
+import { generateAIImage } from "../api/memorial-album";
 
 export default function AIGeneratePage() {
   const [isGenerated, setIsGenerated] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const [generatedImage, setGeneratedImage] = useState(null);
 
-  const handleGenerate = () => {
-    setIsLoading(true);
+  const handleGenerate = async ({ images, prompt }) => {
+    try {
+      setIsLoading(true);
 
-    // ✅ 나중에 여기에 실제 API 요청 로직 들어감
-    setTimeout(() => {
-      setIsLoading(false);
+      // ✅ 객체로 전달해야 함
+      const res = await generateAIImage({ images, prompt });
+
+      setGeneratedImage(res.generatedImage);
       setIsGenerated(true);
-    }, 2000); // 2초 후 완료로 전환
+    } catch (error) {
+      console.error("AI 이미지 생성 실패:", error);
+      alert("이미지 생성에 실패했습니다. 다시 시도해 주세요.");
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
@@ -29,12 +39,14 @@ export default function AIGeneratePage() {
       </BarWrapper>
 
       {isGenerated ? (
-        <GenerateComplete setIsGenerated={setIsGenerated} />
+        <GenerateComplete
+          setIsGenerated={setIsGenerated}
+          generatedImage={generatedImage}
+        />
       ) : (
         <AIGenerateForm onGenerate={handleGenerate} />
       )}
 
-      {/* ✅ 로딩 모달 */}
       <Loding isOpen={isLoading} onCancel={() => setIsLoading(false)} />
     </PageWrapper>
   );

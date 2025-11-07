@@ -2,16 +2,21 @@ import React from "react";
 import styled from "styled-components";
 import { color, typo } from "../../../styles/tokens";
 import IconDownload from "../../../assets/icon-download.svg";
-import PhotoBox from "../assets/photobox-big.png";
 import { Column, Row } from "../../../styles/flex";
 import Button from "../../../components/Button";
 import { useNavigate } from "react-router-dom";
 
-export default function GenerateComplete({ setIsGenerated }) {
+export default function GenerateComplete({ setIsGenerated, generatedImage }) {
   const nav = useNavigate();
 
   const goBack = () => nav(-1);
   const goGenerate = () => setIsGenerated(false);
+
+  const goWritePost = () => {
+    nav("/write", {
+      state: { generatedImage }, // ✅ 생성된 이미지를 state로 전달
+    });
+  };
 
   return (
     <Row>
@@ -24,7 +29,10 @@ export default function GenerateComplete({ setIsGenerated }) {
         </Row>
 
         <Row $gap={"2.8rem"} style={{ marginBottom: "13rem" }}>
-          <GeneratedImg src={PhotoBox} alt="생성된 이미지" />
+          <GeneratedImg
+            src={`data:image/jpeg;base64,${generatedImage}`}
+            alt="생성된 이미지"
+          />
           <Column style={{ width: "24.5rem" }} $justify={"space-between"}>
             <InformText>{`요청하신 사항에 맞추어 \n이미지를 생성했어요`}</InformText>
             <Column $gap={"1.25rem"}>
@@ -32,6 +40,7 @@ export default function GenerateComplete({ setIsGenerated }) {
                 size="L"
                 color="main"
                 text="이 이미지로 게시물 작성하기"
+                onClick={goWritePost} // ✅ 게시물 작성 페이지로 이동
               />
               <Button
                 size="L"
