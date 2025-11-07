@@ -5,17 +5,25 @@ import nextbtn from "../assets/calendar-next-btn.svg";
 import falsebtn from "../assets/false-calendar-next-btn.svg";
 import prevbtn from "../assets/prev-btn.svg";
 import lettericon from "../features/Letters/assets/letter-icon.svg";
-import LetterModal from "../features/Letters/components/LetterModal"; 
+import LetterModal from "../features/Letters/components/LetterModal";
 
 const weekDays = ["일", "월", "화", "수", "목", "금", "토"];
 
 export const Calendar = () => {
   const [currentDate, setCurrentDate] = useState(new Date());
   const [isModalOpen, setIsModalOpen] = useState(false); // 모달 상태
-  const [selectedDay, setSelectedDay] = useState(null);   // 클릭된 날짜 저장
+  const [selectedDay, setSelectedDay] = useState(null); // 클릭된 날짜 저장
 
-  const startOfMonth = new Date(currentDate.getFullYear(), currentDate.getMonth(), 1);
-  const endOfMonth = new Date(currentDate.getFullYear(), currentDate.getMonth() + 1, 0);
+  const startOfMonth = new Date(
+    currentDate.getFullYear(),
+    currentDate.getMonth(),
+    1
+  );
+  const endOfMonth = new Date(
+    currentDate.getFullYear(),
+    currentDate.getMonth() + 1,
+    0
+  );
   const startDay = startOfMonth.getDay();
   const daysInMonth = endOfMonth.getDate();
 
@@ -24,18 +32,27 @@ export const Calendar = () => {
   const today = new Date();
   const isNextMonthAvailable = !(
     currentDate.getFullYear() > today.getFullYear() ||
-    (currentDate.getFullYear() === today.getFullYear() && currentDate.getMonth() >= today.getMonth())
+    (currentDate.getFullYear() === today.getFullYear() &&
+      currentDate.getMonth() >= today.getMonth())
   );
 
   const prevMonth = () =>
-    setCurrentDate(new Date(currentDate.getFullYear(), currentDate.getMonth() - 1, 1));
+    setCurrentDate(
+      new Date(currentDate.getFullYear(), currentDate.getMonth() - 1, 1)
+    );
 
   const nextMonth = () => {
     if (!isNextMonthAvailable) return;
-    setCurrentDate(new Date(currentDate.getFullYear(), currentDate.getMonth() + 1, 1));
+    setCurrentDate(
+      new Date(currentDate.getFullYear(), currentDate.getMonth() + 1, 1)
+    );
   };
 
-  const prevEnd = new Date(currentDate.getFullYear(), currentDate.getMonth(), 0).getDate();
+  const prevEnd = new Date(
+    currentDate.getFullYear(),
+    currentDate.getMonth(),
+    0
+  ).getDate();
 
   const calendarDays = [];
   for (let i = startDay - 1; i >= 0; i--)
@@ -78,7 +95,11 @@ export const Calendar = () => {
 
         <DatesGrid>
           {calendarDays.map((d, idx) => (
-            <DateBox key={idx} isCurrent={d.currentMonth} hasLetter={d.hasLetter}>
+            <DateBox
+              key={idx}
+              isCurrent={d.currentMonth}
+              hasLetter={d.hasLetter}
+            >
               <span>{d.day}</span>
               {d.hasLetter && (
                 <LetterIcon
@@ -163,7 +184,8 @@ const DateBox = styled.div`
   flex-direction: column;
   align-items: center;
   justify-content: flex-start;
-  background-color: ${({ hasLetter }) => (hasLetter ? "#FFF4E6" : "transparent")};
+  background-color: ${({ hasLetter }) =>
+    hasLetter ? "#FFF4E6" : "transparent"};
   color: ${({ isCurrent }) => (isCurrent ? "#ACACAC" : "#ddd")};
   ${typo("bodyb")};
 `;

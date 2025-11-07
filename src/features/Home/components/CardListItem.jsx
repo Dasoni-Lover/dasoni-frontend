@@ -1,3 +1,4 @@
+// src/features/Home/components/CardListItem.jsx
 import React from "react";
 import styled from "styled-components";
 import { useNavigate } from "react-router-dom";
@@ -9,7 +10,10 @@ export const CardListItem = ({ hall }) => {
   const navigate = useNavigate();
 
   const handleClick = () => {
-    navigate("/memorial");
+    // ✅ 클릭한 카드의 hallId를 함께 전달
+    navigate("/memorial", {
+      state: { hallId: hall?.hallId },
+    });
   };
 
   const profile = hall?.profile || profileimg;
