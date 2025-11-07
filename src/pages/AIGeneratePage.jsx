@@ -1,22 +1,52 @@
 import React, { useState } from "react";
-import AIGenerateForm from "../features/AIGenerate/components/AIGenerateForm";
-import BarNavigate from "../components/BarNavigate";
 import styled from "styled-components";
+import BarNavigate from "../components/BarNavigate";
+import AIGenerateForm from "../features/AIGenerate/components/AIGenerateForm";
 import GenerateComplete from "../features/AIGenerate/components/GenerateComplete";
 import Loding from "../features/AIGenerate/components/Loding";
+import { generateAIImage } from "../api/ai";
 
-export default function AIGeneratePage() {
+export default function AIGeneratePage({ hallId = 1 }) {
   const [isGenerated, setIsGenerated] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const [generatedImage, setGeneratedImage] = useState(null);
 
-  const handleGenerate = () => {
+  const handleGenerate = async (formData) => {
+    // formData: { images: [File, File, File], prompt: "..." }
     setIsLoading(true);
+    try {
+      // 1️⃣ 파일을 base64로 변환
+      const convertToBase64 = (file) =>
+        new Promise((resolve, reject) => {
+          const reader = new FileReader();
+          reader.onloadend = () => resolve(reader.result.split(",")[1]); // base64Data만 추출
+          reader.onerror = reject;
+          reader.readAsDataURL(file);
+        });
 
-    // ✅ 나중에 여기에 실제 API 요청 로직 들어감
-    setTimeout(() => {
-      setIsLoading(false);
+      const imagePayload = await Promise.all(
+        formData.images.map(async (file, index) => {
+          if (!file) return null;
+          const base64Data = await convertToBase64(file);
+          return { order: index + 1, base64Data };
+        })
+      );
+
+      const body = {
+        images: imagePayload.filter(Boolean),
+        prompt: formData.prompt,
+      };
+
+      // 2️⃣ API 요청
+      const base64Image = await generateAIImage(hallId, body);
+      setGeneratedImage(base64Image);
       setIsGenerated(true);
-    }, 2000); // 2초 후 완료로 전환
+    } catch (err) {
+      console.error("AI 이미지 생성 실패:", err);
+      alert("AI 이미지 생성에 실패했습니다. 다시 시도해주세요.");
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
@@ -29,12 +59,14 @@ export default function AIGeneratePage() {
       </BarWrapper>
 
       {isGenerated ? (
-        <GenerateComplete setIsGenerated={setIsGenerated} />
+        <GenerateComplete
+          setIsGenerated={setIsGenerated}
+          generatedImage={generatedImage}
+        />
       ) : (
         <AIGenerateForm onGenerate={handleGenerate} />
       )}
 
-      {/* ✅ 로딩 모달 */}
       <Loding isOpen={isLoading} onCancel={() => setIsLoading(false)} />
     </PageWrapper>
   );

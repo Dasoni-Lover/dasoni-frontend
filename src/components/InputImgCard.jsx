@@ -2,14 +2,13 @@ import React, { useEffect, useId, useState } from "react";
 import styled from "styled-components";
 import { color, typo } from "../styles/tokens";
 import { Row } from "../styles/flex";
-
 import IconEssential from "../assets/icon-essential-eclipse.svg";
 import IconBigPlus from "../features/WritePost/assets/icon-big-plus.svg";
 import IconEdit from "../features/WritePost/assets/icon-edit.svg";
 
-export default function InputImgCard({ label, essential, labeltypo }) {
+export default function InputImgCard({ label, essential, labeltypo, onFileSelect }) {
   const [previewUrl, setPreviewUrl] = useState("");
-  const inputId = useId(); // ✅ 각 카드마다 고유 id 부여
+  const inputId = useId();
 
   useEffect(() => {
     return () => {
@@ -18,34 +17,29 @@ export default function InputImgCard({ label, essential, labeltypo }) {
   }, [previewUrl]);
 
   const handleChange = (e) => {
-    const file = e.target.files && e.target.files[0];
+    const file = e.target.files?.[0];
     if (!file) return;
 
     if (previewUrl) URL.revokeObjectURL(previewUrl);
     const nextUrl = URL.createObjectURL(file);
     setPreviewUrl(nextUrl);
+    onFileSelect?.(file);
   };
 
   return (
     <div>
       <Row style={{ marginBottom: "1rem" }}>
         <Label $labeltypo={labeltypo}>{label}</Label>
-        {essential ? <img src={IconEssential} alt="필수" /> : null}
+        {essential && <img src={IconEssential} alt="필수" />}
       </Row>
 
-      <HiddenInput
-        type="file"
-        id={inputId} // ✅ 고유 id
-        accept="image/*"
-        onChange={handleChange}
-      />
+      <HiddenInput type="file" id={inputId} accept="image/*" onChange={handleChange} />
 
       <LabelBox htmlFor={inputId}>
-        {/* ✅ 해당 input만 트리거 */}
         {previewUrl ? (
           <>
             <PreviewImg src={previewUrl} alt="업로드 이미지 미리보기" />
-            <EditIcon src={IconEdit} alt="이미지 수정 아이콘" />
+            <EditIcon src={IconEdit} alt="이미지 수정" />
           </>
         ) : (
           <PlusIcon src={IconBigPlus} alt="이미지 추가" />
@@ -56,8 +50,7 @@ export default function InputImgCard({ label, essential, labeltypo }) {
 }
 
 const Label = styled.div`
-  ${({ $labeltypo }) =>
-    $labeltypo === "bodym2" ? typo("bodym2") : typo("h3")};
+  ${({ $labeltypo }) => ($labeltypo === "bodym2" ? typo("bodym2") : typo("h3"))};
   color: ${color("black.70")};
 `;
 
@@ -70,7 +63,6 @@ const LabelBox = styled.label`
   display: flex;
   width: 12.5rem;
   height: 12.5rem;
-  padding: 0;
   justify-content: center;
   align-items: center;
   border-radius: 0.625rem;
@@ -90,7 +82,6 @@ const PreviewImg = styled.img`
   height: 100%;
   object-fit: cover;
   border-radius: inherit;
-  display: block;
 `;
 
 const EditIcon = styled.img`
