@@ -25,50 +25,44 @@ export const Letter = ({ data }) => {
   );
 };
 
-
 const Container = styled.div`
   width: 56.25rem;
   height: 32rem;
   border-radius: 0.625rem;
   padding: 0.81rem 1.38rem;
-
   background-image: url(${letterbg});
   background-size: cover;
   background-position: center;
   background-repeat: no-repeat;
   background-color: #d9d9d9;
-
   display: flex;
   flex-direction: column;
   justify-content: space-between;
 `;
+
 const To = styled.div`
   color: var(--80, #0e0e0e);
-  /* Heading5 */
   font-family: "Nanum OeHarMeoNiGeurSsi";
   font-size: 2rem;
-  font-style: normal;
   font-weight: 400;
   line-height: 145%;
 `;
+
 const From = styled.div`
   color: var(--80, #0e0e0e);
-  /* Heading5 */
   font-family: "Nanum OeHarMeoNiGeurSsi";
   font-size: 2rem;
-  font-style: normal;
   font-weight: 400;
   line-height: 145%;
 `;
+
 const Date = styled.div`
   width: 100%;
   display: flex;
-  flex-direction: row;
   justify-content: flex-end;
   margin-top: 0.62rem;
   padding-bottom: 0.75rem;
   border-bottom: 1px solid var(--50, #7a7a7a);
-
   ${typo("bodym")};
   color: ${color("black.30")};
 `;
@@ -93,15 +87,12 @@ const InputBox = styled.div`
   border-top: 1px solid var(--50, #7a7a7a);
   height: 19.3rem;
   padding: 0.94rem 0.5rem;
-
-  overflow-y: auto; /* 세로 스크롤 */
-  overflow-x: hidden; /* 가로 스크롤 방지 */
-  -webkit-overflow-scrolling: touch; /* 모바일에서 부드럽게 */
-
-  /* 스크롤바 숨기기 */
-  scrollbar-width: none; /* Firefox */
-  -ms-overflow-style: none; /* IE 10+ */
+  overflow-y: auto;
+  overflow-x: hidden;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
   &::-webkit-scrollbar {
-    display: none; /* Chrome, Safari, Opera */
+    display: none;
   }
 `;

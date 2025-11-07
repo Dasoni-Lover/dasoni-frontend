@@ -84,7 +84,8 @@ export const SentLetterBoxPage = () => {
         data={selectedLetter}
         onCancel={() => setModalOpen(false)}
       />
-      <SideDrawer />
+
+      <SideDrawer/>
     </Wrapper>
   );
 };

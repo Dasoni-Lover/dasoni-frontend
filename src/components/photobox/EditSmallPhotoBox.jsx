@@ -1,18 +1,47 @@
-import React from 'react';
+import React, { useRef, useState } from 'react';
 import styled from 'styled-components';
-import editbutton from '../../assets/edit-btn.svg'; // 아이콘 경로에 맞게 수정하세요
+import editbutton from '../../assets/edit-btn.svg';
 
-export const EditSmallPhotoBox = ({ src }) => {
+export const EditSmallPhotoBox = ({ src: initialSrc }) => {
+  const [src, setSrc] = useState(initialSrc || '');
+  const fileInputRef = useRef(null);
+
+  // 아이콘 클릭 시 파일 선택창 열기
+  const handleEditClick = () => {
+    if (fileInputRef.current) {
+      fileInputRef.current.click();
+    }
+  };
+
+  // 파일 선택 후 미리보기
+  const handleFileChange = (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onload = (event) => {
+      setSrc(event.target.result); // 선택한 이미지 미리보기
+    };
+    reader.readAsDataURL(file);
+  };
+
   return (
     <Wrapper>
       <Img src={src} alt="사진" />
-      <EditIcon src={editbutton} alt="수정 버튼" />
+      <EditIcon src={editbutton} alt="수정 버튼" onClick={handleEditClick} />
+      <input
+        type="file"
+        accept="image/*"
+        ref={fileInputRef}
+        style={{ display: 'none' }}
+        onChange={handleFileChange}
+      />
     </Wrapper>
   );
 };
 
 const Wrapper = styled.div`
-  position: relative; /* 내부 요소를 absolute로 배치하기 위해 필요 */
+  position: relative;
   display: inline-block;
   width: 12.5rem;
   height: 12.5rem;
