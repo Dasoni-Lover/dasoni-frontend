@@ -1,141 +1,140 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import styled from "styled-components";
 import { typo } from "../styles/tokens";
-import Footer from "../components/Footer";
+import { useNavigate } from "react-router-dom";
+import { getPhotos, getHallInfo } from "../api/memorial";
+
 import BarNavigate from "../components/BarNavigate";
 import Profile from "../features/MemorialHome/components/Profile";
 import HallTab from "../features/MemorialHome/components/HallTab";
-import TabButtonDropdown from "../features/MemorialHome/components/TabButtonDropdown";
 import BoxPostList from "../features/MemorialHome/components/BoxPostList";
 import LetterAndLinkShare from "../features/MemorialHome/components/LetterAndLinkShare";
+import LinkShareModal from "../features/MemorialHome/components/LinkShareModal";
+import PostDetailModal from "../features/MemorialHome/components/PostDetailModal";
+import TabButtonDropdown from "../features/MemorialHome/components/TabButtonDropdown";
+
 import AddPostButtonImg from "../features/MemorialHome/assets/addpost-btn.png";
 import foldericon from "../features/MemorialHome/assets/folder-icon.png";
 import aiicon from "../features/MemorialHome/assets/ai-icon.png";
-import LinkShareModal from "../features/MemorialHome/components/LinkShareModal";
-import { useNavigate } from "react-router-dom";
-import PostDetailModal from "../features/MemorialHome/components/PostDetailModal";
 
-const MemorialHomePage = () => {
+const MemorialHomePage = ({ hallId = 1 }) => {
+  const [photos, setPhotos] = useState([]);
+  const [hallInfo, setHallInfo] = useState(null);
+  const [filter, setFilter] = useState({ sortOption: "최신 업로드순", isAIMode: false });
   const [isAddMenuOpen, setIsAddMenuOpen] = useState(false);
   const [isLinkShareModalOpen, setIsLinkShareModalOpen] = useState(false);
-  const [selectedPost, setSelectedPost] = useState(null);
-  const [currentIndex, setCurrentIndex] = useState(null);
+  const [selectedPhoto, setSelectedPhoto] = useState(null);
+  const [activeTab, setActiveTab] = useState(0);
+
   const nav = useNavigate();
 
-  // 🔹 목데이터 (BoxPostList에도 동일하게 유지)
-  const posts = [
-    {
-      id: 1,
-      image: "/img1.jpg",
-      title: "2001년 3월 5일",
-      content: "오래된 앨범에서 영수 어린 시절 사진을 꺼내보았다...",
-      writtenDate: "2022년 2월 25일 작성함",
-      authorName: "박영진",
-    },
-    {
-      id: 2,
-      image: "/img2.jpg",
-      title: "다른 추억",
-      content: "또 다른 내용...",
-      writtenDate: "",
-    },
-    {
-      id: 3,
-      image: "/img3.jpg",
-      title: "소중한 하루",
-      content: "내용...",
-      writtenDate: "",
-    },
-    {
-      id: 4,
-      image: "/img4.jpg",
-      title: "기억",
-      content: "내용...",
-      writtenDate: "",
-    },
-    {
-      id: 5,
-      image: "/img5.jpg",
-      title: "행복했던 날",
-      content: "내용...",
-      writtenDate: "",
-    },
+  // 탭 옵션 정의
+  const tabOptions = [
+    { isPrivate: false, isBydate: true, isAI: false },
+    { isPrivate: true, isBydate: true, isAI: false },
   ];
 
-  const goWritePage = () => nav("/write");
-  const goAIGeneratePage = () => nav("/generate");
+  // 사진 불러오기
+  useEffect(() => {
+    const fetchPhotos = async () => {
+      try {
+        const data = await getPhotos(hallId, tabOptions[activeTab]);
+        setPhotos(data);
+      } catch (err) {
+        console.error("사진 불러오기 실패:", err);
+      }
+    };
+    fetchPhotos();
+  }, [activeTab, hallId]);
 
-  const handlePrev = () => {
-    setCurrentIndex((i) => (i > 0 ? i - 1 : posts.length - 1));
-    setSelectedPost(posts[(currentIndex - 1 + posts.length) % posts.length]);
-  };
+  // 정렬 및 AI 필터 적용
+  const filteredPhotos = React.useMemo(() => {
+    let result = [...photos];
 
-  const handleNext = () => {
-    setCurrentIndex((i) => (i < posts.length - 1 ? i + 1 : 0));
-    setSelectedPost(posts[(currentIndex + 1) % posts.length]);
-  };
+    if (filter.isAIMode) {
+      result = result.filter((p) => p.isAI); // ✅ AI 이미지인 경우만
+    }
+
+    switch (filter.sortOption) {
+      case "최신 업로드순":
+        result.sort((a, b) => new Date(b.uploadDate) - new Date(a.uploadDate));
+        break;
+      case "오래된 업로드순":
+        result.sort((a, b) => new Date(a.uploadDate) - new Date(b.uploadDate));
+        break;
+      case "최신 사진순":
+        result.sort((a, b) => new Date(b.takenDate) - new Date(a.takenDate));
+        break;
+      case "오래된 사진순":
+        result.sort((a, b) => new Date(a.takenDate) - new Date(b.takenDate));
+        break;
+      default:
+        break;
+    }
+
+    return result;
+  }, [photos, filter]);
+
+  // 추모관 정보 불러오기
+  useEffect(() => {
+    const fetchHallInfo = async () => {
+      try {
+        const data = await getHallInfo(hallId);
+        setHallInfo(data);
+      } catch (err) {
+        console.error("추모관 정보 불러오기 실패:", err);
+      }
+    };
+    console.log(hallId)
+    fetchHallInfo();
+  }, [hallId]);
 
   return (
     <Container>
       <BarWrapper>
         <BarNavigate />
       </BarWrapper>
+
       <Content>
-        <Profile />
-        <HallTab />
-        <TabButtonDropdown />
-        <BoxPostList
-          onPostClick={(post) => {
-            const index = posts.findIndex((p) => p.id === post.id);
-            setSelectedPost(post);
-            setCurrentIndex(index);
-          }}
-        />
+        {hallInfo && <Profile data={hallInfo.data} />}
+        <HallTab activeIndex={activeTab} setActiveIndex={setActiveTab} />
+        <TabButtonDropdown onFilterChange={setFilter} /> {/* ✅ 필터 연결 */}
+        <BoxPostList photos={filteredPhotos} onPostClick={(photo) => setSelectedPhoto(photo)} />
       </Content>
 
       <FixedShareButton>
-        <LetterAndLinkShare
-          onLinkShareClick={() => setIsLinkShareModalOpen(true)}
-        />
+        <LetterAndLinkShare onLinkShareClick={() => setIsLinkShareModalOpen(true)} page="default" hallId={hallId} />
       </FixedShareButton>
 
       <FixedAddPostContainer>
         {isAddMenuOpen && (
           <FixedAddPostMenu>
-            <MenuButton onClick={goAIGeneratePage}>
+            <MenuButton onClick={() => nav("/generate")}>
               <MenuIcon src={aiicon} alt="AI 이미지 생성" />
               <span>AI 이미지 생성</span>
             </MenuButton>
-            <MenuButton onClick={goWritePage}>
+            <MenuButton onClick={() => nav("/write")}>
               <MenuIcon src={foldericon} alt="사진 업로드" />
               <span>컴퓨터에서 불러오기</span>
             </MenuButton>
           </FixedAddPostMenu>
         )}
-
         <FixedAddPostButton onClick={() => setIsAddMenuOpen(!isAddMenuOpen)}>
           <img src={AddPostButtonImg} alt="추가 버튼" />
         </FixedAddPostButton>
       </FixedAddPostContainer>
 
-      {/* 🔹 좌우 이동 기능 포함된 모달 */}
-      <PostDetailModal
-        isOpen={!!selectedPost}
-        post={selectedPost}
-        onClose={() => setSelectedPost(null)}
-        onPrev={handlePrev}
-        onNext={handleNext}
-      />
-
-      {isLinkShareModalOpen && (
-        <LinkShareModal onClose={() => setIsLinkShareModalOpen(false)} />
-      )}
-
+      <PostDetailModal isOpen={!!selectedPhoto} post={selectedPhoto} onClose={() => setSelectedPhoto(null)} />
+      {isLinkShareModalOpen && <LinkShareModal onClose={() => setIsLinkShareModalOpen(false)} />}
     </Container>
   );
 };
 
 export default MemorialHomePage;
+
+/* 🎨 스타일 생략 */
+
+
 
 const Container=styled.div`
   position: relative;

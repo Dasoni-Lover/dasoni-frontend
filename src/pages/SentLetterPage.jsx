@@ -1,41 +1,76 @@
-import React, { useState } from 'react'
-import styled from 'styled-components'
-import { color, typo } from '../styles/tokens'
-import BarNavigate from "../components/BarNavigate"
-import { SentLetter } from '../features/Letters/components/SentLetter'
-import Button from '../components/Button'
-import ConfirmModal from '../components/ConfirmModal'
-import { useNavigate } from 'react-router-dom'
-import { SideDrawer } from '../features/Letters/components/SideDrawer'
+// src/pages/SentLetterPage.jsx
+import React, { useState, useEffect } from "react";
+import styled from "styled-components";
+import { useNavigate, useLocation } from "react-router-dom";
+import { color, typo } from "../styles/tokens";
+import BarNavigate from "../components/BarNavigate";
+import { SentLetter } from "../features/Letters/components/SentLetter";
+import Button from "../components/Button";
+import ConfirmModal from "../components/ConfirmModal";
+import { sendLetter } from "../api/letters";
+import { SideDrawer } from "../features/Letters/components/SideDrawer";
 
 export const SentLetterPage = () => {
-  const navigate = useNavigate()
-  const [letterText, setLetterText] = useState('')
-  const [toName, setToName] = useState('')
-  const [fromName, setFromName] = useState('')
-  const [isModalOpen, setIsModalOpen] = useState(false)
-  const [modalType, setModalType] = useState('') // "cancel" | "submit"
+    const location = useLocation();
+  const hallId = location.state?.hallId; 
+  const navigate = useNavigate();
+  const [letterText, setLetterText] = useState("");
+  const [toName, setToName] = useState("");
+  const [fromName, setFromName] = useState("");
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [modalType, setModalType] = useState(""); // "cancel" | "submit"
+  const [canWrite, setCanWrite] = useState({ isOpen: true, isSet: true });
+
+  useEffect(() => {
+    console.log("SentLetterPage hallId:", hallId);
+    setCanWrite({ isOpen: true, isSet: true });
+  }, [hallId]);
 
   const isActive =
     letterText.trim().length >= 50 &&
     toName.trim().length > 0 &&
-    fromName.trim().length > 0
+    fromName.trim().length > 0;
 
   const handleOpenModal = (type) => {
-    setModalType(type)
-    setIsModalOpen(true)
-  }
+    setModalType(type);
+    setIsModalOpen(true);
+  };
+  const handleCloseModal = () => setIsModalOpen(false);
 
-  const handleCloseModal = () => setIsModalOpen(false)
+  const handleSendLetter = async () => {
+    if (!isActive) {
+      alert("편지를 올바르게 작성해 주세요.");
+      return;
+    }
 
-  const handleConfirm = () => {
-    navigate('/sent-letterbox') // 편지함으로 이동
-  }
+    try {
+      await sendLetter(hallId, {
+        toName,
+        fromName,
+        content: letterText,
+        isCompleted: true,
+      });
+      handleOpenModal("submit");
+    } catch (err) {
+      alert(err.message || "편지 보내기 실패");
+    }
+  };
+
+  const handleModalConfirm = () => {
+    setIsModalOpen(false);
+    // navigate로 hallId 전달
+    navigate("/sent-letterbox", { state: { hallId } });
+  };
+
+  if (!canWrite.isOpen)
+    return <Notice>해당 추모관이 아직 열리지 않았습니다.</Notice>;
+  if (!canWrite.isSet)
+    return <Notice>고인 정보 입력이 필요합니다.</Notice>;
 
   return (
     <Wrapper>
       <NavWrapper>
-        <BarNavigate paths={["홈", "故 박영수의 추모관", "편지쓰기"]}/>
+        <BarNavigate paths={["홈", "故 박영수의 추모관", "편지쓰기"]} />
       </NavWrapper>
 
       <TextWrapper>
@@ -60,80 +95,81 @@ export const SentLetterPage = () => {
           text="취소"
           size="M"
           color="white"
-          onClick={() => handleOpenModal('cancel')}
+          onClick={() => handleOpenModal("cancel")}
         />
         <Button
           text="전달하기"
           size="M"
           active={isActive}
-          onClick={() => handleOpenModal('submit')}
+          onClick={handleSendLetter}
         />
       </ButtonWrapper>
 
-      {/* ✅ ConfirmModal */}
       <ConfirmModal
         isOpen={isModalOpen}
-        title={
-          modalType === 'cancel'
-            ? '작성을 그만둘까요?'
-            : '편지를 전달했어요'
-        }
+        title={modalType === "cancel" ? "작성을 그만둘까요?" : "편지를 전달했어요"}
         description={
-          modalType === 'cancel'
-            ? '작성한 내용은 저장되지 않고 사라져요'
-            : '조금만 기다리면 답장이 올 거예요'
+          modalType === "cancel"
+            ? "작성한 내용은 저장되지 않고 사라져요"
+            : "조금만 기다리면 답장이 올 거예요"
         }
-        confirmText={modalType === 'cancel' ? '그만 두기' : '확인'}
-        cancelText={modalType === 'cancel' ? '취소' : null} // ✅ 전달하기 모달에는 닫기 버튼 없음
-        onConfirm={handleConfirm}
+        confirmText={modalType === "cancel" ? "그만 두기" : "확인"}
+        cancelText={modalType === "cancel" ? "취소" : null}
+        onConfirm={handleModalConfirm}
         onCancel={handleCloseModal}
       />
-      <SideDrawer/>
+
+      <SideDrawer />
     </Wrapper>
-  )
-}
+  );
+};
+
 
 const Wrapper = styled.div`
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: flex-start;
   width: 68.5rem;
   margin-top: 1.81rem;
   position: relative;
-`
+`;
 
 const NavWrapper = styled.div`
   width: 100%;
   display: flex;
   justify-content: flex-start;
-  align-items: center;
-`
+`;
 
 const TextWrapper = styled.div`
   width: 100%;
   margin-top: 4.5rem;
   margin-bottom: 4.12rem;
-  gap: 0.62rem;
   display: flex;
   flex-direction: column;
   align-items: flex-start;
-`
+  gap: 0.62rem;
+`;
 
 const Title = styled.div`
   ${typo("h3")};
   color: ${color("black.70")};
-`
+`;
 
 const Content = styled.div`
   ${typo("bodym")};
   color: ${color("black.50")};
-`
+`;
 
 const ButtonWrapper = styled.div`
   margin-top: 4.62rem;
   display: flex;
   justify-content: center;
-  align-items: center;
   gap: 1rem;
-`
+`;
+
+const Notice = styled.div`
+  ${typo("h4")};
+  color: ${color("black.50")};
+  margin-top: 5rem;
+  text-align: center;
+`;
