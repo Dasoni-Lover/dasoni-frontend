@@ -77,7 +77,7 @@ export const MemorialManagerHomePage = () => {
       </FixedAddPostContainer>
 
       {isLinkShareModalOpen && (
-        <LinkShareModal onClose={() => setIsLinkShareModalOpen(false)} />
+        <LinkShareModal onClose={() => setIsLinkShareModalOpen(false)} page="manager"/>
       )}
 
     </Container>

@@ -102,7 +102,7 @@ const MemorialHomePage = ({ hallId = 1 }) => {
       </Content>
 
       <FixedShareButton>
-        <LetterAndLinkShare onLinkShareClick={() => setIsLinkShareModalOpen(true)} />
+        <LetterAndLinkShare onLinkShareClick={() => setIsLinkShareModalOpen(true)} page="default"/>
       </FixedShareButton>
 
       <FixedAddPostContainer>

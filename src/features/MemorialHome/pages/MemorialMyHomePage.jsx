@@ -58,7 +58,7 @@ const MemorialMyHomePage = () => {
 
         <FixedShareButton>
           <LetterAndLinkShare
-            onLinkShareClick={() => setIsLinkShareModalOpen(true)}
+            onLinkShareClick={() => setIsLinkShareModalOpen(true)} page="my"
           />
         </FixedShareButton>
 
