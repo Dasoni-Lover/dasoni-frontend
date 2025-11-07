@@ -7,13 +7,15 @@ import BarNavigate from "../components/BarNavigate";
 import { SentLetter } from "../features/Letters/components/SentLetter";
 import Button from "../components/Button";
 import ConfirmModal from "../components/ConfirmModal";
-import { sendLetter } from "../api/letters";
+import { sendLetter, getLetterStatus } from "../api/letters";
 import { SideDrawer } from "../features/Letters/components/SideDrawer";
+import { getHallInfo } from "../api/memorial"; // ✅ 추모관 정보 가져오기
 
 export const SentLetterPage = () => {
-    const location = useLocation();
-  const hallId = location.state?.hallId; 
+  const location = useLocation();
+  const hallId = location.state?.hallId; // ✅ MemorialHomePage → LetterAndLinkShare → 여기로 전달된 hallId
   const navigate = useNavigate();
+
   const [letterText, setLetterText] = useState("");
   const [toName, setToName] = useState("");
   const [fromName, setFromName] = useState("");
@@ -21,10 +23,46 @@ export const SentLetterPage = () => {
   const [modalType, setModalType] = useState(""); // "cancel" | "submit"
   const [canWrite, setCanWrite] = useState({ isOpen: true, isSet: true });
 
+  // ✅ 해당 추모관 이름 상태
+  const [hallName, setHallName] = useState("");
+
   useEffect(() => {
     console.log("SentLetterPage hallId:", hallId);
-    setCanWrite({ isOpen: true, isSet: true });
-  }, [hallId]);
+
+    if (!hallId) {
+      // hallId 없이 직접 진입한 경우 방어
+      alert("유효하지 않은 추모관입니다.");
+      navigate(-1);
+      return;
+    }
+
+    // ✅ 실제 API로 편지 작성 가능 여부 조회
+    const fetchStatus = async () => {
+      try {
+        const status = await getLetterStatus(hallId);
+        // status: { isOpen: true/false, isSet: true/false }
+        setCanWrite(status);
+      } catch (err) {
+        console.error("편지 작성 가능 여부 조회 실패:", err);
+        // 실패 시 기본값은 그대로 두되, 필요하면 막을 수도 있음
+        setCanWrite({ isOpen: true, isSet: true });
+      }
+    };
+
+    // ✅ 추모관 이름 조회
+    const fetchHallName = async () => {
+      try {
+        const info = await getHallInfo(hallId);
+        const name = info?.data?.name || info?.name || "";
+        setHallName(name);
+      } catch (err) {
+        console.error("추모관 이름 조회 실패:", err);
+      }
+    };
+
+    fetchStatus();
+    fetchHallName();
+  }, [hallId, navigate]);
 
   const isActive =
     letterText.trim().length >= 50 &&
@@ -38,6 +76,11 @@ export const SentLetterPage = () => {
   const handleCloseModal = () => setIsModalOpen(false);
 
   const handleSendLetter = async () => {
+    if (!hallId) {
+      alert("유효하지 않은 추모관입니다.");
+      return;
+    }
+
     if (!isActive) {
       alert("편지를 올바르게 작성해 주세요.");
       return;
@@ -58,25 +101,29 @@ export const SentLetterPage = () => {
 
   const handleModalConfirm = () => {
     setIsModalOpen(false);
-    // navigate로 hallId 전달
+    // ✅ 편지함으로 이동할 때도 hallId 유지
     navigate("/sent-letterbox", { state: { hallId } });
   };
 
+  // ✅ BarNavigate에 들어갈 추모관 이름 텍스트
+  const hallTitle = hallName ? `故 ${hallName}의 추모관` : "故 추모관";
+
   if (!canWrite.isOpen)
     return <Notice>해당 추모관이 아직 열리지 않았습니다.</Notice>;
-  if (!canWrite.isSet)
-    return <Notice>고인 정보 입력이 필요합니다.</Notice>;
+  if (!canWrite.isSet) return <Notice>고인 정보 입력이 필요합니다.</Notice>;
 
   return (
     <Wrapper>
       <NavWrapper>
-        <BarNavigate paths={["홈", "故 박영수의 추모관", "편지쓰기"]} />
+        {/* ✅ 해당 추모관 이름으로 변경 */}
+        <BarNavigate paths={["홈", hallTitle, "편지쓰기"]} />
       </NavWrapper>
 
       <TextWrapper>
         <Title>나의 소중한 마음을 담아 편지를 써 보세요</Title>
         <Content>
-          고인께 전하고 싶은 말과 함께 편지에 마음을 담으면, 다소니가 전달해 드릴게요 <br />
+          고인께 전하고 싶은 말과 함께 편지에 마음을 담으면, 다소니가 전달해
+          드릴게요 <br />
           생일, 기일, 명절 등 기념일에 편지에 대한 답장이 올 거예요.
         </Content>
       </TextWrapper>
@@ -107,7 +154,9 @@ export const SentLetterPage = () => {
 
       <ConfirmModal
         isOpen={isModalOpen}
-        title={modalType === "cancel" ? "작성을 그만둘까요?" : "편지를 전달했어요"}
+        title={
+          modalType === "cancel" ? "작성을 그만둘까요?" : "편지를 전달했어요"
+        }
         description={
           modalType === "cancel"
             ? "작성한 내용은 저장되지 않고 사라져요"
@@ -123,7 +172,6 @@ export const SentLetterPage = () => {
     </Wrapper>
   );
 };
-
 
 const Wrapper = styled.div`
   display: flex;

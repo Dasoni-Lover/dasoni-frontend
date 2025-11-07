@@ -106,7 +106,7 @@ const MemorialHomePage = () => {
     <Container>
       <BarWrapper>
         {/* ✅ 실제 추모관 이름으로 경로/타이틀 표시 */}
-        <BarNavigate paths={["홈", hallTitle]} title={hallTitle} />
+        <BarNavigate paths={["홈", hallTitle]} />
       </BarWrapper>
 
       <Content>

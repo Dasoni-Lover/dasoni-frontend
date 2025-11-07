@@ -1,3 +1,4 @@
+// src/components/PostOptionForm.jsx
 import React, { useState } from "react";
 import styled from "styled-components";
 import { useNavigate } from "react-router-dom";
@@ -13,7 +14,7 @@ import DatePicker from "./DatePicker";
 
 import { uploadPhotoPost } from "../api/memorial-album";
 
-export default function PostOptionForm() {
+export default function PostOptionForm({ content }) {
   const [scope, setScope] = useState("public");
   const [date, setDate] = useState(null);
   const nav = useNavigate();
@@ -27,9 +28,23 @@ export default function PostOptionForm() {
         return;
       }
 
+      if (!content || content.trim().length === 0) {
+        alert("글 내용을 작성해 주세요.");
+        return;
+      }
+
+      // 날짜 포맷: YYYY.MM.DD (없으면 오늘 날짜나 임의 값)
+      const formatDateDot = (d) => {
+        if (!d) return "1940.01.01";
+        const year = d.getFullYear();
+        const month = String(d.getMonth() + 1).padStart(2, "0");
+        const day = String(d.getDate()).padStart(2, "0");
+        return `${year}.${month}.${day}`;
+      };
+
       const payload = {
-        content: "게시글 내용 예시",
-        occurredAt: date ? date.toISOString().split("T")[0] : "1940.01.01",
+        content: content.trim(),
+        occurredAt: formatDateDot(date),
         isPrivate: scope === "private",
         isAI: false,
       };
@@ -43,6 +58,7 @@ export default function PostOptionForm() {
       alert("업로드에 실패했습니다.");
     }
   };
+
   return (
     <Column $justify={"space-between"}>
       <Column>
@@ -53,7 +69,6 @@ export default function PostOptionForm() {
             <img src={IconEssential} alt="필수" />
           </Row>
 
-          {/* 날짜 선택 */}
           <DatePicker
             selected={date}
             onChange={setDate}
@@ -139,7 +154,7 @@ const Label = styled.div`
   color: ${color("black.70")};
 `;
 
-/* 라디오 전체 박스 */
+/* 이하 스타일 그대로 */
 const RadioCard = styled.div`
   background: ${color("black.05")};
   border-radius: 10px;
@@ -149,7 +164,6 @@ const RadioCard = styled.div`
   gap: 14px;
 `;
 
-/* 라디오 한 줄 */
 const RadioOption = styled.label`
   display: grid;
   grid-template-columns: 22px 1fr;
@@ -159,7 +173,6 @@ const RadioOption = styled.label`
   user-select: none;
 `;
 
-/* 아이콘형 라디오 이미지 */
 const RadioIcon = styled.img`
   width: 22px;
   height: 22px;

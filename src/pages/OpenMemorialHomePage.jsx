@@ -155,8 +155,10 @@ export default function OpenMemorialHomePage() {
       nav("/home");
       return;
     }
-    // currentHallId는 이미 localStorage에 저장해둔 상태
-    nav("/memorial");
+
+    nav("/memorial", {
+      state: { hallId: createdHallId },
+    });
   };
 
   return (
