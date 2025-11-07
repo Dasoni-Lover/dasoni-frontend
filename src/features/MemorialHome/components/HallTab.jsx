@@ -53,5 +53,5 @@ const Wrapper = styled.div`
   flex-direction: row;
   justify-content: flex-start;
   align-items: center;
-  border-top: 2px solid var(--70, #313131);
+  border-top: 2px solid #313131;
 `;

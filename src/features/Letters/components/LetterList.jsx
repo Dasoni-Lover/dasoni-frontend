@@ -1,22 +1,24 @@
-import React from 'react'
-import styled from 'styled-components'
-import { LetterListItem } from './LetterListItem'
+import React from 'react';
+import styled from 'styled-components';
+import { LetterListItem } from './LetterListItem';
 
-export const LetterList = ({ onItemClick }) => {
+export const LetterList = ({ letters, onItemClick }) => {
   return (
     <Wrapper>
-        <LetterListItem onClick={onItemClick} />
-        <LetterListItem onClick={onItemClick} />
-        <LetterListItem onClick={onItemClick} />
+      {letters.map(letter => (
+        <LetterListItem
+          key={letter.letterId}
+          letter={letter}
+          onClick={() => onItemClick(letter.letterId)}
+        />
+      ))}
     </Wrapper>
-  )
-}
+  );
+};
 
-
-const Wrapper=styled.div`
-  display: inline-flex;
+const Wrapper = styled.div`
+  display: flex;
   flex-direction: column;
-  align-items: flex-start;
   gap: 0.75rem;
   width: 100%;
-`
+`;
