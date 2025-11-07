@@ -11,6 +11,7 @@ import BoxPostList from "../features/MemorialHome/components/BoxPostList";
 import LetterAndLinkShare from "../features/MemorialHome/components/LetterAndLinkShare";
 import LinkShareModal from "../features/MemorialHome/components/LinkShareModal";
 import PostDetailModal from "../features/MemorialHome/components/PostDetailModal";
+import TabButtonDropdown from "../features/MemorialHome/components/TabButtonDropdown";
 
 import AddPostButtonImg from "../features/MemorialHome/assets/addpost-btn.png";
 import foldericon from "../features/MemorialHome/assets/folder-icon.png";
@@ -19,6 +20,7 @@ import aiicon from "../features/MemorialHome/assets/ai-icon.png";
 const MemorialHomePage = ({ hallId = 1 }) => {
   const [photos, setPhotos] = useState([]);
   const [hallInfo, setHallInfo] = useState(null);
+  const [filter, setFilter] = useState({ sortOption: "최신 업로드순", isAIMode: false });
   const [isAddMenuOpen, setIsAddMenuOpen] = useState(false);
   const [isLinkShareModalOpen, setIsLinkShareModalOpen] = useState(false);
   const [selectedPhoto, setSelectedPhoto] = useState(null);
@@ -26,13 +28,13 @@ const MemorialHomePage = ({ hallId = 1 }) => {
 
   const nav = useNavigate();
 
-  // 🔹 탭에 따라 요청 바디 변경
+  // 탭 옵션 정의
   const tabOptions = [
-    { isPrivate: false, isBydate: true, isAI: false }, // 공유앨범
-    { isPrivate: true, isBydate: true, isAI: false },  // 나와의 앨범
+    { isPrivate: false, isBydate: true, isAI: false },
+    { isPrivate: true, isBydate: true, isAI: false },
   ];
 
-  // 🔹 탭 클릭 시 사진 불러오기
+  // 사진 불러오기
   useEffect(() => {
     const fetchPhotos = async () => {
       try {
@@ -45,7 +47,35 @@ const MemorialHomePage = ({ hallId = 1 }) => {
     fetchPhotos();
   }, [activeTab, hallId]);
 
-  // 🔹 추모관 정보 불러오기
+  // 정렬 및 AI 필터 적용
+  const filteredPhotos = React.useMemo(() => {
+    let result = [...photos];
+
+    if (filter.isAIMode) {
+      result = result.filter((p) => p.isAI); // ✅ AI 이미지인 경우만
+    }
+
+    switch (filter.sortOption) {
+      case "최신 업로드순":
+        result.sort((a, b) => new Date(b.uploadDate) - new Date(a.uploadDate));
+        break;
+      case "오래된 업로드순":
+        result.sort((a, b) => new Date(a.uploadDate) - new Date(b.uploadDate));
+        break;
+      case "최신 사진순":
+        result.sort((a, b) => new Date(b.takenDate) - new Date(a.takenDate));
+        break;
+      case "오래된 사진순":
+        result.sort((a, b) => new Date(a.takenDate) - new Date(b.takenDate));
+        break;
+      default:
+        break;
+    }
+
+    return result;
+  }, [photos, filter]);
+
+  // 추모관 정보 불러오기
   useEffect(() => {
     const fetchHallInfo = async () => {
       try {
@@ -67,10 +97,8 @@ const MemorialHomePage = ({ hallId = 1 }) => {
       <Content>
         {hallInfo && <Profile data={hallInfo.data} />}
         <HallTab activeIndex={activeTab} setActiveIndex={setActiveTab} />
-        <BoxPostList
-          photos={photos}
-          onPostClick={(photo) => setSelectedPhoto(photo)}
-        />
+        <TabButtonDropdown onFilterChange={setFilter} /> {/* ✅ 필터 연결 */}
+        <BoxPostList photos={filteredPhotos} onPostClick={(photo) => setSelectedPhoto(photo)} />
       </Content>
 
       <FixedShareButton>
@@ -90,28 +118,21 @@ const MemorialHomePage = ({ hallId = 1 }) => {
             </MenuButton>
           </FixedAddPostMenu>
         )}
-
         <FixedAddPostButton onClick={() => setIsAddMenuOpen(!isAddMenuOpen)}>
           <img src={AddPostButtonImg} alt="추가 버튼" />
         </FixedAddPostButton>
       </FixedAddPostContainer>
 
-      <PostDetailModal
-        isOpen={!!selectedPhoto}
-        post={selectedPhoto}
-        onClose={() => setSelectedPhoto(null)}
-      />
-
-      {isLinkShareModalOpen && (
-        <LinkShareModal onClose={() => setIsLinkShareModalOpen(false)} />
-      )}
+      <PostDetailModal isOpen={!!selectedPhoto} post={selectedPhoto} onClose={() => setSelectedPhoto(null)} />
+      {isLinkShareModalOpen && <LinkShareModal onClose={() => setIsLinkShareModalOpen(false)} />}
     </Container>
   );
 };
 
 export default MemorialHomePage;
 
-// 🎨 스타일 동일 (생략)
+/* 🎨 스타일 생략 */
+
 
 
 const Container=styled.div`
