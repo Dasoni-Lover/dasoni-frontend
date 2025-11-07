@@ -85,6 +85,7 @@ const MemorialHomePage = ({ hallId = 1 }) => {
         console.error("추모관 정보 불러오기 실패:", err);
       }
     };
+    console.log(hallId)
     fetchHallInfo();
   }, [hallId]);
 
@@ -102,7 +103,7 @@ const MemorialHomePage = ({ hallId = 1 }) => {
       </Content>
 
       <FixedShareButton>
-        <LetterAndLinkShare onLinkShareClick={() => setIsLinkShareModalOpen(true)} page="default"/>
+        <LetterAndLinkShare onLinkShareClick={() => setIsLinkShareModalOpen(true)} page="default" hallId={hallId} />
       </FixedShareButton>
 
       <FixedAddPostContainer>

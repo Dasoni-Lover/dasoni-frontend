@@ -12,7 +12,7 @@ import linksharehover from "../assets/linkshare-hover.svg";
  * @param {Function} onLinkShareClick - 링크 공유 버튼 클릭 시 실행할 함수
  * @param {"default" | "my" | "manager"} page - 네비게이션 동작을 결정하는 모드
  */
-const LetterAndLinkShare = ({ onLinkShareClick, page }) => {
+const LetterAndLinkShare = ({ onLinkShareClick, page, hallId  }) => {
   const [isLetterHover, setIsLetterHover] = useState(false);
   const [isLinkHover, setIsLinkHover] = useState(false);
   const navigate = useNavigate();
@@ -20,7 +20,7 @@ const LetterAndLinkShare = ({ onLinkShareClick, page }) => {
   // Letter 클릭 시 페이지에 따라 네비게이트
   const handleLetterClick = () => {
     if (page === "default") {
-      navigate("/sent-letter");
+      navigate("/sent-letter", { state: { hallId }});
     } else {
       console.log(`⚠️ ${page} 모드에서는 이동하지 않습니다.`);
     }

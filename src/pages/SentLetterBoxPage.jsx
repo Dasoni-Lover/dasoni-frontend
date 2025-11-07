@@ -1,4 +1,3 @@
-// SentLetterBoxPage.jsx
 import React, { useState, useEffect } from "react";
 import styled from "styled-components";
 import { color, typo } from '../styles/tokens';
@@ -9,22 +8,25 @@ import clickicon from "../assets/click-calendar-icon.svg";
 import { SideDrawer } from '../features/Letters/components/SideDrawer';
 import { Calendar } from '../components/Calendar';
 import LetterModal from "../features/Letters/components/LetterModal";
-import axios from "axios";
+import client from "../api/client";
+import { useLocation } from "react-router-dom";
 
 export const SentLetterBoxPage = () => {
   const [showCalendar, setShowCalendar] = useState(false);
   const [modalOpen, setModalOpen] = useState(false);
   const [letters, setLetters] = useState([]);
-  const hallId = location.state?.hallId; 
+  const location = useLocation();
+  const hallId = location.state?.hallId; // navigate에서 받아온 hallId
 
   // 편지 리스트 조회
   const fetchLetters = async () => {
+    if (!hallId) return;
     try {
-      const response = await axios.get(`/api/halls/${hallId}/letters/list`);
-      const lettersData = response.data?.letters || []; // undefined일 경우 빈 배열
-      const sortedLetters = lettersData.sort(
-        (a, b) => new Date(b.completedAt) - new Date(a.completedAt)
-      );
+      const response = await client.get(`/api/halls/${hallId}/letters/list`);
+      const lettersData = response.data?.letters || [];
+      const sortedLetters = lettersData
+        .map(l => ({ ...l, completedAt: l.date })) // date → completedAt
+        .sort((a, b) => new Date(b.completedAt) - new Date(a.completedAt));
       setLetters(sortedLetters);
     } catch (err) {
       console.error("편지 조회 실패:", err);
@@ -33,21 +35,19 @@ export const SentLetterBoxPage = () => {
   };
 
   useEffect(() => {
+    console.log("✅ location.state:", location.state); // hallId 전달 상태 확인
+    console.log("✅ hallId:", hallId);
+    console.log("✅ access_token:", localStorage.getItem("access_token"));
     fetchLetters();
   }, [hallId]);
 
   return (
     <Wrapper>
-      <NavWrapper>
-        <BarNavigate />
-      </NavWrapper>
+      <NavWrapper><BarNavigate /></NavWrapper>
       <Title>총 {letters.length}개의 보낸 편지가 있어요</Title>
 
       <Container>
-        <CalendarWrapper 
-          onClick={() => setShowCalendar(!showCalendar)}
-          showCalendar={showCalendar} 
-        >
+        <CalendarWrapper onClick={() => setShowCalendar(!showCalendar)} showCalendar={showCalendar}>
           <CalendarIconStyled src={showCalendar ? clickicon : calendaricon} />
         </CalendarWrapper>
       </Container>
@@ -141,4 +141,3 @@ const CalendarArea = styled.div`
   flex: 1;
   min-width: 0;
 `;
-

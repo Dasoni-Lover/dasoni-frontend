@@ -1,6 +1,7 @@
+// src/pages/SentLetterPage.jsx
 import React, { useState, useEffect } from "react";
 import styled from "styled-components";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import { color, typo } from "../styles/tokens";
 import BarNavigate from "../components/BarNavigate";
 import { SentLetter } from "../features/Letters/components/SentLetter";
@@ -9,7 +10,9 @@ import ConfirmModal from "../components/ConfirmModal";
 import { sendLetter } from "../api/letters";
 import { SideDrawer } from "../features/Letters/components/SideDrawer";
 
-export const SentLetterPage = ({ hallId = 1 }) => {
+export const SentLetterPage = () => {
+    const location = useLocation();
+  const hallId = location.state?.hallId; 
   const navigate = useNavigate();
   const [letterText, setLetterText] = useState("");
   const [toName, setToName] = useState("");
@@ -19,6 +22,7 @@ export const SentLetterPage = ({ hallId = 1 }) => {
   const [canWrite, setCanWrite] = useState({ isOpen: true, isSet: true });
 
   useEffect(() => {
+    console.log("SentLetterPage hallId:", hallId);
     setCanWrite({ isOpen: true, isSet: true });
   }, [hallId]);
 
@@ -31,10 +35,8 @@ export const SentLetterPage = ({ hallId = 1 }) => {
     setModalType(type);
     setIsModalOpen(true);
   };
-
   const handleCloseModal = () => setIsModalOpen(false);
 
-  // 전달하기 버튼 클릭 시 실제 제출 후 모달 열기
   const handleSendLetter = async () => {
     if (!isActive) {
       alert("편지를 올바르게 작성해 주세요.");
@@ -48,16 +50,15 @@ export const SentLetterPage = ({ hallId = 1 }) => {
         content: letterText,
         isCompleted: true,
       });
-      // 제출 완료 후 모달 열기
       handleOpenModal("submit");
     } catch (err) {
       alert(err.message || "편지 보내기 실패");
     }
   };
 
-  // 모달 확인 버튼 클릭 시 제출 없이 이동
   const handleModalConfirm = () => {
     setIsModalOpen(false);
+    // navigate로 hallId 전달
     navigate("/sent-letterbox", { state: { hallId } });
   };
 
@@ -106,11 +107,7 @@ export const SentLetterPage = ({ hallId = 1 }) => {
 
       <ConfirmModal
         isOpen={isModalOpen}
-        title={
-          modalType === "cancel"
-            ? "작성을 그만둘까요?"
-            : "편지를 전달했어요"
-        }
+        title={modalType === "cancel" ? "작성을 그만둘까요?" : "편지를 전달했어요"}
         description={
           modalType === "cancel"
             ? "작성한 내용은 저장되지 않고 사라져요"
@@ -127,7 +124,7 @@ export const SentLetterPage = ({ hallId = 1 }) => {
   );
 };
 
-// =================== styled ===================
+
 const Wrapper = styled.div`
   display: flex;
   flex-direction: column;
