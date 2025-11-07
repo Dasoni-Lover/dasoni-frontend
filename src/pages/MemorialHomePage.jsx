@@ -1,7 +1,8 @@
+// src/pages/MemorialHomePage.jsx
 import React, { useState, useEffect } from "react";
 import styled from "styled-components";
 import { typo } from "../styles/tokens";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import { getPhotos, getHallInfo } from "../api/memorial";
 
 import BarNavigate from "../components/BarNavigate";
@@ -17,16 +18,23 @@ import AddPostButtonImg from "../features/MemorialHome/assets/addpost-btn.png";
 import foldericon from "../features/MemorialHome/assets/folder-icon.png";
 import aiicon from "../features/MemorialHome/assets/ai-icon.png";
 
-const MemorialHomePage = ({ hallId = 1 }) => {
+const MemorialHomePage = () => {
+  const nav = useNavigate();
+  const location = useLocation();
+
+  // ✅ Home 카드에서 넘어올 때 state로 전달된 hallId 사용, 없으면 1
+  const hallId = location.state?.hallId ?? 1;
+
   const [photos, setPhotos] = useState([]);
   const [hallInfo, setHallInfo] = useState(null);
-  const [filter, setFilter] = useState({ sortOption: "최신 업로드순", isAIMode: false });
+  const [filter, setFilter] = useState({
+    sortOption: "최신 업로드순",
+    isAIMode: false,
+  });
   const [isAddMenuOpen, setIsAddMenuOpen] = useState(false);
   const [isLinkShareModalOpen, setIsLinkShareModalOpen] = useState(false);
   const [selectedPhoto, setSelectedPhoto] = useState(null);
   const [activeTab, setActiveTab] = useState(0);
-
-  const nav = useNavigate();
 
   // 탭 옵션 정의
   const tabOptions = [
@@ -52,7 +60,7 @@ const MemorialHomePage = ({ hallId = 1 }) => {
     let result = [...photos];
 
     if (filter.isAIMode) {
-      result = result.filter((p) => p.isAI); // ✅ AI 이미지인 경우만
+      result = result.filter((p) => p.isAI);
     }
 
     switch (filter.sortOption) {
@@ -85,25 +93,45 @@ const MemorialHomePage = ({ hallId = 1 }) => {
         console.error("추모관 정보 불러오기 실패:", err);
       }
     };
-    console.log(hallId)
+    console.log("현재 hallId:", hallId);
     fetchHallInfo();
   }, [hallId]);
+
+  // ✅ BarNavigate에 쓸 추모관 제목 (고인 이름 기반)
+  const hallTitle = hallInfo?.data?.name
+    ? `故 ${hallInfo.data.name}의 추모관`
+    : "추모관";
 
   return (
     <Container>
       <BarWrapper>
-        <BarNavigate />
+        {/* ✅ 실제 추모관 이름으로 경로/타이틀 표시 */}
+        <BarNavigate paths={["홈", hallTitle]} title={hallTitle} />
       </BarWrapper>
 
       <Content>
         {hallInfo && <Profile data={hallInfo.data} />}
-        <HallTab activeIndex={activeTab} setActiveIndex={setActiveTab} />
-        <TabButtonDropdown onFilterChange={setFilter} /> {/* ✅ 필터 연결 */}
-        <BoxPostList photos={filteredPhotos} onPostClick={(photo) => setSelectedPhoto(photo)} />
+
+        {/* ✅ HallTab이 클릭하면 activeTab이 바뀌도록 onTabChange 사용 */}
+        <HallTab
+          role="visitor"
+          activeIndex={activeTab}
+          onTabChange={setActiveTab}
+        />
+
+        <TabButtonDropdown onFilterChange={setFilter} />
+        <BoxPostList
+          photos={filteredPhotos}
+          onPostClick={(photo) => setSelectedPhoto(photo)}
+        />
       </Content>
 
       <FixedShareButton>
-        <LetterAndLinkShare onLinkShareClick={() => setIsLinkShareModalOpen(true)} page="default" hallId={hallId} />
+        <LetterAndLinkShare
+          onLinkShareClick={() => setIsLinkShareModalOpen(true)}
+          page="default"
+          hallId={hallId}
+        />
       </FixedShareButton>
 
       <FixedAddPostContainer>
@@ -124,21 +152,25 @@ const MemorialHomePage = ({ hallId = 1 }) => {
         </FixedAddPostButton>
       </FixedAddPostContainer>
 
-      <PostDetailModal isOpen={!!selectedPhoto} post={selectedPhoto} onClose={() => setSelectedPhoto(null)} />
-      {isLinkShareModalOpen && <LinkShareModal onClose={() => setIsLinkShareModalOpen(false)} />}
+      <PostDetailModal
+        isOpen={!!selectedPhoto}
+        post={selectedPhoto}
+        onClose={() => setSelectedPhoto(null)}
+      />
+      {isLinkShareModalOpen && (
+        <LinkShareModal onClose={() => setIsLinkShareModalOpen(false)} />
+      )}
     </Container>
   );
 };
 
 export default MemorialHomePage;
 
-/* 🎨 스타일 생략 */
+/* 🎨 스타일 */
 
-
-
-const Container=styled.div`
+const Container = styled.div`
   position: relative;
-`
+`;
 
 const BarWrapper = styled.div`
   margin-top: 30px;
@@ -230,9 +262,9 @@ const MenuButton = styled.button`
   justify-content: center;
   height: 2.75rem;
   width: 13.75rem;
-  border: 1px solid var(--5, #E9E9E9);
+  border: 1px solid var(--5, #e9e9e9);
   border-radius: 5px;
-  background: #FFBC67;
+  background: #ffbc67;
   color: #313131;
   ${typo("h4")};
   cursor: pointer;
