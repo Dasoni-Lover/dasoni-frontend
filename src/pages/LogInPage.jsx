@@ -216,5 +216,5 @@ const RegisterButton = styled.div`
 
 const ErrorMsg = styled.div`
   ${typo("h4")};
-  color: red;
+  color: ${color("red")};
 `;

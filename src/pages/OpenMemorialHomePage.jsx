@@ -51,9 +51,21 @@ export default function OpenMemorialHomePage() {
   };
 
   const normalizeRelation = (relationLabel) => {
-    // "가족이에요" → "가족", "친구예요" → "친구" 이런 식으로 라벨에서 어미 제거
     if (!relationLabel) return "";
-    return relationLabel.replace("이에요", "").replace("예요", "");
+
+    // 화면에 보이는 텍스트에서 어미 제거 ("가족이에요" -> "가족")
+    const base = relationLabel.replace("이에요", "").replace("예요", "");
+
+    switch (base) {
+      case "가족":
+        return "FAMILY";
+      case "연인":
+        return "LOVER";
+      case "친구":
+        return "FRIEND";
+      default:
+        return base; // 혹시 모르는 다른 값 들어오면 그대로
+    }
   };
 
   const handleNext = async () => {
