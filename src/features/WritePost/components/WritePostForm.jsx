@@ -9,8 +9,8 @@ import { Column, Row } from "../../../styles/flex";
 export default function WritePostForm() {
   const location = useLocation();
   const generatedImage = location.state?.generatedImage || null;
+  const hallId = location.state?.hallId; // ✅ 여기서 hallId 추출
 
-  // ✨ 글 내용 상태 추가
   const [content, setContent] = useState("");
 
   return (
@@ -30,8 +30,8 @@ export default function WritePostForm() {
           onChange={(e) => setContent(e.target.value)}
         />
       </Column>
-      {/* ✨ 작성한 내용을 옵션폼으로 내려줌 */}
-      <PostOptionForm content={content} />
+      {/* ✅ hallId도 함께 내려줌 */}
+      <PostOptionForm content={content} hallId={hallId} />
     </Row>
   );
 }

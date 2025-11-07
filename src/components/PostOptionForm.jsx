@@ -13,8 +13,9 @@ import Button from "./Button";
 import DatePicker from "./DatePicker";
 
 import { uploadPhotoPost } from "../api/memorial-album";
+import { getPresignedUrlForImage, uploadFileToS3 } from "../api/files"; // ✅ 추가
 
-export default function PostOptionForm({ content }) {
+export default function PostOptionForm({ content, hallId }) {
   const [scope, setScope] = useState("public");
   const [date, setDate] = useState(null);
   const nav = useNavigate();
@@ -33,23 +34,38 @@ export default function PostOptionForm({ content }) {
         return;
       }
 
-      // 날짜 포맷: YYYY.MM.DD (없으면 오늘 날짜나 임의 값)
+      if (!date) {
+        alert("사진 속 날짜를 선택해 주세요."); // ✅ 날짜 필수
+        return;
+      }
+
+      // 날짜를 "YYYY.MM.DD" 포맷으로 변환
       const formatDateDot = (d) => {
-        if (!d) return "1940.01.01";
         const year = d.getFullYear();
         const month = String(d.getMonth() + 1).padStart(2, "0");
         const day = String(d.getDate()).padStart(2, "0");
         return `${year}.${month}.${day}`;
       };
 
+      // 1) presigned URL 발급
+      const { uploadUrl, fileUrl, contentType } = await getPresignedUrlForImage(
+        file
+      );
+
+      // 2) S3에 실제 업로드
+      await uploadFileToS3(uploadUrl, file, contentType);
+
+      // 3) 업로드된 파일 URL로 게시글 등록
       const payload = {
+        url: fileUrl, // ✅ 필수
         content: content.trim(),
         occurredAt: formatDateDot(date),
         isPrivate: scope === "private",
         isAI: false,
+        hallId, // ✅ 어떤 추모관인지
       };
 
-      const res = await uploadPhotoPost(file, payload);
+      const res = await uploadPhotoPost(payload);
       console.log("게시글 업로드 완료:", res);
       alert("게시물이 등록되었습니다.");
       nav(-1);
@@ -62,7 +78,6 @@ export default function PostOptionForm({ content }) {
   return (
     <Column $justify={"space-between"}>
       <Column>
-        {/* 제목 + 필수마크 */}
         <Column $gap={"0.75rem"}>
           <Row>
             <Label>사진 속 날짜</Label>
@@ -140,7 +155,6 @@ export default function PostOptionForm({ content }) {
         </Column>
       </Column>
 
-      {/* 버튼 */}
       <Column $gap={"1.25rem"}>
         <Button text={"작성하기"} onClick={handleSubmit} />
         <Button text={"취소"} color={"white"} onClick={() => nav(-1)} />
@@ -154,7 +168,7 @@ const Label = styled.div`
   color: ${color("black.70")};
 `;
 
-/* 이하 스타일 그대로 */
+// 이하 스타일 그대로
 const RadioCard = styled.div`
   background: ${color("black.05")};
   border-radius: 10px;

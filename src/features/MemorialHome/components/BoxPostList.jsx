@@ -8,12 +8,12 @@ const BoxPostList = ({ photos = [], onPostClick }) => {
   return (
     <Wrapper $hasPhotos={hasPhotos}>
       {hasPhotos ? (
-        photos.map((photo) => (
+        photos.map((photo, index) => (
           <Img
             key={photo.id}
             src={photo.url}
             alt={`photo-${photo.id}`}
-            onClick={() => onPostClick && onPostClick(photo)}
+            onClick={() => onPostClick && onPostClick(photo, index)} // ✅ index도 전달
           />
         ))
       ) : (

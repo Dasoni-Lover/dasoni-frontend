@@ -3,7 +3,7 @@ import React, { useState, useEffect } from "react";
 import styled from "styled-components";
 import { typo } from "../styles/tokens";
 import { useNavigate, useLocation } from "react-router-dom";
-import { getPhotos, getHallInfo } from "../api/memorial";
+import { getPhotos, getHallInfo, getPhotoDetail } from "../api/memorial";
 
 import BarNavigate from "../components/BarNavigate";
 import Profile from "../features/MemorialHome/components/Profile";
@@ -34,6 +34,8 @@ const MemorialHomePage = () => {
   const [isAddMenuOpen, setIsAddMenuOpen] = useState(false);
   const [isLinkShareModalOpen, setIsLinkShareModalOpen] = useState(false);
   const [selectedPhoto, setSelectedPhoto] = useState(null);
+  // ✅ 현재 모달에 떠 있는 게시글이 filteredPhotos 중 몇 번째인지
+  const [selectedIndex, setSelectedIndex] = useState(null);
   const [activeTab, setActiveTab] = useState(0);
 
   // 탭 옵션 정의
@@ -46,12 +48,29 @@ const MemorialHomePage = () => {
   useEffect(() => {
     const fetchPhotos = async () => {
       try {
-        const data = await getPhotos(hallId, tabOptions[activeTab]);
+        // 0번 탭(공유앨범) → isPrivate:false
+        // 1번 탭(나와의 앨범) → isPrivate:true
+        const isPrivate = activeTab === 1;
+
+        const requestBody = {
+          isPrivate,
+          isBydate: true, // 명세서: 날짜순 정렬
+          isAI: false, // 기본은 AI 필터 끔
+        };
+
+        console.log("📸 사진 조회 요청:", {
+          hallId,
+          activeTab,
+          requestBody,
+        });
+
+        const data = await getPhotos(hallId, requestBody);
         setPhotos(data);
       } catch (err) {
         console.error("사진 불러오기 실패:", err);
       }
     };
+
     fetchPhotos();
   }, [activeTab, hallId]);
 
@@ -102,6 +121,54 @@ const MemorialHomePage = () => {
     ? `故 ${hallInfo.data.name}의 추모관`
     : "추모관";
 
+  // ✅ 특정 index의 게시글을 상세조회해서 모달에 띄우는 함수
+  const openPhotoAtIndex = async (index) => {
+    const target = filteredPhotos[index];
+    if (!target) return;
+
+    try {
+      const detail = await getPhotoDetail(hallId, target.id);
+
+      const mappedPost = {
+        image: detail.url,
+        title: detail.occurredAt || "",
+        content: detail.content,
+        writtenDate: detail.uploadedAt,
+        authorName: detail.name,
+        profileImage: detail.myProfile, // ✅ 프로필 이미지
+        isMine: detail.isMine,
+        isAdmin: detail.isAdmin,
+      };
+
+      setSelectedPhoto(mappedPost);
+      setSelectedIndex(index);
+    } catch (err) {
+      console.error("게시글 상세 불러오기 실패:", err);
+      alert("게시글 정보를 불러오지 못했습니다.");
+    }
+  };
+
+  // ✅ 썸네일 클릭 시 (photo, index) 받아서 해당 index로 열기
+  const handlePhotoClick = (photo, index) => {
+    openPhotoAtIndex(index);
+  };
+
+  // ✅ 이전 글
+  const handlePrev = () => {
+    if (selectedIndex === null || filteredPhotos.length === 0) return;
+    const nextIndex =
+      selectedIndex === 0 ? filteredPhotos.length - 1 : selectedIndex - 1;
+    openPhotoAtIndex(nextIndex);
+  };
+
+  // ✅ 다음 글
+  const handleNext = () => {
+    if (selectedIndex === null || filteredPhotos.length === 0) return;
+    const nextIndex =
+      selectedIndex === filteredPhotos.length - 1 ? 0 : selectedIndex + 1;
+    openPhotoAtIndex(nextIndex);
+  };
+
   return (
     <Container>
       <BarWrapper>
@@ -120,10 +187,7 @@ const MemorialHomePage = () => {
         />
 
         <TabButtonDropdown onFilterChange={setFilter} />
-        <BoxPostList
-          photos={filteredPhotos}
-          onPostClick={(photo) => setSelectedPhoto(photo)}
-        />
+        <BoxPostList photos={filteredPhotos} onPostClick={handlePhotoClick} />
       </Content>
 
       <FixedShareButton>
@@ -141,7 +205,7 @@ const MemorialHomePage = () => {
               <MenuIcon src={aiicon} alt="AI 이미지 생성" />
               <span>AI 이미지 생성</span>
             </MenuButton>
-            <MenuButton onClick={() => nav("/write")}>
+            <MenuButton onClick={() => nav("/write", { state: { hallId } })}>
               <MenuIcon src={foldericon} alt="사진 업로드" />
               <span>컴퓨터에서 불러오기</span>
             </MenuButton>
@@ -156,6 +220,8 @@ const MemorialHomePage = () => {
         isOpen={!!selectedPhoto}
         post={selectedPhoto}
         onClose={() => setSelectedPhoto(null)}
+        onPrev={handlePrev} // ✅ 왼쪽 화살표
+        onNext={handleNext} // ✅ 오른쪽 화살표
       />
       {isLinkShareModalOpen && (
         <LinkShareModal onClose={() => setIsLinkShareModalOpen(false)} />

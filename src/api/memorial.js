@@ -11,3 +11,9 @@ export const getHallInfo = async (hallId) => {
   const res = await client.get(`/api/halls/${hallId}`);
   return res.data;
 };
+
+// 게시글 상세 조회 API
+export const getPhotoDetail = async (hallId, photoId) => {
+  const res = await client.get(`/api/halls/${hallId}/photos/${photoId}`);
+  return res.data; // { url, name, myProfile, content, isAI, uploadedAt, occurredAt, isMine, isAdmin }
+};

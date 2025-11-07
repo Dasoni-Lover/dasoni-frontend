@@ -1,19 +1,10 @@
+// src/features/MemorialHome/components/PostDetailModal.jsx
 import React, { useState } from "react";
-import styled from "styled-components";
+import styled, { css } from "styled-components";
 import { color, typo } from "../../../styles/tokens";
 import IconChevron from "../../../assets/icon-chevron.svg";
 import ConfirmModal from "../../../components/ConfirmModal";
 
-/**
- * 포스트 상세보기 모달
- *
- * 사용 예시:
- * <PostDetailModal
- *   isOpen={!!selectedPost}
- *   post={selectedPost}
- *   onClose={() => setSelectedPost(null)}
- * />
- */
 export default function PostDetailModal({
   isOpen,
   post,
@@ -25,17 +16,46 @@ export default function PostDetailModal({
 
   if (!isOpen || !post) return null;
 
-  const { image, title, content, writtenDate, authorName = "작성자" } = post;
+  const {
+    image,
+    title, // 🎯 occurredAt: "2023.12.14" 형식이 들어옴
+    content,
+    writtenDate, // 🎯 uploadedAt: "2024.01.04" 형식이 들어옴
+    authorName = "작성자",
+    profileImage,
+    isMine,
+    isAdmin,
+  } = post;
 
-  // 컴포넌트 내부
+  // ✅ "2023.12.14" → "2023년 12월 14일"
+  const formatKoreanDate = (dateStr) => {
+    if (!dateStr || typeof dateStr !== "string") return "";
+    const parts = dateStr.split(".");
+    if (parts.length !== 3) return dateStr; // 예상 포맷 아니면 그대로 반환
+
+    const [y, m, d] = parts;
+    const year = Number(y);
+    const month = Number(m);
+    const day = Number(d);
+
+    if (!year || !month || !day) return dateStr;
+
+    return `${year}년 ${month}월 ${day}일`;
+  };
+
+  // ✅ "2024.01.04" → "2024년 1월 4일 작성함"
+  const formatWrittenDate = (dateStr) => {
+    const base = formatKoreanDate(dateStr);
+    if (!base) return "";
+    return `${base} 작성함`;
+  };
 
   const handleDeleteClick = () => {
     setIsDeleteModalOpen(true);
   };
 
   const handleConfirmDelete = () => {
-    // 실제 삭제 로직 실행
-    // ...
+    // TODO: 실제 삭제 로직
     setIsDeleteModalOpen(false);
   };
 
@@ -46,24 +66,36 @@ export default function PostDetailModal({
   return (
     <Overlay onClick={onClose}>
       <ModalContainer onClick={(e) => e.stopPropagation()}>
-        {/* 🔹 좌우 화살표 클릭 시 이벤트 연결 */}
-        <SideArrowLeft src={IconChevron} onClick={onPrev} />
-        <SideArrowRight src={IconChevron} onClick={onNext} />
+        <SideArrowLeft
+          src={IconChevron}
+          onClick={(e) => {
+            e.stopPropagation();
+            onPrev && onPrev();
+          }}
+        />
+        <SideArrowRight
+          src={IconChevron}
+          onClick={(e) => {
+            e.stopPropagation();
+            onNext && onNext();
+          }}
+        />
 
         <ModalInner>
           <HeaderRow>
             <AuthorInfo>
-              <Avatar />
+              <Avatar $src={profileImage} />
               <AuthorName>{authorName}</AuthorName>
             </AuthorInfo>
 
             <HeaderActions>
-              <SmallButton onClick={handleDeleteClick}>삭제</SmallButton>
-              <SmallButton>수정</SmallButton>
+              {(isMine || isAdmin) && (
+                <SmallButton onClick={handleDeleteClick}>삭제</SmallButton>
+              )}
+              {isMine && <SmallButton>수정</SmallButton>}
             </HeaderActions>
           </HeaderRow>
 
-          {/* 공용 삭제 확인 모달 */}
           <ConfirmModal
             isOpen={isDeleteModalOpen}
             title="해당 게시물을 삭제할까요?"
@@ -80,21 +112,23 @@ export default function PostDetailModal({
             </ImageWrapper>
 
             <TextWrapper>
-              <PostTitle>{title}</PostTitle>
+              {/* ✅ 제목을 'YYYY년 M월 D일' 형식으로 */}
+              <PostTitle>{formatKoreanDate(title)}</PostTitle>
               <PostContent>{content}</PostContent>
             </TextWrapper>
           </ContentRow>
 
           <FooterRow>
-            <WrittenDateText>
-              {writtenDate || "2022년 2월 25일 작성함"}
-            </WrittenDateText>
+            {/* ✅ 작성일을 'YYYY년 M월 D일 작성함' 형식으로 */}
+            <WrittenDateText>{formatWrittenDate(writtenDate)}</WrittenDateText>
           </FooterRow>
         </ModalInner>
       </ModalContainer>
     </Overlay>
   );
 }
+
+// ===== 스타일은 그대로 =====
 
 const Overlay = styled.div`
   position: fixed;
@@ -146,6 +180,14 @@ const Avatar = styled.div`
   height: 32px;
   border-radius: 999px;
   background: #d9d9d9;
+
+  ${({ $src }) =>
+    $src &&
+    css`
+      background-image: url(${$src});
+      background-size: cover;
+      background-position: center;
+    `}
 `;
 
 const AuthorName = styled.div`
@@ -178,7 +220,6 @@ const SmallButton = styled.button`
 const ContentRow = styled.div`
   display: flex;
   gap: 2rem;
-
   align-items: flex-start;
 `;
 
@@ -229,7 +270,7 @@ const SideArrowBase = styled.img`
   background: transparent;
   color: #ffffff;
   font-size: 32px;
-  cursor: pointer; /* 아직 기능 없음 */
+  cursor: pointer;
 `;
 
 const SideArrowLeft = styled(SideArrowBase)`
