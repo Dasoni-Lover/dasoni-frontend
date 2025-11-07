@@ -9,7 +9,7 @@ import LetterModal from "../features/Letters/components/LetterModal";
 import { SideDrawer } from "../features/Letters/components/SideDrawer";
 import { fetchLettersList, fetchLetterDetail } from "../api/letters";
 import { getHallInfo } from "../api/memorial";
-import { Calendar } from "../components/Calendar";
+import Calendar from "../components/Calendar"; // Calendar 수정 필요
 
 import calendaricon from "../assets/calendar-icon.svg";
 import clickcalendaricon from "../assets/click-calendar-icon.svg";
@@ -23,6 +23,7 @@ export const SentLetterBoxPage = () => {
   const [selectedLetter, setSelectedLetter] = useState(null);
   const [hallName, setHallName] = useState("");
   const [calendarOpen, setCalendarOpen] = useState(false); // Calendar toggle
+  const [letterDates, setLetterDates] = useState([]); // 달력용 편지 날짜
 
   useEffect(() => {
     const fetchHallName = async () => {
@@ -43,6 +44,10 @@ export const SentLetterBoxPage = () => {
     try {
       const list = await fetchLettersList(hallId);
       setLetters(list);
+
+      // 달력에 표시할 날짜만 추출
+      const dates = list.map((l) => new Date(l.completedAt).getDate());
+      setLetterDates(dates);
     } catch (err) {
       console.error("편지 목록 불러오기 실패:", err);
     }
@@ -92,13 +97,13 @@ export const SentLetterBoxPage = () => {
           <LetterList letters={letters} onItemClick={handleItemClick} />
         </LetterArea>
         {calendarOpen && (
-        <>
-          <Divider /> {/* 새로 추가한 선 */}
-          <CalendarArea>
-            <Calendar />
-          </CalendarArea>
-        </>
-      )}
+          <>
+            <Divider />
+            <CalendarArea>
+              <Calendar hallId={hallId} letterDates={letterDates} />
+            </CalendarArea>
+          </>
+        )}
       </ContentWrapper>
 
       <LetterModal
@@ -184,10 +189,10 @@ const CalendarBorder = styled.div`
   aspect-ratio: 1/1;
 `;
 
-
 const Divider = styled.div`
   width: 0.0625rem;
   height: 42.5rem;
   background-color: #ddd;
   margin: 0 0.5rem;
 `;
+

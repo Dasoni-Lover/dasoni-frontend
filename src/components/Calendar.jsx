@@ -1,3 +1,4 @@
+// src/components/Calendar.jsx
 import React, { useState } from "react";
 import styled from "styled-components";
 import { color, typo } from "../styles/tokens";
@@ -9,25 +10,15 @@ import LetterModal from "../features/Letters/components/LetterModal";
 
 const weekDays = ["일", "월", "화", "수", "목", "금", "토"];
 
-export const Calendar = () => {
+const Calendar = ({ letterDates = [] }) => {
   const [currentDate, setCurrentDate] = useState(new Date());
-  const [isModalOpen, setIsModalOpen] = useState(false); // 모달 상태
-  const [selectedDay, setSelectedDay] = useState(null); // 클릭된 날짜 저장
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [selectedDay, setSelectedDay] = useState(null);
 
-  const startOfMonth = new Date(
-    currentDate.getFullYear(),
-    currentDate.getMonth(),
-    1
-  );
-  const endOfMonth = new Date(
-    currentDate.getFullYear(),
-    currentDate.getMonth() + 1,
-    0
-  );
+  const startOfMonth = new Date(currentDate.getFullYear(), currentDate.getMonth(), 1);
+  const endOfMonth = new Date(currentDate.getFullYear(), currentDate.getMonth() + 1, 0);
   const startDay = startOfMonth.getDay();
   const daysInMonth = endOfMonth.getDate();
-
-  const letterStatus = { 3: true, 5: true, 12: true, 18: true };
 
   const today = new Date();
   const isNextMonthAvailable = !(
@@ -37,35 +28,26 @@ export const Calendar = () => {
   );
 
   const prevMonth = () =>
-    setCurrentDate(
-      new Date(currentDate.getFullYear(), currentDate.getMonth() - 1, 1)
-    );
+    setCurrentDate(new Date(currentDate.getFullYear(), currentDate.getMonth() - 1, 1));
 
   const nextMonth = () => {
     if (!isNextMonthAvailable) return;
-    setCurrentDate(
-      new Date(currentDate.getFullYear(), currentDate.getMonth() + 1, 1)
-    );
+    setCurrentDate(new Date(currentDate.getFullYear(), currentDate.getMonth() + 1, 1));
   };
 
-  const prevEnd = new Date(
-    currentDate.getFullYear(),
-    currentDate.getMonth(),
-    0
-  ).getDate();
+  const prevEnd = new Date(currentDate.getFullYear(), currentDate.getMonth(), 0).getDate();
 
   const calendarDays = [];
-  for (let i = startDay - 1; i >= 0; i--)
-    calendarDays.push({ day: prevEnd - i, currentMonth: false });
-  for (let i = 1; i <= daysInMonth; i++)
+  for (let i = startDay - 1; i >= 0; i--) calendarDays.push({ day: prevEnd - i, currentMonth: false });
+  for (let i = 1; i <= daysInMonth; i++) {
     calendarDays.push({
       day: i,
       currentMonth: true,
-      hasLetter: letterStatus[i] || false,
+      hasLetter: letterDates.includes(i),
     });
+  }
   const totalCells = Math.ceil(calendarDays.length / 7) * 7;
-  for (let i = 1; calendarDays.length < totalCells; i++)
-    calendarDays.push({ day: i, currentMonth: false });
+  for (let i = 1; calendarDays.length < totalCells; i++) calendarDays.push({ day: i, currentMonth: false });
 
   const handleLetterClick = (day) => {
     setSelectedDay(day);
@@ -87,41 +69,28 @@ export const Calendar = () => {
           />
         </Header>
 
-        <WeekRow>
-          {weekDays.map((d) => (
-            <WeekDay key={d}>{d}</WeekDay>
-          ))}
-        </WeekRow>
+        <WeekRow>{weekDays.map((d) => <WeekDay key={d}>{d}</WeekDay>)}</WeekRow>
 
         <DatesGrid>
           {calendarDays.map((d, idx) => (
-            <DateBox
-              key={idx}
-              isCurrent={d.currentMonth}
-              hasLetter={d.hasLetter}
-            >
+            <DateBox key={idx} isCurrent={d.currentMonth} hasLetter={d.hasLetter}>
               <span>{d.day}</span>
               {d.hasLetter && (
-                <LetterIcon
-                  src={lettericon}
-                  alt="편지 아이콘"
-                  onClick={() => handleLetterClick(d.day)}
-                />
+                <LetterIcon src={lettericon} alt="편지 아이콘" onClick={() => handleLetterClick(d.day)} />
               )}
             </DateBox>
           ))}
         </DatesGrid>
       </CalendarContainer>
 
-      <LetterModal
-        isOpen={isModalOpen}
-        onCancel={() => setIsModalOpen(false)}
-      />
+      <LetterModal isOpen={isModalOpen} onCancel={() => setIsModalOpen(false)} />
     </>
   );
 };
 
-// Styled Components
+export default Calendar;
+
+
 const CalendarContainer = styled.div`
   box-sizing: border-box;
   width: 38.9rem;
