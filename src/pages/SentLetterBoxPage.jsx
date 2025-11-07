@@ -4,7 +4,7 @@ import { useLocation } from "react-router-dom";
 import { color, typo } from '../styles/tokens';
 import BarNavigate from "../components/BarNavigate";
 import { LetterList } from "../features/Letters/components/LetterList";
-import { Letter as LetterModal } from "../features/Letters/components/Letter";
+import LetterModal from "../features/Letters/components/LetterModal";
 import { SideDrawer } from '../features/Letters/components/SideDrawer';
 import { fetchLettersList, fetchLetterDetail } from "../api/letters";
 
@@ -45,7 +45,12 @@ export const SentLetterBoxPage = () => {
         <LetterList letters={letters} onItemClick={handleItemClick} />
       </LetterArea>
 
-      <LetterModal isOpen={modalOpen} data={selectedLetter} onCancel={() => setModalOpen(false)} />
+      <LetterModal
+        isOpen={modalOpen}
+        data={selectedLetter}
+        onCancel={() => setModalOpen(false)}
+      />
+
       <SideDrawer/>
     </Wrapper>
   );
