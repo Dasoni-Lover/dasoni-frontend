@@ -1,18 +1,15 @@
-// LetterListItem.jsx
 import React from 'react';
 import styled from 'styled-components';
 import { color, typo } from '../../../styles/tokens';
 
-export const LetterListItem = ({ onClick }) => {
+export const LetterListItem = ({ letter, onClick }) => {
   return (
     <Container onClick={onClick}>
       <Wrapper>
-        <To>TO.박영수</To>
-        <Date>&nbsp;· 2025/10/15</Date>
+        <To>TO. {letter.toName}</To>
+        <Date>&nbsp;· {letter.completedAt}</Date>
       </Wrapper>
-      <Content>
-        영수야, 오늘은 네가 좋아하던 가을 날씨야. 하늘도 높고 바람도 맑아서 ...
-      </Content>
+      <Content>{letter.excerpt}</Content>
     </Container>
   );
 };

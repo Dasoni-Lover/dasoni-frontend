@@ -1,4 +1,3 @@
-// LetterList.jsx
 import React from 'react';
 import styled from 'styled-components';
 import { LetterListItem } from './LetterListItem';
@@ -6,17 +5,20 @@ import { LetterListItem } from './LetterListItem';
 export const LetterList = ({ letters, onItemClick }) => {
   return (
     <Wrapper>
-      {letters.map((letter, idx) => (
-        <LetterListItem key={idx} onClick={onItemClick} />
+      {letters.map(letter => (
+        <LetterListItem
+          key={letter.letterId}
+          letter={letter}
+          onClick={() => onItemClick(letter.letterId)}
+        />
       ))}
     </Wrapper>
   );
 };
 
 const Wrapper = styled.div`
-  display: inline-flex;
+  display: flex;
   flex-direction: column;
-  align-items: flex-start;
   gap: 0.75rem;
   width: 100%;
 `;
