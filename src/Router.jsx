@@ -22,7 +22,6 @@ import AIGeneratePage from "./pages/AIGeneratePage";
 import { SentLetterPage } from "./pages/SentLetterPage";
 import { SentLetterBoxPage } from "./pages/SentLetterBoxPage";
 
-
 const router = createBrowserRouter([
   {
     path: "/",
@@ -34,7 +33,7 @@ const router = createBrowserRouter([
       { path: "/register", element: <RegisterPage /> },
 
       /* 홈 관련 */
-      { path: "/homepage", element: <HomePage /> },
+      { path: "/home", element: <HomePage /> },
 
       /* 추모관 관련 */
       { path: "/memorial", element: <MemorialHomePage /> },

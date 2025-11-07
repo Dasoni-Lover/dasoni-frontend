@@ -39,7 +39,7 @@ export default function LogInPage() {
       setAuthTokens(data);
 
       alert("로그인에 성공했습니다.");
-      navigate("/homepage");
+      navigate("/home");
     } catch (error) {
       console.error(error);
       if (error.response?.status === 401) {
