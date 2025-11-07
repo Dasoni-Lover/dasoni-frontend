@@ -5,19 +5,11 @@ import { SmallPhotoBox } from "../../../components/photobox/SmallPhotoBox";
 import { color, typo } from "../../../styles/tokens";
 import profileimg from "../../../assets/icon-profile-default.svg";
 
-export const CardListItem = ({ status = "입장완료", onOpenModal, hall }) => {
+export const CardListItem = ({ hall }) => {
   const navigate = useNavigate();
 
   const handleClick = () => {
-    if (status === "입장완료") {
-      navigate("/memorial");
-    } else if (status === "요청중") {
-      return;
-    } else if (status === "거절" || status === "요청안함") {
-      if (onOpenModal) {
-        onOpenModal();
-      }
-    }
+    navigate("/memorial");
   };
 
   const profile = hall?.profile || profileimg;
@@ -28,11 +20,7 @@ export const CardListItem = ({ status = "입장완료", onOpenModal, hall }) => 
 
   return (
     <Wrapper onClick={handleClick}>
-      <SmallPhotoBox
-        src={profile}
-        tagText={status === "요청중" ? "요청중" : ""}
-        showTag={status === "요청중"}
-      />
+      <SmallPhotoBox src={profile} />
       <Box>
         <Name>故 {name}</Name>
         <TextWrapper>
