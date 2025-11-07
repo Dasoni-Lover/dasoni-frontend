@@ -9,31 +9,47 @@ import { useNavigate } from "react-router-dom";
 export default function GenerateComplete({ setIsGenerated, generatedImage }) {
   const nav = useNavigate();
 
-  const handleDownload = () => {
-    const link = document.createElement("a");
-    link.href = `data:image/jpeg;base64,${generatedImage}`;
-    link.download = "ai-generated.jpg";
-    link.click();
+  const goBack = () => nav(-1);
+  const goGenerate = () => setIsGenerated(false);
+
+  const goWritePost = () => {
+    nav("/write", {
+      state: { generatedImage }, // ✅ 생성된 이미지를 state로 전달
+    });
   };
 
   return (
     <Row>
       <Column>
-        <Row $justify="start">
-          <DownloadButtonWrapper onClick={handleDownload}>
+        <Row $justify={"start"}>
+          <DownloadButtonWrapper>
             <img src={IconDownload} alt="download" />
             <DownloadText>다운로드</DownloadText>
           </DownloadButtonWrapper>
         </Row>
 
-        <Row $gap="2.8rem" style={{ marginBottom: "13rem" }}>
-          <GeneratedImg src={`data:image/jpeg;base64,${generatedImage}`} alt="생성된 이미지" />
-          <Column style={{ width: "24.5rem" }} $justify="space-between">
-            <InformText>{`요청하신 사항에 맞추어\n이미지를 생성했어요`}</InformText>
-            <Column $gap="1.25rem">
-              <Button size="L" color="main" text="이 이미지로 게시물 작성하기" />
-              <Button size="L" color="white" text="다시 생성" icon onClick={() => setIsGenerated(false)} />
-              <Button size="L" color="white" text="취소" onClick={() => nav(-1)} />
+        <Row $gap={"2.8rem"} style={{ marginBottom: "13rem" }}>
+          <GeneratedImg
+            src={`data:image/jpeg;base64,${generatedImage}`}
+            alt="생성된 이미지"
+          />
+          <Column style={{ width: "24.5rem" }} $justify={"space-between"}>
+            <InformText>{`요청하신 사항에 맞추어 \n이미지를 생성했어요`}</InformText>
+            <Column $gap={"1.25rem"}>
+              <Button
+                size="L"
+                color="main"
+                text="이 이미지로 게시물 작성하기"
+                onClick={goWritePost} // ✅ 게시물 작성 페이지로 이동
+              />
+              <Button
+                size="L"
+                color="white"
+                text="다시 생성"
+                icon={true}
+                onClick={goGenerate}
+              />
+              <Button size="L" color="white" text="취소" onClick={goBack} />
             </Column>
           </Column>
         </Row>
@@ -59,9 +75,9 @@ const GeneratedImg = styled.img`
   width: 32.5rem;
   height: 32.5rem;
   border-radius: 0.4375rem;
-  border: 3px solid #e9e9e9;
+  border: 3px solid var(--5, #e9e9e9);
   background: lightgray 50% / cover no-repeat;
-  box-shadow: 0 4px 32px rgba(0, 0, 0, 0.25);
+  box-shadow: 0 4px 32px 0 rgba(0, 0, 0, 0.25);
 `;
 
 const InformText = styled.div`

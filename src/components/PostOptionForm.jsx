@@ -11,13 +11,37 @@ import { Column, Row } from "../styles/flex";
 import Button from "./Button";
 import DatePicker from "./DatePicker";
 
+import { uploadPhotoPost } from "../api/memorial-album";
+
 export default function PostOptionForm() {
   const [scope, setScope] = useState("public");
   const [date, setDate] = useState(null);
   const nav = useNavigate();
 
-  const goBack = () => {
-    nav(-1);
+  const handleSubmit = async () => {
+    try {
+      const fileInput = document.querySelector('input[type="file"]');
+      const file = fileInput?.files?.[0];
+      if (!file) {
+        alert("사진을 업로드해주세요.");
+        return;
+      }
+
+      const payload = {
+        content: "게시글 내용 예시",
+        occurredAt: date ? date.toISOString().split("T")[0] : "1940.01.01",
+        isPrivate: scope === "private",
+        isAI: false,
+      };
+
+      const res = await uploadPhotoPost(file, payload);
+      console.log("게시글 업로드 완료:", res);
+      alert("게시물이 등록되었습니다.");
+      nav(-1);
+    } catch (error) {
+      console.error("게시글 업로드 실패:", error);
+      alert("업로드에 실패했습니다.");
+    }
   };
   return (
     <Column $justify={"space-between"}>
@@ -39,7 +63,7 @@ export default function PostOptionForm() {
 
         {/* 공유 범위 */}
         <Column>
-          <Label>공유 범위</Label>
+          <Label style={{ marginTop: "2.75rem" }}>공유 범위</Label>
 
           <RadioCard role="radiogroup" aria-label="공유 범위">
             {/* 공개 */}
@@ -103,8 +127,8 @@ export default function PostOptionForm() {
 
       {/* 버튼 */}
       <Column $gap={"1.25rem"}>
-        <Button text={"작성하기"} />
-        <Button text={"취소"} color={"white"} onClick={goBack} />
+        <Button text={"작성하기"} onClick={handleSubmit} />
+        <Button text={"취소"} color={"white"} onClick={() => nav(-1)} />
       </Column>
     </Column>
   );

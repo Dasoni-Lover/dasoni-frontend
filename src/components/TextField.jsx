@@ -1,3 +1,4 @@
+// src/components/TextField.jsx
 import React from "react";
 import styled from "styled-components";
 import { color, typo } from "../styles/tokens";
@@ -13,6 +14,7 @@ export default function TextField({
   titletypo = "h3",
   width = "45rem",
   height = "9.5rem",
+  ...rest
 }) {
   return (
     <Column>
@@ -26,6 +28,7 @@ export default function TextField({
         onChange={onChange}
         $width={width}
         $height={height}
+        {...rest}
       />
     </Column>
   );

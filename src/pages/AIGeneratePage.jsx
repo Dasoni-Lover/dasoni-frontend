@@ -1,49 +1,29 @@
+// src/pages/AIGeneratePage.jsx
 import React, { useState } from "react";
-import styled from "styled-components";
-import BarNavigate from "../components/BarNavigate";
 import AIGenerateForm from "../features/AIGenerate/components/AIGenerateForm";
+import BarNavigate from "../components/BarNavigate";
+import styled from "styled-components";
 import GenerateComplete from "../features/AIGenerate/components/GenerateComplete";
 import Loding from "../features/AIGenerate/components/Loding";
-import { generateAIImage } from "../api/ai";
+import { generateAIImage } from "../api/memorial-album";
 
-export default function AIGeneratePage({ hallId = 1 }) {
+export default function AIGeneratePage() {
   const [isGenerated, setIsGenerated] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [generatedImage, setGeneratedImage] = useState(null);
 
-  const handleGenerate = async (formData) => {
-    // formData: { images: [File, File, File], prompt: "..." }
-    setIsLoading(true);
+  const handleGenerate = async ({ images, prompt }) => {
     try {
-      // 1️⃣ 파일을 base64로 변환
-      const convertToBase64 = (file) =>
-        new Promise((resolve, reject) => {
-          const reader = new FileReader();
-          reader.onloadend = () => resolve(reader.result.split(",")[1]); // base64Data만 추출
-          reader.onerror = reject;
-          reader.readAsDataURL(file);
-        });
+      setIsLoading(true);
 
-      const imagePayload = await Promise.all(
-        formData.images.map(async (file, index) => {
-          if (!file) return null;
-          const base64Data = await convertToBase64(file);
-          return { order: index + 1, base64Data };
-        })
-      );
+      // ✅ 객체로 전달해야 함
+      const res = await generateAIImage({ images, prompt });
 
-      const body = {
-        images: imagePayload.filter(Boolean),
-        prompt: formData.prompt,
-      };
-
-      // 2️⃣ API 요청
-      const base64Image = await generateAIImage(hallId, body);
-      setGeneratedImage(base64Image);
+      setGeneratedImage(res.generatedImage);
       setIsGenerated(true);
-    } catch (err) {
-      console.error("AI 이미지 생성 실패:", err);
-      alert("AI 이미지 생성에 실패했습니다. 다시 시도해주세요.");
+    } catch (error) {
+      console.error("AI 이미지 생성 실패:", error);
+      alert("이미지 생성에 실패했습니다. 다시 시도해 주세요.");
     } finally {
       setIsLoading(false);
     }
