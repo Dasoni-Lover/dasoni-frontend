@@ -50,7 +50,7 @@ const SideBarList = ({ onAlarmClick, isAlarmOpen }) => {
   }, []);
 
   const menuItems = [
-    { label: "홈", path: "/homepage" },
+    { label: "홈", path: "/home" },
     { label: "입장하기", path: "/enter" },
     { label: "개설하기", path: "/open" },
     { label: "나의 추모관", path: "/memorial-my" },
@@ -59,7 +59,7 @@ const SideBarList = ({ onAlarmClick, isAlarmOpen }) => {
 
   const getIsActive = (item) => {
     if (item.label === "홈") {
-      return location.pathname === "/" || location.pathname === "/homepage";
+      return location.pathname === "/" || location.pathname === "/home";
     }
     if (item.label === "로그아웃") {
       return false; // 로그아웃은 active 표시 안 함

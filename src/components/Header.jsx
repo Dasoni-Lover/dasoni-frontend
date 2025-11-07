@@ -7,7 +7,7 @@ export default function Header({ showAuthButtons }) {
 
   return (
     <Wrapper>
-      <Logo onClick={() => navigate("/homepage")}>다소니</Logo>
+      <Logo onClick={() => navigate("/home")}>다소니</Logo>
 
       {showAuthButtons && (
         <ButtonGroup>

@@ -1,8 +1,16 @@
-import React from "react";
+import React, { useState } from "react";
 import styled from "styled-components";
 import HallTabButton from "./HallTabButton";
 
-const HallTab = ({ role = "visitor", activeIndex, setActiveIndex }) => {
+const HallTab = ({
+  role = "visitor",
+  activeIndex: controlledIndex,
+  onTabChange,
+}) => {
+  // 기본값 visitor
+  const [internalIndex, setInternalIndex] = useState(0);
+
+  // 역할에 따른 탭 구성
   const tabConfig = {
     visitor: ["공유앨범", "나와의 앨범"],
     owner: ["나의 기록", "추모객 관리", "녹음 파일 관리"],
@@ -10,7 +18,18 @@ const HallTab = ({ role = "visitor", activeIndex, setActiveIndex }) => {
     home: ["내가 입장한 추모관", "내가 관리하는 추모관"],
   };
 
-  const tabs = tabConfig[role] || tabConfig.visitor;
+  const tabs = tabConfig[role] || tabConfig.visitor; // 안전하게 visitor fallback
+
+  // 외부에서 activeIndex를 넘겨주면 그걸 쓰고, 아니면 내부 state 사용
+  const activeIndex = controlledIndex ?? internalIndex;
+
+  const handleClick = (index) => {
+    if (onTabChange) {
+      onTabChange(index); // HomePage에서 탭 변경 감지
+    } else {
+      setInternalIndex(index); // 기존처럼 내부에서만 쓰는 경우
+    }
+  };
 
   return (
     <Wrapper>
@@ -19,7 +38,7 @@ const HallTab = ({ role = "visitor", activeIndex, setActiveIndex }) => {
           key={index}
           text={text}
           isActive={activeIndex === index}
-          onClick={() => setActiveIndex(index)}
+          onClick={() => handleClick(index)}
         />
       ))}
     </Wrapper>
@@ -36,5 +55,3 @@ const Wrapper = styled.div`
   align-items: center;
   border-top: 2px solid #313131;
 `;
-
-// <HallTab role="visitor" />

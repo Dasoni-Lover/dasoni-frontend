@@ -1,5 +1,5 @@
 // src/features/OpenMemorialHome/components/OpenStep2.jsx
-import React, { useEffect, useState } from "react";
+import React, { useEffect } from "react";
 import styled from "styled-components";
 import { typo, color } from "../../../styles/tokens";
 import { Row } from "../../../styles/flex";
@@ -7,14 +7,26 @@ import IconEssentialEclipse from "../../../assets/icon-essential-eclipse.svg";
 import DatePicker from "../../../components/DatePicker";
 import InputImgCard from "../../../components/InputImgCard";
 
-export default function OpenStep2({ onValidChange }) {
-  const [birthDate, setBirthDate] = useState(null); // 생일
-  const [deathDate, setDeathDate] = useState(null); // 기일
+export default function OpenStep2({ onValidChange, formData, setFormData }) {
+  const birthDate = formData.birthDate || null;
+  const deathDate = formData.deathDate || null;
 
   useEffect(() => {
     const isValid = !!birthDate && !!deathDate;
     onValidChange?.(isValid);
   }, [birthDate, deathDate, onValidChange]);
+
+  const handleBirthChange = (date) => {
+    setFormData((prev) => ({ ...prev, birthDate: date }));
+  };
+
+  const handleDeathChange = (date) => {
+    setFormData((prev) => ({ ...prev, deathDate: date }));
+  };
+
+  const handleProfileFileChange = (file) => {
+    setFormData((prev) => ({ ...prev, profileFile: file }));
+  };
 
   return (
     <>
@@ -30,7 +42,7 @@ export default function OpenStep2({ onValidChange }) {
         <FieldRight>
           <DatePicker
             selected={birthDate}
-            onChange={setBirthDate}
+            onChange={handleBirthChange}
             placeholder="YYYY/M/D"
           />
         </FieldRight>
@@ -46,7 +58,7 @@ export default function OpenStep2({ onValidChange }) {
         <FieldRight>
           <DatePicker
             selected={deathDate}
-            onChange={setDeathDate}
+            onChange={handleDeathChange}
             placeholder="YYYY/M/D"
           />
         </FieldRight>
@@ -55,7 +67,7 @@ export default function OpenStep2({ onValidChange }) {
       <FormRow style={{ marginBottom: 0 }}>
         <Label>고인의 프로필 사진을 업로드해 주세요</Label>
         <FieldRight>
-          <InputImgCard />
+          <InputImgCard onFileChange={handleProfileFileChange} />
         </FieldRight>
       </FormRow>
     </>

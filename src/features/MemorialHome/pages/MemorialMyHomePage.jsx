@@ -1,3 +1,4 @@
+// src/features/MemorialHome/pages/MemorialMyHomePage.jsx (경로는 프로젝트에 맞게)
 import React, { useState } from "react";
 import styled from "styled-components";
 import { typo } from "../../../styles/tokens";
@@ -15,27 +16,56 @@ import aiicon from "../assets/ai-icon.png";
 import LinkShareModal from "../components/LinkShareModal";
 import { NoPost } from "../components/NoPost";
 import MyMemorialModal from "../components/MyMemorialModal";
+import { createMyHall } from "../../../api/my-hall"; // ✅ 본인 추모관 개설 API
 
 const MemorialMyHomePage = () => {
   const nav = useNavigate();
 
-  // “내 추모관이 존재하는지” 여부 (API 연동 전이므로 임시값)
-  const [hasMemorialHome, setHasMemorialHome] = useState(false);
+  // ✅ localStorage 기반 초기값: 이미 개설한 적 있으면 true
+  const [hasMemorialHome, setHasMemorialHome] = useState(() => {
+    const stored = localStorage.getItem("hasMyMemorialHome");
+    return stored === "true";
+  });
 
-  // 존재하지 않을 경우에만 모달 오픈
-  const [isModalOpen, setIsModalOpen] = useState(!hasMemorialHome);
+  // ✅ 존재하지 않을 경우에만 모달 오픈 (초기 한 번만 판단)
+  const [isModalOpen, setIsModalOpen] = useState(() => {
+    const stored = localStorage.getItem("hasMyMemorialHome");
+    return stored === "true" ? false : true;
+  });
 
   const [isAddMenuOpen, setIsAddMenuOpen] = useState(false);
   const [isLinkShareModalOpen, setIsLinkShareModalOpen] = useState(false);
+  const [isCreating, setIsCreating] = useState(false); // ✅ 중복 클릭 방지용
 
   const goWritePage = () => nav("/write");
   const goAIGeneratePage = () => nav("/generate");
 
-  const handleCreateClick = () => {
-    setHasMemorialHome(true);
-    setIsModalOpen(false);
-  };
+  // ✅ "나의 추모관 개설하기" 버튼 클릭 시
+  const handleCreateClick = async () => {
+    if (isCreating || hasMemorialHome) return;
 
+    try {
+      setIsCreating(true);
+
+      const res = await createMyHall(); // POST /api/halls/me/create
+      const hallId = res?.hallId;
+
+      // ✅ 한 번 개설 후부터는 영구적으로 모달 안 뜨게
+      setHasMemorialHome(true);
+      setIsModalOpen(false);
+      localStorage.setItem("hasMyMemorialHome", "true");
+
+      if (hallId) {
+        localStorage.setItem("myHallId", String(hallId));
+      }
+    } catch (error) {
+      console.error("본인 추모관 개설 실패:", error);
+      // 필요하면 alert 추가 가능 (UI 텍스트 자체는 건들지 않음)
+      // alert("추모관 개설에 실패했습니다. 잠시 후 다시 시도해 주세요.");
+    } finally {
+      setIsCreating(false);
+    }
+  };
 
   return (
     <Container>
@@ -48,9 +78,10 @@ const MemorialMyHomePage = () => {
         <ContentWrapper>
           <Content>
             <ProfileBox>
+              {/* ✅ hasMemorialHome에 따라 수정 가능 여부만 제어 (UI는 그대로) */}
               <DefaultProfile isEditable={hasMemorialHome} />
             </ProfileBox>
-            <HallTab role= "owner" />
+            <HallTab role="owner" />
             <TabButtonDropdown />
             <NoPost />
           </Content>
@@ -85,13 +116,15 @@ const MemorialMyHomePage = () => {
           <LinkShareModal onClose={() => setIsLinkShareModalOpen(false)} />
         )}
 
+        {/* Footer import는 이미 되어 있으니 필요하면 아래에 사용 가능 */}
+        {/* <Footer /> */}
       </BlurWrapper>
 
       {/* 모달은 항상 페이지 위에 표시됨 */}
       {isModalOpen && (
         <MyMemorialModal
           isOpen={isModalOpen}
-          onCreateClick={handleCreateClick}
+          onCreateClick={handleCreateClick} // ✅ 실제 API 호출 연결
         />
       )}
     </Container>
@@ -213,9 +246,9 @@ const MenuButton = styled.button`
   justify-content: center;
   height: 2.75rem;
   width: 13.75rem;
-  border: 1px solid var(--5, #E9E9E9);
+  border: 1px solid var(--5, #e9e9e9);
   border-radius: 5px;
-  background: #FFBC67;
+  background: #ffbc67;
   color: #313131;
   ${typo("h4")};
   cursor: pointer;

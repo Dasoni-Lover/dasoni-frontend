@@ -1,45 +1,40 @@
-import React from 'react'
-import styled from 'styled-components'
-import { useNavigate } from 'react-router-dom'  
-import { SmallPhotoBox } from "../../../components/photobox/SmallPhotoBox"
-import { color, typo } from '../../../styles/tokens'
-import profileimg from "../../../assets/profile-img.png"
+import React from "react";
+import styled from "styled-components";
+import { useNavigate } from "react-router-dom";
+import { SmallPhotoBox } from "../../../components/photobox/SmallPhotoBox";
+import { color, typo } from "../../../styles/tokens";
+import profileimg from "../../../assets/icon-profile-default.svg";
 
-export const CardListItem = ({ status = "입장완료", onOpenModal }) => {
+export const CardListItem = ({ hall }) => {
   const navigate = useNavigate();
 
   const handleClick = () => {
-    if (status === "입장완료") {
-      navigate('/memorial');
-    } else if (status === "요청중" ) {
-      return;
-    } else if (status === "거절" || status === "요청안함"){
-      onOpenModal();
-    }
-
+    navigate("/memorial");
   };
 
+  const profile = hall?.profile || profileimg;
+  const name = hall?.name || "이름 미상";
+  const birthday = hall?.birthday || "-";
+  const deadday = hall?.deadday || "-";
+  const adminName = hall?.adminName || "-";
+
   return (
-    <Wrapper onClick={handleClick}> 
-      <SmallPhotoBox
-        src={profileimg}
-        tagText={status === "요청중" ? "요청중" : ""}
-        showTag={status === "요청중"}
-      />
+    <Wrapper onClick={handleClick}>
+      <SmallPhotoBox src={profile} />
       <Box>
-        <Name>故 박영수</Name>
+        <Name>故 {name}</Name>
         <TextWrapper>
           <ContentWrapper>
             <Type1>생일</Type1>
-            <Text>1993. 2. 11.</Text>
+            <Text>{birthday}</Text>
           </ContentWrapper>
           <ContentWrapper>
             <Type1>기일</Type1>
-            <Text>2021. 4. 24.</Text>
+            <Text>{deadday}</Text>
           </ContentWrapper>
           <ContentWrapper>
             <Type2>관리자</Type2>
-            <Text>박영진</Text>
+            <Text>{adminName}</Text>
           </ContentWrapper>
         </TextWrapper>
       </Box>
@@ -58,9 +53,9 @@ const Wrapper = styled.div`
   box-sizing: border-box;
   margin: 0;
   border-radius: 0.75rem;
-  border: 2px solid #F2E8DF;
-  background: var(--Background, #FFFDFB);
-  cursor: pointer; 
+  border: 2px solid #f2e8df;
+  background: var(--Background, #fffdfb);
+  cursor: pointer;
   transition: all 0.2s ease;
 
   &:hover {
@@ -79,7 +74,7 @@ const Box = styled.div`
 
 const Name = styled.div`
   ${typo("h2")};
-  color: ${color("black.70")};    
+  color: ${color("black.70")};
 `;
 
 const TextWrapper = styled.div`

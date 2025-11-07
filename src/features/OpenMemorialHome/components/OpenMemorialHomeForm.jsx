@@ -12,8 +12,15 @@ import OpenStep4 from "./OpenStep4";
 /**
  * step: 1~4
  * onStepValidChange: (boolean) => void
+ * formData: 전체 폼 데이터
+ * setFormData: 폼 데이터 업데이트 함수
  */
-export default function OpenMemorialHomeForm({ step = 1, onStepValidChange }) {
+export default function OpenMemorialHomeForm({
+  step = 1,
+  onStepValidChange,
+  formData,
+  setFormData,
+}) {
   return (
     <WhiteBox>
       {/* 상단 진행바 */}
@@ -24,10 +31,34 @@ export default function OpenMemorialHomeForm({ step = 1, onStepValidChange }) {
       </Row>
 
       {/* 단계별 내용 */}
-      {step === 1 && <OpenStep1 onValidChange={onStepValidChange} />}
-      {step === 2 && <OpenStep2 onValidChange={onStepValidChange} />}
-      {step === 3 && <OpenStep3 onValidChange={onStepValidChange} />}
-      {step === 4 && <OpenStep4 onValidChange={onStepValidChange} />}
+      {step === 1 && (
+        <OpenStep1
+          onValidChange={onStepValidChange}
+          formData={formData}
+          setFormData={setFormData}
+        />
+      )}
+      {step === 2 && (
+        <OpenStep2
+          onValidChange={onStepValidChange}
+          formData={formData}
+          setFormData={setFormData}
+        />
+      )}
+      {step === 3 && (
+        <OpenStep3
+          onValidChange={onStepValidChange}
+          formData={formData}
+          setFormData={setFormData}
+        />
+      )}
+      {step === 4 && (
+        <OpenStep4
+          onValidChange={onStepValidChange}
+          formData={formData}
+          setFormData={setFormData}
+        />
+      )}
     </WhiteBox>
   );
 }

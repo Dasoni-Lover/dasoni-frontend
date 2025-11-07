@@ -6,7 +6,13 @@ import IconEssential from "../assets/icon-essential-eclipse.svg";
 import IconBigPlus from "../features/WritePost/assets/icon-big-plus.svg";
 import IconEdit from "../features/WritePost/assets/icon-edit.svg";
 
-export default function InputImgCard({ label, essential, labeltypo, onFileSelect }) {
+// ⬇️ onFileChange prop 추가
+export default function InputImgCard({
+  label,
+  essential,
+  labeltypo,
+  onFileChange,
+}) {
   const [previewUrl, setPreviewUrl] = useState("");
   const inputId = useId();
 
@@ -23,7 +29,11 @@ export default function InputImgCard({ label, essential, labeltypo, onFileSelect
     if (previewUrl) URL.revokeObjectURL(previewUrl);
     const nextUrl = URL.createObjectURL(file);
     setPreviewUrl(nextUrl);
-    onFileSelect?.(file);
+
+    // ✅ 부모(OpenStep2)에게 File 객체 전달
+    if (onFileChange) {
+      onFileChange(file);
+    }
   };
 
   return (
