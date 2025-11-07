@@ -17,7 +17,7 @@ import AddPostButtonImg from "../features/MemorialHome/assets/addpost-btn.png";
 import foldericon from "../features/MemorialHome/assets/folder-icon.png";
 import aiicon from "../features/MemorialHome/assets/ai-icon.png";
 
-const MemorialHomePage = ({ hallId = 1 }) => {
+const MemorialHomePage = ({ hallId=1 }) => {
   const [photos, setPhotos] = useState([]);
   const [hallInfo, setHallInfo] = useState(null);
   const [filter, setFilter] = useState({ sortOption: "최신 업로드순", isAIMode: false });
