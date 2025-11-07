@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import styled from "styled-components";
 import { typo } from "../styles/tokens";
 import { useNavigate } from "react-router-dom";
-import { getPhotos } from "../api/memorial";
+import { getPhotos, getHallInfo } from "../api/memorial";
 
 import BarNavigate from "../components/BarNavigate";
 import Profile from "../features/MemorialHome/components/Profile";
@@ -18,6 +18,7 @@ import aiicon from "../features/MemorialHome/assets/ai-icon.png";
 
 const MemorialHomePage = ({ hallId = 1 }) => {
   const [photos, setPhotos] = useState([]);
+  const [hallInfo, setHallInfo] = useState(null);
   const [isAddMenuOpen, setIsAddMenuOpen] = useState(false);
   const [isLinkShareModalOpen, setIsLinkShareModalOpen] = useState(false);
   const [selectedPhoto, setSelectedPhoto] = useState(null);
@@ -44,6 +45,19 @@ const MemorialHomePage = ({ hallId = 1 }) => {
     fetchPhotos();
   }, [activeTab, hallId]);
 
+  // 🔹 추모관 정보 불러오기
+  useEffect(() => {
+    const fetchHallInfo = async () => {
+      try {
+        const data = await getHallInfo(hallId);
+        setHallInfo(data);
+      } catch (err) {
+        console.error("추모관 정보 불러오기 실패:", err);
+      }
+    };
+    fetchHallInfo();
+  }, [hallId]);
+
   return (
     <Container>
       <BarWrapper>
@@ -51,7 +65,7 @@ const MemorialHomePage = ({ hallId = 1 }) => {
       </BarWrapper>
 
       <Content>
-        <Profile />
+        {hallInfo && <Profile data={hallInfo.data} />}
         <HallTab activeIndex={activeTab} setActiveIndex={setActiveTab} />
         <BoxPostList
           photos={photos}

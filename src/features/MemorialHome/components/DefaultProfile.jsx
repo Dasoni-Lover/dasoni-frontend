@@ -1,22 +1,22 @@
 import React from 'react';
-import profileimg from "../../../assets/profile-img.png";
 import styled from 'styled-components';
 import { color, typo } from "../../../styles/tokens";
 import { SmallPhotoBox } from "../../../components/photobox/SmallPhotoBox";
 import { EditSmallPhotoBox } from "../../../components/photobox/EditSmallPhotoBox";
+import defaultProfileImg from "../../../assets/icon-profile-default.svg";
 
-const DefaultProfile = ({ isEditable = false }) => {
+const DefaultProfile = ({ name = "이름 없음", date = "", src, isEditable = false }) => {
   return (
     <Wrapper>
       <Box>
-        <Name>박영수</Name>
-        <Date>1993. 2. 11 ~ 2021. 4. 24</Date>
+        <Name>{name}</Name>
+        {date && <Date>{date}</Date>}
       </Box>
 
       {isEditable ? (
-        <EditSmallPhotoBox src={profileimg} />
+        <EditSmallPhotoBox src={src || defaultProfileImg} />
       ) : (
-        <SmallPhotoBox src={profileimg} />
+        <SmallPhotoBox src={src || defaultProfileImg} />
       )}
     </Wrapper>
   );
