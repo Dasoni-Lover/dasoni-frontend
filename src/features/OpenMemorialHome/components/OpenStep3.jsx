@@ -1,24 +1,32 @@
 // src/features/OpenMemorialHome/components/OpenStep3.jsx
-import React, { useEffect, useState } from "react";
+import React, { useEffect } from "react";
 import styled from "styled-components";
 import { typo, color } from "../../../styles/tokens";
 import IconEssentialEclipse from "../../../assets/icon-essential-eclipse.svg";
 import { InputField } from "../../../components/InputField";
 import Button from "../../../components/Button";
 
-export default function OpenStep3({ onValidChange }) {
-  const [place, setPlace] = useState("");
-  const [phone, setPhone] = useState("");
-  const [deathFile, setDeathFile] = useState(null);
+export default function OpenStep3({ onValidChange, formData, setFormData }) {
+  const place = formData.place || "";
+  const phone = formData.phone || "";
+  const deathFile = formData.docsFile || null;
 
   useEffect(() => {
     const isValid = !!deathFile; // ✅ 파일만 필수
     onValidChange?.(isValid);
   }, [deathFile, onValidChange]);
 
+  const handlePlaceChange = (e) => {
+    setFormData((prev) => ({ ...prev, place: e.target.value }));
+  };
+
+  const handlePhoneChange = (e) => {
+    setFormData((prev) => ({ ...prev, phone: e.target.value }));
+  };
+
   const handleFileChange = (e) => {
     const file = e.target.files?.[0] || null;
-    setDeathFile(file);
+    setFormData((prev) => ({ ...prev, docsFile: file }));
   };
 
   const triggerFileInput = () => {
@@ -35,7 +43,7 @@ export default function OpenStep3({ onValidChange }) {
         <InputField
           placeholder="국립기억의 숲 A-261 구역 등 자세히면 좋아요"
           value={place}
-          onChange={(e) => setPlace(e.target.value)}
+          onChange={handlePlaceChange}
         />
       </FormRow>
 
@@ -44,7 +52,7 @@ export default function OpenStep3({ onValidChange }) {
         <InputField
           placeholder="010-1234-5678"
           value={phone}
-          onChange={(e) => setPhone(e.target.value)}
+          onChange={handlePhoneChange}
         />
       </FormRow>
 

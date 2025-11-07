@@ -8,7 +8,7 @@ import profileimg from "../features/Onboarding/assets/default-profile-img.svg";
 import DatePicker from "../components/DatePicker";
 import dropdownicon from "../assets/row-icon.svg";
 import { checkDuplicateId, registerUser } from "../api/user";
-import client from "../api/client"; // ✅ presigned-url 요청용 axios 클라이언트
+import { getPresignedUrlForImage, uploadFileToS3 } from "../api/files";
 
 export default function RegisterPage() {
   const navigate = useNavigate();
@@ -107,37 +107,6 @@ export default function RegisterPage() {
     }
   };
 
-  // 파일 확장자 기준으로 안전한 Content-Type 정규화
-  const getImageContentType = (file) => {
-    if (!file) return "application/octet-stream";
-
-    // 1순위: 브라우저가 이미 타입을 알고 있으면 그걸 사용
-    if (file.type) {
-      return file.type;
-    }
-
-    // 2순위: 확장자로 추론
-    const ext = file.name.split(".").pop().toLowerCase();
-
-    switch (ext) {
-      case "jpg":
-      case "jpeg":
-        return "image/jpeg";
-      case "png":
-        return "image/png";
-      case "gif":
-        return "image/gif";
-      case "bmp":
-        return "image/bmp";
-      case "svg":
-      case "svg+xml":
-        return "image/svg+xml";
-      default:
-        // 백엔드랑 얘기해서 허용 안 할 거면 여기서 막아도 됨
-        return "application/octet-stream";
-    }
-  };
-
   // ✅ 회원가입 API
   const handleRegister = async () => {
     if (!logId.trim()) {
@@ -174,55 +143,25 @@ export default function RegisterPage() {
     const genderBool = selectedGender === "여성";
 
     setIsRegistering(true);
-
     try {
-      // ✅ 1) 프로필 이미지가 있으면 presigned-url 발급 + S3 업로드
       let myProfile = "";
 
       if (profileImageFile) {
-        // ✔ 안전한 contentType 계산
-        const contentType = getImageContentType(profileImageFile);
-        console.log("upload contentType:", {
-          fileType: profileImageFile.type,
-          normalized: contentType,
-        });
+        // ✅ 공용 유틸 사용
+        const { uploadUrl, fileUrl, contentType } =
+          await getPresignedUrlForImage(profileImageFile);
 
-        // 1-1) presigned-url 요청
-        const presignRes = await client.post(
-          "/api/files/images/presigned-url",
-          {
-            filename: profileImageFile.name,
-            contentType, // ← 정규화된 타입 사용
-            fileSize: profileImageFile.size,
-          }
-        );
-
-        const { uploadUrl, fileUrl } = presignRes.data;
-
-        // 1-2) S3로 실제 업로드
-        const uploadRes = await fetch(uploadUrl, {
-          method: "PUT",
-          headers: {
-            "Content-Type": contentType, // presign 때와 완전히 동일해야 함
-          },
-          body: profileImageFile,
-        });
-
-        if (!uploadRes.ok) {
-          console.error("S3 upload failed status:", uploadRes.status);
-          throw new Error("이미지 업로드에 실패했습니다.");
-        }
-
+        await uploadFileToS3(uploadUrl, profileImageFile, contentType);
         myProfile = fileUrl;
       }
-      // ✅ 2) 회원가입 요청
+
       const body = {
         name: name.trim(),
         gender: genderBool,
         birthday,
         logId: logId.trim(),
         password,
-        myProfile, // S3에 업로드된 이미지 URL (없으면 "")
+        myProfile,
       };
 
       const data = await registerUser(body); // ← user.js 사용

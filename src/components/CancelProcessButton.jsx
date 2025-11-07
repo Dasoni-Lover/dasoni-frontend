@@ -4,11 +4,14 @@ import IconDelete from "../assets/icon-delete.svg";
 import { color, typo } from "../styles/tokens";
 import { Row } from "../styles/flex";
 
-export default function CancelProcessButton({ onClick }) {
+export default function CancelProcessButton({
+  title = "작성 취소하기",
+  onClick,
+}) {
   return (
     <Wrapper onClick={onClick}>
       <img src={IconDelete} />
-      <CancleText> 작성취소하기</CancleText>
+      <CancleText>{title}</CancleText>
     </Wrapper>
   );
 }
