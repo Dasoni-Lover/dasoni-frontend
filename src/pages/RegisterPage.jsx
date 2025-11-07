@@ -8,7 +8,8 @@ import profileimg from "../features/Onboarding/assets/default-profile-img.svg";
 import DatePicker from "../components/DatePicker";
 import dropdownicon from "../assets/row-icon.svg";
 import { checkDuplicateId, registerUser } from "../api/user";
-import client from "../api/client"; // ✅ presigned-url 요청용 axios 클라이언트
+import { getPresignedUrlForImage, uploadFileToS3 } from "../api/files";
+import ConfirmModal from "../components/ConfirmModal";
 
 export default function RegisterPage() {
   const navigate = useNavigate();
@@ -16,6 +17,7 @@ export default function RegisterPage() {
   const [isOpen, setIsOpen] = useState(false);
   const [selectedGender, setSelectedGender] = useState("성별을 선택해 주세요");
   const dropdownRef = useRef(null);
+  const [isSuccess, setIsSuccess] = useState(false);
 
   // ✅ 프로필 이미지 상태
   const [profileImageFile, setProfileImageFile] = useState(null);
@@ -89,52 +91,14 @@ export default function RegisterPage() {
     try {
       setIsCheckingId(true);
       const data = await checkDuplicateId(logId.trim()); // ← user.js 사용
-      // data: { isAvailable: true/false }
 
       setHasCheckedId(true);
       setIsIdAvailable(data.isAvailable);
-
-      if (data.isAvailable) {
-        alert("사용 가능한 아이디입니다.");
-      } else {
-        alert("이미 사용 중인 아이디입니다.");
-      }
     } catch (error) {
       console.error(error);
       alert("ID 중복확인 중 오류가 발생했습니다.");
     } finally {
       setIsCheckingId(false);
-    }
-  };
-
-  // 파일 확장자 기준으로 안전한 Content-Type 정규화
-  const getImageContentType = (file) => {
-    if (!file) return "application/octet-stream";
-
-    // 1순위: 브라우저가 이미 타입을 알고 있으면 그걸 사용
-    if (file.type) {
-      return file.type;
-    }
-
-    // 2순위: 확장자로 추론
-    const ext = file.name.split(".").pop().toLowerCase();
-
-    switch (ext) {
-      case "jpg":
-      case "jpeg":
-        return "image/jpeg";
-      case "png":
-        return "image/png";
-      case "gif":
-        return "image/gif";
-      case "bmp":
-        return "image/bmp";
-      case "svg":
-      case "svg+xml":
-        return "image/svg+xml";
-      default:
-        // 백엔드랑 얘기해서 허용 안 할 거면 여기서 막아도 됨
-        return "application/octet-stream";
     }
   };
 
@@ -174,62 +138,31 @@ export default function RegisterPage() {
     const genderBool = selectedGender === "여성";
 
     setIsRegistering(true);
-
     try {
-      // ✅ 1) 프로필 이미지가 있으면 presigned-url 발급 + S3 업로드
       let myProfile = "";
 
       if (profileImageFile) {
-        // ✔ 안전한 contentType 계산
-        const contentType = getImageContentType(profileImageFile);
-        console.log("upload contentType:", {
-          fileType: profileImageFile.type,
-          normalized: contentType,
-        });
+        // ✅ 공용 유틸 사용
+        const { uploadUrl, fileUrl, contentType } =
+          await getPresignedUrlForImage(profileImageFile);
 
-        // 1-1) presigned-url 요청
-        const presignRes = await client.post(
-          "/api/files/images/presigned-url",
-          {
-            filename: profileImageFile.name,
-            contentType, // ← 정규화된 타입 사용
-            fileSize: profileImageFile.size,
-          }
-        );
-
-        const { uploadUrl, fileUrl } = presignRes.data;
-
-        // 1-2) S3로 실제 업로드
-        const uploadRes = await fetch(uploadUrl, {
-          method: "PUT",
-          headers: {
-            "Content-Type": contentType, // presign 때와 완전히 동일해야 함
-          },
-          body: profileImageFile,
-        });
-
-        if (!uploadRes.ok) {
-          console.error("S3 upload failed status:", uploadRes.status);
-          throw new Error("이미지 업로드에 실패했습니다.");
-        }
-
+        await uploadFileToS3(uploadUrl, profileImageFile, contentType);
         myProfile = fileUrl;
       }
-      // ✅ 2) 회원가입 요청
+
       const body = {
         name: name.trim(),
         gender: genderBool,
         birthday,
         logId: logId.trim(),
         password,
-        myProfile, // S3에 업로드된 이미지 URL (없으면 "")
+        myProfile,
       };
 
       const data = await registerUser(body); // ← user.js 사용
       console.log("register response:", data);
 
-      alert("회원가입이 완료되었습니다. 로그인 페이지로 이동합니다.");
-      navigate("/login");
+      setIsSuccess(true);
     } catch (error) {
       console.error(error);
       if (error.message === "이미지 업로드에 실패했습니다.") {
@@ -282,6 +215,7 @@ export default function RegisterPage() {
                       width="auto"
                       value={logId}
                       onChange={handleChangeLogId}
+                      border={isIdAvailable === false ? "red" : undefined}
                     />
                     <ButtonSize>
                       <Button
@@ -293,7 +227,11 @@ export default function RegisterPage() {
                     </ButtonSize>
                   </IdCheck>
                   {hasCheckedId ? (
-                    <CheckedMessage>사용할 수 있는 아이디에요</CheckedMessage>
+                    <CheckedMessage $isAvailable={isIdAvailable}>
+                      {isIdAvailable
+                        ? "사용할 수 있는 아이디에요"
+                        : "사용할 수 없는 아이디에요"}
+                    </CheckedMessage>
                   ) : null}
                 </InputBox>
                 <InputBox>
@@ -382,6 +320,15 @@ export default function RegisterPage() {
           </ClickBox>
         </Box>
       </OutBox>
+      <ConfirmModal
+        isOpen={isSuccess}
+        title="성공적으로 회원가입을 마쳤어요"
+        description="다소니 마을에 오신 것을 환영해요"
+        confirmText="로그인 하러가기"
+        onConfirm={() => {
+          navigate("/login");
+        }}
+      />
     </Wrapper>
   );
 }
@@ -482,7 +429,8 @@ const IdCheck = styled.div`
 
 const CheckedMessage = styled.div`
   ${typo("bodym")};
-  color: ${color("black.30")};
+  color: ${({ $isAvailable }) =>
+    $isAvailable === false ? color("red") : color("black.30")};
 `;
 
 const ButtonSize = styled.div`

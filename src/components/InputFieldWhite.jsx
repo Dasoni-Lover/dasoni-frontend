@@ -7,10 +7,11 @@ export const InputFieldWhite = ({
   width = "50%",
   value,
   onChange,
+  border, // ✅ border props 추가
   ...rest
 }) => {
   return (
-    <Wrapper $width={width}>
+    <Wrapper $width={width} $border={border}>
       <StyledInput
         type="text"
         placeholder={placeholder}
@@ -31,7 +32,8 @@ const Wrapper = styled.div`
   gap: 0.625rem;
   flex: 1 0 0;
   border-radius: 0.25rem;
-  border: 1px solid #a8a8a8;
+  border: 2px solid
+    ${({ $border }) => ($border === "red" ? color("red") : "#a8a8a8")}; /* ✅ 조건부 border color */
   background: #fff;
   box-sizing: border-box;
 `;
@@ -49,6 +51,3 @@ const StyledInput = styled.input`
     color: #7c7c7c;
   }
 `;
-
-//<InputField placeholder="고인의 이름을 입력하세요" />
-//<InputField placeholder="아이디를 입력하세요" width="100%" />

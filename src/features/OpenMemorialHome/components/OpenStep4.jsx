@@ -1,15 +1,15 @@
 // src/features/OpenMemorialHome/components/OpenStep4.jsx
-import React, { useEffect, useState } from "react";
+import React, { useEffect } from "react";
 import styled from "styled-components";
 import { typo, color } from "../../../styles/tokens";
 import IconEssentialEclipse from "../../../assets/icon-essential-eclipse.svg";
 import RelationSelector from "../../../components/RelationSelector";
 import TagSelector from "../../../components/TagSelector";
 
-export default function OpenStep4({ onValidChange }) {
-  const [relation, setRelation] = useState(null); // 관계 1개
-  const [selectedTags, setSelectedTags] = useState([]); // 태그 최대 3개
-  const [intro, setIntro] = useState("");
+export default function OpenStep4({ onValidChange, formData, setFormData }) {
+  const relation = formData.relation || null;
+  const selectedTags = formData.natures || [];
+  const intro = formData.review || "";
 
   const relationOptions = ["가족이에요", "친구예요", "연인이에요"];
 
@@ -49,6 +49,18 @@ export default function OpenStep4({ onValidChange }) {
     onValidChange?.(isValid);
   }, [relation, selectedTags, intro, onValidChange]);
 
+  const handleRelationChange = (value) => {
+    setFormData((prev) => ({ ...prev, relation: value }));
+  };
+
+  const handleTagsChange = (tags) => {
+    setFormData((prev) => ({ ...prev, natures: tags }));
+  };
+
+  const handleIntroChange = (e) => {
+    setFormData((prev) => ({ ...prev, review: e.target.value }));
+  };
+
   return (
     <>
       <StepTitle>기본 정보를 입력해 주세요.</StepTitle>
@@ -61,7 +73,7 @@ export default function OpenStep4({ onValidChange }) {
       <RelationSelector
         options={relationOptions}
         value={relation}
-        onChange={setRelation}
+        onChange={handleRelationChange}
         gap="0.65rem"
         style={{ marginBottom: "4rem" }}
       />
@@ -75,7 +87,7 @@ export default function OpenStep4({ onValidChange }) {
       <TagSelector
         tagRows={tagRows}
         value={selectedTags}
-        onChange={setSelectedTags}
+        onChange={handleTagsChange}
         max={3}
       />
 
@@ -88,7 +100,7 @@ export default function OpenStep4({ onValidChange }) {
       <IntroTextArea
         placeholder="고인은 어떤 사람이었나요?"
         value={intro}
-        onChange={(e) => setIntro(e.target.value)}
+        onChange={handleIntroChange}
       />
     </>
   );
