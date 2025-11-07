@@ -28,8 +28,9 @@ const Overlay = styled.div`
   align-items: center;
   justify-content: center;
   z-index: 3000;
-  pointer-events: all; /* 배경 클릭해도 닫히지 않게 */
+  height: calc(100% - 6.25rem);
   margin-top: 6.25rem;
+  pointer-events: all; /* 배경 클릭해도 닫히지 않게 */
 `;
 
 const ModalContainer = styled.div`

@@ -85,7 +85,6 @@ const MemorialMyHomePage = () => {
           <LinkShareModal onClose={() => setIsLinkShareModalOpen(false)} />
         )}
 
-        <Footer />
       </BlurWrapper>
 
       {/* 모달은 항상 페이지 위에 표시됨 */}
@@ -116,7 +115,6 @@ const ContentWrapper = styled.div`
   align-items: center;
   transition: all 0.3s ease;
   flex: 1;
-  min-height: 45rem;
   @media (max-width: 1200px) {
     align-items: flex-start;
   }

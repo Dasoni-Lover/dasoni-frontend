@@ -8,11 +8,11 @@ const Footer = () => {
 
 const Wrapper = styled.div`
   width: 100%;
-  height: 12.5rem;
-  background: var(--0, #FFF);
+  height: 5rem;
+  background: var(--Lightgrey, #F8F8F8);
 
   ${typo("bodym2")};
-  color: #E9E9E9;
+  color: #ddd;
 
   display: flex;
   flex-direction: column;
