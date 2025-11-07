@@ -13,6 +13,7 @@ export default function LogInPage() {
   const [logId, setLogId] = useState("");
   const [password, setPassword] = useState("");
   const [isLoggingIn, setIsLoggingIn] = useState(false);
+  const [error, setError] = useState(false);
 
   const handleLogin = async () => {
     if (!logId.trim()) {
@@ -42,13 +43,7 @@ export default function LogInPage() {
       navigate("/home");
     } catch (error) {
       console.error(error);
-      if (error.response?.status === 401) {
-        alert("아이디 또는 비밀번호가 올바르지 않습니다.");
-      } else if (error.response?.data?.message) {
-        alert(`로그인 실패: ${error.response.data.message}`);
-      } else {
-        alert("로그인 중 오류가 발생했습니다.");
-      }
+      setError(true);
     } finally {
       setIsLoggingIn(false);
     }
@@ -86,10 +81,14 @@ export default function LogInPage() {
           </MainWrapper>
 
           <ClickBox>
+            {error ? (
+              <ErrorMsg>아이디 또는 비밀번호가 일치하지 않아요</ErrorMsg>
+            ) : null}
             <Button
               text={isLoggingIn ? "로그인 중..." : "로그인"}
               onClick={handleLogin}
               disabled={isLoggingIn}
+              style={{ marginTop: "0.62rem", marginBottom: "1.25rem" }}
             />
 
             <MiniWrapper>
@@ -192,7 +191,6 @@ const ClickBox = styled.div`
   width: 24.5rem;
   flex-direction: column;
   align-items: center;
-  gap: 1.25rem;
 `;
 
 const MiniWrapper = styled.div`
@@ -214,4 +212,9 @@ const RegisterButton = styled.div`
   ${typo("bodym")};
   color: #308dff;
   cursor: pointer;
+`;
+
+const ErrorMsg = styled.div`
+  ${typo("h4")};
+  color: red;
 `;
