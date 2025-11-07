@@ -8,11 +8,11 @@ import { LetterList } from "../features/Letters/components/LetterList";
 import LetterModal from "../features/Letters/components/LetterModal";
 import { SideDrawer } from "../features/Letters/components/SideDrawer";
 import { fetchLettersList, fetchLetterDetail } from "../api/letters";
-import { getHallInfo } from "../api/memorial"; // ✅ 추가: 추모관 이름 가져오기용
+import { getHallInfo } from "../api/memorial";
 import { Calendar } from "../components/Calendar";
 
-import calendaricon from "../assets/calendar-icon.svg"
-import clickcalendaricon from "../assets/click-calendar-icon.svg"
+import calendaricon from "../assets/calendar-icon.svg";
+import clickcalendaricon from "../assets/click-calendar-icon.svg";
 
 export const SentLetterBoxPage = () => {
   const location = useLocation();
@@ -21,9 +21,9 @@ export const SentLetterBoxPage = () => {
   const [letters, setLetters] = useState([]);
   const [modalOpen, setModalOpen] = useState(false);
   const [selectedLetter, setSelectedLetter] = useState(null);
-  const [hallName, setHallName] = useState(""); // 추모관 이름 상태 추가
+  const [hallName, setHallName] = useState("");
+  const [calendarOpen, setCalendarOpen] = useState(false); // Calendar toggle
 
-  // 추모관 이름 가져오기
   useEffect(() => {
     const fetchHallName = async () => {
       if (!hallId) return;
@@ -38,7 +38,6 @@ export const SentLetterBoxPage = () => {
     fetchHallName();
   }, [hallId]);
 
-  // ✅ 편지 목록 불러오기
   const fetchLetters = async () => {
     if (!hallId) return;
     try {
@@ -49,7 +48,6 @@ export const SentLetterBoxPage = () => {
     }
   };
 
-  // ✅ 편지 상세 불러오기
   const handleItemClick = async (letterId) => {
     if (!hallId) return;
     try {
@@ -65,8 +63,11 @@ export const SentLetterBoxPage = () => {
     fetchLetters();
   }, [hallId]);
 
-  // ✅ BarNavigate 표시용 텍스트 구성
   const hallTitle = hallName ? `故 ${hallName}의 추모관` : "故 추모관";
+
+  const toggleCalendar = () => {
+    setCalendarOpen(!calendarOpen);
+  };
 
   return (
     <Wrapper>
@@ -77,15 +78,28 @@ export const SentLetterBoxPage = () => {
         />
       </NavWrapper>
 
-      <Title>총 {letters.length}개의 보낸 편지가 있어요</Title>
-      <CalendarWrapper>
-          <CalendarBorder>
-            <CalendarIcon src={calendaricon}/>
+      <TitleAndCalendar>
+        <Title>총 {letters.length}개의 보낸 편지가 있어요</Title>
+        <CalendarWrapper onClick={toggleCalendar}>
+          <CalendarBorder active={calendarOpen}>
+            <CalendarIcon src={calendarOpen ? clickcalendaricon : calendaricon} />
           </CalendarBorder>
-      </CalendarWrapper>
-      <LetterArea>
-        <LetterList letters={letters} onItemClick={handleItemClick} />
-      </LetterArea>
+        </CalendarWrapper>
+      </TitleAndCalendar>
+
+      <ContentWrapper>
+        <LetterArea calendarOpen={calendarOpen}>
+          <LetterList letters={letters} onItemClick={handleItemClick} />
+        </LetterArea>
+        {calendarOpen && (
+        <>
+          <Divider /> {/* 새로 추가한 선 */}
+          <CalendarArea>
+            <Calendar />
+          </CalendarArea>
+        </>
+      )}
+      </ContentWrapper>
 
       <LetterModal
         isOpen={modalOpen}
@@ -93,7 +107,7 @@ export const SentLetterBoxPage = () => {
         onCancel={() => setModalOpen(false)}
       />
 
-      <SideDrawer/>
+      <SideDrawer />
     </Wrapper>
   );
 };
@@ -108,48 +122,72 @@ const Wrapper = styled.div`
   position: relative;
 `;
 
-const Title = styled.div`
-  width: 100%;
-  ${typo("h3")};
-  color: ${color("black.70")};
-  margin-bottom: 1.5rem;
-`;
-
 const NavWrapper = styled.div`
   width: 100%;
   margin-bottom: 4.5rem;
 `;
 
-const LetterArea = styled.div`
+const TitleAndCalendar = styled.div`
+  display: flex;
+  flex-direction: column;
   width: 100%;
+  margin-bottom: 1rem;
 `;
 
-const CalendarIcon=styled.img`
-    width: 1.5rem;
+const Title = styled.div`
+  ${typo("h3")};
+  color: ${color("black.70")};
+`;
+
+const ContentWrapper = styled.div`
+  display: flex;
+  width: 100%;
+  gap: 0rem;
+  position: relative;
+`;
+
+const LetterArea = styled.div`
+  width: ${({ calendarOpen }) => (calendarOpen ? "29.125rem" : "68.5rem")};
+  transition: width 0.4s ease;
+`;
+
+const CalendarArea = styled.div`
+  width: 30rem;
+  position: relative;
+`;
+
+const CalendarIcon = styled.img`
+  width: 1.5rem;
   height: 1.66669rem;
-`
-const CalendarBorder=styled.div`
+`;
+
+const CalendarWrapper = styled.div`
+  width: 100%;
+  display: flex;
+  flex-direction: row;
+  justify-content: flex-end;
+  margin-top: 1rem;
+`;
+
+const CalendarBorder = styled.div`
   display: flex;
   width: 2.5rem;
   height: 2.5rem;
   padding: 0.25rem;
+  cursor: pointer;
   justify-content: center;
   align-items: center;
-  gap: 0.25rem;
-  flex-shrink: 0;
-  aspect-ratio: 1/1;
-
   border-radius: 0.25rem;
-  border: 1px solid var(--10, #DDD);
-  background: var(--0, #FFF);
+  border: ${({ active }) => (active ? "1px solid #FFCC8C" : "1px solid #DDD")};
+  background: ${({ active }) => (active ? "#FFF4E6" : "#FFF")};
   box-sizing: border-box;
-  margin-bottom: 1rem;
+  aspect-ratio: 1/1;
+`;
 
-`
 
-const CalendarWrapper=styled.div`
-  display: flex;
-  flex-direction: row;
-  justify-content: flex-end;
-  width: 100%;
-`
+const Divider = styled.div`
+  width: 0.0625rem;
+  height: 42.5rem;
+  background-color: #ddd;
+  margin: 0 0.5rem;
+`;

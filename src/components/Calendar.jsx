@@ -123,6 +123,7 @@ export const Calendar = () => {
 
 // Styled Components
 const CalendarContainer = styled.div`
+  box-sizing: border-box;
   width: 38.9rem;
   background: ${color ? color("white") : "#fff"};
 `;
