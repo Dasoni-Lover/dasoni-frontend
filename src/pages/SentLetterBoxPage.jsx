@@ -5,10 +5,14 @@ import { useLocation } from "react-router-dom";
 import { color, typo } from "../styles/tokens";
 import BarNavigate from "../components/BarNavigate";
 import { LetterList } from "../features/Letters/components/LetterList";
-import { Letter as LetterModal } from "../features/Letters/components/Letter";
+import LetterModal from "../features/Letters/components/LetterModal";
 import { SideDrawer } from "../features/Letters/components/SideDrawer";
 import { fetchLettersList, fetchLetterDetail } from "../api/letters";
 import { getHallInfo } from "../api/memorial"; // ✅ 추가: 추모관 이름 가져오기용
+import { Calendar } from "../components/Calendar";
+
+import calendaricon from "../assets/calendar-icon.svg"
+import clickcalendaricon from "../assets/click-calendar-icon.svg"
 
 export const SentLetterBoxPage = () => {
   const location = useLocation();
@@ -17,9 +21,9 @@ export const SentLetterBoxPage = () => {
   const [letters, setLetters] = useState([]);
   const [modalOpen, setModalOpen] = useState(false);
   const [selectedLetter, setSelectedLetter] = useState(null);
-  const [hallName, setHallName] = useState(""); // ✅ 추모관 이름 상태 추가
+  const [hallName, setHallName] = useState(""); // 추모관 이름 상태 추가
 
-  // ✅ 추모관 이름 가져오기
+  // 추모관 이름 가져오기
   useEffect(() => {
     const fetchHallName = async () => {
       if (!hallId) return;
@@ -74,7 +78,11 @@ export const SentLetterBoxPage = () => {
       </NavWrapper>
 
       <Title>총 {letters.length}개의 보낸 편지가 있어요</Title>
-
+      <CalendarWrapper>
+          <CalendarBorder>
+            <CalendarIcon src={calendaricon}/>
+          </CalendarBorder>
+      </CalendarWrapper>
       <LetterArea>
         <LetterList letters={letters} onItemClick={handleItemClick} />
       </LetterArea>
@@ -115,3 +123,33 @@ const NavWrapper = styled.div`
 const LetterArea = styled.div`
   width: 100%;
 `;
+
+const CalendarIcon=styled.img`
+    width: 1.5rem;
+  height: 1.66669rem;
+`
+const CalendarBorder=styled.div`
+  display: flex;
+  width: 2.5rem;
+  height: 2.5rem;
+  padding: 0.25rem;
+  justify-content: center;
+  align-items: center;
+  gap: 0.25rem;
+  flex-shrink: 0;
+  aspect-ratio: 1/1;
+
+  border-radius: 0.25rem;
+  border: 1px solid var(--10, #DDD);
+  background: var(--0, #FFF);
+  box-sizing: border-box;
+  margin-bottom: 1rem;
+
+`
+
+const CalendarWrapper=styled.div`
+  display: flex;
+  flex-direction: row;
+  justify-content: flex-end;
+  width: 100%;
+`
