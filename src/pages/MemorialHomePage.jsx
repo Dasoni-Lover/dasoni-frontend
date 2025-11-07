@@ -38,12 +38,6 @@ const MemorialHomePage = () => {
   const [selectedIndex, setSelectedIndex] = useState(null);
   const [activeTab, setActiveTab] = useState(0);
 
-  // 탭 옵션 정의
-  const tabOptions = [
-    { isPrivate: false, isBydate: true, isAI: false },
-    { isPrivate: true, isBydate: true, isAI: false },
-  ];
-
   // 사진 불러오기
   useEffect(() => {
     const fetchPhotos = async () => {
@@ -130,6 +124,7 @@ const MemorialHomePage = () => {
       const detail = await getPhotoDetail(hallId, target.id);
 
       const mappedPost = {
+        id: target.id,
         image: detail.url,
         title: detail.occurredAt || "",
         content: detail.content,
@@ -220,6 +215,7 @@ const MemorialHomePage = () => {
         isOpen={!!selectedPhoto}
         post={selectedPhoto}
         onClose={() => setSelectedPhoto(null)}
+        hallId={hallId}
         onPrev={handlePrev} // ✅ 왼쪽 화살표
         onNext={handleNext} // ✅ 오른쪽 화살표
       />

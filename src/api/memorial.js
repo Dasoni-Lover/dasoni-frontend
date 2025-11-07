@@ -17,3 +17,20 @@ export const getPhotoDetail = async (hallId, photoId) => {
   const res = await client.get(`/api/halls/${hallId}/photos/${photoId}`);
   return res.data; // { url, name, myProfile, content, isAI, uploadedAt, occurredAt, isMine, isAdmin }
 };
+
+// ✅ 게시글 수정
+export const updatePhoto = async (hallId, photoId, body) => {
+  const res = await client.patch(
+    `/api/halls/${hallId}/photos/${photoId}/update`,
+    body
+  );
+  return res.data;
+};
+
+// ✅ 게시글 삭제
+export const deletePhoto = async (hallId, photoId) => {
+  const res = await client.delete(
+    `/api/halls/${hallId}/photos/${photoId}/delete`
+  );
+  return res.data;
+};

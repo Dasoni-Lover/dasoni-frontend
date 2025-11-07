@@ -95,7 +95,8 @@ export const SentLetterPage = () => {
       });
       handleOpenModal("submit");
     } catch (err) {
-      alert(err.message || "편지 보내기 실패");
+      console.error("편지 보내기 실패:", err.response?.data || err);
+      alert(err.response?.data?.message || "편지 보내기 실패");
     }
   };
 

@@ -3,10 +3,16 @@ import client from "./client";
 // 편지 보내기
 export const sendLetter = async (hallId, body) => {
   try {
+    console.log("📨 sendLetter 요청:", { hallId, body });
     const res = await client.post(`/api/halls/${hallId}/letters/send`, body);
+    console.log("📨 sendLetter 응답:", res.data);
     return res.data;
   } catch (err) {
-    throw err.response?.data || err;
+    console.error("❌ sendLetter 에러:", {
+      status: err.response?.status,
+      data: err.response?.data,
+    });
+    throw err; // <- 원본 에러 그대로 던지기
   }
 };
 
