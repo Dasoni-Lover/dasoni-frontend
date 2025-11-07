@@ -1,15 +1,17 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, createContext } from "react";
 import Header from "../components/Header";
 import styled, { createGlobalStyle } from "styled-components";
 import SideBar from "../components/sidebar/SideBar";
-import Footer from "../components/Footer"; // ✅ 추가
+import Footer from "../components/Footer";
 import { useLocation } from "react-router-dom";
 import NanumOeHarMeoNiGeurSsi from "../assets/fonts/NanumOeHarMeoNiGeurSsi.ttf";
+
+// ✅ 사이드바 상태를 전역으로 공유하기 위한 Context
+export const SidebarContext = createContext();
 
 export default function GlobalStyle({ children }) {
   const location = useLocation();
 
-  // 1️경로별 콘텐츠 기준 너비 설정
   const CONTENT_MAX_WIDTH_BY_PATH = {
     "/": 600,
     "/login": 502,
@@ -54,7 +56,7 @@ export default function GlobalStyle({ children }) {
     location.pathname === "/register";
 
   return (
-    <>
+    <SidebarContext.Provider value={{ isOpen, setIsOpen }}>
       <FontGlobalStyle />
       <Wrapper $isOpen={isOpen} $shouldShiftContent={shouldShiftContent}>
         <Header showAuthButtons={showAuthButtons} />
@@ -67,13 +69,12 @@ export default function GlobalStyle({ children }) {
             {children}
           </ContentWrapper>
 
-          {/* ✅ 푸터 추가 */}
           <FooterWrapper>
             <Footer />
           </FooterWrapper>
         </MainContent>
       </Wrapper>
-    </>
+    </SidebarContext.Provider>
   );
 }
 
@@ -90,9 +91,7 @@ const Wrapper = styled.div`
   display: flex;
   position: relative;
   flex-direction: column;
-  min-height: 100vh; /* ✅ 화면 전체 높이 확보 */
-
-  /* 사이드바 열림 여부에 따른 패딩 */
+  min-height: 100vh;
   padding-left: ${({ $isOpen, $shouldShiftContent }) => {
     if (!$shouldShiftContent) return "0";
     return $isOpen ? "calc(300px + 40px)" : "60px";
@@ -100,10 +99,10 @@ const Wrapper = styled.div`
 `;
 
 const MainContent = styled.div`
-  flex: 1; /* ✅ Header 제외 나머지 영역 확장 */
+  flex: 1;
   display: flex;
   flex-direction: column;
-  justify-content: space-between; /* 내용 + 푸터 분리 */
+  justify-content: space-between;
 `;
 
 const ContentWrapper = styled.div`
@@ -121,5 +120,5 @@ const ContentWrapper = styled.div`
 
 const FooterWrapper = styled.footer`
   position: relative;
-  z-index: 1; /* ✅ 사이드바보다 아래로 */
+  z-index: 1;
 `;
