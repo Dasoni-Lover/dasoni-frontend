@@ -58,7 +58,7 @@ export const SentLetterPage = ({ hallId = 1 }) => {
   // 모달 확인 버튼 클릭 시 제출 없이 이동
   const handleModalConfirm = () => {
     setIsModalOpen(false);
-    navigate("/sent-letterbox");
+    navigate("/sent-letterbox", { state: { hallId } });
   };
 
   if (!canWrite.isOpen)
