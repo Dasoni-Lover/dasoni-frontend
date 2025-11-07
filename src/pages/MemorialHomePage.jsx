@@ -131,7 +131,6 @@ const MemorialHomePage = () => {
         <LinkShareModal onClose={() => setIsLinkShareModalOpen(false)} />
       )}
 
-      <Footer />
     </Container>
   );
 };

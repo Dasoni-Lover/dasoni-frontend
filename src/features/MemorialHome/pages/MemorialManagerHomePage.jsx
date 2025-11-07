@@ -80,7 +80,6 @@ export const MemorialManagerHomePage = () => {
         <LinkShareModal onClose={() => setIsLinkShareModalOpen(false)} />
       )}
 
-      <Footer />
     </Container>
   );
 };

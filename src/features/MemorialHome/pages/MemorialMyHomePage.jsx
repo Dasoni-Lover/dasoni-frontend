@@ -3,94 +3,118 @@ import styled from "styled-components";
 import { typo } from "../../../styles/tokens";
 import { useNavigate } from "react-router-dom";
 
-import Header from "../../../components/Header";
 import Footer from "../../../components/Footer";
 import BarNavigate from "../../../components/BarNavigate";
 import DefaultProfile from "../components/DefaultProfile";
 import HallTab from "../components/HallTab";
 import TabButtonDropdown from "../components/TabButtonDropdown";
-import BoxPostList from "../components/BoxPostList";
-import SideBar from "../../../components/sidebar/SideBar";
 import LetterAndLinkShare from "../components/LetterAndLinkShare";
 import AddPostButtonImg from "../assets/addpost-btn.png";
 import foldericon from "../assets/folder-icon.png";
 import aiicon from "../assets/ai-icon.png";
 import LinkShareModal from "../components/LinkShareModal";
 import { NoPost } from "../components/NoPost";
+import MyMemorialModal from "../components/MyMemorialModal";
 
 const MemorialMyHomePage = () => {
   const nav = useNavigate();
+
+  // “내 추모관이 존재하는지” 여부 (API 연동 전이므로 임시값)
+  const [hasMemorialHome, setHasMemorialHome] = useState(false);
+
+  // 존재하지 않을 경우에만 모달 오픈
+  const [isModalOpen, setIsModalOpen] = useState(!hasMemorialHome);
+
   const [isAddMenuOpen, setIsAddMenuOpen] = useState(false);
-  const [isLinkShareModalOpen, setIsLinkShareModalOpen] = useState(false); // 모달 상태
+  const [isLinkShareModalOpen, setIsLinkShareModalOpen] = useState(false);
+
   const goWritePage = () => nav("/write");
   const goAIGeneratePage = () => nav("/generate");
 
+  const handleCreateClick = () => {
+    setHasMemorialHome(true);
+    setIsModalOpen(false);
+  };
+
+
   return (
     <Container>
-      <BarWrapper>
-        <BarNavigate />
-      </BarWrapper>
-      <ContentWrapper>
-        <Content>
-          <ProfileBox>
-            <DefaultProfile isEditable={true} />
-          </ProfileBox>
-          <HallTab role="owner" />
-          <TabButtonDropdown />
-          <NoPost />
-        </Content>
-      </ContentWrapper>
+      {/* 메인 콘텐츠는 항상 렌더링되며 모달이 열리면 흐려짐 */}
+      <BlurWrapper $blur={isModalOpen}>
+        <BarWrapper>
+          <BarNavigate />
+        </BarWrapper>
 
-      {/* 우측 고정 버튼 */}
-      <FixedShareButton>
-        <LetterAndLinkShare
-          onLinkShareClick={() => setIsLinkShareModalOpen(true)} // 버튼 클릭 시 모달 열기
-        />
-      </FixedShareButton>
+        <ContentWrapper>
+          <Content>
+            <ProfileBox>
+              <DefaultProfile isEditable={hasMemorialHome} />
+            </ProfileBox>
+            <HallTab role= "owner" />
+            <TabButtonDropdown />
+            <NoPost />
+          </Content>
+        </ContentWrapper>
 
-      <FixedAddPostContainer>
-        {isAddMenuOpen && (
-          <FixedAddPostMenu>
-            <MenuButton onClick={goAIGeneratePage}>
-              <MenuIcon src={aiicon} alt="AI 이미지 생성" />
-              <span>AI 이미지 생성</span>
-            </MenuButton>
-            <MenuButton onClick={goWritePage}>
-              <MenuIcon src={foldericon} alt="사진 업로드" />
-              <span>컴퓨터에서 불러오기</span>
-            </MenuButton>
-          </FixedAddPostMenu>
+        <FixedShareButton>
+          <LetterAndLinkShare
+            onLinkShareClick={() => setIsLinkShareModalOpen(true)}
+          />
+        </FixedShareButton>
+
+        <FixedAddPostContainer>
+          {isAddMenuOpen && (
+            <FixedAddPostMenu>
+              <MenuButton onClick={goAIGeneratePage}>
+                <MenuIcon src={aiicon} alt="AI 이미지 생성" />
+                <span>AI 이미지 생성</span>
+              </MenuButton>
+              <MenuButton onClick={goWritePage}>
+                <MenuIcon src={foldericon} alt="사진 업로드" />
+                <span>컴퓨터에서 불러오기</span>
+              </MenuButton>
+            </FixedAddPostMenu>
+          )}
+
+          <FixedAddPostButton onClick={() => setIsAddMenuOpen(!isAddMenuOpen)}>
+            <img src={AddPostButtonImg} alt="추가 버튼" />
+          </FixedAddPostButton>
+        </FixedAddPostContainer>
+
+        {isLinkShareModalOpen && (
+          <LinkShareModal onClose={() => setIsLinkShareModalOpen(false)} />
         )}
 
-        <FixedAddPostButton onClick={() => setIsAddMenuOpen(!isAddMenuOpen)}>
-          <img src={AddPostButtonImg} alt="추가 버튼" />
-        </FixedAddPostButton>
-      </FixedAddPostContainer>
+      </BlurWrapper>
 
-      {/* 모달 */}
-      {isLinkShareModalOpen && (
-        <LinkShareModal onClose={() => setIsLinkShareModalOpen(false)} />
+      {/* 모달은 항상 페이지 위에 표시됨 */}
+      {isModalOpen && (
+        <MyMemorialModal
+          isOpen={isModalOpen}
+          onCreateClick={handleCreateClick}
+        />
       )}
-
-      <Footer />
     </Container>
   );
 };
 
 export default MemorialMyHomePage;
 
-
-const Container=styled.div`
+const Container = styled.div`
   position: relative;
-`
+`;
+
+const BlurWrapper = styled.div`
+  filter: ${({ $blur }) => ($blur ? "blur(4px)" : "none")};
+  transition: filter 0.2s ease;
+`;
 
 const ContentWrapper = styled.div`
   display: flex;
   flex-direction: column;
   align-items: center;
   transition: all 0.3s ease;
-  flex: 1; /* footer 위 공간 채우기 */
-  min-height: 45rem;
+  flex: 1;
   @media (max-width: 1200px) {
     align-items: flex-start;
   }
@@ -126,7 +150,6 @@ const FixedShareButton = styled.div`
   top: 160px;
   z-index: 1000;
   cursor: pointer;
-
   @media (max-width: 1200px) {
     display: none;
   }
@@ -140,7 +163,6 @@ const FixedAddPostContainer = styled.div`
   display: flex;
   flex-direction: column;
   align-items: center;
-
   @media (max-width: 1200px) {
     display: none;
   }
