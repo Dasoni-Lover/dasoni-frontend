@@ -5,7 +5,6 @@ import openbtn from "../../assets/sidebar-dark-icon.svg";
 import SideBarList from "../sidebar/SideBarList";
 import AlarmPanel from "../alarm/AlarmPanel";
 
-
 const SideBar = ({ isOpen, toggleSidebar }) => {
   const [isAlarmOpen, setIsAlarmOpen] = useState(false);
 
@@ -35,7 +34,6 @@ const SideBar = ({ isOpen, toggleSidebar }) => {
         {isOpen && (
           <Menu>
             <SideBarList onAlarmClick={toggleAlarm} isAlarmOpen={isAlarmOpen} />
-
           </Menu>
         )}
       </Wrapper>
@@ -47,7 +45,6 @@ const SideBar = ({ isOpen, toggleSidebar }) => {
 };
 
 export default SideBar;
-
 
 const Wrapper = styled.div`
   position: fixed;

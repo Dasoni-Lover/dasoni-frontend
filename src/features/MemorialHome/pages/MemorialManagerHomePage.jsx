@@ -1,59 +1,211 @@
-import React, { useState } from "react";
+// src/features/MemorialHome/pages/MemorialManagerHomePage.jsx
+import React, { useState, useEffect } from "react";
 import styled from "styled-components";
 import { color, typo } from "../../../styles/tokens";
-import { useNavigate } from "react-router-dom"; 
+import { useNavigate, useLocation } from "react-router-dom";
 
-import Footer from "../../../components/Footer";
 import BarNavigate from "../../../components/BarNavigate";
 import Profile from "../components/Profile";
 import HallTab from "../components/HallTab";
 import TabButtonDropdown from "../components/TabButtonDropdown";
 import BoxPostList from "../components/BoxPostList";
-import SideBar from "../../../components/sidebar/SideBar";
 import LetterAndLinkShare from "../components/LetterAndLinkShare";
+import LinkShareModal from "../components/LinkShareModal";
+import PostDetailModal from "../components/PostDetailModal";
+
 import AddPostButtonImg from "../assets/addpost-btn.png";
 import foldericon from "../assets/folder-icon.png";
 import aiicon from "../assets/ai-icon.png";
-import LinkShareModal from "../components/LinkShareModal";
 import modifyicon from "../../../assets/edit-btn.svg";
+
+import { getHallInfo, getPhotos, getPhotoDetail } from "../../../api/memorial";
 
 export const MemorialManagerHomePage = () => {
   const [isAddMenuOpen, setIsAddMenuOpen] = useState(false);
   const [isLinkShareModalOpen, setIsLinkShareModalOpen] = useState(false);
-  const navigate = useNavigate(); // ✅ 네비게이트 훅 선언
+  const [hallInfo, setHallInfo] = useState(null);
+  const [photos, setPhotos] = useState([]);
+  const [activeTab, setActiveTab] = useState(0); // 0: 공유앨범, 1: 나와의 앨범, 2: 추모객 관리
+  const [filter, setFilter] = useState({
+    sortOption: "최신 업로드순",
+    isAIMode: false,
+  });
+  const [selectedPhoto, setSelectedPhoto] = useState(null);
+  const [selectedIndex, setSelectedIndex] = useState(null);
+  const [reloadKey, setReloadKey] = useState(0); // ✅ 삭제 후 리로드 트리거
 
-  const handleModifyClick = () => {
-    navigate("/memorial-manager/edit-profile"); // ✅ 페이지 이동
+  const navigate = useNavigate();
+  const location = useLocation();
+  const hallId = location.state?.hallId ?? 1;
+
+  // ✅ 추모관 정보 불러오기 (manager 버전: res.data 사용)
+  useEffect(() => {
+    const fetchHall = async () => {
+      try {
+        const res = await getHallInfo(hallId);
+        setHallInfo(res?.data);
+      } catch (e) {
+        console.error("추모관 정보 불러오기 실패:", e);
+      }
+    };
+    fetchHall();
+  }, [hallId]);
+
+  // ✅ 사진 리스트 불러오기 (isMine / isPrivate 반영)
+  useEffect(() => {
+    const fetchPhotos = async () => {
+      try {
+        let requestBody = {
+          isBydate: true,
+          isAI: false,
+        };
+
+        // 요구사항:
+        // - 나와의 앨범: isMine = true
+        // - 공유 앨범: isPrivate = false
+        if (activeTab === 0) {
+          // 공유앨범
+          requestBody.isPrivate = false;
+          requestBody.isMine = false;
+        } else if (activeTab === 1) {
+          // 나와의 앨범
+          requestBody.isPrivate = true;
+          requestBody.isMine = true;
+        } else {
+          // 3번째 탭(추모객 관리) - 필요에 따라 조정
+          requestBody.isPrivate = true;
+          requestBody.isMine = false;
+        }
+
+        console.log("📸 사진 조회 요청 (manager):", {
+          hallId,
+          activeTab,
+          requestBody,
+        });
+
+        const data = await getPhotos(hallId, requestBody);
+        setPhotos(data);
+      } catch (e) {
+        console.error("사진 불러오기 실패:", e);
+      }
+    };
+
+    fetchPhotos();
+  }, [activeTab, hallId, reloadKey]); // ✅ reloadKey 추가
+
+  // ✅ 정렬 및 AI 필터 적용 (isMine / isPrivate는 서버에서 필터됨)
+  const filteredPhotos = React.useMemo(() => {
+    let result = [...photos];
+
+    if (filter.isAIMode) {
+      result = result.filter((p) => p.isAI);
+    }
+
+    switch (filter.sortOption) {
+      case "최신 업로드순":
+        result.sort((a, b) => new Date(b.uploadDate) - new Date(a.uploadDate));
+        break;
+      case "오래된 업로드순":
+        result.sort((a, b) => new Date(a.uploadDate) - new Date(b.uploadDate));
+        break;
+      case "최신 사진순":
+        result.sort((a, b) => new Date(b.takenDate) - new Date(a.takenDate));
+        break;
+      case "오래된 사진순":
+        result.sort((a, b) => new Date(a.takenDate) - new Date(b.takenDate));
+        break;
+      default:
+        break;
+    }
+    return result;
+  }, [photos, filter]);
+
+  // ✅ 게시글 상세조회 (모달 열기)
+  const openPhotoAtIndex = async (index) => {
+    const target = filteredPhotos[index];
+    if (!target) return;
+
+    try {
+      const detail = await getPhotoDetail(hallId, target.id);
+      const mappedPost = {
+        id: target.id,
+        image: detail.url,
+        title: detail.occurredAt || "",
+        content: detail.content,
+        writtenDate: detail.uploadedAt,
+        authorName: detail.name,
+        profileImage: detail.myProfile,
+        isMine: detail.isMine,
+        isAdmin: detail.isAdmin,
+      };
+      setSelectedPhoto(mappedPost);
+      setSelectedIndex(index);
+    } catch (err) {
+      console.error("게시글 상세 불러오기 실패:", err);
+      alert("게시글 정보를 불러오지 못했습니다.");
+    }
   };
 
-  const goWritePage = () => navigate("/write");
-  const goAIGeneratePage = () => navigate("/generate");
+  const handlePhotoClick = (photo, index) => openPhotoAtIndex(index);
+
+  const handlePrev = () => {
+    if (selectedIndex === null || filteredPhotos.length === 0) return;
+    const prevIndex =
+      selectedIndex === 0 ? filteredPhotos.length - 1 : selectedIndex - 1;
+    openPhotoAtIndex(prevIndex);
+  };
+
+  const handleNext = () => {
+    if (selectedIndex === null || filteredPhotos.length === 0) return;
+    const nextIndex =
+      selectedIndex === filteredPhotos.length - 1 ? 0 : selectedIndex + 1;
+    openPhotoAtIndex(nextIndex);
+  };
+
+  const handleModifyClick = () => {
+    navigate("/memorial-manager/edit-profile");
+  };
+
+  const goWritePage = () => navigate("/write", { state: { hallId } });
+  const goAIGeneratePage = () => navigate("/generate", { state: { hallId } });
+
+  const hallTitle = hallInfo?.name ? `故 ${hallInfo.name}의 추모관` : "추모관";
+
+  // ✅ 모달에서 삭제 후 호출되는 콜백
+  const handlePostDeleted = () => {
+    setReloadKey((prev) => prev + 1); // useEffect 다시 돌게
+  };
 
   return (
     <Container>
       <BarWrapper>
-        <BarNavigate />
-        <Title>故 박영수의 추모관</Title>
+        <BarNavigate paths={["홈", hallTitle]} />
       </BarWrapper>
 
       <ContentWrapper>
         <ModifyButton onClick={handleModifyClick}>
-          {/* ✅ 클릭 이벤트 추가 */}
           <ModifyIcon src={modifyicon} />
           <ModifyText>프로필 수정</ModifyText>
         </ModifyButton>
 
         <Content>
-          <Profile />
-          <HallTab role="manager" />
-          <TabButtonDropdown />
-          <BoxPostList />
+          {hallInfo && <Profile data={hallInfo} />}
+          <HallTab
+            role="manager"
+            activeIndex={activeTab}
+            onTabChange={setActiveTab}
+          />
+          <TabButtonDropdown onFilterChange={setFilter} />
+          <BoxPostList photos={filteredPhotos} onPostClick={handlePhotoClick} />
         </Content>
       </ContentWrapper>
 
       <FixedShareButton>
         <LetterAndLinkShare
           onLinkShareClick={() => setIsLinkShareModalOpen(true)}
+          onLetterClick={() => navigate("/letter", { state: { hallId } })}
+          page="manager"
+          hallId={hallId}
         />
       </FixedShareButton>
 
@@ -76,24 +228,37 @@ export const MemorialManagerHomePage = () => {
         </FixedAddPostButton>
       </FixedAddPostContainer>
 
-      {isLinkShareModalOpen && (
-        <LinkShareModal onClose={() => setIsLinkShareModalOpen(false)} page="manager"/>
-      )}
+      <PostDetailModal
+        isOpen={!!selectedPhoto}
+        post={selectedPhoto}
+        onClose={() => setSelectedPhoto(null)}
+        hallId={hallId}
+        onPrev={handlePrev}
+        onNext={handleNext}
+        onDeleted={handlePostDeleted} // ✅ 삭제 후 리로드 콜백 전달
+      />
 
+      {isLinkShareModalOpen && (
+        <LinkShareModal
+          onClose={() => setIsLinkShareModalOpen(false)}
+          page="manager"
+        />
+      )}
     </Container>
   );
 };
 
-const Container=styled.div`
+/* 🎨 스타일 동일 */
+const Container = styled.div`
   position: relative;
-`
+`;
 
 const ContentWrapper = styled.div`
   display: flex;
   flex-direction: column;
   align-items: center;
   transition: all 0.3s ease;
-  flex: 1; /* footer 위 공간 채우기 */
+  flex: 1;
 
   @media (max-width: 1200px) {
     align-items: flex-start;
@@ -116,13 +281,6 @@ const BarWrapper = styled.div`
   }
 `;
 
-const Title = styled.div`
-  ${typo("h2")};
-  color: ${color("black.70")};
-  text-align: left;
-  margin-bottom: 52px;
-`;
-
 const ModifyButton = styled.div`
   width: 100%;
   display: flex;
@@ -133,7 +291,7 @@ const ModifyButton = styled.div`
   transition: all 0.2s ease;
 
   &:hover {
-    transform: translateY(-1.5px); /* 살짝 위로 떠오르는 느낌 */
+    transform: translateY(-1.5px);
   }
 `;
 
@@ -163,7 +321,6 @@ const FixedShareButton = styled.div`
   top: 160px;
   z-index: 1000;
   cursor: pointer;
-
   @media (max-width: 1200px) {
     display: none;
   }
@@ -177,7 +334,6 @@ const FixedAddPostContainer = styled.div`
   display: flex;
   flex-direction: column;
   align-items: center;
-
   @media (max-width: 1200px) {
     display: none;
   }
@@ -186,13 +342,11 @@ const FixedAddPostContainer = styled.div`
 const FixedAddPostButton = styled.div`
   cursor: pointer;
   transition: transform 0.2s ease;
-
   img {
     width: 128px;
     height: 128px;
     object-fit: contain;
   }
-
   &:hover {
     transform: scale(1.05);
   }
@@ -208,7 +362,6 @@ const FixedAddPostMenu = styled.div`
   align-items: center;
   gap: 8px;
   animation: slideUp 0.25s ease forwards;
-
   @keyframes slideUp {
     from {
       opacity: 0;
@@ -228,9 +381,9 @@ const MenuButton = styled.button`
   justify-content: center;
   height: 2.75rem;
   width: 13.75rem;
-  border: 1px solid var(--5, #E9E9E9);
+  border: 1px solid var(--5, #e9e9e9);
   border-radius: 5px;
-  background: #FFBC67;
+  background: #ffbc67;
   color: #313131;
   ${typo("h4")};
   cursor: pointer;

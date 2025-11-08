@@ -1,69 +1,119 @@
+// src/features/MemorialHome/components/PostDetailModal.jsx
 import React, { useState } from "react";
-import styled from "styled-components";
+import styled, { css } from "styled-components";
 import { color, typo } from "../../../styles/tokens";
 import IconChevron from "../../../assets/icon-chevron.svg";
 import ConfirmModal from "../../../components/ConfirmModal";
+import { deletePhoto } from "../../../api/memorial";
+import { useNavigate } from "react-router-dom";
 
-/**
- * 포스트 상세보기 모달
- *
- * 사용 예시:
- * <PostDetailModal
- *   isOpen={!!selectedPost}
- *   post={selectedPost}
- *   onClose={() => setSelectedPost(null)}
- * />
- */
 export default function PostDetailModal({
   isOpen,
   post,
   onClose,
   onPrev,
   onNext,
+  hallId,
+  onDeleted, // ✅ 삭제 후 부모에게 알려줄 콜백 (옵션)
 }) {
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+  const navigate = useNavigate();
 
   if (!isOpen || !post) return null;
 
-  const { image, title, content, writtenDate, authorName = "작성자" } = post;
+  const {
+    id,
+    image,
+    title,
+    content,
+    writtenDate,
+    authorName = "작성자",
+    profileImage,
+    isMine,
+    isAdmin,
+  } = post;
 
-  // 컴포넌트 내부
+  const formatKoreanDate = (dateStr) => {
+    if (!dateStr || typeof dateStr !== "string") return "";
+    const parts = dateStr.split(".");
+    if (parts.length !== 3) return dateStr;
+    const [y, m, d] = parts;
+    return `${Number(y)}년 ${Number(m)}월 ${Number(d)}일`;
+  };
+  const formatWrittenDate = (dateStr) =>
+    dateStr ? `${formatKoreanDate(dateStr)} 작성함` : "";
 
-  const handleDeleteClick = () => {
-    setIsDeleteModalOpen(true);
+  const handleDeleteClick = () => setIsDeleteModalOpen(true);
+
+  const handleConfirmDelete = async () => {
+    try {
+      console.log("삭제 요청:", hallId, id);
+      await deletePhoto(hallId, id);
+      alert("게시글이 삭제되었습니다.");
+      setIsDeleteModalOpen(false);
+      onClose(); // 모달 닫기
+      if (onDeleted) {
+        onDeleted(id); // ✅ 부모에 알리기
+      }
+    } catch (err) {
+      console.error("게시글 삭제 실패:", err);
+      alert("삭제 중 오류가 발생했습니다.");
+    }
   };
 
-  const handleConfirmDelete = () => {
-    // 실제 삭제 로직 실행
-    // ...
-    setIsDeleteModalOpen(false);
-  };
+  const handleCancelDelete = () => setIsDeleteModalOpen(false);
 
-  const handleCancelDelete = () => {
-    setIsDeleteModalOpen(false);
+  const handleEditClick = () => {
+    navigate("/write", {
+      state: {
+        hallId,
+        isEdit: true,
+        photoId: id,
+        postData: {
+          content,
+          occurredAt: title,
+          isPrivate: 0, // 필요시 교체
+          imageUrl: image,
+        },
+      },
+    });
   };
 
   return (
     <Overlay onClick={onClose}>
       <ModalContainer onClick={(e) => e.stopPropagation()}>
-        {/* 🔹 좌우 화살표 클릭 시 이벤트 연결 */}
-        <SideArrowLeft src={IconChevron} onClick={onPrev} />
-        <SideArrowRight src={IconChevron} onClick={onNext} />
+        <SideArrowLeft
+          src={IconChevron}
+          onClick={(e) => {
+            e.stopPropagation();
+            onPrev && onPrev();
+          }}
+        />
+        <SideArrowRight
+          src={IconChevron}
+          onClick={(e) => {
+            e.stopPropagation();
+            onNext && onNext();
+          }}
+        />
 
         <ModalInner>
           <HeaderRow>
             <AuthorInfo>
-              <Avatar />
+              <Avatar $src={profileImage} />
               <AuthorName>{authorName}</AuthorName>
             </AuthorInfo>
 
             <HeaderActions>
-              <SmallButton onClick={handleDeleteClick}>삭제</SmallButton>
-              <SmallButton>수정</SmallButton>
+              {(isMine || isAdmin) && (
+                <SmallButton onClick={handleDeleteClick}>삭제</SmallButton>
+              )}
+              {isMine && (
+                <SmallButton onClick={handleEditClick}>수정</SmallButton>
+              )}
             </HeaderActions>
           </HeaderRow>
 
-          {/* 공용 삭제 확인 모달 */}
           <ConfirmModal
             isOpen={isDeleteModalOpen}
             title="해당 게시물을 삭제할까요?"
@@ -80,15 +130,13 @@ export default function PostDetailModal({
             </ImageWrapper>
 
             <TextWrapper>
-              <PostTitle>{title}</PostTitle>
+              <PostTitle>{formatKoreanDate(title)}</PostTitle>
               <PostContent>{content}</PostContent>
             </TextWrapper>
           </ContentRow>
 
           <FooterRow>
-            <WrittenDateText>
-              {writtenDate || "2022년 2월 25일 작성함"}
-            </WrittenDateText>
+            <WrittenDateText>{formatWrittenDate(writtenDate)}</WrittenDateText>
           </FooterRow>
         </ModalInner>
       </ModalContainer>
@@ -96,6 +144,7 @@ export default function PostDetailModal({
   );
 }
 
+/* 🎨 스타일 동일 */
 const Overlay = styled.div`
   position: fixed;
   inset: 0;
@@ -146,6 +195,13 @@ const Avatar = styled.div`
   height: 32px;
   border-radius: 999px;
   background: #d9d9d9;
+  ${({ $src }) =>
+    $src &&
+    css`
+      background-image: url(${$src});
+      background-size: cover;
+      background-position: center;
+    `}
 `;
 
 const AuthorName = styled.div`
@@ -168,7 +224,6 @@ const SmallButton = styled.button`
   align-items: center;
   gap: 0.625rem;
   cursor: pointer;
-
   border-radius: 0.3125rem;
   border: 2px solid var(--5, #e9e9e9);
   background: var(--0, #fff);
@@ -178,7 +233,6 @@ const SmallButton = styled.button`
 const ContentRow = styled.div`
   display: flex;
   gap: 2rem;
-
   align-items: flex-start;
 `;
 
@@ -229,7 +283,7 @@ const SideArrowBase = styled.img`
   background: transparent;
   color: #ffffff;
   font-size: 32px;
-  cursor: pointer; /* 아직 기능 없음 */
+  cursor: pointer;
 `;
 
 const SideArrowLeft = styled(SideArrowBase)`

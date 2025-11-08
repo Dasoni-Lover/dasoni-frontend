@@ -5,10 +5,20 @@ import InfoList from "./InfoList";
 import { color, typo } from "../../../styles/tokens";
 
 const Profile = ({ data }) => {
-  // data가 없을 경우를 대비해 구조분해
   if (!data) return null;
 
-  const { name, profile, natures, place, phone, review, date } = data;
+  const { name, profile, nature, place, phone, review, date } = data;
+
+  // ✅ 전화번호 표시용 포맷 함수
+  const formatPhone = (num) => {
+    if (!num) return "";
+    const digits = num.replace(/[^0-9]/g, ""); // 숫자만 남기기
+    if (digits.length < 4) return digits;
+    if (digits.length < 8) return digits.replace(/(\d{3})(\d{1,4})/, "$1-$2");
+    return digits.replace(/(\d{3})(\d{3,4})(\d{1,4})/, "$1-$2-$3");
+  };
+
+  const formattedPhone = formatPhone(phone);
 
   return (
     <Container>
@@ -16,13 +26,16 @@ const Profile = ({ data }) => {
         <DefaultProfile name={name} src={profile} date={date} />
         <Content>{review || "함께있을 때 즐거웠던 사람"}</Content>
       </Wrapper>
-      <InfoList nature={natures} place={place} phone={phone} />
+
+      {/* ✅ InfoList에 하이픈 포함된 전화번호 전달 */}
+      <InfoList nature={nature} place={place} phone={formattedPhone} />
     </Container>
   );
 };
 
 export default Profile;
 
+/* 🎨 스타일 */
 const Container = styled.div`
   display: flex;
   width: 100%;

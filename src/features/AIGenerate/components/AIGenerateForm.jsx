@@ -8,6 +8,7 @@ import TextField from "../../../components/TextField";
 import Button from "../../../components/Button";
 import { useNavigate } from "react-router-dom";
 import CancelProcessButton from "../../../components/CancelProcessButton";
+import ConfirmModal from "../../../components/ConfirmModal";
 
 export default function AIGenerateForm({ onGenerate }) {
   const nav = useNavigate();
@@ -21,6 +22,15 @@ export default function AIGenerateForm({ onGenerate }) {
   // ✅ 프롬프트 상태
   const [prompt, setPrompt] = useState("");
 
+  const [isCanceled, setIsCanceled] = useState(false);
+
+  const handleCancelProcess = () => {
+    setIsCanceled(true);
+  };
+
+  const goHome = () => {
+    nav("/home");
+  };
   // File → base64 문자열로 변환 (dataURL에서 "base64," 뒤만 사용)
   const fileToBase64 = (file) =>
     new Promise((resolve, reject) => {
@@ -86,7 +96,10 @@ export default function AIGenerateForm({ onGenerate }) {
   return (
     <div>
       <Row $justify={"end"}>
-        <CancelProcessButton />
+        <CancelProcessButton
+          title={"작성 그만두기"}
+          onClick={handleCancelProcess}
+        />
       </Row>
       <Subtitle>이미지 생성에 참고할 사진을 올려주세요</Subtitle>
 
@@ -132,6 +145,17 @@ export default function AIGenerateForm({ onGenerate }) {
           onClick={handleClickGenerate} // ✅ 이벤트 객체 대신 우리가 만든 데이터 전달
         />
       </Row>
+      {/*  그만두기 클릭 시 */}
+      <ConfirmModal
+        isOpen={isCanceled}
+        title="추모관 개설을 그만둘까요?"
+        confirmText="그만두기"
+        cancelText="취소"
+        onConfirm={goHome}
+        onCancel={() => {
+          setIsCanceled(false);
+        }}
+      />
     </div>
   );
 }

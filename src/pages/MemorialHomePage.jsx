@@ -3,7 +3,7 @@ import React, { useState, useEffect } from "react";
 import styled from "styled-components";
 import { typo } from "../styles/tokens";
 import { useNavigate, useLocation } from "react-router-dom";
-import { getPhotos, getHallInfo } from "../api/memorial";
+import { getPhotos, getHallInfo, getPhotoDetail } from "../api/memorial";
 
 import BarNavigate from "../components/BarNavigate";
 import Profile from "../features/MemorialHome/components/Profile";
@@ -34,28 +34,45 @@ const MemorialHomePage = () => {
   const [isAddMenuOpen, setIsAddMenuOpen] = useState(false);
   const [isLinkShareModalOpen, setIsLinkShareModalOpen] = useState(false);
   const [selectedPhoto, setSelectedPhoto] = useState(null);
-  const [activeTab, setActiveTab] = useState(0);
+  const [selectedIndex, setSelectedIndex] = useState(null); // 모달에서 현재 몇 번째인지
+  const [activeTab, setActiveTab] = useState(0); // 0: 공유앨범, 1: 나와의 앨범
+  const [reloadKey, setReloadKey] = useState(0); // ✅ 삭제 후 리렌더 트리거
 
-  // 탭 옵션 정의
-  const tabOptions = [
-    { isPrivate: false, isBydate: true, isAI: false },
-    { isPrivate: true, isBydate: true, isAI: false },
-  ];
-
-  // 사진 불러오기
+  // ✅ 사진 불러오기 (isMine / isPrivate 반영)
   useEffect(() => {
     const fetchPhotos = async () => {
       try {
-        const data = await getPhotos(hallId, tabOptions[activeTab]);
+        const isShareTab = activeTab === 0;
+        const isMyTab = activeTab === 1;
+
+        // 👉 요구사항:
+        // - 나와의 앨범: isMine = true
+        // - 공유 앨범: isPrivate = false
+        const requestBody = {
+          isBydate: true,
+          isAI: false,
+          isPrivate: isShareTab ? false : true, // 공유앨범일 때 false, 나머지는 true
+          isMine: isMyTab, // 나와의 앨범일 때 true, 공유앨범일 때 false
+        };
+
+        console.log("📸 사진 조회 요청 (visitor):", {
+          hallId,
+          activeTab,
+          requestBody,
+          reloadKey,
+        });
+
+        const data = await getPhotos(hallId, requestBody);
         setPhotos(data);
       } catch (err) {
         console.error("사진 불러오기 실패:", err);
       }
     };
-    fetchPhotos();
-  }, [activeTab, hallId]);
 
-  // 정렬 및 AI 필터 적용
+    fetchPhotos();
+  }, [activeTab, hallId, reloadKey]); // ✅ reloadKey 추가
+
+  // ✅ 정렬 및 AI 필터 적용 (isPrivate / isMine은 서버에서 필터됨)
   const filteredPhotos = React.useMemo(() => {
     let result = [...photos];
 
@@ -83,7 +100,7 @@ const MemorialHomePage = () => {
     return result;
   }, [photos, filter]);
 
-  // 추모관 정보 불러오기
+  // ✅ 추모관 정보 불러오기
   useEffect(() => {
     const fetchHallInfo = async () => {
       try {
@@ -102,17 +119,66 @@ const MemorialHomePage = () => {
     ? `故 ${hallInfo.data.name}의 추모관`
     : "추모관";
 
+  // ✅ 특정 index의 게시글을 상세조회해서 모달에 띄우는 함수
+  const openPhotoAtIndex = async (index) => {
+    const target = filteredPhotos[index];
+    if (!target) return;
+
+    try {
+      const detail = await getPhotoDetail(hallId, target.id);
+
+      const mappedPost = {
+        id: target.id,
+        image: detail.url,
+        title: detail.occurredAt || "",
+        content: detail.content,
+        writtenDate: detail.uploadedAt,
+        authorName: detail.name,
+        profileImage: detail.myProfile,
+        isMine: detail.isMine,
+        isAdmin: detail.isAdmin,
+      };
+
+      setSelectedPhoto(mappedPost);
+      setSelectedIndex(index);
+    } catch (err) {
+      console.error("게시글 상세 불러오기 실패:", err);
+      alert("게시글 정보를 불러오지 못했습니다.");
+    }
+  };
+
+  const handlePhotoClick = (photo, index) => {
+    openPhotoAtIndex(index);
+  };
+
+  const handlePrev = () => {
+    if (selectedIndex === null || filteredPhotos.length === 0) return;
+    const nextIndex =
+      selectedIndex === 0 ? filteredPhotos.length - 1 : selectedIndex - 1;
+    openPhotoAtIndex(nextIndex);
+  };
+
+  const handleNext = () => {
+    if (selectedIndex === null || filteredPhotos.length === 0) return;
+    const nextIndex =
+      selectedIndex === filteredPhotos.length - 1 ? 0 : selectedIndex + 1;
+    openPhotoAtIndex(nextIndex);
+  };
+
+  // ✅ 모달에서 삭제 후 호출되는 콜백
+  const handlePostDeleted = () => {
+    setReloadKey((prev) => prev + 1);
+  };
+
   return (
     <Container>
       <BarWrapper>
-        {/* ✅ 실제 추모관 이름으로 경로/타이틀 표시 */}
         <BarNavigate paths={["홈", hallTitle]} />
       </BarWrapper>
 
       <Content>
         {hallInfo && <Profile data={hallInfo.data} />}
 
-        {/* ✅ HallTab이 클릭하면 activeTab이 바뀌도록 onTabChange 사용 */}
         <HallTab
           role="visitor"
           activeIndex={activeTab}
@@ -120,10 +186,7 @@ const MemorialHomePage = () => {
         />
 
         <TabButtonDropdown onFilterChange={setFilter} />
-        <BoxPostList
-          photos={filteredPhotos}
-          onPostClick={(photo) => setSelectedPhoto(photo)}
-        />
+        <BoxPostList photos={filteredPhotos} onPostClick={handlePhotoClick} />
       </Content>
 
       <FixedShareButton>
@@ -137,11 +200,11 @@ const MemorialHomePage = () => {
       <FixedAddPostContainer>
         {isAddMenuOpen && (
           <FixedAddPostMenu>
-            <MenuButton onClick={() => nav("/generate")}>
+            <MenuButton onClick={() => nav("/generate", { state: { hallId } })}>
               <MenuIcon src={aiicon} alt="AI 이미지 생성" />
               <span>AI 이미지 생성</span>
             </MenuButton>
-            <MenuButton onClick={() => nav("/write")}>
+            <MenuButton onClick={() => nav("/write", { state: { hallId } })}>
               <MenuIcon src={foldericon} alt="사진 업로드" />
               <span>컴퓨터에서 불러오기</span>
             </MenuButton>
@@ -156,6 +219,10 @@ const MemorialHomePage = () => {
         isOpen={!!selectedPhoto}
         post={selectedPhoto}
         onClose={() => setSelectedPhoto(null)}
+        hallId={hallId}
+        onPrev={handlePrev}
+        onNext={handleNext}
+        onDeleted={handlePostDeleted} // ✅ 삭제 후 리스트 새로고침
       />
       {isLinkShareModalOpen && (
         <LinkShareModal onClose={() => setIsLinkShareModalOpen(false)} />

@@ -4,21 +4,29 @@ import { color, typo } from "../styles/tokens";
 import { Row } from "../styles/flex";
 import IconEssential from "../assets/icon-essential-eclipse.svg";
 import IconBigPlus from "../features/WritePost/assets/icon-big-plus.svg";
-import IconEdit from "../features/WritePost/assets/icon-edit.svg";
+import IconEdit from "../assets/edit-btn.svg";
 
-// ⬇️ onFileChange prop 추가
 export default function InputImgCard({
   label,
   essential,
   labeltypo,
   onFileChange,
+  previewUrl: initialPreviewUrl, // ✨ 추가: 부모에서 넘어오는 초기 이미지
 }) {
-  const [previewUrl, setPreviewUrl] = useState("");
+  const [previewUrl, setPreviewUrl] = useState(initialPreviewUrl || "");
   const inputId = useId();
 
+  // ✨ props로 받은 previewUrl이 바뀌면 state에도 반영
+  useEffect(() => {
+    setPreviewUrl(initialPreviewUrl || "");
+  }, [initialPreviewUrl]);
+
+  // 언마운트 시 blob URL 정리
   useEffect(() => {
     return () => {
-      if (previewUrl) URL.revokeObjectURL(previewUrl);
+      if (previewUrl && previewUrl.startsWith("blob:")) {
+        URL.revokeObjectURL(previewUrl);
+      }
     };
   }, [previewUrl]);
 
@@ -26,11 +34,14 @@ export default function InputImgCard({
     const file = e.target.files?.[0];
     if (!file) return;
 
-    if (previewUrl) URL.revokeObjectURL(previewUrl);
+    // 이전 blob URL 정리
+    if (previewUrl && previewUrl.startsWith("blob:")) {
+      URL.revokeObjectURL(previewUrl);
+    }
+
     const nextUrl = URL.createObjectURL(file);
     setPreviewUrl(nextUrl);
 
-    // ✅ 부모(OpenStep2)에게 File 객체 전달
     if (onFileChange) {
       onFileChange(file);
     }
@@ -43,7 +54,12 @@ export default function InputImgCard({
         {essential && <img src={IconEssential} alt="필수" />}
       </Row>
 
-      <HiddenInput type="file" id={inputId} accept="image/*" onChange={handleChange} />
+      <HiddenInput
+        type="file"
+        id={inputId}
+        accept="image/*"
+        onChange={handleChange}
+      />
 
       <LabelBox htmlFor={inputId}>
         {previewUrl ? (
@@ -60,7 +76,8 @@ export default function InputImgCard({
 }
 
 const Label = styled.div`
-  ${({ $labeltypo }) => ($labeltypo === "bodym2" ? typo("bodym2") : typo("h3"))};
+  ${({ $labeltypo }) =>
+    $labeltypo === "bodym2" ? typo("bodym2") : typo("h3")};
   color: ${color("black.70")};
 `;
 

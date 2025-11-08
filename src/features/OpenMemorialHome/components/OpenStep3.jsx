@@ -1,5 +1,5 @@
 // src/features/OpenMemorialHome/components/OpenStep3.jsx
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import styled from "styled-components";
 import { typo, color } from "../../../styles/tokens";
 import IconEssentialEclipse from "../../../assets/icon-essential-eclipse.svg";
@@ -8,8 +8,12 @@ import Button from "../../../components/Button";
 
 export default function OpenStep3({ onValidChange, formData, setFormData }) {
   const place = formData.place || "";
-  const phone = formData.phone || "";
   const deathFile = formData.docsFile || null;
+
+  // ✅ 로컬 표시용 전화번호 상태 (하이픈 포함)
+  const [displayPhone, setDisplayPhone] = useState(
+    formData.phone ? formatPhone(formData.phone) : ""
+  );
 
   useEffect(() => {
     const isValid = !!deathFile; // ✅ 파일만 필수
@@ -20,8 +24,17 @@ export default function OpenStep3({ onValidChange, formData, setFormData }) {
     setFormData((prev) => ({ ...prev, place: e.target.value }));
   };
 
+  // ✅ 전화번호 입력 핸들러 (11자리 제한 + 숫자만 저장)
   const handlePhoneChange = (e) => {
-    setFormData((prev) => ({ ...prev, phone: e.target.value }));
+    let value = e.target.value.replace(/[^0-9]/g, ""); // 숫자만 남기기
+    if (value.length > 11) value = value.slice(0, 11); // 11자리 제한
+
+    // 화면에 표시용 포맷 (010-1234-5678)
+    const formatted = formatPhone(value);
+    setDisplayPhone(formatted);
+
+    // 서버 전송용 (하이픈 제거)
+    setFormData((prev) => ({ ...prev, phone: value }));
   };
 
   const handleFileChange = (e) => {
@@ -51,8 +64,9 @@ export default function OpenStep3({ onValidChange, formData, setFormData }) {
         <Label>개설자의 연락처를 알려주세요</Label>
         <InputField
           placeholder="010-1234-5678"
-          value={phone}
+          value={displayPhone}
           onChange={handlePhoneChange}
+          maxLength={13} // "010-1234-5678" 포함 시 13자
         />
       </FormRow>
 
@@ -87,6 +101,15 @@ export default function OpenStep3({ onValidChange, formData, setFormData }) {
   );
 }
 
+/* ✅ 전화번호 포맷 함수 */
+function formatPhone(value) {
+  if (!value) return "";
+  if (value.length < 4) return value;
+  if (value.length < 8) return value.replace(/(\d{3})(\d{1,4})/, "$1-$2");
+  return value.replace(/(\d{3})(\d{3,4})(\d{1,4})/, "$1-$2-$3");
+}
+
+/* 🎨 스타일 */
 const StepTitle = styled.div`
   ${typo("h3")};
   color: ${color("black.70")};

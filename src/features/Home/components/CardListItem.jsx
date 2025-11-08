@@ -6,14 +6,21 @@ import { SmallPhotoBox } from "../../../components/photobox/SmallPhotoBox";
 import { color, typo } from "../../../styles/tokens";
 import profileimg from "../../../assets/icon-profile-default.svg";
 
-export const CardListItem = ({ hall }) => {
+export const CardListItem = ({ hall, type }) => {
   const navigate = useNavigate();
 
   const handleClick = () => {
-    // ✅ 클릭한 카드의 hallId를 함께 전달
-    navigate("/memorial", {
-      state: { hallId: hall?.hallId },
-    });
+    if (type === "managed") {
+      // ✅ 내가 관리하는 추모관 → 관리자 페이지
+      navigate("/memorial-manager", {
+        state: { hallId: hall?.hallId },
+      });
+    } else {
+      // ✅ 내가 입장한 추모관 → 일반 추모관 페이지
+      navigate("/memorial", {
+        state: { hallId: hall?.hallId },
+      });
+    }
   };
 
   const profile = hall?.profile || profileimg;

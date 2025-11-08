@@ -13,14 +13,72 @@ import Button from "./Button";
 import DatePicker from "./DatePicker";
 
 import { uploadPhotoPost } from "../api/memorial-album";
+import { getPresignedUrlForImage, uploadFileToS3 } from "../api/files";
+import { updatePhoto } from "../api/memorial"; // ✨ 수정 API 추가
 
-export default function PostOptionForm({ content }) {
-  const [scope, setScope] = useState("public");
-  const [date, setDate] = useState(null);
+export default function PostOptionForm({
+  content,
+  hallId,
+  isEdit = false, // ✨ 수정 여부
+  photoId, // ✨ 수정 대상 사진 ID
+  initialDate = null,
+  initialScope = "public",
+}) {
+  const [scope, setScope] = useState(initialScope);
+  const [date, setDate] = useState(initialDate);
   const nav = useNavigate();
+
+  const formatDateDot = (d) => {
+    const year = d.getFullYear();
+    const month = String(d.getMonth() + 1).padStart(2, "0");
+    const day = String(d.getDate()).padStart(2, "0");
+    return `${year}.${month}.${day}`;
+  };
 
   const handleSubmit = async () => {
     try {
+      if (!content || content.trim().length === 0) {
+        alert("글 내용을 작성해 주세요.");
+        return;
+      }
+
+      if (!date) {
+        alert("사진 속 날짜를 선택해 주세요.");
+        return;
+      }
+
+      const occurredAt = formatDateDot(date);
+      const isPrivateValue = scope === "private" ? 1 : 0; // ✨ 수정 API 명세에 맞게 숫자
+
+      // ✨ [수정 모드] : 사진 업로드 없이 patch
+      if (isEdit) {
+        if (!hallId || !photoId) {
+          alert("수정 대상 정보를 찾을 수 없습니다.");
+          return;
+        }
+
+        const payload = {
+          content: content.trim(),
+          occurredAt,
+          isPrivate: isPrivateValue,
+        };
+
+        console.log(
+          "📝 updatePhoto payload:",
+          payload,
+          "hallId:",
+          hallId,
+          "photoId:",
+          photoId
+        );
+        await updatePhoto(hallId, photoId, payload);
+
+        alert("게시물이 수정되었습니다.");
+        nav(-1);
+        return;
+      }
+
+      // ✨ [새 글 작성] : 기존 로직 그대로
       const fileInput = document.querySelector('input[type="file"]');
       const file = fileInput?.files?.[0];
       if (!file) {
@@ -28,47 +86,44 @@ export default function PostOptionForm({ content }) {
         return;
       }
 
-      if (!content || content.trim().length === 0) {
-        alert("글 내용을 작성해 주세요.");
-        return;
-      }
+      // 1) presigned URL 발급
+      const { uploadUrl, fileUrl, contentType } = await getPresignedUrlForImage(
+        file
+      );
 
-      // 날짜 포맷: YYYY.MM.DD (없으면 오늘 날짜나 임의 값)
-      const formatDateDot = (d) => {
-        if (!d) return "1940.01.01";
-        const year = d.getFullYear();
-        const month = String(d.getMonth() + 1).padStart(2, "0");
-        const day = String(d.getDate()).padStart(2, "0");
-        return `${year}.${month}.${day}`;
-      };
+      // 2) S3에 실제 업로드
+      await uploadFileToS3(uploadUrl, file, contentType);
 
+      // 3) 업로드된 파일 URL로 게시글 등록
       const payload = {
+        url: fileUrl,
         content: content.trim(),
-        occurredAt: formatDateDot(date),
+        occurredAt,
         isPrivate: scope === "private",
         isAI: false,
+        hallId,
       };
 
-      const res = await uploadPhotoPost(file, payload);
+      const res = await uploadPhotoPost(payload);
       console.log("게시글 업로드 완료:", res);
       alert("게시물이 등록되었습니다.");
       nav(-1);
     } catch (error) {
-      console.error("게시글 업로드 실패:", error);
-      alert("업로드에 실패했습니다.");
+      console.error("게시글 저장 실패:", error);
+      alert("저장에 실패했습니다.");
     }
   };
 
   return (
     <Column $justify={"space-between"}>
       <Column>
-        {/* 제목 + 필수마크 */}
         <Column $gap={"0.75rem"}>
           <Row>
             <Label>사진 속 날짜</Label>
             <img src={IconEssential} alt="필수" />
           </Row>
 
+          {/* ✨ 초기값을 가진 DatePicker */}
           <DatePicker
             selected={date}
             onChange={setDate}
@@ -140,9 +195,11 @@ export default function PostOptionForm({ content }) {
         </Column>
       </Column>
 
-      {/* 버튼 */}
       <Column $gap={"1.25rem"}>
-        <Button text={"작성하기"} onClick={handleSubmit} />
+        <Button
+          text={isEdit ? "수정 완료" : "작성하기"}
+          onClick={handleSubmit}
+        />
         <Button text={"취소"} color={"white"} onClick={() => nav(-1)} />
       </Column>
     </Column>
@@ -154,7 +211,7 @@ const Label = styled.div`
   color: ${color("black.70")};
 `;
 
-/* 이하 스타일 그대로 */
+// 이하 스타일 동일
 const RadioCard = styled.div`
   background: ${color("black.05")};
   border-radius: 10px;

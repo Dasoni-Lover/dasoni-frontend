@@ -88,7 +88,9 @@ export const SentLetterBoxPage = () => {
         <Title>총 {letters.length}개의 보낸 편지가 있어요</Title>
         <CalendarWrapper onClick={toggleCalendar}>
           <CalendarBorder active={calendarOpen}>
-            <CalendarIcon src={calendarOpen ? clickcalendaricon : calendaricon} />
+            <CalendarIcon
+              src={calendarOpen ? clickcalendaricon : calendaricon}
+            />
           </CalendarBorder>
         </CalendarWrapper>
       </TitleAndCalendar>
@@ -130,7 +132,10 @@ const Wrapper = styled.div`
   position: relative;
 `;
 
-const NavWrapper = styled.div`width: 100%; margin-bottom: 4.5rem;`;
+const NavWrapper = styled.div`
+  width: 100%;
+  margin-bottom: 4.5rem;
+`;
 
 const TitleAndCalendar = styled.div`
   display: flex;
@@ -139,7 +144,10 @@ const TitleAndCalendar = styled.div`
   margin-bottom: 1rem;
 `;
 
-const Title = styled.div`${typo("h3")}; color: ${color("black.70")};`;
+const Title = styled.div`
+  ${typo("h3")};
+  color: ${color("black.70")};
+`;
 
 const ContentWrapper = styled.div`
   display: flex;
@@ -153,9 +161,15 @@ const LetterArea = styled.div`
   transition: width 0.4s ease;
 `;
 
-const CalendarArea = styled.div`width: 30rem; position: relative;`;
+const CalendarArea = styled.div`
+  width: 30rem;
+  position: relative;
+`;
 
-const CalendarIcon = styled.img`width: 1.5rem; height: 1.66669rem;`;
+const CalendarIcon = styled.img`
+  width: 1.5rem;
+  height: 1.66669rem;
+`;
 
 const CalendarWrapper = styled.div`
   width: 100%;
@@ -183,5 +197,5 @@ const Divider = styled.div`
   width: 0.0625rem;
   height: 42.5rem;
   background-color: #ddd;
-  margin: 0 0.5rem;
+  margin: 0 0.5rem 0 2rem;
 `;
