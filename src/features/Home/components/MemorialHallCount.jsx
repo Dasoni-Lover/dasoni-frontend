@@ -2,12 +2,19 @@ import React from "react";
 import styled from "styled-components";
 import addicon from "../assets/add-icon.svg";
 import { color, typo } from "../../../styles/tokens";
+import { useNavigate } from "react-router-dom";
 
 export const MemorialHallCount = ({ count = 0 }) => {
+  const nav = useNavigate();
+
+  const goEnter = () => {
+    nav("/enter");
+  };
+
   return (
     <Wrapper>
       <Text>{count}곳의 추모관에 입장해 있어요</Text>
-      <ButtonWrapper>
+      <ButtonWrapper onClick={goEnter}>
         <Icon src={addicon} />
         <Content>입장하기</Content>
       </ButtonWrapper>
