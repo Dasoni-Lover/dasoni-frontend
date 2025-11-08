@@ -130,9 +130,9 @@ const MemorialMyHomePage = () => {
             </ProfileBox>
 
             <HallTab role="owner" />
-            <MyRecord/>
-            {/* <TabButtonDropdown />
-            <NoPost /> */}
+            {/* <MyRecord/> */}
+            <TabButtonDropdown />
+            <NoPost />
           </Content>
         </ContentWrapper>
 
