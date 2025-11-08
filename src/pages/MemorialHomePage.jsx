@@ -36,6 +36,7 @@ const MemorialHomePage = () => {
   const [selectedPhoto, setSelectedPhoto] = useState(null);
   const [selectedIndex, setSelectedIndex] = useState(null); // 모달에서 현재 몇 번째인지
   const [activeTab, setActiveTab] = useState(0); // 0: 공유앨범, 1: 나와의 앨범
+  const [reloadKey, setReloadKey] = useState(0); // ✅ 삭제 후 리렌더 트리거
 
   // ✅ 사진 불러오기 (isMine / isPrivate 반영)
   useEffect(() => {
@@ -58,6 +59,7 @@ const MemorialHomePage = () => {
           hallId,
           activeTab,
           requestBody,
+          reloadKey,
         });
 
         const data = await getPhotos(hallId, requestBody);
@@ -68,7 +70,7 @@ const MemorialHomePage = () => {
     };
 
     fetchPhotos();
-  }, [activeTab, hallId]);
+  }, [activeTab, hallId, reloadKey]); // ✅ reloadKey 추가
 
   // ✅ 정렬 및 AI 필터 적용 (isPrivate / isMine은 서버에서 필터됨)
   const filteredPhotos = React.useMemo(() => {
@@ -163,6 +165,11 @@ const MemorialHomePage = () => {
     openPhotoAtIndex(nextIndex);
   };
 
+  // ✅ 모달에서 삭제 후 호출되는 콜백
+  const handlePostDeleted = () => {
+    setReloadKey((prev) => prev + 1);
+  };
+
   return (
     <Container>
       <BarWrapper>
@@ -215,6 +222,7 @@ const MemorialHomePage = () => {
         hallId={hallId}
         onPrev={handlePrev}
         onNext={handleNext}
+        onDeleted={handlePostDeleted} // ✅ 삭제 후 리스트 새로고침
       />
       {isLinkShareModalOpen && (
         <LinkShareModal onClose={() => setIsLinkShareModalOpen(false)} />

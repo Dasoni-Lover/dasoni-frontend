@@ -32,6 +32,7 @@ export const MemorialManagerHomePage = () => {
   });
   const [selectedPhoto, setSelectedPhoto] = useState(null);
   const [selectedIndex, setSelectedIndex] = useState(null);
+  const [reloadKey, setReloadKey] = useState(0); // ✅ 삭제 후 리로드 트리거
 
   const navigate = useNavigate();
   const location = useLocation();
@@ -71,8 +72,7 @@ export const MemorialManagerHomePage = () => {
           requestBody.isPrivate = true;
           requestBody.isMine = true;
         } else {
-          // 3번째 탭(추모객 관리)은 일단 전체 중 private=true(예시) 정도로 두거나
-          // 필요에 따라 백엔드 명세 맞게 조정
+          // 3번째 탭(추모객 관리) - 필요에 따라 조정
           requestBody.isPrivate = true;
           requestBody.isMine = false;
         }
@@ -91,7 +91,7 @@ export const MemorialManagerHomePage = () => {
     };
 
     fetchPhotos();
-  }, [activeTab, hallId]);
+  }, [activeTab, hallId, reloadKey]); // ✅ reloadKey 추가
 
   // ✅ 정렬 및 AI 필터 적용 (isMine / isPrivate는 서버에서 필터됨)
   const filteredPhotos = React.useMemo(() => {
@@ -171,6 +171,11 @@ export const MemorialManagerHomePage = () => {
 
   const hallTitle = hallInfo?.name ? `故 ${hallInfo.name}의 추모관` : "추모관";
 
+  // ✅ 모달에서 삭제 후 호출되는 콜백
+  const handlePostDeleted = () => {
+    setReloadKey((prev) => prev + 1); // useEffect 다시 돌게
+  };
+
   return (
     <Container>
       <BarWrapper>
@@ -230,6 +235,7 @@ export const MemorialManagerHomePage = () => {
         hallId={hallId}
         onPrev={handlePrev}
         onNext={handleNext}
+        onDeleted={handlePostDeleted} // ✅ 삭제 후 리로드 콜백 전달
       />
 
       {isLinkShareModalOpen && (

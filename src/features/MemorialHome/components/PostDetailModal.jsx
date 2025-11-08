@@ -4,7 +4,7 @@ import styled, { css } from "styled-components";
 import { color, typo } from "../../../styles/tokens";
 import IconChevron from "../../../assets/icon-chevron.svg";
 import ConfirmModal from "../../../components/ConfirmModal";
-import { deletePhoto } from "../../../api/memorial"; // ✅ 실제 삭제 API 위치
+import { deletePhoto } from "../../../api/memorial";
 import { useNavigate } from "react-router-dom";
 
 export default function PostDetailModal({
@@ -13,7 +13,8 @@ export default function PostDetailModal({
   onClose,
   onPrev,
   onNext,
-  hallId, // ✅ 부모에서 넘겨준 hallId
+  hallId,
+  onDeleted, // ✅ 삭제 후 부모에게 알려줄 콜백 (옵션)
 }) {
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const navigate = useNavigate();
@@ -21,7 +22,7 @@ export default function PostDetailModal({
   if (!isOpen || !post) return null;
 
   const {
-    id, // ✅ photo_id
+    id,
     image,
     title,
     content,
@@ -32,7 +33,6 @@ export default function PostDetailModal({
     isAdmin,
   } = post;
 
-  // 날짜 포맷 함수 (이전 그대로)
   const formatKoreanDate = (dateStr) => {
     if (!dateStr || typeof dateStr !== "string") return "";
     const parts = dateStr.split(".");
@@ -43,10 +43,8 @@ export default function PostDetailModal({
   const formatWrittenDate = (dateStr) =>
     dateStr ? `${formatKoreanDate(dateStr)} 작성함` : "";
 
-  // ✅ 삭제 클릭 → 확인 모달 열기
   const handleDeleteClick = () => setIsDeleteModalOpen(true);
 
-  // ✅ 실제 삭제 로직
   const handleConfirmDelete = async () => {
     try {
       console.log("삭제 요청:", hallId, id);
@@ -54,6 +52,9 @@ export default function PostDetailModal({
       alert("게시글이 삭제되었습니다.");
       setIsDeleteModalOpen(false);
       onClose(); // 모달 닫기
+      if (onDeleted) {
+        onDeleted(id); // ✅ 부모에 알리기
+      }
     } catch (err) {
       console.error("게시글 삭제 실패:", err);
       alert("삭제 중 오류가 발생했습니다.");
@@ -62,7 +63,6 @@ export default function PostDetailModal({
 
   const handleCancelDelete = () => setIsDeleteModalOpen(false);
 
-  // ✅ 수정 클릭 → /write 페이지로 이동
   const handleEditClick = () => {
     navigate("/write", {
       state: {
@@ -71,9 +71,9 @@ export default function PostDetailModal({
         photoId: id,
         postData: {
           content,
-          occurredAt: title, // 날짜 필드 ("YYYY.MM.DD")
-          isPrivate: 0, // 필요하면 실제 값으로 교체
-          imageUrl: image, // ✨ 수정 페이지에서 사용할 기존 사진 URL
+          occurredAt: title,
+          isPrivate: 0, // 필요시 교체
+          imageUrl: image,
         },
       },
     });
@@ -144,7 +144,7 @@ export default function PostDetailModal({
   );
 }
 
-/* 🎨 스타일 그대로 */
+/* 🎨 스타일 동일 */
 const Overlay = styled.div`
   position: fixed;
   inset: 0;
