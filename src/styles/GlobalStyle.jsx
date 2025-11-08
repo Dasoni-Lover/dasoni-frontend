@@ -69,9 +69,12 @@ export default function GlobalStyle({ children }) {
             {children}
           </ContentWrapper>
 
-          <FooterWrapper>
-            <Footer />
-          </FooterWrapper>
+          {location.pathname !== "/login" && location.pathname !== "/register" && (
+            <FooterWrapper>
+              <Footer />
+            </FooterWrapper>
+          )}
+
         </MainContent>
       </Wrapper>
     </SidebarContext.Provider>
