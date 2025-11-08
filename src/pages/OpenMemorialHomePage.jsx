@@ -156,7 +156,7 @@ export default function OpenMemorialHomePage() {
       return;
     }
 
-    nav("/memorial", {
+    nav("/memorial-manager", {
       state: { hallId: createdHallId },
     });
   };
