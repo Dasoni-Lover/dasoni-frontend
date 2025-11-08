@@ -25,7 +25,7 @@ export const MemorialManagerHomePage = () => {
   const [isLinkShareModalOpen, setIsLinkShareModalOpen] = useState(false);
   const [hallInfo, setHallInfo] = useState(null);
   const [photos, setPhotos] = useState([]);
-  const [activeTab, setActiveTab] = useState(0);
+  const [activeTab, setActiveTab] = useState(0); // 0: 공유앨범, 1: 나와의 앨범, 2: 추모객 관리
   const [filter, setFilter] = useState({
     sortOption: "최신 업로드순",
     isAIMode: false,
@@ -37,7 +37,7 @@ export const MemorialManagerHomePage = () => {
   const location = useLocation();
   const hallId = location.state?.hallId ?? 1;
 
-  // ✅ 추모관 정보 불러오기
+  // ✅ 추모관 정보 불러오기 (manager 버전: res.data 사용)
   useEffect(() => {
     const fetchHall = async () => {
       try {
@@ -50,27 +50,57 @@ export const MemorialManagerHomePage = () => {
     fetchHall();
   }, [hallId]);
 
-  // ✅ 사진 리스트 불러오기
+  // ✅ 사진 리스트 불러오기 (isMine / isPrivate 반영)
   useEffect(() => {
     const fetchPhotos = async () => {
       try {
-        const data = await getPhotos(hallId, {
-          isPrivate: activeTab === 1,
+        let requestBody = {
           isBydate: true,
           isAI: false,
+        };
+
+        // 요구사항:
+        // - 나와의 앨범: isMine = true
+        // - 공유 앨범: isPrivate = false
+        if (activeTab === 0) {
+          // 공유앨범
+          requestBody.isPrivate = false;
+          requestBody.isMine = false;
+        } else if (activeTab === 1) {
+          // 나와의 앨범
+          requestBody.isPrivate = true;
+          requestBody.isMine = true;
+        } else {
+          // 3번째 탭(추모객 관리)은 일단 전체 중 private=true(예시) 정도로 두거나
+          // 필요에 따라 백엔드 명세 맞게 조정
+          requestBody.isPrivate = true;
+          requestBody.isMine = false;
+        }
+
+        console.log("📸 사진 조회 요청 (manager):", {
+          hallId,
+          activeTab,
+          requestBody,
         });
+
+        const data = await getPhotos(hallId, requestBody);
         setPhotos(data);
       } catch (e) {
         console.error("사진 불러오기 실패:", e);
       }
     };
-    fetchPhotos();
-  }, [hallId, activeTab]);
 
-  // ✅ 정렬 및 필터 적용
+    fetchPhotos();
+  }, [activeTab, hallId]);
+
+  // ✅ 정렬 및 AI 필터 적용 (isMine / isPrivate는 서버에서 필터됨)
   const filteredPhotos = React.useMemo(() => {
     let result = [...photos];
-    if (filter.isAIMode) result = result.filter((p) => p.isAI);
+
+    if (filter.isAIMode) {
+      result = result.filter((p) => p.isAI);
+    }
+
     switch (filter.sortOption) {
       case "최신 업로드순":
         result.sort((a, b) => new Date(b.uploadDate) - new Date(a.uploadDate));
@@ -168,7 +198,7 @@ export const MemorialManagerHomePage = () => {
       <FixedShareButton>
         <LetterAndLinkShare
           onLinkShareClick={() => setIsLinkShareModalOpen(true)}
-          onLetterClick={() => navigate("/letter", { state: { hallId } })} // ✅ 추가된 부분
+          onLetterClick={() => navigate("/letter", { state: { hallId } })}
           page="manager"
           hallId={hallId}
         />
@@ -193,7 +223,6 @@ export const MemorialManagerHomePage = () => {
         </FixedAddPostButton>
       </FixedAddPostContainer>
 
-      {/* ✅ 상세조회 모달 추가 */}
       <PostDetailModal
         isOpen={!!selectedPhoto}
         post={selectedPhoto}

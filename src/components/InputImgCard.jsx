@@ -4,14 +4,14 @@ import { color, typo } from "../styles/tokens";
 import { Row } from "../styles/flex";
 import IconEssential from "../assets/icon-essential-eclipse.svg";
 import IconBigPlus from "../features/WritePost/assets/icon-big-plus.svg";
-import IconEdit from "../features/WritePost/assets/icon-edit.svg";
+import IconEdit from "../assets/edit-btn.svg";
 
 export default function InputImgCard({
   label,
   essential,
   labeltypo,
   onFileChange,
-  previewUrl: initialPreviewUrl,   // ✨ 추가: 부모에서 넘어오는 초기 이미지
+  previewUrl: initialPreviewUrl, // ✨ 추가: 부모에서 넘어오는 초기 이미지
 }) {
   const [previewUrl, setPreviewUrl] = useState(initialPreviewUrl || "");
   const inputId = useId();

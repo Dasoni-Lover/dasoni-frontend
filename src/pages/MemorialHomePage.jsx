@@ -34,25 +34,27 @@ const MemorialHomePage = () => {
   const [isAddMenuOpen, setIsAddMenuOpen] = useState(false);
   const [isLinkShareModalOpen, setIsLinkShareModalOpen] = useState(false);
   const [selectedPhoto, setSelectedPhoto] = useState(null);
-  // ✅ 현재 모달에 떠 있는 게시글이 filteredPhotos 중 몇 번째인지
-  const [selectedIndex, setSelectedIndex] = useState(null);
-  const [activeTab, setActiveTab] = useState(0);
+  const [selectedIndex, setSelectedIndex] = useState(null); // 모달에서 현재 몇 번째인지
+  const [activeTab, setActiveTab] = useState(0); // 0: 공유앨범, 1: 나와의 앨범
 
-  // 사진 불러오기
+  // ✅ 사진 불러오기 (isMine / isPrivate 반영)
   useEffect(() => {
     const fetchPhotos = async () => {
       try {
-        // 0번 탭(공유앨범) → isPrivate:false
-        // 1번 탭(나와의 앨범) → isPrivate:true
-        const isPrivate = activeTab === 1;
+        const isShareTab = activeTab === 0;
+        const isMyTab = activeTab === 1;
 
+        // 👉 요구사항:
+        // - 나와의 앨범: isMine = true
+        // - 공유 앨범: isPrivate = false
         const requestBody = {
-          isPrivate,
-          isBydate: true, // 명세서: 날짜순 정렬
-          isAI: false, // 기본은 AI 필터 끔
+          isBydate: true,
+          isAI: false,
+          isPrivate: isShareTab ? false : true, // 공유앨범일 때 false, 나머지는 true
+          isMine: isMyTab, // 나와의 앨범일 때 true, 공유앨범일 때 false
         };
 
-        console.log("📸 사진 조회 요청:", {
+        console.log("📸 사진 조회 요청 (visitor):", {
           hallId,
           activeTab,
           requestBody,
@@ -68,7 +70,7 @@ const MemorialHomePage = () => {
     fetchPhotos();
   }, [activeTab, hallId]);
 
-  // 정렬 및 AI 필터 적용
+  // ✅ 정렬 및 AI 필터 적용 (isPrivate / isMine은 서버에서 필터됨)
   const filteredPhotos = React.useMemo(() => {
     let result = [...photos];
 
@@ -96,7 +98,7 @@ const MemorialHomePage = () => {
     return result;
   }, [photos, filter]);
 
-  // 추모관 정보 불러오기
+  // ✅ 추모관 정보 불러오기
   useEffect(() => {
     const fetchHallInfo = async () => {
       try {
@@ -130,7 +132,7 @@ const MemorialHomePage = () => {
         content: detail.content,
         writtenDate: detail.uploadedAt,
         authorName: detail.name,
-        profileImage: detail.myProfile, // ✅ 프로필 이미지
+        profileImage: detail.myProfile,
         isMine: detail.isMine,
         isAdmin: detail.isAdmin,
       };
@@ -143,12 +145,10 @@ const MemorialHomePage = () => {
     }
   };
 
-  // ✅ 썸네일 클릭 시 (photo, index) 받아서 해당 index로 열기
   const handlePhotoClick = (photo, index) => {
     openPhotoAtIndex(index);
   };
 
-  // ✅ 이전 글
   const handlePrev = () => {
     if (selectedIndex === null || filteredPhotos.length === 0) return;
     const nextIndex =
@@ -156,7 +156,6 @@ const MemorialHomePage = () => {
     openPhotoAtIndex(nextIndex);
   };
 
-  // ✅ 다음 글
   const handleNext = () => {
     if (selectedIndex === null || filteredPhotos.length === 0) return;
     const nextIndex =
@@ -167,14 +166,12 @@ const MemorialHomePage = () => {
   return (
     <Container>
       <BarWrapper>
-        {/* ✅ 실제 추모관 이름으로 경로/타이틀 표시 */}
         <BarNavigate paths={["홈", hallTitle]} />
       </BarWrapper>
 
       <Content>
         {hallInfo && <Profile data={hallInfo.data} />}
 
-        {/* ✅ HallTab이 클릭하면 activeTab이 바뀌도록 onTabChange 사용 */}
         <HallTab
           role="visitor"
           activeIndex={activeTab}
@@ -196,7 +193,7 @@ const MemorialHomePage = () => {
       <FixedAddPostContainer>
         {isAddMenuOpen && (
           <FixedAddPostMenu>
-            <MenuButton onClick={() => nav("/generate")}>
+            <MenuButton onClick={() => nav("/generate", { state: { hallId } })}>
               <MenuIcon src={aiicon} alt="AI 이미지 생성" />
               <span>AI 이미지 생성</span>
             </MenuButton>
@@ -216,8 +213,8 @@ const MemorialHomePage = () => {
         post={selectedPhoto}
         onClose={() => setSelectedPhoto(null)}
         hallId={hallId}
-        onPrev={handlePrev} // ✅ 왼쪽 화살표
-        onNext={handleNext} // ✅ 오른쪽 화살표
+        onPrev={handlePrev}
+        onNext={handleNext}
       />
       {isLinkShareModalOpen && (
         <LinkShareModal onClose={() => setIsLinkShareModalOpen(false)} />
