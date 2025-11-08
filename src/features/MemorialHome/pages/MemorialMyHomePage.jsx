@@ -18,6 +18,8 @@ import MyMemorialModal from "../components/MyMemorialModal";
 import { createMyHall, getMyHall } from "../../../api/my-hall";
 import { getHallInfo } from "../../../api/memorial";
 
+import BoxPostList from "../components/BoxPostList";
+
 const MemorialMyHomePage = () => {
   const nav = useNavigate();
 
