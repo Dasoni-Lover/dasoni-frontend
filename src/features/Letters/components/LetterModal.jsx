@@ -2,15 +2,16 @@ import React from "react";
 import styled from "styled-components";
 import { Letter } from "./Letter";
 
-export default function LetterModal({
-  isOpen,
-  onCancel,
-}) {
-  if (!isOpen) return null;
+export default function LetterModal({ isOpen, onCancel, data }) {
+  if (!isOpen || !data) return null;
+
+  const handleOverlayClick = (e) => {
+    if (e.target === e.currentTarget) onCancel();
+  };
 
   return (
-    <Overlay onClick={onCancel}>
-        <Letter/>
+    <Overlay onClick={handleOverlayClick}>
+      <Letter data={data} />
     </Overlay>
   );
 }
@@ -24,4 +25,3 @@ const Overlay = styled.div`
   justify-content: center;
   z-index: 3000;
 `;
-

@@ -4,8 +4,8 @@ import { color, typo } from "../../../styles/tokens";
 import loding1 from "../assets/loding1-icon.svg";
 import loding2 from "../assets/loding2-icon.svg";
 import loding3 from "../assets/loding3-icon.svg";
-import loding4 from "../assets/img-box.png";
-import loding5 from "../assets/img-box.png";
+import loding4 from "../assets/loding4-icon.svg";
+import loding5 from "../assets/loding5-icon.svg";
 
 export default function Loding({ isOpen, onCancel }) {
   const images = [loding1, loding2, loding3, loding4, loding5];
