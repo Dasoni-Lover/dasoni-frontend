@@ -1,5 +1,4 @@
-// src/components/Calendar.jsx
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import styled from "styled-components";
 import { color, typo } from "../styles/tokens";
 import nextbtn from "../assets/calendar-next-btn.svg";
@@ -7,13 +6,30 @@ import falsebtn from "../assets/false-calendar-next-btn.svg";
 import prevbtn from "../assets/prev-btn.svg";
 import lettericon from "../features/Letters/assets/letter-icon.svg";
 import LetterModal from "../features/Letters/components/LetterModal";
+import { fetchLetterDetail, fetchLettersCalendar } from "../api/letters";
 
 const weekDays = ["일", "월", "화", "수", "목", "금", "토"];
 
-const Calendar = ({ letterDates = [] }) => {
+const Calendar = ({ hallId }) => {
   const [currentDate, setCurrentDate] = useState(new Date());
+  const [calendarLetters, setCalendarLetters] = useState([]); // 달력 편지 리스트
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [selectedDay, setSelectedDay] = useState(null);
+  const [selectedLetter, setSelectedLetter] = useState(null);
+
+  useEffect(() => {
+    if (!hallId) return;
+    const loadCalendar = async () => {
+      try {
+        const year = currentDate.getFullYear();
+        const month = currentDate.getMonth() + 1;
+        const days = await fetchLettersCalendar(hallId, year, month);
+        setCalendarLetters(days); // [{ date, letterId }]
+      } catch (err) {
+        console.error("달력 편지 조회 실패:", err);
+      }
+    };
+    loadCalendar();
+  }, [currentDate, hallId]);
 
   const startOfMonth = new Date(currentDate.getFullYear(), currentDate.getMonth(), 1);
   const endOfMonth = new Date(currentDate.getFullYear(), currentDate.getMonth() + 1, 0);
@@ -21,15 +37,13 @@ const Calendar = ({ letterDates = [] }) => {
   const daysInMonth = endOfMonth.getDate();
 
   const today = new Date();
-  const isNextMonthAvailable = !(
-    currentDate.getFullYear() > today.getFullYear() ||
+  const isNextMonthAvailable =
+    currentDate.getFullYear() < today.getFullYear() ||
     (currentDate.getFullYear() === today.getFullYear() &&
-      currentDate.getMonth() >= today.getMonth())
-  );
+      currentDate.getMonth() < today.getMonth());
 
   const prevMonth = () =>
     setCurrentDate(new Date(currentDate.getFullYear(), currentDate.getMonth() - 1, 1));
-
   const nextMonth = () => {
     if (!isNextMonthAvailable) return;
     setCurrentDate(new Date(currentDate.getFullYear(), currentDate.getMonth() + 1, 1));
@@ -38,20 +52,35 @@ const Calendar = ({ letterDates = [] }) => {
   const prevEnd = new Date(currentDate.getFullYear(), currentDate.getMonth(), 0).getDate();
 
   const calendarDays = [];
-  for (let i = startDay - 1; i >= 0; i--) calendarDays.push({ day: prevEnd - i, currentMonth: false });
+  for (let i = startDay - 1; i >= 0; i--)
+    calendarDays.push({ day: prevEnd - i, currentMonth: false, letterId: null });
+
   for (let i = 1; i <= daysInMonth; i++) {
+    const dayStr = `${currentDate.getFullYear()}.${String(currentDate.getMonth() + 1).padStart(
+      2,
+      "0"
+    )}.${String(i).padStart(2, "0")}`;
+    const letterObj = calendarLetters.find((l) => l.date === dayStr);
     calendarDays.push({
       day: i,
       currentMonth: true,
-      hasLetter: letterDates.includes(i),
+      letterId: letterObj?.letterId || null,
     });
   }
-  const totalCells = Math.ceil(calendarDays.length / 7) * 7;
-  for (let i = 1; calendarDays.length < totalCells; i++) calendarDays.push({ day: i, currentMonth: false });
 
-  const handleLetterClick = (day) => {
-    setSelectedDay(day);
-    setIsModalOpen(true);
+  const totalCells = Math.ceil(calendarDays.length / 7) * 7;
+  for (let i = 1; calendarDays.length < totalCells; i++)
+    calendarDays.push({ day: i, currentMonth: false, letterId: null });
+
+  const handleLetterClick = async (letterId) => {
+    if (!letterId) return;
+    try {
+      const detail = await fetchLetterDetail(hallId, letterId);
+      setSelectedLetter(detail);
+      setIsModalOpen(true);
+    } catch (err) {
+      console.error("편지 상세 조회 실패:", err);
+    }
   };
 
   return (
@@ -73,23 +102,32 @@ const Calendar = ({ letterDates = [] }) => {
 
         <DatesGrid>
           {calendarDays.map((d, idx) => (
-            <DateBox key={idx} isCurrent={d.currentMonth} hasLetter={d.hasLetter}>
+            <DateBox key={idx} isCurrent={d.currentMonth} hasLetter={!!d.letterId}>
               <span>{d.day}</span>
-              {d.hasLetter && (
-                <LetterIcon src={lettericon} alt="편지 아이콘" onClick={() => handleLetterClick(d.day)} />
+              {d.letterId && (
+                <LetterIcon
+                  src={lettericon}
+                  alt="편지 아이콘"
+                  onClick={() => handleLetterClick(d.letterId)}
+                />
               )}
             </DateBox>
           ))}
         </DatesGrid>
       </CalendarContainer>
 
-      <LetterModal isOpen={isModalOpen} onCancel={() => setIsModalOpen(false)} />
+      <LetterModal
+        isOpen={isModalOpen}
+        data={selectedLetter}
+        onCancel={() => setIsModalOpen(false)}
+      />
     </>
   );
 };
 
 export default Calendar;
 
+// Styled Components
 
 const CalendarContainer = styled.div`
   box-sizing: border-box;
@@ -154,8 +192,7 @@ const DateBox = styled.div`
   flex-direction: column;
   align-items: center;
   justify-content: flex-start;
-  background-color: ${({ hasLetter }) =>
-    hasLetter ? "#FFF4E6" : "transparent"};
+  background-color: ${({ hasLetter }) => (hasLetter ? "#FFF4E6" : "transparent")};
   color: ${({ isCurrent }) => (isCurrent ? "#ACACAC" : "#ddd")};
   ${typo("bodyb")};
 `;
