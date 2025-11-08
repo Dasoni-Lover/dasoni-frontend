@@ -168,6 +168,7 @@ export const MemorialManagerHomePage = () => {
       <FixedShareButton>
         <LetterAndLinkShare
           onLinkShareClick={() => setIsLinkShareModalOpen(true)}
+          onLetterClick={() => navigate("/letter", { state: { hallId } })} // ✅ 추가된 부분
           page="manager"
           hallId={hallId}
         />
