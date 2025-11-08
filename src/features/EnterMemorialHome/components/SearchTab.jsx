@@ -14,7 +14,7 @@ export const SearchTab = () => {
     <Wrapper>
         <Box>
             <Type>고인의 성함</Type>
-            <InputField width="100%"/>
+            <InputField width="100%" placeholder="고인 성함"/>
         </Box>
         <Box>
             <Type>고인의 생일</Type>
