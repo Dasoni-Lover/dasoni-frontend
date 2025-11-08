@@ -168,7 +168,7 @@ export const SentLetterPage = () => {
         onCancel={handleCloseModal}
       />
 
-      <SideDrawer />
+      <SideDrawer  hallId={hallId}/>
     </Wrapper>
   );
 };

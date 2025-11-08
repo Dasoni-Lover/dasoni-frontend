@@ -1,4 +1,3 @@
-// src/pages/SentLetterBoxPage.jsx
 import React, { useState, useEffect } from "react";
 import styled from "styled-components";
 import { useLocation } from "react-router-dom";
@@ -9,7 +8,7 @@ import LetterModal from "../features/Letters/components/LetterModal";
 import { SideDrawer } from "../features/Letters/components/SideDrawer";
 import { fetchLettersList, fetchLetterDetail } from "../api/letters";
 import { getHallInfo } from "../api/memorial";
-import Calendar from "../components/Calendar"; // Calendar 수정 필요
+import Calendar from "../components/Calendar";
 
 import calendaricon from "../assets/calendar-icon.svg";
 import clickcalendaricon from "../assets/click-calendar-icon.svg";
@@ -22,9 +21,10 @@ export const SentLetterBoxPage = () => {
   const [modalOpen, setModalOpen] = useState(false);
   const [selectedLetter, setSelectedLetter] = useState(null);
   const [hallName, setHallName] = useState("");
-  const [calendarOpen, setCalendarOpen] = useState(false); // Calendar toggle
-  const [letterDates, setLetterDates] = useState([]); // 달력용 편지 날짜
+  const [calendarOpen, setCalendarOpen] = useState(false);
+  const [letterDates, setLetterDates] = useState([]);
 
+  // 추모관 정보 불러오기
   useEffect(() => {
     const fetchHallName = async () => {
       if (!hallId) return;
@@ -32,6 +32,7 @@ export const SentLetterBoxPage = () => {
         const info = await getHallInfo(hallId);
         const name = info?.data?.name || info?.name || "";
         setHallName(name);
+        console.log("불러온 추모관 정보:", info);
       } catch (err) {
         console.error("추모관 이름 불러오기 실패:", err);
       }
@@ -39,28 +40,18 @@ export const SentLetterBoxPage = () => {
     fetchHallName();
   }, [hallId]);
 
+  // 편지 목록 불러오기
   const fetchLetters = async () => {
     if (!hallId) return;
     try {
       const list = await fetchLettersList(hallId);
       setLetters(list);
 
-      // 달력에 표시할 날짜만 추출
       const dates = list.map((l) => new Date(l.completedAt).getDate());
       setLetterDates(dates);
+      console.log("불러온 편지 목록:", list);
     } catch (err) {
       console.error("편지 목록 불러오기 실패:", err);
-    }
-  };
-
-  const handleItemClick = async (letterId) => {
-    if (!hallId) return;
-    try {
-      const detail = await fetchLetterDetail(hallId, letterId);
-      setSelectedLetter(detail);
-      setModalOpen(true);
-    } catch (err) {
-      console.error("편지 상세 불러오기 실패:", err);
     }
   };
 
@@ -68,11 +59,21 @@ export const SentLetterBoxPage = () => {
     fetchLetters();
   }, [hallId]);
 
+  const handleItemClick = async (letterId) => {
+    if (!hallId) return;
+    try {
+      const detail = await fetchLetterDetail(hallId, letterId);
+      setSelectedLetter(detail);
+      setModalOpen(true);
+      console.log("선택한 편지 상세:", detail);
+    } catch (err) {
+      console.error("편지 상세 불러오기 실패:", err);
+    }
+  };
+
   const hallTitle = hallName ? `故 ${hallName}의 추모관` : "故 추모관";
 
-  const toggleCalendar = () => {
-    setCalendarOpen(!calendarOpen);
-  };
+  const toggleCalendar = () => setCalendarOpen(!calendarOpen);
 
   return (
     <Wrapper>
@@ -96,6 +97,7 @@ export const SentLetterBoxPage = () => {
         <LetterArea calendarOpen={calendarOpen}>
           <LetterList letters={letters} onItemClick={handleItemClick} />
         </LetterArea>
+
         {calendarOpen && (
           <>
             <Divider />
@@ -112,12 +114,13 @@ export const SentLetterBoxPage = () => {
         onCancel={() => setModalOpen(false)}
       />
 
-      <SideDrawer />
+      {/* hallId를 SideDrawer에 전달 */}
+      <SideDrawer hallId={hallId} />
     </Wrapper>
   );
 };
 
-// Styled
+// --- styled components ---
 const Wrapper = styled.div`
   display: flex;
   flex-direction: column;
@@ -127,10 +130,7 @@ const Wrapper = styled.div`
   position: relative;
 `;
 
-const NavWrapper = styled.div`
-  width: 100%;
-  margin-bottom: 4.5rem;
-`;
+const NavWrapper = styled.div`width: 100%; margin-bottom: 4.5rem;`;
 
 const TitleAndCalendar = styled.div`
   display: flex;
@@ -139,10 +139,7 @@ const TitleAndCalendar = styled.div`
   margin-bottom: 1rem;
 `;
 
-const Title = styled.div`
-  ${typo("h3")};
-  color: ${color("black.70")};
-`;
+const Title = styled.div`${typo("h3")}; color: ${color("black.70")};`;
 
 const ContentWrapper = styled.div`
   display: flex;
@@ -156,20 +153,13 @@ const LetterArea = styled.div`
   transition: width 0.4s ease;
 `;
 
-const CalendarArea = styled.div`
-  width: 30rem;
-  position: relative;
-`;
+const CalendarArea = styled.div`width: 30rem; position: relative;`;
 
-const CalendarIcon = styled.img`
-  width: 1.5rem;
-  height: 1.66669rem;
-`;
+const CalendarIcon = styled.img`width: 1.5rem; height: 1.66669rem;`;
 
 const CalendarWrapper = styled.div`
   width: 100%;
   display: flex;
-  flex-direction: row;
   justify-content: flex-end;
   margin-top: 1rem;
 `;
@@ -195,4 +185,3 @@ const Divider = styled.div`
   background-color: #ddd;
   margin: 0 0.5rem;
 `;
-
