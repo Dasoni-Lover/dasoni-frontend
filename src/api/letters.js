@@ -35,3 +35,11 @@ export const fetchLetterDetail = async (hallId, letterId) => {
   const res = await client.get(`/api/halls/${hallId}/letters/${letterId}`);
   return res.data; // { toName, fromName, content, completedAt }
 };
+
+// 편지 달력 조회
+export const fetchLettersCalendar = async (hallId, year, month) => {
+  const res = await client.get(
+    `/api/halls/${hallId}/letters/calendar?year=${year}&month=${month}`
+  );
+  return res.data?.days || []; // [{ date, letterId }]
+};
