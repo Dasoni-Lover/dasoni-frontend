@@ -53,6 +53,7 @@ const Img = styled.img`
   object-fit: cover;
   border-radius: 10px;
   border: solid 2px #E9E9E9;
+  box-sizing: border-box;
 `;
 
 const EditIcon = styled.img`
