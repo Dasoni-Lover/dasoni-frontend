@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import styled from "styled-components";
 import closebtn from "../../assets/close-btn.png";
-import openbtn from "../../assets/open-btn.png";
+import openbtn from "../../assets/sidebar-dark-icon.svg";
 import SideBarList from "../sidebar/SideBarList";
 import AlarmPanel from "../alarm/AlarmPanel";
 
