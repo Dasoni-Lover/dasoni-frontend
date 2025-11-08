@@ -17,8 +17,7 @@ import { NoPost } from "../components/NoPost";
 import MyMemorialModal from "../components/MyMemorialModal";
 import { createMyHall, getMyHall } from "../../../api/my-hall";
 import { getHallInfo } from "../../../api/memorial";
-
-import BoxPostList from "../components/BoxPostList";
+import MyRecord from "../components/MyRecord";
 
 const MemorialMyHomePage = () => {
   const nav = useNavigate();
@@ -131,8 +130,9 @@ const MemorialMyHomePage = () => {
             </ProfileBox>
 
             <HallTab role="owner" />
-            <TabButtonDropdown />
-            <NoPost />
+            <MyRecord/>
+            {/* <TabButtonDropdown />
+            <NoPost /> */}
           </Content>
         </ContentWrapper>
 
