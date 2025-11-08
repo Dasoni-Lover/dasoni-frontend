@@ -1,17 +1,17 @@
-import React, { useState } from 'react'
-import styled from 'styled-components'
-import { useNavigate } from 'react-router-dom'
-import sideIcon from '../assets/drawer-bg.svg' 
-import first from "../assets/first.svg"
-import second from "../assets/second.svg"
-import third from "../assets/third.svg"
-import firstopen from "../assets/first-open.svg"
-import secondopen from "../assets/second-open.svg"
-import thirdopen from "../assets/third-open.svg"
+import React, { useState } from "react";
+import styled from "styled-components";
+import { useNavigate } from "react-router-dom";
+import sideIcon from "../assets/drawer-bg.svg";
+import first from "../assets/first.svg";
+import second from "../assets/second.svg";
+import third from "../assets/third.svg";
+import firstopen from "../assets/first-open.svg";
+import secondopen from "../assets/second-open.svg";
+import thirdopen from "../assets/third-open.svg";
 
-export const SideDrawer = () => {
-  const [hovered, setHovered] = useState({ first: false, second: false, third: false })
-  const navigate = useNavigate()
+export const SideDrawer = ({ hallId }) => {
+  const [hovered, setHovered] = useState({ first: false, second: false, third: false });
+  const navigate = useNavigate();
 
   return (
     <DrawerWrapper>
@@ -25,7 +25,7 @@ export const SideDrawer = () => {
         isHovered={hovered.first}
         onMouseEnter={() => setHovered(prev => ({ ...prev, first: true }))}
         onMouseLeave={() => setHovered(prev => ({ ...prev, first: false }))}
-        onClick={() => navigate('/sent-letterbox')} // 여기에 이동 경로 지정
+        onClick={() => navigate('/sent-letterbox', { state: { hallId } })} // hallId 전달
       />
 
       <DrawerItem
@@ -36,7 +36,6 @@ export const SideDrawer = () => {
         isHovered={hovered.second}
         onMouseEnter={() => setHovered(prev => ({ ...prev, second: true }))}
         onMouseLeave={() => setHovered(prev => ({ ...prev, second: false }))}
-    
       />
 
       <DrawerItem
@@ -49,8 +48,8 @@ export const SideDrawer = () => {
         onMouseLeave={() => setHovered(prev => ({ ...prev, third: false }))}
       />
     </DrawerWrapper>
-  )
-}
+  );
+};
 
 const DrawerWrapper = styled.div`
   position: fixed;
@@ -59,13 +58,13 @@ const DrawerWrapper = styled.div`
   width: 17.5rem;
   height: 17.5rem;
   z-index: 1000;
-`
+`;
 
 const DrawerButton = styled.img`
   width: 100%;
   height: 100%;
   cursor: pointer;
-`
+`;
 
 const DrawerItem = styled.img`
   position: absolute;
@@ -77,5 +76,4 @@ const DrawerItem = styled.img`
   z-index: ${props => (props.isHovered ? 2000 : 1000)};
   transition: all 0.15s ease;
   transform: ${({ isHovered }) => (isHovered ? 'translateY(-0.4rem)' : 'translateY(0)')};
-  
 `;
