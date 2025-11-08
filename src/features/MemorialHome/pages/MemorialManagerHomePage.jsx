@@ -144,7 +144,7 @@ export const MemorialManagerHomePage = () => {
   return (
     <Container>
       <BarWrapper>
-        <BarNavigate paths={["홈", hallTitle]} title={hallTitle} />
+        <BarNavigate paths={["홈", hallTitle]} />
       </BarWrapper>
 
       <ContentWrapper>
