@@ -62,7 +62,10 @@ export const HomePage = () => {
         {/* 현재 선택된 탭의 추모관 개수 */}
         <MemorialHallCount count={currentHalls.length} />
         {/* 현재 선택된 탭의 추모관 목록 */}
-        <CardList halls={currentHalls} />
+        <CardList
+          halls={currentHalls}
+          type={activeTab === 1 ? "managed" : "my"} // ✅ 관리 탭이면 managed
+        />
       </Content>
     </Wrapper>
   );

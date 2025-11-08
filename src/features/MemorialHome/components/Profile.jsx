@@ -8,7 +8,7 @@ const Profile = ({ data }) => {
   // data가 없을 경우를 대비해 구조분해
   if (!data) return null;
 
-  const { name, profile, natures, place, phone, review, date } = data;
+  const { name, profile, nature, place, phone, review, date } = data;
 
   return (
     <Container>
@@ -16,7 +16,7 @@ const Profile = ({ data }) => {
         <DefaultProfile name={name} src={profile} date={date} />
         <Content>{review || "함께있을 때 즐거웠던 사람"}</Content>
       </Wrapper>
-      <InfoList nature={natures} place={place} phone={phone} />
+      <InfoList nature={nature} place={place} phone={phone} />
     </Container>
   );
 };

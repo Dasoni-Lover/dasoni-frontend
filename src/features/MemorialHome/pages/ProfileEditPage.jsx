@@ -8,10 +8,17 @@ import photo from "../assets/post-img.png";
 import { PointText } from "../../../components/PointText";
 import Button from "../../../components/Button";
 import DatePicker from "../../../components/DatePicker";
+import { useNavigate } from "react-router-dom";
 
 export const ProfileEditPage = () => {
   const [birthDate, setBirthDate] = useState(null); // 생일
   const [deathDate, setDeathDate] = useState(null); // 기일
+
+  const nav = useNavigate();
+
+  const goBack = () => {
+    nav(-1);
+  };
 
   return (
     <Wrapper>
@@ -81,7 +88,7 @@ export const ProfileEditPage = () => {
           <ButtonWrapper>
             <Button text="저장하기" size="M" />
             <Border>
-              <Button text="취소" size="M" color="white" />
+              <Button text="취소" size="M" color="white" onClick={goBack} />
             </Border>
           </ButtonWrapper>
         </Container>
@@ -176,11 +183,11 @@ const ButtonWrapper = styled.div`
   width: 13.75rem;
 `;
 
-const Border=styled.div`
+const Border = styled.div`
   width: 100%;
   border-radius: 0.5rem;
-border: 2px solid var(--5, #E9E9E9);
-background: var(--0, #FFF);
-box-shadow: 0 0 5px 0 rgba(0, 0, 0, 0.04);
-box-sizing: border-box;
-`
+  border: 2px solid var(--5, #e9e9e9);
+  background: var(--0, #fff);
+  box-shadow: 0 0 5px 0 rgba(0, 0, 0, 0.04);
+  box-sizing: border-box;
+`;

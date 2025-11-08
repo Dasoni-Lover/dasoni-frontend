@@ -2,11 +2,11 @@ import React from "react";
 import styled from "styled-components";
 import { CardListItem } from "./CardListItem";
 
-export const CardList = ({ halls = [] }) => {
+export const CardList = ({ halls = [], type = "my" }) => {
   return (
     <Wrapper>
       {halls.map((hall, index) => (
-        <CardListItem key={index} hall={hall} />
+        <CardListItem key={index} hall={hall} type={type} />
       ))}
     </Wrapper>
   );
