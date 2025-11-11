@@ -1,4 +1,3 @@
-// src/pages/mypage/MemorialMyHomePage.jsx
 import React, { useState, useEffect } from "react";
 import styled from "styled-components";
 import { typo } from "../../../styles/tokens";
@@ -18,6 +17,7 @@ import MyMemorialModal from "../components/MyMemorialModal";
 import { createMyHall, getMyHall } from "../../../api/my-hall";
 import { getHallInfo } from "../../../api/memorial";
 import MyRecord from "../components/MyRecord";
+import UploadVoiceRecord from "../components/UploadVoiceRecord"
 
 const MemorialMyHomePage = () => {
   const nav = useNavigate();
@@ -27,6 +27,7 @@ const MemorialMyHomePage = () => {
   const [isAddMenuOpen, setIsAddMenuOpen] = useState(false);
   const [isLinkShareModalOpen, setIsLinkShareModalOpen] = useState(false);
   const [isCreating, setIsCreating] = useState(false);
+  const [activeTab, setActiveTab] = useState(0); 
 
   // 내 추모관 정보
   const [hallInfo, setHallInfo] = useState(null);
@@ -107,6 +108,25 @@ const MemorialMyHomePage = () => {
     })
     .finally(() => setIsCreating(false));
 };
+
+
+  //탭 변경 핸들러
+  const handleTabChange = (index) => {
+    setActiveTab(index);
+  };
+
+  //탭별로 렌더링할 콘텐츠 결정
+  const renderTabContent = () => {
+    switch (activeTab) {
+      case 0:
+        return <TabButtonDropdown />;
+      case 1:
+        return <MyRecord/>;
+      case 2:
+        return <UploadVoiceRecord />;
+    }
+  };
+
   return (
     <Container>
       <BlurWrapper $blur={isModalOpen}>
@@ -129,10 +149,8 @@ const MemorialMyHomePage = () => {
               />
             </ProfileBox>
 
-            <HallTab role="owner" />
-            {/* <MyRecord/> */}
-            <TabButtonDropdown />
-            <NoPost />
+            <HallTab role="owner" onTabChange={handleTabChange} activeIndex={activeTab}/>
+            {renderTabContent()}
           </Content>
         </ContentWrapper>
 
@@ -166,12 +184,12 @@ const MemorialMyHomePage = () => {
         )}
       </BlurWrapper>
 
-      {isModalOpen && (
+      {/* {isModalOpen && (
         <MyMemorialModal
           isOpen={isModalOpen}
           onCreateClick={handleCreateClick}
         />
-      )}
+      )} */}
     </Container>
   );
 };
@@ -180,8 +198,8 @@ export default MemorialMyHomePage;
 
 const Container = styled.div`position: relative;`;
 const BlurWrapper = styled.div`
-  filter: ${({ $blur }) => ($blur ? "blur(4px)" : "none")};
-  transition: filter 0.2s ease;
+  /* filter: ${({ $blur }) => ($blur ? "blur(4px)" : "none")};
+  transition: filter 0.2s ease; */
 `;
 const ContentWrapper = styled.div`
   display: flex;
