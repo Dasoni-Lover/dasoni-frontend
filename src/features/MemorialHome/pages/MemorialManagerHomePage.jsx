@@ -12,6 +12,7 @@ import BoxPostList from "../components/BoxPostList";
 import LetterAndLinkShare from "../components/LetterAndLinkShare";
 import LinkShareModal from "../components/LinkShareModal";
 import PostDetailModal from "../components/PostDetailModal";
+import MyRecord from "../components/MyRecord";
 
 import AddPostButtonImg from "../assets/addpost-btn.png";
 import foldericon from "../assets/folder-icon.png";
@@ -32,13 +33,13 @@ export const MemorialManagerHomePage = () => {
   });
   const [selectedPhoto, setSelectedPhoto] = useState(null);
   const [selectedIndex, setSelectedIndex] = useState(null);
-  const [reloadKey, setReloadKey] = useState(0); // ✅ 삭제 후 리로드 트리거
+  const [reloadKey, setReloadKey] = useState(0);
 
   const navigate = useNavigate();
   const location = useLocation();
   const hallId = location.state?.hallId ?? 1;
 
-  // ✅ 추모관 정보 불러오기 (manager 버전: res.data 사용)
+  // ✅ 추모관 정보 불러오기
   useEffect(() => {
     const fetchHall = async () => {
       try {
@@ -51,37 +52,21 @@ export const MemorialManagerHomePage = () => {
     fetchHall();
   }, [hallId]);
 
-  // ✅ 사진 리스트 불러오기 (isMine / isPrivate 반영)
+  // ✅ 사진 리스트 불러오기 (activeTab 0,1 일 때만)
   useEffect(() => {
+    if (activeTab === 2) return; // 추모객 관리 탭일 때는 fetch 안 함
+
     const fetchPhotos = async () => {
       try {
-        let requestBody = {
-          isBydate: true,
-          isAI: false,
-        };
+        let requestBody = { isBydate: true, isAI: false };
 
-        // 요구사항:
-        // - 나와의 앨범: isMine = true
-        // - 공유 앨범: isPrivate = false
         if (activeTab === 0) {
-          // 공유앨범
           requestBody.isPrivate = false;
           requestBody.isMine = false;
         } else if (activeTab === 1) {
-          // 나와의 앨범
           requestBody.isPrivate = true;
           requestBody.isMine = true;
-        } else {
-          // 3번째 탭(추모객 관리) - 필요에 따라 조정
-          requestBody.isPrivate = true;
-          requestBody.isMine = false;
         }
-
-        console.log("📸 사진 조회 요청 (manager):", {
-          hallId,
-          activeTab,
-          requestBody,
-        });
 
         const data = await getPhotos(hallId, requestBody);
         setPhotos(data);
@@ -91,9 +76,9 @@ export const MemorialManagerHomePage = () => {
     };
 
     fetchPhotos();
-  }, [activeTab, hallId, reloadKey]); // ✅ reloadKey 추가
+  }, [activeTab, hallId, reloadKey]);
 
-  // ✅ 정렬 및 AI 필터 적용 (isMine / isPrivate는 서버에서 필터됨)
+  // ✅ 정렬 + 필터
   const filteredPhotos = React.useMemo(() => {
     let result = [...photos];
 
@@ -117,10 +102,11 @@ export const MemorialManagerHomePage = () => {
       default:
         break;
     }
+
     return result;
   }, [photos, filter]);
 
-  // ✅ 게시글 상세조회 (모달 열기)
+  // ✅ 게시글 상세조회
   const openPhotoAtIndex = async (index) => {
     const target = filteredPhotos[index];
     if (!target) return;
@@ -146,7 +132,7 @@ export const MemorialManagerHomePage = () => {
     }
   };
 
-  const handlePhotoClick = (photo, index) => openPhotoAtIndex(index);
+  const handlePhotoClick = (_, index) => openPhotoAtIndex(index);
 
   const handlePrev = () => {
     if (selectedIndex === null || filteredPhotos.length === 0) return;
@@ -162,19 +148,13 @@ export const MemorialManagerHomePage = () => {
     openPhotoAtIndex(nextIndex);
   };
 
-  const handleModifyClick = () => {
-    navigate("/memorial-manager/edit-profile");
-  };
-
+  const handleModifyClick = () => navigate("/memorial-manager/edit-profile");
   const goWritePage = () => navigate("/write", { state: { hallId } });
   const goAIGeneratePage = () => navigate("/generate", { state: { hallId } });
 
   const hallTitle = hallInfo?.name ? `故 ${hallInfo.name}의 추모관` : "추모관";
 
-  // ✅ 모달에서 삭제 후 호출되는 콜백
-  const handlePostDeleted = () => {
-    setReloadKey((prev) => prev + 1); // useEffect 다시 돌게
-  };
+  const handlePostDeleted = () => setReloadKey((prev) => prev + 1);
 
   return (
     <Container>
@@ -190,13 +170,17 @@ export const MemorialManagerHomePage = () => {
 
         <Content>
           {hallInfo && <Profile data={hallInfo} />}
-          <HallTab
-            role="manager"
-            activeIndex={activeTab}
-            onTabChange={setActiveTab}
-          />
-          <TabButtonDropdown onFilterChange={setFilter} />
-          <BoxPostList photos={filteredPhotos} onPostClick={handlePhotoClick} />
+          <HallTab role="manager" activeIndex={activeTab} onTabChange={setActiveTab} />
+
+          {/* 탭에 따라 렌더링 분기 */}
+          {activeTab === 2 ? (
+            <MyRecord />
+          ) : (
+            <>
+              <TabButtonDropdown onFilterChange={setFilter} />
+              <BoxPostList photos={filteredPhotos} onPostClick={handlePhotoClick} />
+            </>
+          )}
         </Content>
       </ContentWrapper>
 
@@ -235,7 +219,7 @@ export const MemorialManagerHomePage = () => {
         hallId={hallId}
         onPrev={handlePrev}
         onNext={handleNext}
-        onDeleted={handlePostDeleted} // ✅ 삭제 후 리로드 콜백 전달
+        onDeleted={handlePostDeleted}
       />
 
       {isLinkShareModalOpen && (
@@ -248,7 +232,7 @@ export const MemorialManagerHomePage = () => {
   );
 };
 
-/* 🎨 스타일 동일 */
+/* 🎨 스타일 */
 const Container = styled.div`
   position: relative;
 `;
@@ -257,12 +241,7 @@ const ContentWrapper = styled.div`
   display: flex;
   flex-direction: column;
   align-items: center;
-  transition: all 0.3s ease;
   flex: 1;
-
-  @media (max-width: 1200px) {
-    align-items: flex-start;
-  }
 `;
 
 const BarWrapper = styled.div`
@@ -271,25 +250,18 @@ const BarWrapper = styled.div`
   display: flex;
   justify-content: center;
   flex-direction: column;
-
   > * {
     width: 1096px;
-  }
-
-  @media (max-width: 1200px) {
-    justify-content: flex-start;
   }
 `;
 
 const ModifyButton = styled.div`
   width: 100%;
   display: flex;
-  flex-direction: row;
   justify-content: flex-end;
   align-items: center;
   cursor: pointer;
   transition: all 0.2s ease;
-
   &:hover {
     transform: translateY(-1.5px);
   }
@@ -304,7 +276,6 @@ const ModifyIcon = styled.img`
 const ModifyText = styled.div`
   ${typo("h4")};
   color: ${color("black.70")};
-
   ${ModifyButton}:hover & {
     color: ${color("black.100")};
   }
@@ -381,7 +352,7 @@ const MenuButton = styled.button`
   justify-content: center;
   height: 2.75rem;
   width: 13.75rem;
-  border: 1px solid var(--5, #e9e9e9);
+  border: 1px solid #e9e9e9;
   border-radius: 5px;
   background: #ffbc67;
   color: #313131;
