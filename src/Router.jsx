@@ -21,6 +21,8 @@ import AIGeneratePage from "./pages/AIGeneratePage";
 /* 편지함 */
 import { SentLetterPage } from "./pages/SentLetterPage";
 import { SentLetterBoxPage } from "./pages/SentLetterBoxPage";
+import {LeaveLetterPage} from "./pages/LeaveLetterPage";
+import { LeaveLetterBoxPage } from "./pages/LeaveLetterBoxPage";
 
 const router = createBrowserRouter([
   {
@@ -53,6 +55,8 @@ const router = createBrowserRouter([
       /* 편지함 */
       { path: "/sent-letter", element: <SentLetterPage /> },
       { path: "/sent-letterbox", element: <SentLetterBoxPage /> },
+      { path: "/leave-letter", element: <LeaveLetterPage /> },
+      { path: "/leave-letterbox", element: <LeaveLetterBoxPage /> },
     ],
   },
 ]);

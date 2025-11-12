@@ -19,10 +19,12 @@ const LetterAndLinkShare = ({ onLinkShareClick, page, hallId }) => {
 
   // Letter 클릭 시 페이지에 따라 네비게이트
   const handleLetterClick = () => {
-    // 👇 default + manager 에서는 편지쓰기 페이지로 이동
+    // default + manager 에서는 편지쓰기 페이지로 이동
     if (page === "default" || page === "manager") {
       navigate("/sent-letter", { state: { hallId } });
-    } else {
+    } else if(page === "my"){
+      navigate("/leave-letter", { state: { hallId } });
+    }else {
       console.log(`⚠️ ${page} 모드에서는 이동하지 않습니다.`);
     }
   };
