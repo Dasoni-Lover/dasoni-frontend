@@ -115,17 +115,25 @@ const MemorialMyHomePage = () => {
     setActiveTab(index);
   };
 
-  //탭별로 렌더링할 콘텐츠 결정
-  const renderTabContent = () => {
-    switch (activeTab) {
-      case 0:
-        return <TabButtonDropdown />;
-      case 1:
-        return <MyRecord/>;
-      case 2:
-        return <UploadVoiceRecord />;
-    }
-  };
+  // 탭별로 렌더링할 콘텐츠 결정
+const renderTabContent = () => {
+  switch (activeTab) {
+    case 0:
+      return (
+        <>
+          <TabButtonDropdown />
+          <NoPost />
+        </>
+      )
+    case 1:
+      return <MyRecord />
+    case 2:
+      return <UploadVoiceRecord />
+    default:
+      return null
+  }
+}
+
 
   return (
     <Container>
@@ -184,12 +192,12 @@ const MemorialMyHomePage = () => {
         )}
       </BlurWrapper>
 
-      {/* {isModalOpen && (
+      {isModalOpen && (
         <MyMemorialModal
           isOpen={isModalOpen}
           onCreateClick={handleCreateClick}
         />
-      )} */}
+      )}
     </Container>
   );
 };

@@ -7,19 +7,17 @@ import downicon from '../assets/dropdown-icon.png'
 import righticon from '../assets/open-icon.svg'
 import VisitorListItemContent from './VisitorListItemContent'
 
-export default function VisitorListItem({ openAll }) {
+export default function VisitorListItem({ openAll, type }) {
   const [isOpen, setIsOpen] = useState(false)
   const [contentWidth, setContentWidth] = useState('auto')
   const idWrapperRef = useRef(null)
 
-  // IdWrapper 너비 측정해서 content에 동일 적용
   useEffect(() => {
     if (idWrapperRef.current) {
       setContentWidth(`${idWrapperRef.current.offsetWidth}px`)
     }
   }, [])
 
-  // 부모에서 전체 열기/닫기 상태를 제어
   useEffect(() => {
     setIsOpen(openAll)
   }, [openAll])
@@ -38,8 +36,14 @@ export default function VisitorListItem({ openAll }) {
         </Wrapper>
 
         <ButtonWrapper>
-          <Button text="수락" size="S" width="6.25rem" />
-          <Button text="거절" size="S" width="6.25rem" color="white" />
+          {type === 'request' ? (
+            <>
+              <Button text="수락" size="S" width="6.25rem" />
+              <Button text="거절" size="S" width="6.25rem" color="white" />
+            </>
+          ) : (
+            <Button text="내보내기" size="S" width="6.25rem" color="white"/>
+          )}
         </ButtonWrapper>
       </TopRow>
 
@@ -84,8 +88,6 @@ const Open = styled.img`
 
 const IdWrapper = styled.div`
   display: flex;
-  flex-direction: row;
-  justify-content: flex-start;
   align-items: center;
   padding-right: 1rem;
   gap: 1rem;
@@ -101,7 +103,6 @@ const Name = styled.div`
   color: var(--70, #313131);
   font-family: Pretendard;
   font-size: 1rem;
-  font-style: normal;
   font-weight: 500;
   line-height: 130%;
   flex: 1 0 0;

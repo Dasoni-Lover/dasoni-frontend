@@ -232,7 +232,6 @@ export const MemorialManagerHomePage = () => {
   );
 };
 
-/* 🎨 스타일 */
 const Container = styled.div`
   position: relative;
 `;

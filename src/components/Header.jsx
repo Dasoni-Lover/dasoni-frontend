@@ -34,7 +34,7 @@ const Wrapper = styled.header`
   padding: 0 4.38rem;
   background: white;
   border-bottom: 1px solid #7a7a7a;
-  z-index: 1000;
+  z-index: 10000;
 `;
 
 const Logo = styled.img`

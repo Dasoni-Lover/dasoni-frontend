@@ -13,7 +13,6 @@ export default function FoldableButton({ text, src, onClick }) {
 
 const Wrapper = styled.div`
   width: 7.56rem;
-  height: 3.25rem;
   display: flex;
   padding: 0.5rem 1.25rem 0.5rem 1rem;
   justify-content: center;
