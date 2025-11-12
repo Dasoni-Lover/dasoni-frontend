@@ -29,10 +29,7 @@ export default function GenerateComplete({ setIsGenerated, generatedImage }) {
         </Row>
 
         <Row $gap={"2.8rem"} style={{ marginBottom: "13rem" }}>
-          <GeneratedImg
-            src={`data:image/jpeg;base64,${generatedImage}`}
-            alt="생성된 이미지"
-          />
+          <GeneratedImg src={generatedImage} alt="생성된 이미지" />
           <Column style={{ width: "24.5rem" }} $justify={"space-between"}>
             <InformText>{`요청하신 사항에 맞추어 \n이미지를 생성했어요`}</InformText>
             <Column $gap={"1.25rem"}>

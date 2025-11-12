@@ -23,6 +23,7 @@ export default function PostOptionForm({
   photoId, // ✨ 수정 대상 사진 ID
   initialDate = null,
   initialScope = "public",
+  photoFile,
 }) {
   const [scope, setScope] = useState(initialScope);
   const [date, setDate] = useState(initialDate);
@@ -74,13 +75,15 @@ export default function PostOptionForm({
         await updatePhoto(hallId, photoId, payload);
 
         alert("게시물이 수정되었습니다.");
-        nav(-1);
+        nav("/memorial-manager", {
+          state: { hallId },
+          replace: true, // (선택) 뒤로가기 시 글작성 화면으로 안 돌아오게
+        });
         return;
       }
 
       // ✨ [새 글 작성] : 기존 로직 그대로
-      const fileInput = document.querySelector('input[type="file"]');
-      const file = fileInput?.files?.[0];
+      const file = photoFile;
       if (!file) {
         alert("사진을 업로드해주세요.");
         return;
@@ -107,7 +110,10 @@ export default function PostOptionForm({
       const res = await uploadPhotoPost(payload);
       console.log("게시글 업로드 완료:", res);
       alert("게시물이 등록되었습니다.");
-      nav(-1);
+      nav("/memorial-manager", {
+        state: { hallId },
+        replace: true, // (선택)
+      });
     } catch (error) {
       console.error("게시글 저장 실패:", error);
       alert("저장에 실패했습니다.");
