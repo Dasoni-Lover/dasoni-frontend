@@ -22,7 +22,10 @@ import AIGeneratePage from "./pages/AIGeneratePage";
 import { SentLetterPage } from "./pages/SentLetterPage";
 import { SentLetterBoxPage } from "./pages/SentLetterBoxPage";
 import {LeaveLetterPage} from "./pages/LeaveLetterPage";
+import { SavedLetterPage } from "./pages/SavedLetterPage";
 import { LeaveLetterBoxPage } from "./pages/LeaveLetterBoxPage";
+import { SavedLetterBoxPage } from "./pages/SavedLetterBoxPage";
+import RecievedLetterBoxPage from "./pages/RecievedLetterBoxPage";
 
 const router = createBrowserRouter([
   {
@@ -57,6 +60,9 @@ const router = createBrowserRouter([
       { path: "/sent-letterbox", element: <SentLetterBoxPage /> },
       { path: "/leave-letter", element: <LeaveLetterPage /> },
       { path: "/leave-letterbox", element: <LeaveLetterBoxPage /> },
+      { path: "/saved-letter", element: <SavedLetterPage /> },
+      { path: "/saved-letterbox", element: <SavedLetterBoxPage /> },
+      { path: "/received-letterbox", element: <RecievedLetterBoxPage /> },
     ],
   },
 ]);

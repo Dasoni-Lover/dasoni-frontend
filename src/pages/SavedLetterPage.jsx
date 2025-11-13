@@ -8,7 +8,7 @@ import Button from "../components/Button";
 import ConfirmModal from "../components/ConfirmModal";
 import { sendLetter } from "../api/letters";
 
-export const LeaveLetterPage = () => {
+export const SavedLetterPage = () => {
   const location = useLocation();
   const hallId = location.state?.hallId; 
   const navigate = useNavigate();
@@ -64,7 +64,7 @@ export const LeaveLetterPage = () => {
   return (
     <Wrapper>
       <NavWrapper>
-        <BarNavigate paths={["나의 추모관", "편지쓰기"]} />
+        <BarNavigate paths={["나의 추모관", "임시보관함","편지쓰기"]} />
       </NavWrapper>
 
       <TextWrapper>

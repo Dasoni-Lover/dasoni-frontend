@@ -10,7 +10,7 @@ import Calendar from "../components/Calendar";
 import calendaricon from "../assets/calendar-icon.svg";
 import clickcalendaricon from "../assets/click-calendar-icon.svg";
 
-export const LeaveLetterBoxPage = () => {
+export const SavedLetterBoxPage = () => {
   const location = useLocation();
   const hallId = location.state?.hallId;
 
@@ -75,8 +75,7 @@ export const LeaveLetterBoxPage = () => {
     <Wrapper>
       <NavWrapper>
         <BarNavigate
-          paths={["나의 추모관", "보낸 편지함"]}
-          title="보낸 편지함"
+          paths={["나의 추모관", "임시보관함"]}
         />
       </NavWrapper>
 
