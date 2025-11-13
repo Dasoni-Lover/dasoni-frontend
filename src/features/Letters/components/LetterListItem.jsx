@@ -1,6 +1,7 @@
 import React from 'react';
 import styled from 'styled-components';
 import { color, typo } from '../../../styles/tokens';
+import deleteicon from "../assets/delete-icon.svg";
 
 export const LetterListItem = ({ letter, onClick }) => {
   return (

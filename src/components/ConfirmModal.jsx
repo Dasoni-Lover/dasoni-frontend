@@ -7,6 +7,8 @@ export default function ConfirmModal({
   isOpen,
   title,
   description,
+  subImage = null,
+  subText = null,
   confirmText = "확인",
   cancelText = null,
   onConfirm,
@@ -16,28 +18,33 @@ export default function ConfirmModal({
 
   return (
     <Overlay onClick={onCancel}>
-      {/* 안쪽 클릭은 닫히지 않도록 */}
       <ModalContainer onClick={(e) => e.stopPropagation()}>
-        {/*  description 유무에 따라 margin-bottom 다르게 */}
         <Title $hasDescription={!!description}>{title}</Title>
 
-        {description && <Description>{description}</Description>}
+        {description && (
+          <Description $hasSub={!!(subImage || subText)}>
+            {description}
+          </Description>
+        )}
+
+        {(subImage || subText) && (
+          <InfoBox>
+            {subImage && <InfoImage src={subImage} alt="info" />}
+            {subText && <InfoText>{subText}</InfoText>}
+          </InfoBox>
+        )}
 
         <ButtonGroup>
           <Button text={confirmText} size="L" onClick={onConfirm} />
           {cancelText ? (
-            <Button
-              text={cancelText}
-              size="L"
-              color="white"
-              onClick={onCancel}
-            />
+            <Button text={cancelText} size="L" color="white" onClick={onCancel} />
           ) : null}
         </ButtonGroup>
       </ModalContainer>
     </Overlay>
   );
 }
+
 
 const Overlay = styled.div`
   position: fixed;
@@ -55,14 +62,12 @@ const ModalContainer = styled.div`
   border-radius: 24px;
   background: #ffffff;
   box-shadow: 0 18px 40px rgba(0, 0, 0, 0.25);
-
   display: flex;
   flex-direction: column;
   align-items: center;
   box-sizing: border-box;
 `;
 
-/*  description 유무에 따라 margin-bottom 변경 */
 const Title = styled.h2`
   ${typo("h2")};
   color: ${color("black.80")};
@@ -75,7 +80,27 @@ const Description = styled.p`
   ${typo("bodym2")};
   color: ${color("black.80")};
   text-align: center;
-  margin-bottom: 5.5rem;
+  margin-bottom: ${({ $hasSub }) => ($hasSub ? "2rem" : "5rem")};
+`;
+
+const InfoBox = styled.div`
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 2rem;
+  height: 3.125rem;
+`;
+
+const InfoImage = styled.img`
+  width: 3.125rem;
+  height: 3.125rem;
+`;
+
+const InfoText = styled.p`
+  ${typo("h3")};
+  color: ${color("black.50")};
 `;
 
 const ButtonGroup = styled.div`
