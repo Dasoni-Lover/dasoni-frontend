@@ -1,19 +1,29 @@
 // src/components/sidebar/MiniAlarm.jsx
-import React from "react";
-import alarmicon from "../../assets/alarm-icon.png";
+import React, { useState } from "react";
+import alarmGrey from "../../assets/icon-bell-grey.svg";
+import alarmBlack from "../../assets/icon-bell-black.svg";
 import styled from "styled-components";
 import { color } from "../../styles/tokens";
 
 const MiniAlarm = ({ onClick, isActive, count = 0 }) => {
+  const [isHover, setIsHover] = useState(false);
+
   const displayCount = typeof count === "number" && count > 0 ? count : 0;
 
+  const iconSrc = isActive || isHover ? alarmBlack : alarmGrey;
+
   return (
-    <Container onClick={onClick} $isActive={isActive}>
+    <Container
+      onClick={onClick}
+      $isActive={isActive}
+      onMouseEnter={() => setIsHover(true)}
+      onMouseLeave={() => setIsHover(false)}
+    >
       <Box>
-        <AlarmIcon src={alarmicon} alt="알림 아이콘" />
-        <Text $isActive={isActive}>알림</Text>
+        <AlarmIcon src={iconSrc} alt="알림 아이콘" />
+        <Text $isActive={isActive || isHover}>알림</Text>
       </Box>
-      <Count>{displayCount}</Count>
+      <Count $isActive={isActive || isHover}>{displayCount}</Count>
     </Container>
   );
 };
@@ -29,15 +39,13 @@ const Container = styled.div`
   cursor: pointer;
   transition: background 0.2s ease;
   border-radius: 0.1875rem;
-  background: ${({ $isActive }) => ($isActive ? "#313131" : "transparent")};
+  background: ${({ $isActive }) => ($isActive ? "#FFF4E6" : "transparent")};
+  border-left: ${({ $isActive }) =>
+    $isActive ? "2px solid var(--main, #FFBC67)" : "transparent"};
 
   &:hover {
-    background: #313131;
-  }
-
-  /* 부모 hover 시 자식(Text) 색 변경 */
-  &:hover ${() => Text} {
-    color: ${color("white")};
+    border-left: 2px solid ${color("main")};
+    background: #fff4e6;
   }
 `;
 
@@ -51,6 +59,7 @@ const Box = styled.div`
 const AlarmIcon = styled.img`
   width: 1.079rem;
   height: 1.079rem;
+  transition: opacity 0.2s ease;
 `;
 
 const Text = styled.div`
@@ -58,15 +67,18 @@ const Text = styled.div`
   font-size: 1.07913rem;
   font-weight: 500;
   line-height: 145%;
-  color: ${({ $isActive }) => ($isActive ? color("white") : color("black.50"))};
+  color: ${({ $isActive }) =>
+    $isActive ? color("black.80") : color("black.50")};
   transition: color 0.2s ease;
 `;
 
 const Count = styled.p`
-  color: var(--50, #7a7a7a);
+  color: ${({ $isActive }) =>
+    $isActive ? color("black.80") : color("black.50")};
   font-family: Pretendard;
   font-size: 19.424px;
   font-weight: 500;
+  transition: color 0.2s ease;
 `;
 
 export default MiniAlarm;
