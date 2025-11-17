@@ -61,14 +61,14 @@ const ButtonWrapper = styled.div`
   box-shadow: 0 0 10px 0 rgba(0, 0, 0, 0.04);
 
   background-color: ${({ $color, $active }) => {
-    if (!$active) return "#E2CBAF";
+    if (!$active) return "#F8E4CA";
     if ($color === "white") return "#fff";
     return color("main");
   }};
 
   pointer-events: ${({ $active }) => ($active ? "auto" : "none")};
   white-space: nowrap;
-  color: ${({ $active }) => ($active ? color("black.70") : "#938675")};
+  color: ${({ $active }) => ($active ? color("black.70") : "#fff")};
 `;
 
 const Icon = styled.img`

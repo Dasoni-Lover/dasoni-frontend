@@ -1,12 +1,14 @@
 // src/features/OpenMemorialHome/components/OpenStep4.jsx
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import styled from "styled-components";
 import { typo, color } from "../../../styles/tokens";
 import IconEssentialEclipse from "../../../assets/icon-essential-eclipse.svg";
 import RelationSelector from "../../../components/RelationSelector";
 import TagSelector from "../../../components/TagSelector";
+import Toast from "../../../components/Toast";
 
 export default function OpenStep4({ onValidChange, formData, setFormData }) {
+  const [isToastOpen, setIsToastOpen] = useState(false);
   const relation = formData.relation || null;
   const selectedTags = formData.natures || [];
   const intro = formData.review || "";
@@ -89,6 +91,7 @@ export default function OpenStep4({ onValidChange, formData, setFormData }) {
         value={selectedTags}
         onChange={handleTagsChange}
         max={3}
+        onMaxExceed={() => setIsToastOpen(true)}
       />
 
       {/* 한 줄 소개 */}
@@ -101,6 +104,11 @@ export default function OpenStep4({ onValidChange, formData, setFormData }) {
         placeholder="고인은 어떤 사람이었나요?"
         value={intro}
         onChange={handleIntroChange}
+      />
+      <Toast
+        text="단어는 3개까지 선택할 수 있어요"
+        isOpen={isToastOpen}
+        onClose={() => setIsToastOpen(false)}
       />
     </>
   );
