@@ -14,7 +14,7 @@ import LinkShareModal from "../components/LinkShareModal";
 import PostDetailModal from "../components/PostDetailModal";
 import MyRecord from "../components/MyRecord";
 
-import AddPostButtonImg from "../assets/addpost-btn.png";
+import AddPostButtonImg from "../assets/btn-add-post.svg";
 import foldericon from "../assets/folder-icon.png";
 import aiicon from "../assets/ai-icon.png";
 import modifyicon from "../../../assets/edit-btn.svg";
@@ -170,7 +170,11 @@ export const MemorialManagerHomePage = () => {
 
         <Content>
           {hallInfo && <Profile data={hallInfo} />}
-          <HallTab role="manager" activeIndex={activeTab} onTabChange={setActiveTab} />
+          <HallTab
+            role="manager"
+            activeIndex={activeTab}
+            onTabChange={setActiveTab}
+          />
 
           {/* 탭에 따라 렌더링 분기 */}
           {activeTab === 2 ? (
@@ -178,7 +182,10 @@ export const MemorialManagerHomePage = () => {
           ) : (
             <>
               <TabButtonDropdown onFilterChange={setFilter} />
-              <BoxPostList photos={filteredPhotos} onPostClick={handlePhotoClick} />
+              <BoxPostList
+                photos={filteredPhotos}
+                onPostClick={handlePhotoClick}
+              />
             </>
           )}
         </Content>

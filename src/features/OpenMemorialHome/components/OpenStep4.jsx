@@ -91,7 +91,6 @@ export default function OpenStep4({ onValidChange, formData, setFormData }) {
         value={selectedTags}
         onChange={handleTagsChange}
         max={3}
-        onMaxExceed={() => setIsToastOpen(true)}
       />
 
       {/* 한 줄 소개 */}

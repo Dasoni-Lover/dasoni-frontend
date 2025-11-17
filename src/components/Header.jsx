@@ -33,7 +33,7 @@ const Wrapper = styled.header`
   align-items: center;
   padding: 0 4.38rem;
   background: white;
-  z-index: 10000;
+  z-index: 999;
 `;
 
 const Logo = styled.img`

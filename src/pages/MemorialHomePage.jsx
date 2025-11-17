@@ -14,7 +14,7 @@ import LinkShareModal from "../features/MemorialHome/components/LinkShareModal";
 import PostDetailModal from "../features/MemorialHome/components/PostDetailModal";
 import TabButtonDropdown from "../features/MemorialHome/components/TabButtonDropdown";
 
-import AddPostButtonImg from "../features/MemorialHome/assets/addpost-btn.png";
+import AddPostButtonImg from "../features/MemorialHome/assets/btn-add-post.svg";
 import foldericon from "../features/MemorialHome/assets/folder-icon.png";
 import aiicon from "../features/MemorialHome/assets/ai-icon.png";
 
