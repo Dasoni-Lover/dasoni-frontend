@@ -3,6 +3,7 @@ import styled from "styled-components";
 import { color, typo } from "../styles/tokens";
 import IconFolder from "../assets/icon-folder.svg";
 import IconAdd from "../assets/icon-add.svg";
+import IconSearch from "../assets/icon-search.svg";
 
 export default function Button({
   text,
@@ -17,6 +18,7 @@ export default function Button({
   const iconMap = {
     add: IconAdd,
     folder: IconFolder,
+    search: IconSearch,
   };
 
   const iconSrc =
@@ -71,6 +73,4 @@ const ButtonWrapper = styled.div`
 
 const Icon = styled.img`
   margin-right: 0.5rem;
-  width: 1rem;
-  height: 1rem;
 `;
