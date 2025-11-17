@@ -200,16 +200,14 @@ const Text = styled.div`
   gap: 0.75rem;
   cursor: pointer;
   ${typo("h3")};
-  color: ${({ $active }) => ($active ? color("black.80") : color("black.50"))};
-  background-color: ${({ $active }) => ($active ? "#FFBC67" : "transparent")};
+  color: ${({ $active }) => ($active ? color("black.70") : color("black.30"))};
   border-radius: 0.25rem;
   width: 13.25rem;
   transition: all 0.2s ease;
   box-sizing: border-box;
 
   &:hover {
-    color: ${color("black.80")};
-    background-color: #ffbc67;
+    color: ${color("black.70")};
   }
 `;
 
