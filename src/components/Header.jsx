@@ -33,7 +33,6 @@ const Wrapper = styled.header`
   align-items: center;
   padding: 0 4.38rem;
   background: white;
-  border-bottom: 1px solid #7a7a7a;
   z-index: 10000;
 `;
 

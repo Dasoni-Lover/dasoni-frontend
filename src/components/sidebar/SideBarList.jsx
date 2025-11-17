@@ -7,6 +7,7 @@ import { color, typo } from "../../styles/tokens";
 import { useNavigate, useLocation } from "react-router-dom";
 import { logoutUser, clearAuthTokens, getAccessToken } from "../../api/auth";
 import { getSidebarInfo } from "../../api/user";
+import IconLogout from "../../assets/icon-logout.svg";
 
 const SideBarList = ({ onAlarmClick, isAlarmOpen }) => {
   const navigate = useNavigate();
@@ -58,42 +59,37 @@ const SideBarList = ({ onAlarmClick, isAlarmOpen }) => {
     fetchSidebarInfo();
   }, []);
 
+  // ✅ 로그아웃을 제외한 일반 메뉴만
   const menuItems = [
     { label: "홈", path: "/home" },
     { label: "입장하기", path: "/enter" },
     { label: "개설하기", path: "/open" },
     { label: "나의 추모관", path: "/memorial-my" },
-    { label: "로그아웃", path: "/" },
   ];
 
   const getIsActive = (item) => {
     if (item.label === "홈") {
       return location.pathname === "/" || location.pathname === "/home";
     }
-    if (item.label === "로그아웃") {
-      return false; // 로그아웃은 active 표시 안 함
-    }
     return location.pathname === item.path;
   };
 
-  const handleMenuClick = async (item) => {
-    // 로그아웃 메뉴 클릭
-    if (item.label === "로그아웃") {
-      try {
-        await logoutUser(); // 서버 로그아웃
-      } catch (error) {
-        console.warn("로그아웃 실패(서버):", error);
-      } finally {
-        clearAuthTokens(); // 클라이언트 토큰 삭제
-        navigate("/");
-        alert("로그아웃 되었습니다.");
-        window.location.reload(); // 사이드바 즉시 초기화
-      }
-      return;
-    }
-
-    // 일반 메뉴 이동
+  const handleMenuClick = (item) => {
     navigate(item.path);
+  };
+
+  // ✅ 로그아웃 버튼 전용 핸들러 (맨 아래에서 사용)
+  const handleLogoutClick = async () => {
+    try {
+      await logoutUser(); // 서버 로그아웃
+    } catch (error) {
+      console.warn("로그아웃 실패(서버):", error);
+    } finally {
+      clearAuthTokens(); // 클라이언트 토큰 삭제
+      navigate("/");
+      alert("로그아웃 되었습니다.");
+      window.location.reload(); // 사이드바 즉시 초기화
+    }
   };
 
   const handleLoginClick = () => {
@@ -114,8 +110,9 @@ const SideBarList = ({ onAlarmClick, isAlarmOpen }) => {
         {/* 로그인/프로필 영역 - 로그아웃일 땐 "로그인"으로 보이고 클릭 시 로그인 페이지로 */}
         <LoginRow onClick={handleLoginClick} $clickable={!isLoggedIn}>
           <MiniProflie
-            name={isLoggedIn ? sidebarInfo.name : "로그인"}
+            name={isLoggedIn ? sidebarInfo.name : "로그인 해주세요"}
             profileImg={sidebarInfo.myProfile}
+            isLogin={isLoggedIn}
           />
         </LoginRow>
 
@@ -129,19 +126,27 @@ const SideBarList = ({ onAlarmClick, isAlarmOpen }) => {
         )}
       </Wrapper1>
 
-      {/* ✅ 로그인 상태일 때: 기존 메뉴 전체 노출 */}
+      {/* ✅ 로그인 상태일 때: 메뉴 + (맨 아래) 로그아웃 */}
       {isLoggedIn ? (
-        <Wrapper2>
-          {menuItems.map((item) => (
-            <Text
-              key={item.path}
-              onClick={() => handleMenuClick(item)}
-              $active={getIsActive(item)}
-            >
-              {item.label}
-            </Text>
-          ))}
-        </Wrapper2>
+        <>
+          <Wrapper2>
+            {menuItems.map((item) => (
+              <Text
+                key={item.path}
+                onClick={() => handleMenuClick(item)}
+                $active={getIsActive(item)}
+              >
+                {item.label}
+              </Text>
+            ))}
+          </Wrapper2>
+
+          {/* 🔻 여기서부터는 사이드바 제일 아래 영역 */}
+          <LogoutWrapper>
+            <img src={IconLogout} />
+            <LogoutText onClick={handleLogoutClick}>로그아웃</LogoutText>
+          </LogoutWrapper>
+        </>
       ) : (
         // ✅ 로그아웃 상태일 때: "회원가입" 한 줄만 노출
         <Wrapper2>
@@ -162,6 +167,7 @@ const Container = styled.div`
   align-items: center;
   justify-content: flex-start;
   gap: 2rem;
+  height: 100%; /* 🔸 상위에서 높이 주면 로그아웃이 진짜 맨 아래로 감 */
 `;
 
 const Wrapper1 = styled.div`
@@ -183,7 +189,6 @@ const LoginRow = styled.div`
 
 const Wrapper2 = styled.div`
   display: flex;
-  height: 12.125rem;
   padding: 0 0.27rem;
   flex-direction: column;
   align-items: flex-start;
@@ -223,4 +228,34 @@ const AuthMenuText = styled.div`
   color: ${color("black.50")};
   width: 13.25rem;
   box-sizing: border-box;
+`;
+
+// 🔻 로그아웃 버튼을 사이드바 제일 아래로 보내는 래퍼
+const LogoutWrapper = styled.div`
+  display: flex;
+  margin-top: auto; /* 핵심: 위 요소들과 최대한 거리 벌리기 */
+  flex-direction: row;
+  align-self: stretch;
+  align-items: center;
+  padding: 0 0.27rem 0.5rem 0.27rem;
+`;
+
+// 🔻 실제 로그아웃 버튼 스타일
+const LogoutText = styled.div`
+  display: flex;
+  padding: 0.25rem 1rem;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.75rem;
+  cursor: pointer;
+  ${typo("h3")};
+  color: ${color("black.30")};
+  border-radius: 0.25rem;
+  width: 13.25rem;
+  box-sizing: border-box;
+  transition: all 0.2s ease;
+
+  &:hover {
+    color: ${color("black.70")};
+  }
 `;

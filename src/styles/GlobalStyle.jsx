@@ -69,12 +69,12 @@ export default function GlobalStyle({ children }) {
             {children}
           </ContentWrapper>
 
-          {location.pathname !== "/login" && location.pathname !== "/register" && (
-            <FooterWrapper>
-              <Footer />
-            </FooterWrapper>
-          )}
-
+          {location.pathname !== "/login" &&
+            location.pathname !== "/register" && (
+              <FooterWrapper>
+                <Footer />
+              </FooterWrapper>
+            )}
         </MainContent>
       </Wrapper>
     </SidebarContext.Provider>
@@ -97,7 +97,7 @@ const Wrapper = styled.div`
   min-height: 100vh;
   padding-left: ${({ $isOpen, $shouldShiftContent }) => {
     if (!$shouldShiftContent) return "0";
-    return $isOpen ? "calc(300px + 40px)" : "60px";
+    return $isOpen ? "calc(300px)" : "0";
   }};
 `;
 

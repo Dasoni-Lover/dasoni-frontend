@@ -60,7 +60,7 @@ export const HomePage = () => {
       )}
       <Content>
         {/* 현재 선택된 탭의 추모관 개수 */}
-        <MemorialHallCount count={currentHalls.length} />
+        <MemorialHallCount count={currentHalls.length} tab={activeTab} />
         {/* 현재 선택된 탭의 추모관 목록 */}
         <CardList
           halls={currentHalls}
