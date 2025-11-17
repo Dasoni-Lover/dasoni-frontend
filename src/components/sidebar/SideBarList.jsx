@@ -143,8 +143,10 @@ const SideBarList = ({ onAlarmClick, isAlarmOpen }) => {
 
           {/* 🔻 여기서부터는 사이드바 제일 아래 영역 */}
           <LogoutWrapper>
-            <img src={IconLogout} />
-            <LogoutText onClick={handleLogoutClick}>로그아웃</LogoutText>
+            <LogoutText onClick={handleLogoutClick}>
+              <img src={IconLogout} />
+              로그아웃
+            </LogoutText>
           </LogoutWrapper>
         </>
       ) : (
@@ -189,7 +191,6 @@ const LoginRow = styled.div`
 
 const Wrapper2 = styled.div`
   display: flex;
-  padding: 0 0.27rem;
   flex-direction: column;
   align-items: flex-start;
   gap: 0.75rem;
@@ -234,18 +235,14 @@ const AuthMenuText = styled.div`
 const LogoutWrapper = styled.div`
   display: flex;
   margin-top: auto; /* 핵심: 위 요소들과 최대한 거리 벌리기 */
-  flex-direction: row;
-  align-self: stretch;
-  align-items: center;
-  padding: 0 0.27rem 0.5rem 0.27rem;
+  gap: 0.65rem;
 `;
 
 // 🔻 실제 로그아웃 버튼 스타일
 const LogoutText = styled.div`
   display: flex;
-  padding: 0.25rem 1rem;
-  flex-direction: column;
-  align-items: flex-start;
+
+  align-items: center;
   gap: 0.75rem;
   cursor: pointer;
   ${typo("h3")};

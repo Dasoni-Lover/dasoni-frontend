@@ -108,5 +108,4 @@ const ToggleButton = styled.button`
 const Menu = styled.div`
   width: 100%;
   flex: 1;
-  display: flex; /* 내부의 SideBarList가 height: 100%를 먹을 수 있게 */
 `;
