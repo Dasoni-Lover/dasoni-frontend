@@ -178,7 +178,7 @@ export const MemorialManagerHomePage = () => {
 
           {/* 탭에 따라 렌더링 분기 */}
           {activeTab === 2 ? (
-            <MyRecord />
+            <MyRecord hallId={hallId}/>
           ) : (
             <>
               <TabButtonDropdown onFilterChange={setFilter} />

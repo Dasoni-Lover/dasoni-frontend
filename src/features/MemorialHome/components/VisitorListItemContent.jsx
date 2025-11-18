@@ -2,29 +2,33 @@ import React from 'react'
 import styled from 'styled-components'
 import { color,typo } from '../../../styles/tokens'
 
-export default function VisitorListItemContent() {
+export default function VisitorListItemContent({ item }) {
   return (
     <Container>
-        <Wrapper>
-            <Type>이름</Type>
-            <Content>김민서</Content>
-        </Wrapper>
-        <Wrapper>
-            <Type>관계</Type>
-            <Content>친구</Content>
-        </Wrapper>
-        <Wrapper>
-            <Type>영진님을 표현하는 단어</Type>
-            <Content>소중한 · 밝은</Content>
-        </Wrapper>
-        <Wrapper>
-            <Type>관계 세부 설명</Type>
-            <Content>중학교 동창입니다.</Content>
-        </Wrapper>
-        <Wrapper>
-            <Type>영진님 한 줄 소개</Type>
-            <Content>중학교 동창입니다. 중학교 동창입니다.</Content>
-        </Wrapper>
+      <Wrapper>
+        <Type>이름</Type>
+        <Content>{item.name}</Content>
+      </Wrapper>
+
+      <Wrapper>
+        <Type>관계</Type>
+        <Content>{item.relationship}</Content>
+      </Wrapper>
+
+      <Wrapper>
+        <Type>영진님을 표현하는 단어</Type>
+        <Content>{item.keywords?.join(" · ")}</Content>
+      </Wrapper>
+
+      <Wrapper>
+        <Type>관계 설명</Type>
+        <Content>{item.description}</Content>
+      </Wrapper>
+
+      <Wrapper>
+        <Type>한 줄 소개</Type>
+        <Content>{item.introduction}</Content>
+      </Wrapper>
     </Container>
   )
 }

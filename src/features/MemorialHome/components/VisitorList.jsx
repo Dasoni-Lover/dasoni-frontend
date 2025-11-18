@@ -2,15 +2,19 @@ import React from 'react'
 import styled from 'styled-components'
 import VisitorListItem from './VisitorListItem'
 
-export default function VisitorList({ openAll, type }) {
+export default function VisitorList({ data, openAll, type }) {
   return (
     <Box>
       <Container>
-        {Array.from({ length: 10 }).map((_, i) => (
-          <ItemWrapper key={i}>
-            <VisitorListItem openAll={openAll} type={type} />
-          </ItemWrapper>
-        ))}
+        {data?.map((item, index) => (
+        <VisitorListItem
+          key={item.id}
+          openAll={openAll}
+          type={type}
+          item={item}
+          index={index + 1}
+        />
+      ))}
       </Container>
     </Box>
   )
