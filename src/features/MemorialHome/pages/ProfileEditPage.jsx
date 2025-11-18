@@ -9,13 +9,14 @@ import { PointText } from "../../../components/PointText";
 import Button from "../../../components/Button";
 import DatePicker from "../../../components/DatePicker";
 import { useNavigate, useLocation } from "react-router-dom";
-import { updateHallProfile,getHallInfo } from "../../../api/memorial";
-
+import { updateHallProfile, getHallInfo } from "../../../api/memorial";
+import { getPresignedUrlForImage, uploadFileToS3 } from "../../../api/files";
+import defaultprofile from "../../../assets/default-profile-icon.svg";
 
 export const ProfileEditPage = () => {
   const nav = useNavigate();
   const location = useLocation();
-  const hallId = location.state?.hallId; 
+  const hallId = location.state?.hallId;
 
   // 상태값
   const [name, setName] = useState("");
@@ -23,19 +24,23 @@ export const ProfileEditPage = () => {
   const [deathDate, setDeathDate] = useState(null);
   const [place, setPlace] = useState("");
   const [phone, setPhone] = useState("");
-  const [profileImage, setProfileImage] = useState(null);
 
-  // 📌 YYYY.MM.DD 포맷 변환 함수
-  const toDotFormat = (date) => {
+  // 기존 이미지 URL (preview용)
+  const [profileImageUrl, setProfileImageUrl] = useState(null);
+  // 새로 업로드할 File 객체
+  const [profileFile, setProfileFile] = useState(null);
+
+  // YYYY.MM.DD 포맷 변환
+  const toDotFormat4 = (date) => {
     if (!date) return null;
     const d = new Date(date);
-    const year = String(d.getFullYear()).slice(2); // 2024 → "24"
+    const year = d.getFullYear();
     const month = String(d.getMonth() + 1).padStart(2, "0");
     const day = String(d.getDate()).padStart(2, "0");
     return `${year}.${month}.${day}`;
   };
 
-  // 📌 전화번호 자동 하이픈 formatting
+  // 전화번호 자동 하이픈 formatting
   const formatPhone = (value) => {
     const num = value.replace(/[^0-9]/g, "");
     if (num.length <= 3) return num;
@@ -43,50 +48,63 @@ export const ProfileEditPage = () => {
     return `${num.slice(0, 3)}-${num.slice(3, 7)}-${num.slice(7, 11)}`;
   };
 
-  // 📌 기존 데이터 불러오기
+  // 기존 데이터 불러오기
   useEffect(() => {
     const fetchData = async () => {
       try {
         const res = await getHallInfo(hallId);
-
         const data = res?.data;
 
         setName(data?.name || "");
         setPlace(data?.place || "");
         setPhone(data?.phone || "");
-        setProfileImage(data?.profile || null);
+        setProfileImageUrl(data?.profile || null);
         setBirthDate(data?.birthday || null);
         setDeathDate(data?.deadday || null);
       } catch (e) {
         console.error("추모관 정보 불러오기 실패:", e);
       }
     };
-
     if (hallId) fetchData();
   }, [hallId]);
 
-
-const handleSave = async () => {
-  const body = {
-    profile: profileImage,
-    name,
-    birthday: toDotFormat(birthDate),
-    deadday: toDotFormat(deathDate),
-    place,
-    phone,
+  // File 선택 시 처리 (미리보기 + 상태 저장)
+  const handleFileSelect = (file) => {
+    if (!file) return;
+    setProfileFile(file);
+    setProfileImageUrl(URL.createObjectURL(file)); // preview
   };
 
-  try {
-    await updateHallProfile(hallId, body);
+  // 저장
+  const handleSave = async () => {
+    let uploadedProfileUrl = profileImageUrl;
 
-    alert("추모관 정보가 수정되었습니다.");
-    nav(-1);
-  } catch (e) {
-    console.error("프로필 수정 실패:", e);
-    alert("수정에 실패했습니다.");
-  }
-};
+    try {
+      // 파일이 선택되었으면 S3 업로드
+      if (profileFile) {
+        const { uploadUrl, fileUrl, contentType } =
+          await getPresignedUrlForImage(profileFile);
+        await uploadFileToS3(uploadUrl, profileFile, contentType);
+        uploadedProfileUrl = fileUrl; // 실제 S3 URL
+      }
 
+      const body = {
+        profile: uploadedProfileUrl || null,
+        name: name || null,
+        birthday: birthDate ? toDotFormat4(birthDate) : null,
+        deadday: deathDate ? toDotFormat4(deathDate) : null,
+        place: place || null,
+        phone: phone || null,
+      };
+
+      await updateHallProfile(hallId, body);
+      alert("추모관 정보가 수정되었습니다.");
+      nav(-1);
+    } catch (e) {
+      console.error("프로필 수정 실패:", e);
+      alert("수정에 실패했습니다.");
+    }
+  };
 
   return (
     <Wrapper>
@@ -101,7 +119,6 @@ const handleSave = async () => {
 
         <Container>
           <Box>
-            {/* 이름 */}
             <InputWrapper>
               <Text>고인의 성함</Text>
               <InputField
@@ -111,7 +128,6 @@ const handleSave = async () => {
               />
             </InputWrapper>
 
-            {/* 생일 */}
             <InputWrapper>
               <PointTextWrapper>
                 <PointText question="고인의 생일을 알려주세요" />
@@ -125,7 +141,6 @@ const handleSave = async () => {
               </DateWrapper>
             </InputWrapper>
 
-            {/* 기일 */}
             <InputWrapper>
               <PointTextWrapper>
                 <PointText question="고인의 기일을 알려주세요" />
@@ -139,13 +154,14 @@ const handleSave = async () => {
               </DateWrapper>
             </InputWrapper>
 
-            {/* 사진 */}
             <InputWrapper>
               <Text>고인의 프로필 사진을 업로드해 주세요</Text>
-              <EditSmallPhotoBox src={profileImage} />
+              <EditSmallPhotoBox
+                src={profileImageUrl || defaultprofile}
+                onFileSelect={handleFileSelect} // File 객체 그대로 전달
+              />
             </InputWrapper>
 
-            {/* 주소 */}
             <InputWrapper>
               <Text>고인을 모신 곳을 알려주세요</Text>
               <InputField
@@ -155,7 +171,6 @@ const handleSave = async () => {
               />
             </InputWrapper>
 
-            {/* 연락처 */}
             <InputWrapper>
               <Text>개설자의 연락처를 알려주세요</Text>
               <InputField
@@ -166,7 +181,6 @@ const handleSave = async () => {
             </InputWrapper>
           </Box>
 
-          {/* 버튼 */}
           <ButtonWrapper>
             <Button text="저장하기" size="M" onClick={handleSave} />
             <Border>
@@ -178,38 +192,6 @@ const handleSave = async () => {
     </Wrapper>
   );
 };
-
-// ============ styled-components ============
-
-const InputWrapper = styled.div`
-  width: 100%;
-  display: flex;
-  align-items: center;
-  gap: 1rem;
-`;
-
-const PointTextWrapper = styled.div`
-  flex: 1;
-  display: flex;
-  align-items: center;
-`;
-
-const DateWrapper = styled.div`
-  flex: 1;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  width: 50%;
-`;
-
-const Text = styled.div`
-  display: flex;
-  height: 20px;
-  width: 50%;
-  align-items: center;
-  ${typo("bodym2")};
-  color: ${color("black.50")};
-`;
 
 const Wrapper = styled.div`
   height: 100vh;
@@ -252,6 +234,36 @@ const Box = styled.div`
   border-radius: 20px;
   background: #fff;
   box-shadow: 0 2px 8.2px 0 rgba(0, 0, 0, 0.15);
+`;
+
+const InputWrapper = styled.div`
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+`;
+
+const PointTextWrapper = styled.div`
+  flex: 1;
+  display: flex;
+  align-items: center;
+`;
+
+const DateWrapper = styled.div`
+  flex: 1;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 50%;
+`;
+
+const Text = styled.div`
+  display: flex;
+  height: 20px;
+  width: 50%;
+  align-items: center;
+  ${typo("bodym2")};
+  color: ${color("black.50")};
 `;
 
 const ButtonWrapper = styled.div`

@@ -1,28 +1,29 @@
-import React, { useRef, useState } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import styled from 'styled-components';
 import editbutton from '../../assets/edit-btn.svg';
 
-export const EditSmallPhotoBox = ({ src: initialSrc }) => {
+export const EditSmallPhotoBox = ({ src: initialSrc, onFileSelect }) => {
   const [src, setSrc] = useState(initialSrc || '');
   const fileInputRef = useRef(null);
 
-  // 아이콘 클릭 시 파일 선택창 열기
+  useEffect(() => {
+    setSrc(initialSrc || '');
+  }, [initialSrc]);
+
   const handleEditClick = () => {
-    if (fileInputRef.current) {
-      fileInputRef.current.click();
-    }
+    fileInputRef.current?.click();
   };
 
-  // 파일 선택 후 미리보기
   const handleFileChange = (e) => {
-    const file = e.target.files[0];
+    const file = e.target.files?.[0];
     if (!file) return;
 
-    const reader = new FileReader();
-    reader.onload = (event) => {
-      setSrc(event.target.result); // 선택한 이미지 미리보기
-    };
-    reader.readAsDataURL(file);
+    // 미리보기
+    const previewUrl = URL.createObjectURL(file);
+    setSrc(previewUrl);
+
+    // File 객체 그대로 전달 (Base64 변환 X)
+    if (onFileSelect) onFileSelect(file);
   };
 
   return (
