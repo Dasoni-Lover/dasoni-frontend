@@ -6,7 +6,7 @@ export default function VisitorList({ openAll, type }) {
   return (
     <Box>
       <Container>
-        {Array.from({ length: 4 }).map((_, i) => (
+        {Array.from({ length: 10 }).map((_, i) => (
           <ItemWrapper key={i}>
             <VisitorListItem openAll={openAll} type={type} />
           </ItemWrapper>

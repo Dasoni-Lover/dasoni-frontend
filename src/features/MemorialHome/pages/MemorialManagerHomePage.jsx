@@ -165,7 +165,7 @@ export const MemorialManagerHomePage = () => {
       <ContentWrapper>
         <ModifyButton onClick={handleModifyClick}>
           <ModifyIcon src={modifyicon} />
-          <ModifyText>프로필 수정</ModifyText>
+          <ModifyText>추모관 정보 수정</ModifyText>
         </ModifyButton>
 
         <Content>
@@ -248,6 +248,7 @@ const ContentWrapper = styled.div`
   flex-direction: column;
   align-items: center;
   flex: 1;
+  
 `;
 
 const BarWrapper = styled.div`

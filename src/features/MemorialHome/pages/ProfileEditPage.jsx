@@ -24,7 +24,7 @@ export const ProfileEditPage = () => {
     <Wrapper>
       <Header />
       <ContentBox>
-        <Title>고인 정보 수정</Title>
+        <Title>추모관 정보 수정</Title>
         <Content>
           추모관 개설을 위한 정보를 입력해 주세요.
           <br />
