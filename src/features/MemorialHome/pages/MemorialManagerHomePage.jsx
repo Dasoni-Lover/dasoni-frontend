@@ -148,9 +148,11 @@ export const MemorialManagerHomePage = () => {
   };
 
   const handleModifyClick = () =>
-    navigate("/memorial-manager/edit-profile");
-  const goWritePage = () => navigate("/write", { state: { hallId } });
-  const goAIGeneratePage = () => navigate("/generate", { state: { hallId } });
+    navigate("/memorial-manager/edit-profile", { state: { hallId } });
+  const goWritePage = () =>
+     navigate("/write", { state: { hallId } });
+  const goAIGeneratePage = () =>
+     navigate("/generate", { state: { hallId } });
 
   const hallTitle = hallInfo?.name
     ? `故 ${hallInfo.name}의 추모관`

@@ -18,6 +18,7 @@ import { createMyHall, getMyHall } from "../../../api/my-hall";
 import { getHallInfo } from "../../../api/memorial";
 import MyRecord from "../components/MyRecord";
 import UploadVoiceRecord from "../components/UploadVoiceRecord";
+import AddPostModal from "../components/AddPostModal";
 
 const MemorialMyHomePage = () => {
   const nav = useNavigate();
@@ -137,7 +138,7 @@ const MemorialMyHomePage = () => {
     <Container>
       <BlurWrapper $blur={isModalOpen}>
         <BarWrapper>
-          <BarNavigate />
+          <BarNavigate paths={["홈", "나의 추모관"]}/>
         </BarWrapper>
 
         <ContentWrapper>
