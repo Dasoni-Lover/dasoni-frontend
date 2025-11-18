@@ -58,15 +58,13 @@ export default function OpenMemorialHomePage() {
 
     switch (base) {
       case "가족":
-        return "FAMILY";
       case "연인":
-        return "LOVER";
       case "친구":
-        return "FRIEND";
+        return base; // "가족", "연인", "친구" 중 하나를 반환
       default:
-        return base; // 혹시 모르는 다른 값 들어오면 그대로
-    }
-  };
+        return base;
+ }
+ };
 
   const handleNext = async () => {
     if (!isStepValid || isSubmitting) return;
