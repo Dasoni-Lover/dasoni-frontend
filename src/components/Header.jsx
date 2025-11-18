@@ -1,14 +1,14 @@
 import React from "react";
 import styled from "styled-components";
 import { useNavigate } from "react-router-dom";
-import logo from "../assets/logo.svg"
+import logo from "../assets/logo.svg";
 
 export default function Header({ showAuthButtons }) {
   const navigate = useNavigate();
 
   return (
     <Wrapper>
-      <Logo src={logo} onClick={() => navigate("/home")}/>
+      <Logo src={logo} onClick={() => navigate("/home")} />
 
       {showAuthButtons && (
         <ButtonGroup>
@@ -33,14 +33,12 @@ const Wrapper = styled.header`
   align-items: center;
   padding: 0 4.38rem;
   background: white;
-  border-bottom: 1px solid #7a7a7a;
-  z-index: 10000;
+  z-index: 999;
 `;
 
 const Logo = styled.img`
-  width: 10.51219rem;
-  height: 2.06325rem; 
-  margin-top: 0.8rem;
+  width: 6.875rem;
+  height: 2.76788rem;
   cursor: pointer;
 `;
 

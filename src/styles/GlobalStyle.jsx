@@ -69,12 +69,12 @@ export default function GlobalStyle({ children }) {
             {children}
           </ContentWrapper>
 
-          {location.pathname !== "/login" && location.pathname !== "/register" && (
-            <FooterWrapper>
-              <Footer />
-            </FooterWrapper>
-          )}
-
+          {location.pathname !== "/login" &&
+            location.pathname !== "/register" && (
+              <FooterWrapper>
+                <Footer />
+              </FooterWrapper>
+            )}
         </MainContent>
       </Wrapper>
     </SidebarContext.Provider>
@@ -97,7 +97,8 @@ const Wrapper = styled.div`
   min-height: 100vh;
   padding-left: ${({ $isOpen, $shouldShiftContent }) => {
     if (!$shouldShiftContent) return "0";
-    return $isOpen ? "calc(300px + 40px)" : "60px";
+    // 🔥 콘텐츠를 사이드바 영역 오른쪽에서부터 시작하게
+    return $isOpen ? "300px" : "60px"; // 열려있으면 300, 닫혀도 60 확보
   }};
 `;
 
@@ -112,13 +113,13 @@ const ContentWrapper = styled.div`
   flex: 1;
   display: flex;
   flex-direction: column;
-  align-items: ${({ $isOpen, $shouldShiftContent }) => {
-    if (!$shouldShiftContent) return "center";
-    return $isOpen ? "flex-start" : "center";
-  }};
+  align-items: ${({ $shouldShiftContent }) =>
+    $shouldShiftContent ? "flex-start" : "center"};
   width: 100%;
   transition: all 0.5s ease;
   margin-top: 6.25rem;
+  padding-left: ${({ $isOpen, $shouldShiftContent }) =>
+    $isOpen && $shouldShiftContent ? "2rem" : "0"};
 `;
 
 const FooterWrapper = styled.footer`

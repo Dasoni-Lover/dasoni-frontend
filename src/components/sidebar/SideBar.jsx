@@ -52,10 +52,19 @@ const Wrapper = styled.div`
   left: 0;
   width: ${({ $isOpen }) => ($isOpen ? "300px" : "60px")};
   height: calc(100vh - 6.25rem);
+
+  border-radius: 0 0.625rem 0.625rem 0;
   background: ${({ $isOpen }) => ($isOpen ? "var(--0, #fff)" : "transparent")};
+  border-top: ${({ $isOpen }) =>
+    $isOpen ? "2px solid var(--5, #E9E9E9);" : "none"};
   border-right: ${({ $isOpen }) =>
-    $isOpen ? "1.079px solid var(--10, #DDD)" : "none"};
-  transition: all 0.3s ease;
+    $isOpen ? "2px solid var(--5, #E9E9E9);" : "none"};
+  border-bottom: ${({ $isOpen }) =>
+    $isOpen ? "2px solid var(--5, #E9E9E9);" : "none"};
+  box-shadow: ${({ $isOpen }) =>
+    $isOpen ? "0 0 24.4px 0 rgba(0, 0, 0, 0.11);" : "none"};
+
+  transition: all 0.2s ease;
   z-index: 10;
   display: flex;
   flex-direction: column;
@@ -64,9 +73,8 @@ const Wrapper = styled.div`
   gap: ${({ $isOpen }) => ($isOpen ? "23.91px" : "0")};
   flex-shrink: 0;
   padding: ${({ $isOpen }) =>
-    $isOpen ? "44.244px 30.705px 582px 31.295px" : "30px 40px"};
+    $isOpen ? "44.244px 30.705px 30px 31.295px" : "30px 40px"};
   box-sizing: border-box;
-  overflow: hidden;
 `;
 
 const ToggleButton = styled.button`
@@ -96,6 +104,8 @@ const ToggleButton = styled.button`
   }
 `;
 
+/* 🔻 메뉴 영역이 남은 세로 공간을 꽉 채우도록 */
 const Menu = styled.div`
   width: 100%;
+  flex: 1;
 `;

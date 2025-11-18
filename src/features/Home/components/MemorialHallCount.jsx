@@ -1,23 +1,36 @@
 import React from "react";
 import styled from "styled-components";
-import addicon from "../assets/add-icon.svg";
 import { color, typo } from "../../../styles/tokens";
 import { useNavigate } from "react-router-dom";
+import Button from "../../../components/Button";
 
-export const MemorialHallCount = ({ count = 0 }) => {
+export const MemorialHallCount = ({ count = 0, tab = 0 }) => {
   const nav = useNavigate();
 
-  const goEnter = () => {
-    nav("/enter");
+  const text =
+    tab === 0
+      ? `${count}곳의 추모관에 입장해 있어요`
+      : `${count}곳의 추모관을 개설했어요`;
+
+  const buttonText = tab === 0 ? "추모관 입장하기" : "새 추모관 개설하기";
+  const buttonRoute = tab === 0 ? "/enter" : "/open";
+
+  const handleClick = () => {
+    nav(buttonRoute);
   };
 
   return (
     <Wrapper>
-      <Text>{count}곳의 추모관에 입장해 있어요</Text>
-      <ButtonWrapper onClick={goEnter}>
-        <Icon src={addicon} />
-        <Content>입장하기</Content>
-      </ButtonWrapper>
+      <Text>{text}</Text>
+
+      <Button
+        text={buttonText}
+        size="M"
+        onClick={handleClick}
+        width="13.75rem"
+        color="white"
+        icon="add"
+      />
     </Wrapper>
   );
 };
@@ -34,25 +47,4 @@ const Wrapper = styled.div`
 const Text = styled.div`
   ${typo("h4")};
   color: ${color("black.30")};
-`;
-
-const ButtonWrapper = styled.div`
-  display: flex;
-  padding: 0 1.25rem;
-  align-items: center;
-  flex-direction: row;
-  gap: 0.38rem;
-  cursor: pointer;
-`;
-
-const Icon = styled.img`
-  width: 1.5rem;
-  height: 1.5rem;
-  flex-shrink: 0;
-  aspect-ratio: 1 / 1;
-`;
-
-const Content = styled.div`
-  ${typo("h4")};
-  color: ${color("black.100")};
 `;

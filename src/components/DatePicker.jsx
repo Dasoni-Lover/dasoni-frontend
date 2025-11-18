@@ -1,3 +1,4 @@
+// src/components/DatePicker.jsx
 import React, { forwardRef } from "react";
 import styled from "styled-components";
 import ReactDatePicker, { registerLocale } from "react-datepicker";
@@ -40,16 +41,23 @@ import { color, typo } from "../styles/tokens";
 registerLocale("ko", ko);
 
 /* ───────────── 커스텀 인풋 (react-datepicker용) ───────────── */
-const DateInput = forwardRef(({ value, onClick, placeholder, borderColor, $height }, ref) => {
-  return (
-    <DateField onClick={onClick} ref={ref} $borderColor={borderColor} $height={$height}>
-      <input readOnly value={value || ""} placeholder={placeholder} />
-      <CalendarButton type="button" aria-label="날짜 선택">
-        <img src={IconCalendar} alt="calendar icon" />
-      </CalendarButton>
-    </DateField>
-  );
-});
+const DateInput = forwardRef(
+  ({ value, onClick, placeholder, borderColor, $height }, ref) => {
+    return (
+      <DateField
+        onClick={onClick}
+        ref={ref}
+        $borderColor={borderColor}
+        $height={$height}
+      >
+        <input readOnly value={value || ""} placeholder={placeholder} />
+        <CalendarButton type="button" aria-label="날짜 선택">
+          <img src={IconCalendar} alt="calendar icon" />
+        </CalendarButton>
+      </DateField>
+    );
+  }
+);
 
 function DatePicker({
   selected,
@@ -57,8 +65,11 @@ function DatePicker({
   placeholder = "YYYY/M/D",
   dateFormat = "yyyy/M/d",
   borderColor,
-  width = "100%",    // 부모에 맞춰 기본 100%
-  height = "48px",   // 기본 높이
+  width = "100%", // 부모에 맞춰 기본 100%
+  height = "48px", // 기본 높이
+  // 🔹 기본값: 년/월 드롭다운 ON
+  showMonthDropdown = true,
+  showYearDropdown = true,
   ...props
 }) {
   return (
@@ -69,10 +80,20 @@ function DatePicker({
         dateFormat={dateFormat}
         placeholderText={placeholder}
         // customInput에 prop 전달: height는 $height로 전달
-        customInput={<DateInput placeholder={placeholder} borderColor={borderColor} $height={height} />}
+        customInput={
+          <DateInput
+            placeholder={placeholder}
+            borderColor={borderColor}
+            $height={height}
+          />
+        }
         popperPlacement="bottom-start"
         locale="ko"
         showPopperArrow={false}
+        // 🔹 년/월 드롭다운 기본 적용
+        showMonthDropdown={showMonthDropdown}
+        showYearDropdown={showYearDropdown}
+        dropdownMode="select"
         {...props}
       />
     </DatePickerWrapper>
@@ -141,7 +162,7 @@ const DateField = styled.button`
     box-sizing: border-box;
 
     &::placeholder {
-      color: ${color("black.40")};
+      color: ${color("black.30")};
     }
   }
 `;

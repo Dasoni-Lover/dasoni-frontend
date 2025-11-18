@@ -6,7 +6,7 @@ import { color, typo } from "../../styles/tokens";
 
 // SideBarList 에서 name, profileImg 내려줌
 // 로그인 안 되어 있으면 기본값(name='로그인 해주세요', profileImg=null)
-const MiniProfile = ({ name, profileImg }) => {
+const MiniProfile = ({ name, profileImg, isLogin }) => {
   const displayName = name || "로그인 해주세요";
   const imgSrc = profileImg || profileimg;
 
@@ -14,7 +14,7 @@ const MiniProfile = ({ name, profileImg }) => {
     <Box>
       <ProfileContainer>
         <ProfileImage src={imgSrc} alt="프로필 이미지" />
-        <Nickname>{displayName}</Nickname>
+        <Nickname $isLogin={isLogin}>{displayName}</Nickname>
       </ProfileContainer>
     </Box>
   );
@@ -41,6 +41,6 @@ const ProfileImage = styled.img`
 `;
 
 const Nickname = styled.span`
-  ${typo("h3")};
+  ${({ $isLogin }) => ($isLogin ? typo("h3") : typo("h4"))};
   color: ${color("black.50")};
 `;

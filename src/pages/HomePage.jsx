@@ -60,7 +60,14 @@ export const HomePage = () => {
       )}
       <Content>
         {/* 현재 선택된 탭의 추모관 개수 */}
-        <MemorialHallCount count={currentHalls.length} />
+        <MemorialHallCount count={currentHalls.length} tab={activeTab} />
+
+        {currentHalls.length === 0 && activeTab === 0 ? (
+          <NoneText>입장한 추모관이 없어요</NoneText>
+        ) : null}
+        {currentHalls.length === 0 && activeTab === 1 ? (
+          <NoneText>개설한 추모관이 없어요</NoneText>
+        ) : null}
         {/* 현재 선택된 탭의 추모관 목록 */}
         <CardList
           halls={currentHalls}
@@ -93,4 +100,10 @@ const Content = styled.div`
   gap: 2rem;
   align-self: stretch;
   margin-top: 2.5rem;
+`;
+
+const NoneText = styled.div`
+  ${typo("h4")};
+  color: ${color("black.30")};
+  margin-top: 9rem;
 `;

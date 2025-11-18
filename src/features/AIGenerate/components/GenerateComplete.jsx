@@ -74,7 +74,7 @@ const GeneratedImg = styled.img`
   border-radius: 0.4375rem;
   border: 3px solid var(--5, #e9e9e9);
   background: lightgray 50% / cover no-repeat;
-  box-shadow: 0 4px 32px 0 rgba(0, 0, 0, 0.25);
+  box-shadow: 0 4px 22.6px 0 rgba(0, 0, 0, 0.25);
 `;
 
 const InformText = styled.div`

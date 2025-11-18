@@ -283,10 +283,10 @@ export default function RegisterPage() {
                     {isOpen && (
                       <DropdownMenu>
                         <DropdownItem onClick={() => handleSelect("남성")}>
-                          남성
+                          남자
                         </DropdownItem>
                         <DropdownItem onClick={() => handleSelect("여성")}>
-                          여성
+                          여자
                         </DropdownItem>
                       </DropdownMenu>
                     )}
@@ -505,11 +505,11 @@ const DropdownMenu = styled.div`
   top: 3.25rem;
   right: 0;
   background: white;
-  border: 1px solid #ddd;
-  border-radius: 6px;
-  box-shadow: 0 0.125rem 0.5rem rgba(0, 0, 0, 0.1);
+  border: 1px solid #a8a8a8;
+  border-radius: 0.25rem;
+  box-shadow: 0 4px 20px 0 rgba(0, 0, 0, 0.25);
   z-index: 10;
-  width: 30%;
+  width: 100%;
 `;
 
 const DropdownItem = styled.div`
@@ -518,6 +518,7 @@ const DropdownItem = styled.div`
   ${typo("bodym")};
   color: #7a7a7c;
   cursor: pointer;
+  border-bottom: 1px solid #a8a8a8;
 
   &:hover {
     background-color: #f0f0f0;

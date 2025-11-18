@@ -15,7 +15,7 @@ const HallTab = ({
     visitor: ["공유앨범", "나와의 앨범"],
     owner: ["나의 기록", "추모객 관리", "녹음 파일 관리"],
     manager: ["공유앨범", "나와의 앨범", "추모객 관리"],
-    home: ["내가 입장한 추모관", "내가 관리하는 추모관"],
+    home: ["내가 입장한 추모관", "내가 개설한 추모관"],
   };
 
   const tabs = tabConfig[role] || tabConfig.visitor; // 안전하게 visitor fallback
@@ -53,5 +53,4 @@ const Wrapper = styled.div`
   flex-direction: row;
   justify-content: flex-start;
   align-items: center;
-  border-top: 2px solid #313131;
 `;

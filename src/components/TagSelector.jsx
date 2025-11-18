@@ -1,7 +1,8 @@
 // src/components/TagSelector.jsx
-import React from "react";
+import React, { useState } from "react";
 import styled from "styled-components";
 import { color, typo } from "../styles/tokens";
+import Toast from "../components/Toast"; // 🔥 추가
 
 /**
  * props:
@@ -17,6 +18,8 @@ export default function TagSelector({
   onChange,
   max = 3,
 }) {
+  const [isToastOpen, setIsToastOpen] = useState(false); // 🔥 추가
+
   const handleClick = (word) => {
     const isSelected = value.includes(word);
 
@@ -26,7 +29,8 @@ export default function TagSelector({
     }
 
     if (value.length >= max) {
-      // 최대 개수면 더 못 선택 (무시)
+      // 최대 개수면 토스트 띄우기 🔥
+      setIsToastOpen(true);
       return;
     }
 
@@ -51,6 +55,13 @@ export default function TagSelector({
           ))}
         </TagGrid>
       ))}
+
+      {/* 🔥 기존 UI 변경 없이 Toast만 추가 */}
+      <Toast
+        text="단어는 3개까지 선택할 수 있어요"
+        isOpen={isToastOpen}
+        onClose={() => setIsToastOpen(false)}
+      />
     </>
   );
 }

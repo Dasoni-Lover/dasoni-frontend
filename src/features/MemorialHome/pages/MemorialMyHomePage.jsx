@@ -8,7 +8,7 @@ import DefaultProfile from "../components/DefaultProfile";
 import HallTab from "../components/HallTab";
 import TabButtonDropdown from "../components/TabButtonDropdown";
 import LetterAndLinkShare from "../components/LetterAndLinkShare";
-import AddPostButtonImg from "../assets/addpost-btn.png";
+import AddPostButtonImg from "../assets/btn-add-post.svg";
 import foldericon from "../assets/folder-icon.png";
 import aiicon from "../assets/ai-icon.png";
 import LinkShareModal from "../components/LinkShareModal";
@@ -17,7 +17,7 @@ import MyMemorialModal from "../components/MyMemorialModal";
 import { createMyHall, getMyHall } from "../../../api/my-hall";
 import { getHallInfo } from "../../../api/memorial";
 import MyRecord from "../components/MyRecord";
-import UploadVoiceRecord from "../components/UploadVoiceRecord"
+import UploadVoiceRecord from "../components/UploadVoiceRecord";
 
 const MemorialMyHomePage = () => {
   const nav = useNavigate();
@@ -27,88 +27,87 @@ const MemorialMyHomePage = () => {
   const [isAddMenuOpen, setIsAddMenuOpen] = useState(false);
   const [isLinkShareModalOpen, setIsLinkShareModalOpen] = useState(false);
   const [isCreating, setIsCreating] = useState(false);
-  const [activeTab, setActiveTab] = useState(0); 
+  const [activeTab, setActiveTab] = useState(0);
 
   // 내 추모관 정보
   const [hallInfo, setHallInfo] = useState(null);
 
   // 페이지 진입 시 내 추모관 존재 여부 확인
   useEffect(() => {
-  getMyHall()
-    .then(async (res) => {
-      console.log("[getMyHall] 응답:", res); // 전체 응답 확인
-      if (res.myHallExists) {
-        setHasMemorialHome(true);
-        setIsModalOpen(false);
-        if (res.hallId) {
-          localStorage.setItem("myHallId", String(res.hallId));
-          setTimeout(() => fetchHallInfo(res.hallId), 500);
+    getMyHall()
+      .then(async (res) => {
+        console.log("[getMyHall] 응답:", res); // 전체 응답 확인
+        if (res.myHallExists) {
+          setHasMemorialHome(true);
+          setIsModalOpen(false);
+          if (res.hallId) {
+            localStorage.setItem("myHallId", String(res.hallId));
+            setTimeout(() => fetchHallInfo(res.hallId), 500);
+          }
+        } else {
+          setHasMemorialHome(false);
+          setIsModalOpen(true);
         }
-      } else {
-        setHasMemorialHome(false);
+      })
+      .catch((error) => {
+        console.error("[getMyHall] 내 추모관 조회 실패:", error);
         setIsModalOpen(true);
-      }
-    })
-    .catch((error) => {
-      console.error("[getMyHall] 내 추모관 조회 실패:", error);
-      setIsModalOpen(true);
-    });
-}, []);
+      });
+  }, []);
 
   // 추모관 정보 조회
   const fetchHallInfo = async (hallId) => {
-  try {
-    console.log("[fetchHallInfo] 호출 hallId:", hallId); // hallId 확인
-    const info = await getHallInfo(hallId);
-    console.log("[fetchHallInfo] 서버 응답:", info); // 서버 응답 확인
+    try {
+      console.log("[fetchHallInfo] 호출 hallId:", hallId); // hallId 확인
+      const info = await getHallInfo(hallId);
+      console.log("[fetchHallInfo] 서버 응답:", info); // 서버 응답 확인
 
-    if (info?.data) {
-      setHallInfo(info.data);
-    } else {
-      console.warn("[fetchHallInfo] 서버 데이터가 비어있음, 기본값 적용");
+      if (info?.data) {
+        setHallInfo(info.data);
+      } else {
+        console.warn("[fetchHallInfo] 서버 데이터가 비어있음, 기본값 적용");
+        setHallInfo({
+          name: "이름 없음",
+          profile: null,
+          birthday: "1111",
+          deadday: "",
+        });
+      }
+    } catch (error) {
+      console.error("[fetchHallInfo] 추모관 정보 조회 실패:", error);
       setHallInfo({
-        name: "이름 없음",
-        profile: null,
-        birthday: "1111",
+        name: "황선우",
+        profile: "",
+        birthday: "1999",
         deadday: "",
       });
     }
-  } catch (error) {
-    console.error("[fetchHallInfo] 추모관 정보 조회 실패:", error);
-    setHallInfo({
-      name: "황선우",
-      profile: "",
-      birthday: "1999",
-      deadday: "",
-    });
-  }
-};
+  };
 
   const goWritePage = () => nav("/write");
   const goAIGeneratePage = () => nav("/generate");
 
   const handleCreateClick = () => {
-  if (isCreating || hasMemorialHome) return;
+    if (isCreating || hasMemorialHome) return;
 
-  setIsCreating(true);
-  createMyHall()
-    .then(async (res) => {
-      console.log("[createMyHall] 응답:", res); 
-      const hallId = res?.hallId;
-      if (hallId) {
-        localStorage.setItem("myHallId", String(hallId));
-        setHasMemorialHome(true);
-        setIsModalOpen(false);
-        setTimeout(() => fetchHallInfo(hallId), 500);
-      }
-    })
-    .catch((error) => {
-      console.error("[createMyHall] 본인 추모관 개설 실패:", error);
-      alert("추모관 개설에 실패했습니다. 잠시 후 다시 시도해 주세요.");
-    })
-    .finally(() => setIsCreating(false));
-};
-
+    setIsCreating(true);
+    createMyHall()
+      .then(async (res) => {
+        console.log("[createMyHall] 응답:", res);
+        const hallId = res?.hallId;
+        if (hallId) {
+          localStorage.setItem("myHallId", String(hallId));
+          setHasMemorialHome(true);
+          setIsModalOpen(false);
+          setTimeout(() => fetchHallInfo(hallId), 500);
+        }
+      })
+      .catch((error) => {
+        console.error("[createMyHall] 본인 추모관 개설 실패:", error);
+        alert("추모관 개설에 실패했습니다. 잠시 후 다시 시도해 주세요.");
+      })
+      .finally(() => setIsCreating(false));
+  };
 
   //탭 변경 핸들러
   const handleTabChange = (index) => {
@@ -116,24 +115,23 @@ const MemorialMyHomePage = () => {
   };
 
   // 탭별로 렌더링할 콘텐츠 결정
-const renderTabContent = () => {
-  switch (activeTab) {
-    case 0:
-      return (
-        <>
-          <TabButtonDropdown />
-          <NoPost />
-        </>
-      )
-    case 1:
-      return <MyRecord />
-    case 2:
-      return <UploadVoiceRecord />
-    default:
-      return null
-  }
-}
-
+  const renderTabContent = () => {
+    switch (activeTab) {
+      case 0:
+        return (
+          <>
+            <TabButtonDropdown />
+            <NoPost />
+          </>
+        );
+      case 1:
+        return <MyRecord />;
+      case 2:
+        return <UploadVoiceRecord />;
+      default:
+        return null;
+    }
+  };
 
   return (
     <Container>
@@ -157,7 +155,11 @@ const renderTabContent = () => {
               />
             </ProfileBox>
 
-            <HallTab role="owner" onTabChange={handleTabChange} activeIndex={activeTab}/>
+            <HallTab
+              role="owner"
+              onTabChange={handleTabChange}
+              activeIndex={activeTab}
+            />
             {renderTabContent()}
           </Content>
         </ContentWrapper>
@@ -204,7 +206,9 @@ const renderTabContent = () => {
 
 export default MemorialMyHomePage;
 
-const Container = styled.div`position: relative;`;
+const Container = styled.div`
+  position: relative;
+`;
 const BlurWrapper = styled.div`
   /* filter: ${({ $blur }) => ($blur ? "blur(4px)" : "none")};
   transition: filter 0.2s ease; */
@@ -235,7 +239,9 @@ const Content = styled.div`
   width: 1096px;
   transition: all 0.3s ease;
 `;
-const ProfileBox = styled.div`margin-bottom: 52px;`;
+const ProfileBox = styled.div`
+  margin-bottom: 52px;
+`;
 const FixedShareButton = styled.div`
   position: absolute;
   right: -380px;

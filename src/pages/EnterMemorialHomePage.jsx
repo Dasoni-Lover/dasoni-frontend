@@ -18,7 +18,7 @@ export const EnterMemorialHomePage = () => {
 
   return (
     <Wrapper>
-      <Text>새 추모관 입장하기</Text>
+      <Text>추모관 입장하기</Text>
       <SearchTab />
       <Content>
         <CardList onOpenModal={handleOpenModal} />

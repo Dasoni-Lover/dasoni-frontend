@@ -1,14 +1,14 @@
-import React from 'react'
-import styled from 'styled-components'
-import { typo, color } from '../../../styles/tokens'
+import React from "react";
+import styled from "styled-components";
+import { typo, color } from "../../../styles/tokens";
 
 const HallTabButton = ({ text, isActive, onClick }) => {
   return (
     <Wrapper isActive={isActive} onClick={onClick}>
       <Text isActive={isActive}>{text}</Text>
     </Wrapper>
-  )
-}
+  );
+};
 
 const Wrapper = styled.div`
   display: flex;
@@ -18,16 +18,21 @@ const Wrapper = styled.div`
   align-items: center;
   gap: 0.625rem;
   flex-shrink: 0;
-  background-color: ${({ isActive }) => (isActive ? '#FFBC67' : 'white')};
+  background-color: ${({ isActive }) => (isActive ? "#fff4e6" : "white")};
   cursor: pointer;
+
+  border-top: ${({ isActive }) =>
+    isActive
+      ? "  3px solid var(--main, #ffbc67);"
+      : "2px solid var(--10, #DDD)"};
+
   transition: background-color 0.2s ease;
 `;
 
-
 const Text = styled.div`
-  ${typo('h4')};
-  color: ${({ isActive }) => (isActive ? 'black.80' : color('black.30'))};
+  ${typo("h4")};
+  color: ${({ isActive }) => (isActive ? "black.80" : color("black.50"))};
   transition: color 0.2s ease;
-`
+`;
 
-export default HallTabButton
+export default HallTabButton;
