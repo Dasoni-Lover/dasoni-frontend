@@ -12,21 +12,20 @@ import BoxPostList from "../components/BoxPostList";
 import LetterAndLinkShare from "../components/LetterAndLinkShare";
 import LinkShareModal from "../components/LinkShareModal";
 import PostDetailModal from "../components/PostDetailModal";
+import AddPostModal from "../components/AddPostModal"; 
 import MyRecord from "../components/MyRecord";
 
 import AddPostButtonImg from "../assets/btn-add-post.svg";
-import foldericon from "../assets/folder-icon.png";
-import aiicon from "../assets/ai-icon.png";
 import modifyicon from "../../../assets/edit-btn.svg";
 
 import { getHallInfo, getPhotos, getPhotoDetail } from "../../../api/memorial";
 
 export const MemorialManagerHomePage = () => {
-  const [isAddMenuOpen, setIsAddMenuOpen] = useState(false);
+  const [isAddModalOpen, setIsAddModalOpen] = useState(false); // ⭐ 메뉴 → 모달로 교체
   const [isLinkShareModalOpen, setIsLinkShareModalOpen] = useState(false);
   const [hallInfo, setHallInfo] = useState(null);
   const [photos, setPhotos] = useState([]);
-  const [activeTab, setActiveTab] = useState(0); // 0: 공유앨범, 1: 나와의 앨범, 2: 추모객 관리
+  const [activeTab, setActiveTab] = useState(0);
   const [filter, setFilter] = useState({
     sortOption: "최신 업로드순",
     isAIMode: false,
@@ -39,7 +38,7 @@ export const MemorialManagerHomePage = () => {
   const location = useLocation();
   const hallId = location.state?.hallId ?? 1;
 
-  // ✅ 추모관 정보 불러오기
+  // 추모관 정보 불러오기
   useEffect(() => {
     const fetchHall = async () => {
       try {
@@ -52,9 +51,9 @@ export const MemorialManagerHomePage = () => {
     fetchHall();
   }, [hallId]);
 
-  // ✅ 사진 리스트 불러오기 (activeTab 0,1 일 때만)
+  // 사진 리스트 불러오기
   useEffect(() => {
-    if (activeTab === 2) return; // 추모객 관리 탭일 때는 fetch 안 함
+    if (activeTab === 2) return;
 
     const fetchPhotos = async () => {
       try {
@@ -78,7 +77,7 @@ export const MemorialManagerHomePage = () => {
     fetchPhotos();
   }, [activeTab, hallId, reloadKey]);
 
-  // ✅ 정렬 + 필터
+  // 필터 적용
   const filteredPhotos = React.useMemo(() => {
     let result = [...photos];
 
@@ -106,7 +105,7 @@ export const MemorialManagerHomePage = () => {
     return result;
   }, [photos, filter]);
 
-  // ✅ 게시글 상세조회
+  // 상세조회
   const openPhotoAtIndex = async (index) => {
     const target = filteredPhotos[index];
     if (!target) return;
@@ -148,11 +147,14 @@ export const MemorialManagerHomePage = () => {
     openPhotoAtIndex(nextIndex);
   };
 
-  const handleModifyClick = () => navigate("/memorial-manager/edit-profile");
+  const handleModifyClick = () =>
+    navigate("/memorial-manager/edit-profile");
   const goWritePage = () => navigate("/write", { state: { hallId } });
   const goAIGeneratePage = () => navigate("/generate", { state: { hallId } });
 
-  const hallTitle = hallInfo?.name ? `故 ${hallInfo.name}의 추모관` : "추모관";
+  const hallTitle = hallInfo?.name
+    ? `故 ${hallInfo.name}의 추모관`
+    : "추모관";
 
   const handlePostDeleted = () => setReloadKey((prev) => prev + 1);
 
@@ -176,9 +178,8 @@ export const MemorialManagerHomePage = () => {
             onTabChange={setActiveTab}
           />
 
-          {/* 탭에 따라 렌더링 분기 */}
           {activeTab === 2 ? (
-            <MyRecord hallId={hallId}/>
+            <MyRecord hallId={hallId} />
           ) : (
             <>
               <TabButtonDropdown onFilterChange={setFilter} />
@@ -200,24 +201,20 @@ export const MemorialManagerHomePage = () => {
         />
       </FixedShareButton>
 
+      {/* 기존 메뉴 X → AddPostModal 모달 표시 */}
       <FixedAddPostContainer>
-        {isAddMenuOpen && (
-          <FixedAddPostMenu>
-            <MenuButton onClick={goAIGeneratePage}>
-              <MenuIcon src={aiicon} alt="AI 이미지 생성" />
-              <span>AI 이미지 생성</span>
-            </MenuButton>
-            <MenuButton onClick={goWritePage}>
-              <MenuIcon src={foldericon} alt="사진 업로드" />
-              <span>컴퓨터에서 불러오기</span>
-            </MenuButton>
-          </FixedAddPostMenu>
-        )}
-
-        <FixedAddPostButton onClick={() => setIsAddMenuOpen(!isAddMenuOpen)}>
+        <FixedAddPostButton onClick={() => setIsAddModalOpen(true)}>
           <img src={AddPostButtonImg} alt="추가 버튼" />
         </FixedAddPostButton>
       </FixedAddPostContainer>
+
+      {isAddModalOpen && (
+        <AddPostModal
+          onClose={() => setIsAddModalOpen(false)}
+          onSelectAI={goAIGeneratePage}
+          onSelectComputer={goWritePage}
+        />
+      )}
 
       <PostDetailModal
         isOpen={!!selectedPhoto}
@@ -239,6 +236,7 @@ export const MemorialManagerHomePage = () => {
   );
 };
 
+
 const Container = styled.div`
   position: relative;
 `;
@@ -248,7 +246,6 @@ const ContentWrapper = styled.div`
   flex-direction: column;
   align-items: center;
   flex: 1;
-  
 `;
 
 const BarWrapper = styled.div`
@@ -327,52 +324,4 @@ const FixedAddPostButton = styled.div`
   &:hover {
     transform: scale(1.05);
   }
-`;
-
-const FixedAddPostMenu = styled.div`
-  position: absolute;
-  bottom: 160px;
-  right: 50%;
-  transform: translateX(50%);
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 8px;
-  animation: slideUp 0.25s ease forwards;
-  @keyframes slideUp {
-    from {
-      opacity: 0;
-      transform: translateY(10px) translateX(50%);
-    }
-    to {
-      opacity: 1;
-      transform: translateY(0) translateX(50%);
-    }
-  }
-`;
-
-const MenuButton = styled.button`
-  display: flex;
-  padding: 0 0.8125rem;
-  align-items: center;
-  justify-content: center;
-  height: 2.75rem;
-  width: 13.75rem;
-  border: 1px solid #e9e9e9;
-  border-radius: 5px;
-  background: #ffbc67;
-  color: #313131;
-  ${typo("h4")};
-  cursor: pointer;
-  box-shadow: 0 0 7.6px 0 rgba(0, 0, 0, 0.18);
-
-  span {
-    flex: 1;
-    text-align: center;
-  }
-`;
-
-const MenuIcon = styled.img`
-  height: 2.1rem;
-  flex-shrink: 0;
 `;
