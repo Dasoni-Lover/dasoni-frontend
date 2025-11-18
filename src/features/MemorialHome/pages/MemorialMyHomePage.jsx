@@ -246,7 +246,6 @@ const FixedShareButton = styled.div`
   position: absolute;
   right: -380px;
   top: 160px;
-  z-index: 1000;
   cursor: pointer;
   @media (max-width: 1200px) {
     display: none;
