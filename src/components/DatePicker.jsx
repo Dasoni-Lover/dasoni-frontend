@@ -1,3 +1,4 @@
+// src/components/DatePicker.jsx
 import React, { forwardRef } from "react";
 import styled from "styled-components";
 import ReactDatePicker, { registerLocale } from "react-datepicker";
@@ -66,6 +67,9 @@ function DatePicker({
   borderColor,
   width = "100%", // 부모에 맞춰 기본 100%
   height = "48px", // 기본 높이
+  // 🔹 기본값: 년/월 드롭다운 ON
+  showMonthDropdown = true,
+  showYearDropdown = true,
   ...props
 }) {
   return (
@@ -86,6 +90,10 @@ function DatePicker({
         popperPlacement="bottom-start"
         locale="ko"
         showPopperArrow={false}
+        // 🔹 년/월 드롭다운 기본 적용
+        showMonthDropdown={showMonthDropdown}
+        showYearDropdown={showYearDropdown}
+        dropdownMode="select"
         {...props}
       />
     </DatePickerWrapper>
