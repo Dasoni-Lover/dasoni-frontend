@@ -1,7 +1,8 @@
-import React, { useState, useRef } from "react";
+// src/features/MemorialMyHome/components/UploadVoiceRecord.jsx
+import React, { useState, useRef, useEffect } from "react";
 import styled from "styled-components";
 import Button from "../../../components/Button";
-import { uploadVoiceFile } from "../../../api/voice";
+import { uploadVoiceFile, getVoiceFile } from "../../../api/voice";
 import VoiceRecord from "./VoiceRecord";
 
 export default function UploadVoiceRecord() {
@@ -9,42 +10,80 @@ export default function UploadVoiceRecord() {
   const [isUploading, setIsUploading] = useState(false);
   const fileInputRef = useRef(null);
 
+  // ✅ 녹음파일관리 탭이 렌더될 때 서버에 저장된 음성 파일 조회
+  useEffect(() => {
+    const loadExistingVoice = async () => {
+      try {
+        const hallId = localStorage.getItem("myHallId");
+        if (!hallId) return;
+
+        const data = await getVoiceFile(hallId); // { url: "..." }
+        if (!data || !data.url) return;
+
+        // 서버에 저장된 url로부터 Blob → File 변환해서
+        // 기존 VoiceRecord UI 로직을 그대로 사용
+        const response = await fetch(data.url);
+        if (!response.ok) {
+          console.warn("기존 음성 파일 다운로드 실패:", response.status);
+          return;
+        }
+
+        const blob = await response.blob();
+        const file = new File([blob], "voice.mp3", {
+          type: blob.type || "audio/mpeg",
+        });
+
+        setSelectedFile(file);
+      } catch (err) {
+        console.warn("기존 음성 파일 조회/로딩 실패:", err);
+      }
+    };
+
+    loadExistingVoice();
+  }, []);
+
   const handleUploadClick = () => {
-    fileInputRef.current.click();
+    if (fileInputRef.current) {
+      fileInputRef.current.click();
+    }
   };
 
-// 기존 UploadVoiceRecord.jsx 파일
-const handleFileChange = async (e) => {
-  const file = e.target.files[0];
-  if (!file) return;
+  const handleFileChange = async (e) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
 
-  if (file.type !== "audio/mpeg") {
-    alert("mp3 파일만 업로드 가능합니다.");
-    return;
-  }
+    if (file.type !== "audio/mpeg") {
+      alert("mp3 파일만 업로드 가능합니다.");
+      return;
+    }
 
-  setSelectedFile(file);
-  setIsUploading(true);
+    setSelectedFile(file);
+    setIsUploading(true);
 
-  try {
-    const hallId = localStorage.getItem("myHallId");
-    if (!hallId) throw new Error("추모관 ID가 없습니다.");
+    try {
+      const hallId = localStorage.getItem("myHallId");
+      if (!hallId) throw new Error("추모관 ID가 없습니다.");
 
-    // presigned URL + S3 업로드 + 백엔드 등록
-    const uploadedUrl = await uploadVoiceFile(hallId, file);
+      // presigned URL + S3 업로드 + 백엔드 등록
+      const uploadedUrl = await uploadVoiceFile(hallId, file);
+      console.log("업로드 성공:", uploadedUrl);
+      // 업로드 후에도 selectedFile은 그대로 유지되므로
+      // VoiceRecord에서 즉시 재생 가능
+    } catch (err) {
+      console.error("업로드 실패:", err);
+      alert("업로드에 실패했습니다. 다시 시도해주세요.");
+      setSelectedFile(null);
+    } finally {
+      setIsUploading(false);
+    }
+  };
 
-    console.log("업로드 성공:", uploadedUrl);
-    // 업로드 후 VoiceRecord로 바로 보여줌
-  } catch (err) {
-    console.error("업로드 실패:", err);
-    alert("업로드에 실패했습니다. 다시 시도해주세요.");
+  const handleReupload = () => {
     setSelectedFile(null);
-  } finally {
-    setIsUploading(false);
-  }
-};
-
-  const handleReupload = () => setSelectedFile(null);
+    if (fileInputRef.current) {
+      fileInputRef.current.value = "";
+    }
+  };
 
   return (
     <Container>
@@ -75,7 +114,10 @@ const handleFileChange = async (e) => {
   );
 }
 
-const Container = styled.div`margin-top: 2.75rem; width: 100%;`;
+const Container = styled.div`
+  margin-top: 2.75rem;
+  width: 100%;
+`;
 
 const Wrapper = styled.div`
   display: flex;
@@ -87,12 +129,12 @@ const Wrapper = styled.div`
   align-self: stretch;
   box-sizing: border-box;
   border-radius: 1.25rem;
-  border: 1px solid var(--5, #E9E9E9);
-  background: var(--Lightgrey, #F8F8F8);
+  border: 1px solid var(--5, #e9e9e9);
+  background: var(--Lightgrey, #f8f8f8);
 `;
 
 const Text = styled.div`
-  color: var(--80, #0E0E0E);
+  color: var(--80, #0e0e0e);
   text-align: center;
   font-family: Pretendard;
   font-size: 1rem;
@@ -102,7 +144,7 @@ const Text = styled.div`
 `;
 
 const Highlight = styled.span`
-  color: var(--80, #0E0E0E);
+  color: var(--80, #0e0e0e);
   font-family: Pretendard;
   font-size: 1rem;
   font-style: normal;
@@ -110,4 +152,6 @@ const Highlight = styled.span`
   line-height: 130%;
 `;
 
-const HiddenInput = styled.input`display: none;`;
+const HiddenInput = styled.input`
+  display: none;
+`;

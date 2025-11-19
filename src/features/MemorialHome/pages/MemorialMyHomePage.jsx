@@ -1,3 +1,4 @@
+// src/features/MemorialMyHome/pages/MemorialMyHomePage.jsx
 import React, { useState, useEffect } from "react";
 import styled from "styled-components";
 import { typo } from "../../../styles/tokens";
@@ -14,11 +15,18 @@ import aiicon from "../assets/ai-icon.png";
 import LinkShareModal from "../components/LinkShareModal";
 import { NoPost } from "../components/NoPost";
 import MyMemorialModal from "../components/MyMemorialModal";
-import { createMyHall, getMyHall } from "../../../api/my-hall";
+import {
+  createMyHall,
+  getMyHall,
+  updateMyHallProfile,
+} from "../../../api/my-hall";
 import { getHallInfo } from "../../../api/memorial";
 import MyRecord from "../components/MyRecord";
 import UploadVoiceRecord from "../components/UploadVoiceRecord";
 import AddPostModal from "../components/AddPostModal";
+
+// ✅ presigned-url / S3 업로드 유틸
+import { getPresignedUrlForImage, uploadFileToS3 } from "../../../api/files";
 
 const MemorialMyHomePage = () => {
   const nav = useNavigate();
@@ -28,6 +36,7 @@ const MemorialMyHomePage = () => {
   const [isAddMenuOpen, setIsAddMenuOpen] = useState(false);
   const [isLinkShareModalOpen, setIsLinkShareModalOpen] = useState(false);
   const [isCreating, setIsCreating] = useState(false);
+  const [isUpdatingProfile, setIsUpdatingProfile] = useState(false);
   const [activeTab, setActiveTab] = useState(0);
 
   // 내 추모관 정보
@@ -37,7 +46,7 @@ const MemorialMyHomePage = () => {
   useEffect(() => {
     getMyHall()
       .then(async (res) => {
-        console.log("[getMyHall] 응답:", res); // 전체 응답 확인
+        console.log("[getMyHall] 응답:", res);
         if (res.myHallExists) {
           setHasMemorialHome(true);
           setIsModalOpen(false);
@@ -59,9 +68,9 @@ const MemorialMyHomePage = () => {
   // 추모관 정보 조회
   const fetchHallInfo = async (hallId) => {
     try {
-      console.log("[fetchHallInfo] 호출 hallId:", hallId); // hallId 확인
+      console.log("[fetchHallInfo] 호출 hallId:", hallId);
       const info = await getHallInfo(hallId);
-      console.log("[fetchHallInfo] 서버 응답:", info); // 서버 응답 확인
+      console.log("[fetchHallInfo] 서버 응답:", info);
 
       if (info?.data) {
         setHallInfo(info.data);
@@ -110,7 +119,55 @@ const MemorialMyHomePage = () => {
       .finally(() => setIsCreating(false));
   };
 
-  //탭 변경 핸들러
+  const handleProfileFileSelect = async (file) => {
+    if (!file) return;
+    if (isUpdatingProfile) return;
+
+    try {
+      setIsUpdatingProfile(true);
+
+      // 1) presigned-url 발급
+      const { uploadUrl, fileUrl, contentType } = await getPresignedUrlForImage(
+        file
+      );
+      console.log("[handleProfileFileSelect] presigned 응답:", {
+        uploadUrl,
+        fileUrl,
+        contentType,
+      });
+
+      // 2) S3 업로드
+      await uploadFileToS3(uploadUrl, file, contentType);
+      console.log("[handleProfileFileSelect] S3 업로드 성공");
+
+      // 3) 추모관 프로필 PATCH
+      await updateMyHallProfile(fileUrl);
+      console.log("[handleProfileFileSelect] 프로필 PATCH 성공");
+
+      // ✅ 3-1) 사이드바에도 알려주기 (전역 이벤트 발행)
+      window.dispatchEvent(
+        new CustomEvent("myProfileUpdated", {
+          detail: { profileUrl: fileUrl },
+        })
+      );
+
+      // 4) 최신 hallInfo 다시 조회
+      const myHallId = localStorage.getItem("myHallId");
+      if (myHallId) {
+        await fetchHallInfo(myHallId);
+      }
+    } catch (error) {
+      console.error(
+        "[handleProfileFileSelect] 프로필 이미지 업데이트 실패:",
+        error
+      );
+      alert("프로필 이미지 변경에 실패했습니다. 잠시 후 다시 시도해 주세요.");
+    } finally {
+      setIsUpdatingProfile(false);
+    }
+  };
+
+  // 탭 변경 핸들러
   const handleTabChange = (index) => {
     setActiveTab(index);
   };
@@ -138,7 +195,7 @@ const MemorialMyHomePage = () => {
     <Container>
       <BlurWrapper $blur={isModalOpen}>
         <BarWrapper>
-          <BarNavigate paths={["홈", "나의 추모관"]}/>
+          <BarNavigate paths={["홈", "나의 추모관"]} />
         </BarWrapper>
 
         <ContentWrapper>
@@ -153,7 +210,9 @@ const MemorialMyHomePage = () => {
                     : ""
                 }
                 src={hallInfo?.profile}
+                onFileSelect={handleProfileFileSelect}
               />
+              {/* 필요하다면 isUpdatingProfile일 때 로딩 스피너나 문구 추가 가능 */}
             </ProfileBox>
 
             <HallTab
@@ -207,51 +266,63 @@ const MemorialMyHomePage = () => {
 
 export default MemorialMyHomePage;
 
+// ================= 스타일 =================
 const Container = styled.div`
   position: relative;
 `;
+
 const BlurWrapper = styled.div`
   /* filter: ${({ $blur }) => ($blur ? "blur(4px)" : "none")};
   transition: filter 0.2s ease; */
 `;
+
 const ContentWrapper = styled.div`
   display: flex;
   flex-direction: column;
   align-items: center;
   transition: all 0.3s ease;
   flex: 1;
+
   @media (max-width: 1200px) {
     align-items: flex-start;
   }
 `;
+
 const BarWrapper = styled.div`
   margin-top: 30px;
   margin-bottom: 52px;
   display: flex;
   justify-content: center;
+
   > * {
     width: 1096px;
   }
+
   @media (max-width: 1200px) {
     justify-content: flex-start;
   }
 `;
+
 const Content = styled.div`
   width: 1096px;
   transition: all 0.3s ease;
 `;
+
 const ProfileBox = styled.div`
   margin-bottom: 52px;
 `;
+
 const FixedShareButton = styled.div`
   position: absolute;
   right: -380px;
   top: 160px;
   cursor: pointer;
+
   @media (max-width: 1200px) {
     display: none;
   }
 `;
+
 const FixedAddPostContainer = styled.div`
   position: fixed;
   right: 148px;
@@ -260,22 +331,27 @@ const FixedAddPostContainer = styled.div`
   display: flex;
   flex-direction: column;
   align-items: center;
+
   @media (max-width: 1200px) {
     display: none;
   }
 `;
+
 const FixedAddPostButton = styled.div`
   cursor: pointer;
   transition: transform 0.2s ease;
+
   img {
     width: 128px;
     height: 128px;
     object-fit: contain;
   }
+
   &:hover {
     transform: scale(1.05);
   }
 `;
+
 const FixedAddPostMenu = styled.div`
   position: absolute;
   bottom: 160px;
@@ -286,6 +362,7 @@ const FixedAddPostMenu = styled.div`
   align-items: center;
   gap: 8px;
   animation: slideUp 0.25s ease forwards;
+
   @keyframes slideUp {
     from {
       opacity: 0;
@@ -297,6 +374,7 @@ const FixedAddPostMenu = styled.div`
     }
   }
 `;
+
 const MenuButton = styled.button`
   display: flex;
   padding: 0 0.8125rem;
@@ -311,11 +389,13 @@ const MenuButton = styled.button`
   ${typo("h4")};
   cursor: pointer;
   box-shadow: 0 0 7.6px 0 rgba(0, 0, 0, 0.18);
+
   span {
     flex: 1;
     text-align: center;
   }
 `;
+
 const MenuIcon = styled.img`
   height: 2.1rem;
   flex-shrink: 0;

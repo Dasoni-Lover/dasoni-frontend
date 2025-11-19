@@ -1,11 +1,20 @@
-import React from 'react';
-import styled from 'styled-components';
+// src/features/MemorialHome/components/DefaultProfile.jsx
+import React from "react";
+import styled from "styled-components";
 import { color, typo } from "../../../styles/tokens";
 import { SmallPhotoBox } from "../../../components/photobox/SmallPhotoBox";
 import { EditSmallPhotoBox } from "../../../components/photobox/EditSmallPhotoBox";
 import defaultProfileImg from "../../../assets/icon-profile-default.svg";
 
-const DefaultProfile = ({ name = "이름 없음", date = "", src, isEditable = false }) => {
+const DefaultProfile = ({
+  name = "이름 없음",
+  date = "",
+  src,
+  isEditable = false,
+  onFileSelect,
+}) => {
+  const profileSrc = src || defaultProfileImg;
+
   return (
     <Wrapper>
       <Box>
@@ -14,9 +23,9 @@ const DefaultProfile = ({ name = "이름 없음", date = "", src, isEditable = f
       </Box>
 
       {isEditable ? (
-        <EditSmallPhotoBox src={src || defaultProfileImg} />
+        <EditSmallPhotoBox src={profileSrc} onFileSelect={onFileSelect} />
       ) : (
-        <SmallPhotoBox src={src || defaultProfileImg} />
+        <SmallPhotoBox src={profileSrc} />
       )}
     </Wrapper>
   );
@@ -48,6 +57,3 @@ const Date = styled.div`
   ${typo("h3")};
   color: ${color("black.70")};
 `;
-
-
-//수정버튼 있는 버전 : <DefaultProfile isEditable={true} /> 

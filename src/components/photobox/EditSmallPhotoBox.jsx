@@ -1,14 +1,10 @@
-import React, { useState, useRef, useEffect } from 'react';
-import styled from 'styled-components';
-import editbutton from '../../assets/edit-btn.svg';
+// src/components/photobox/EditSmallPhotoBox.jsx
+import React, { useRef } from "react";
+import styled from "styled-components";
+import editbutton from "../../assets/edit-btn.svg";
 
-export const EditSmallPhotoBox = ({ src: initialSrc, onFileSelect }) => {
-  const [src, setSrc] = useState(initialSrc || '');
+export const EditSmallPhotoBox = ({ src, onFileSelect }) => {
   const fileInputRef = useRef(null);
-
-  useEffect(() => {
-    setSrc(initialSrc || '');
-  }, [initialSrc]);
 
   const handleEditClick = () => {
     fileInputRef.current?.click();
@@ -18,12 +14,10 @@ export const EditSmallPhotoBox = ({ src: initialSrc, onFileSelect }) => {
     const file = e.target.files?.[0];
     if (!file) return;
 
-    // 미리보기
-    const previewUrl = URL.createObjectURL(file);
-    setSrc(previewUrl);
-
-    // File 객체 그대로 전달 (Base64 변환 X)
-    if (onFileSelect) onFileSelect(file);
+    // ✅ File 객체를 그대로 부모에게 전달
+    if (onFileSelect) {
+      onFileSelect(file);
+    }
   };
 
   return (
@@ -34,7 +28,7 @@ export const EditSmallPhotoBox = ({ src: initialSrc, onFileSelect }) => {
         type="file"
         accept="image/*"
         ref={fileInputRef}
-        style={{ display: 'none' }}
+        style={{ display: "none" }}
         onChange={handleFileChange}
       />
     </Wrapper>
@@ -53,7 +47,7 @@ const Img = styled.img`
   height: 100%;
   object-fit: cover;
   border-radius: 10px;
-  border: solid 2px #E9E9E9;
+  border: solid 2px #e9e9e9;
   box-sizing: border-box;
 `;
 
