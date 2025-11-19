@@ -1,67 +1,79 @@
 // src/features/MemorialHome/components/MyRecord.jsx
-import React, { useState, useEffect } from 'react'
-import styled from 'styled-components'
-import { UnderlineButton } from './UnderlineButtton'
-import FoldableButton from './FoldableButton'
-import VisitorList from "../components/VisitorList"
+import React, { useState, useEffect } from 'react';
+import styled from 'styled-components';
+import { UnderlineButton } from './UnderlineButtton';
+import FoldableButton from './FoldableButton';
+import VisitorList from "../components/VisitorList";
+import { getRequestList, getVisitorList } from "../../../api/visitor";
 
-import { getRequestList, getVisitorList } from "../../../api/visitor"
-
-import upicon from "../assets/up-icon.svg"
-import downicon from "../assets/dropdown-icon.png"
+import upicon from "../assets/up-icon.svg";
+import downicon from "../assets/dropdown-icon.png";
 
 export default function MyRecord({ hallId }) {
-  const [openAll, setOpenAll] = useState(false)
-  const [activeTab, setActiveTab] = useState('request')
+  const [openAll, setOpenAll] = useState(false);
+  const [activeTab, setActiveTab] = useState('request');
 
   // 🔥 상태 분리
-  const [requestList, setRequestList] = useState([])
-  const [visitorList, setVisitorList] = useState([])
+  const [requestList, setRequestList] = useState([]);
+  const [visitorList, setVisitorList] = useState([]);
+
+  // 🔥 count 상태
+  const [requestCount, setRequestCount] = useState(0);
+  const [visitorCount, setVisitorCount] = useState(0);
 
   // 현재 화면에 표시될 데이터
-  const [data, setData] = useState([])
+  const [data, setData] = useState([]);
 
-  // 🔥 activeTab 변경될 때마다 API 호출 + 상태 분리
   useEffect(() => {
     const fetchData = async () => {
       try {
         if (activeTab === 'request') {
-          const res = await getRequestList(hallId)
+          const res = await getRequestList(hallId);
 
-          const list = res.requests?.map(r => ({
-            requestId: r.requestId ?? r.userId,
-            name: r.name,
-            relation: r.relation,
-            natures: r.natures,
-            review: r.review,
-            detail: r.detail,
-          })) ?? []
+          const list = (res.requestList ?? [])
+            .map(r => ({
+              requestId: r.requestId,
+              name: r.name,
+              relation: r.relation,
+              natures: r.natures?.slice(0, 3) ?? [],
+              review: r.review,
+              detail: r.detail,
+            }))
+            .sort((a, b) => b.requestId - a.requestId); // 최신순
 
-          setRequestList(list)
-          setData(list)
+          setRequestList(list);
+          setData(list);
+          setRequestCount(res.requestCount ?? list.length);
         } else {
-          const res = await getVisitorList(hallId)
+          const res = await getVisitorList(hallId);
 
-          const list = res.visitors?.map(v => ({
-            visitorId: v.visitorId ?? v.userId,
-            name: v.name,
-            relation: v.relation,
-            natures: v.natures,
-            review: v.review,
-            detail: v.detail,
-          })) ?? []
+          const list = (res.visitors ?? [])
+            .map(v => ({
+              visitorId: v.userId,
+              name: v.name,
+              relation: v.relation,
+              natures: v.natures?.slice(0, 3) ?? [],
+              review: v.review,
+              detail: v.detail,
+            }))
+            .sort((a, b) => b.visitorId - a.visitorId); // 최신순
 
-          setVisitorList(list)
-          setData(list)
+          setVisitorList(list);
+          setData(list);
+          setVisitorCount(res.visitorCount ?? list.length);
         }
-
       } catch (err) {
-        console.error("데이터 불러오기 실패:", err)
+        console.error("데이터 불러오기 실패:", err);
+        setRequestList([]);
+        setVisitorList([]);
+        setData([]);
+        setRequestCount(0);
+        setVisitorCount(0);
       }
-    }
+    };
 
-    fetchData()
-  }, [activeTab, hallId])
+    fetchData();
+  }, [activeTab, hallId]);
 
   return (
     <Wrapper>
@@ -69,13 +81,13 @@ export default function MyRecord({ hallId }) {
         <ButtonWrapper>
           <UnderlineButton
             text="입장 요청"
-            count={requestList.length}   // 🔥 request 전용 count
+            count={requestCount}
             type={activeTab === 'request' ? 'click' : 'false'}
             onClick={() => setActiveTab('request')}
           />
           <UnderlineButton
             text="추모객 명단"
-            count={visitorList.length}    // 🔥 visitor 전용 count
+            count={visitorCount}
             type={activeTab === 'visitor' ? 'click' : 'false'}
             onClick={() => setActiveTab('visitor')}
           />
@@ -89,7 +101,7 @@ export default function MyRecord({ hallId }) {
 
       <VisitorList data={data} openAll={openAll} type={activeTab} />
     </Wrapper>
-  )
+  );
 }
 
 const Wrapper = styled.div`
@@ -97,20 +109,20 @@ const Wrapper = styled.div`
   height: 36.8rem;
   display: flex;
   flex-direction: column;
-`
+`;
 
 const ButtonWrapper = styled.div`
   display: flex;
   justify-content: flex-start;
   align-items: center;
-`
+`;
 
 const DropDownWrapper = styled.div`
   display: flex;
   justify-content: flex-end;
   align-items: center;
   gap: 0.25rem;
-`
+`;
 
 const Container = styled.div`
   width: 100%;
@@ -121,4 +133,4 @@ const Container = styled.div`
   padding-top: 2rem;
   border-bottom: 1px solid var(--5, #E9E9E9);
   margin-bottom: 0.75rem;
-`
+`;
