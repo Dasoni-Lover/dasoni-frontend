@@ -3,10 +3,15 @@ import styled from 'styled-components';
 import { color, typo } from "../../../styles/tokens";
 import { CardListItemEnter } from './CardListItemEnter';
 import Button from '../../../components/Button';
+import { useNavigate } from "react-router-dom";
 
 export const EnterModal = ({ hall, onClose }) => {
+
+  const navigate = useNavigate();
+
   const handleRequest = () => {
-    // 요청 로직 추가 가능
+    // hall 정보를 넘기면서 RequestEntryPage로 이동
+    navigate("/request-entry", { state: { hall } });
     onClose();
   };
 

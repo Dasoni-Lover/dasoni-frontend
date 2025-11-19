@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { useLocation } from "react-router-dom"; // 추가
 import styled from "styled-components";
 import { color, typo } from "../styles/tokens";
 import { Column, Row } from "../styles/flex";
@@ -7,40 +8,29 @@ import RequestEntryForm from "../features/RequestEntry/components/RequestEntryFo
 import Button from "../components/Button";
 import ConfirmModal from "../components/ConfirmModal";
 
-Button;
 export default function RequestEntryPage() {
+  const location = useLocation();
+  const hall = location.state?.hall; // 모달에서 전달한 hall 데이터
+
   const [step, setStep] = useState(1);
   const MAX_STEP = 3;
-
-  const [isStepValid, setIsStepValid] = useState(false); //  현재 단계 유효 여부
+  const [isStepValid, setIsStepValid] = useState(false);
   const isLastStep = step === MAX_STEP;
-
-  const [isCompleted, setIsCompleted] = useState(false); // 요청 완료
-  const [isCanceled, setIsCanceled] = useState(false); // 요청 취소
+  const [isCompleted, setIsCompleted] = useState(false);
+  const [isCanceled, setIsCanceled] = useState(false);
 
   const handleNext = () => {
-    if (!isStepValid) return; //  필수값 미입력 시 막기
-
-    if (step < MAX_STEP) {
-      setStep(step + 1);
-    } else {
-      // 마지막 단계 "완료" 처리
-      console.log("입장요청 완료 처리 TODO");
-      setIsCompleted(true);
-    }
+    if (!isStepValid) return;
+    if (step < MAX_STEP) setStep(step + 1);
+    else setIsCompleted(true);
   };
 
   const handlePrevOrCancel = () => {
-    if (step === 1) {
-      console.log("입장요청 취소 처리 TODO");
-      return;
-    }
-    setStep(step - 1);
+    if (step === 1) setIsCanceled(true);
+    else setStep(step - 1);
   };
 
-  const handleCancelProcess = () => {
-    setIsCanceled(true);
-  };
+  const handleCancelProcess = () => setIsCanceled(true);
 
   return (
     <div>
@@ -53,11 +43,11 @@ export default function RequestEntryPage() {
             </Subtitle>
             <CancelProcessButton onClick={handleCancelProcess} />
           </Row>
+          {hall && <HallInfo>현재 선택된 추모관: {hall.name}</HallInfo>}
         </Column>
       </BarWrapper>
 
       <Row $justify={"space-between"}>
-        {/*  폼에서 현재 단계의 유효 여부를 알려줌 */}
         <RequestEntryForm step={step} onStepValidChange={setIsStepValid} />
 
         <Column $gap={"1rem"}>
@@ -66,7 +56,7 @@ export default function RequestEntryPage() {
             width="14rem"
             text={isLastStep ? "완료" : "다음"}
             onClick={handleNext}
-            active={isStepValid} //  필수값 다 채워지면 true
+            active={isStepValid}
           />
 
           <Button
@@ -78,22 +68,19 @@ export default function RequestEntryPage() {
           />
         </Column>
       </Row>
-      {/*  완료 클릭 시 */}
+
       <ConfirmModal
         isOpen={isCompleted}
         title="성공적으로 입장 요청을 보냈어요"
         description="관리자가 요청을 승인하면 알림을 보내드릴게요"
         confirmText="흠으로"
       />
-      {/*  그만두기 클릭 시 */}
       <ConfirmModal
         isOpen={isCanceled}
         title="추모관 입장요청을 그만둘까요?"
         confirmText="그만두기"
         cancelText="취소"
-        onCancel={() => {
-          setIsCanceled(false);
-        }}
+        onCancel={() => setIsCanceled(false)}
       />
     </div>
   );
@@ -123,4 +110,10 @@ const Subtitle = styled.div`
   ${typo("h4")};
   color: ${color("black.50")};
   white-space: pre-line;
+`;
+
+const HallInfo = styled.div`
+  ${typo("h4")};
+  color: ${color("black.70")};
+  margin-top: 1rem;
 `;
