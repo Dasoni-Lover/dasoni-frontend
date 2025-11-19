@@ -1,9 +1,10 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import styled, { css } from "styled-components";
 import { useNavigate } from "react-router-dom";
 import { SmallPhotoBox } from "../../../components/photobox/SmallPhotoBox";
 import { color, typo } from "../../../styles/tokens";
 import profileimg from "../../../assets/icon-profile-default.svg";
+import { fetchManagedHalls } from "../../../api/user"; // ⭐ 추가
 
 const tagTextByStatus = {
   ENTERING: "입장 완료",
@@ -13,19 +14,45 @@ const tagTextByStatus = {
 
 export const CardListItemEnter = ({ hall, onOpenModal }) => {
   const navigate = useNavigate();
+  const [managedHallIds, setManagedHallIds] = useState([]);
+
+  // ⭐ 내가 관리하는 추모관 목록 가져오기
+  useEffect(() => {
+    const loadManagedHalls = async () => {
+      try {
+        const data = await fetchManagedHalls();
+        const ids = data.halls.map((h) => h.hallId);
+        setManagedHallIds(ids);
+      } catch (err) {
+        console.error("관리 추모관 목록 로드 실패:", err);
+      }
+    };
+    loadManagedHalls();
+  }, []);
 
   const handleClick = () => {
     if (!hall) return;
 
     switch (hall.status) {
-      case "ENTERING":
-        navigate("/memorial", { state: { hallId: hall.hallId } });
+      case "ENTERING": {
+        // ⭐ 관리자인지 체크
+        const isManager = managedHallIds.includes(hall.hallId);
+
+        if (isManager) {
+          navigate("/memorial-manager", { state: { hallId: hall.hallId } });
+        } else {
+          navigate("/memorial", { state: { hallId: hall.hallId } });
+        }
         break;
+      }
+
       case "WAITING":
         return;
+
       case "NONE":
         onOpenModal && onOpenModal(hall);
         break;
+
       default:
         break;
     }
@@ -43,11 +70,11 @@ export const CardListItemEnter = ({ hall, onOpenModal }) => {
       disabled={hall.status === "WAITING"}
       status={hall.status}
     >
-    <SmallPhotoBox 
-      src={profile}
-      showTag={hall.status !== "NONE"} 
-      tagText={tagTextByStatus[hall.status]}
-    />
+      <SmallPhotoBox
+        src={profile}
+        showTag={hall.status !== "NONE"}
+        tagText={tagTextByStatus[hall.status]}
+      />
 
       <Box>
         <Name>故 {name}</Name>
