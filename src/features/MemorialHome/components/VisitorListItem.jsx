@@ -3,24 +3,34 @@ import styled from 'styled-components'
 import { color, typo } from '../../../styles/tokens'
 import Button from '../../../components/Button'
 import ConfirmModal from '../../../components/ConfirmModal'
+import VisitorListItemContent from './VisitorListItemContent'
+import { respondRequest } from '../../../api/visitor'
 
 import downicon from '../assets/dropdown-icon.png'
 import righticon from '../assets/open-icon.svg'
-import VisitorListItemContent from './VisitorListItemContent'
 
-export default function VisitorListItem({ openAll, type, item, index }) {
+export default function VisitorListItem({ openAll, type, item, index, hallId, onActionComplete }) {
   const [isOpen, setIsOpen] = useState(false)
   const [isModalOpen, setIsModalOpen] = useState(false)
   const [contentWidth, setContentWidth] = useState('auto')
   const idWrapperRef = useRef(null)
 
   useEffect(() => {
-    if (idWrapperRef.current) {
-      setContentWidth(`${idWrapperRef.current.offsetWidth}px`)
-    }
+    if (idWrapperRef.current) setContentWidth(`${idWrapperRef.current.offsetWidth}px`)
   }, [])
 
   useEffect(() => setIsOpen(openAll), [openAll])
+
+  const handleRequest = async (isAccept) => {
+    try {
+      await respondRequest(hallId, item.requestId, isAccept)
+      alert(isAccept ? '입장 요청이 수락되었습니다.' : '입장 요청이 거절되었습니다.')
+      if (onActionComplete) onActionComplete() // 리스트 갱신
+    } catch (err) {
+      console.error('요청 처리 실패:', err)
+      alert('요청 처리에 실패했습니다.')
+    }
+  }
 
   return (
     <Container>
@@ -36,8 +46,8 @@ export default function VisitorListItem({ openAll, type, item, index }) {
         <ButtonWrapper>
           {type === 'request' ? (
             <>
-              <Button text="수락" size="S" width="6.25rem" />
-              <Button text="거절" size="S" width="6.25rem" color="white" />
+              <Button text="수락" size="S" width="6.25rem" onClick={() => handleRequest(true)} />
+              <Button text="거절" size="S" width="6.25rem" color="white" onClick={() => handleRequest(false)} />
             </>
           ) : (
             <Button
@@ -71,8 +81,6 @@ export default function VisitorListItem({ openAll, type, item, index }) {
     </Container>
   )
 }
-
-
 const Container = styled.div`
   display: flex;
   flex-direction: column;
