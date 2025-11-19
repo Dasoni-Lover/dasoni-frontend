@@ -1,7 +1,6 @@
-// src/pages/EnterMemorialHomePage.jsx
 import React, { useState, useEffect } from "react";
 import styled from "styled-components";
-import { CardList } from "../features/Home/components/CardList";
+import { CardListEnter } from "../features/EnterMemorialHome/components/CardListEnter";
 import { SearchTab } from "../features/EnterMemorialHome/components/SearchTab";
 import { EnterModal } from "../features/EnterMemorialHome/components/EnterModal";
 import { color, typo } from "../styles/tokens";
@@ -9,13 +8,19 @@ import { searchHalls } from "../api/search-hall";
 
 export const EnterMemorialHomePage = () => {
   const [modalVisible, setModalVisible] = useState(false);
+  const [selectedHall, setSelectedHall] = useState(null);
   const [searchResults, setSearchResults] = useState([]);
   const [loadingInitial, setLoadingInitial] = useState(true);
 
-  const handleOpenModal = () => setModalVisible(true);
-  const handleCloseModal = () => setModalVisible(false);
+  const handleOpenModal = (hall) => {
+    setSelectedHall(hall);
+    setModalVisible(true);
+  };
+  const handleCloseModal = () => {
+    setSelectedHall(null);
+    setModalVisible(false);
+  };
 
-  // ===== 페이지 로드 시 전체 추모관 가져오기 =====
   useEffect(() => {
     const fetchAllHalls = async () => {
       try {
@@ -39,11 +44,13 @@ export const EnterMemorialHomePage = () => {
         {loadingInitial ? (
           <LoadingText>로딩중...</LoadingText>
         ) : (
-          <CardList halls={searchResults} onOpenModal={handleOpenModal} />
+          <CardListEnter halls={searchResults} onOpenModal={handleOpenModal} />
         )}
       </Content>
 
-      {modalVisible && <EnterModal onClose={handleCloseModal} />}
+      {modalVisible && (
+        <EnterModal hall={selectedHall} onClose={handleCloseModal} />
+      )}
     </Wrapper>
   );
 };

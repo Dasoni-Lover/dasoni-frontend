@@ -1,36 +1,43 @@
-// src/features/Home/components/CardListItem.jsx
 import React from "react";
-import styled from "styled-components";
+import styled, { css } from "styled-components";
 import { useNavigate } from "react-router-dom";
 import { SmallPhotoBox } from "../../../components/photobox/SmallPhotoBox";
 import { color, typo } from "../../../styles/tokens";
 import profileimg from "../../../assets/icon-profile-default.svg";
 
-export const CardListItem = ({ hall, type }) => {
+export const CardListItemEnter = ({ hall, onOpenModal }) => {
   const navigate = useNavigate();
 
   const handleClick = () => {
-    if (type === "managed") {
-      // 내가 관리하는 추모관 → 관리자 페이지
-      navigate("/memorial-manager", {
-        state: { hallId: hall?.hallId },
-      });
-    } else {
-      // 내가 입장한 추모관 → 일반 추모관 페이지
-      navigate("/memorial", {
-        state: { hallId: hall?.hallId },
-      });
+    if (!hall) return;
+
+    switch (hall.status) {
+      case "ENTERING":
+        navigate("/memorial", { state: { hallId: hall.hallId } });
+        break;
+      case "WAITING":
+        // 클릭 비활성화
+        return;
+      case "NONE":
+        onOpenModal && onOpenModal(hall);
+        break;
+      default:
+        break;
     }
   };
 
   const profile = hall?.profile || profileimg;
   const name = hall?.name || "이름 미상";
   const birthday = hall?.birthday || "-";
-  const deadday = hall?.deadday || "-";
+  const deadday = hall?.deadDay || "-";
   const adminName = hall?.adminName || "-";
 
   return (
-    <Wrapper onClick={handleClick}>
+    <Wrapper
+      onClick={handleClick}
+      disabled={hall.status === "WAITING"}
+      status={hall.status}
+    >
       <SmallPhotoBox src={profile} />
       <Box>
         <Name>故 {name}</Name>
@@ -68,6 +75,16 @@ const Wrapper = styled.div`
   background: var(--Background, #fffdfb);
   cursor: pointer;
   transition: all 0.2s ease;
+
+  ${({ status }) =>
+    status === "WAITING" &&
+    css`
+      opacity: 0.5;
+      cursor: not-allowed;
+      &:hover {
+        transform: none;
+      }
+    `}
 
   &:hover {
     transform: translateY(-4px);

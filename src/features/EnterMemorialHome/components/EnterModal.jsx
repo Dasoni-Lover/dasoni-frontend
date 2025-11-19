@@ -1,24 +1,22 @@
 import React from 'react';
 import styled from 'styled-components';
 import { color, typo } from "../../../styles/tokens";
-import { CardListItem } from '../../Home/components/CardListItem';
+import { CardListItemEnter } from './CardListItemEnter';
 import Button from '../../../components/Button';
 
-export const EnterModal = ({ onClose }) => {
+export const EnterModal = ({ hall, onClose }) => {
   const handleRequest = () => {
-    // 요청 로직이 나중에 추가될 수 있음
-    onClose(); // 요청 후 모달 닫기
+    // 요청 로직 추가 가능
+    onClose();
   };
 
-  const handleCancel = () => {
-    onClose(); // 취소 시 모달 닫기
-  };
+  const handleCancel = () => onClose();
 
   return (
     <Wrapper onClick={onClose}>
       <Box onClick={(e) => e.stopPropagation()}>
         <Text>해당 추모관에 입장 요청을 보낼까요?</Text>
-        <CardListItem />
+        <CardListItemEnter hall={hall} type="none" />
         <ButtonWrapper>
           <Button text="요청하기" onClick={handleRequest} />
           <Button text="취소" color="white" onClick={handleCancel} />
