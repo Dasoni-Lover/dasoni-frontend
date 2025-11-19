@@ -5,6 +5,12 @@ import { SmallPhotoBox } from "../../../components/photobox/SmallPhotoBox";
 import { color, typo } from "../../../styles/tokens";
 import profileimg from "../../../assets/icon-profile-default.svg";
 
+const tagTextByStatus = {
+  ENTERING: "입장 완료",
+  WAITING: "요청 중",
+  NONE: null
+};
+
 export const CardListItemEnter = ({ hall, onOpenModal }) => {
   const navigate = useNavigate();
 
@@ -16,7 +22,6 @@ export const CardListItemEnter = ({ hall, onOpenModal }) => {
         navigate("/memorial", { state: { hallId: hall.hallId } });
         break;
       case "WAITING":
-        // 클릭 비활성화
         return;
       case "NONE":
         onOpenModal && onOpenModal(hall);
@@ -38,7 +43,12 @@ export const CardListItemEnter = ({ hall, onOpenModal }) => {
       disabled={hall.status === "WAITING"}
       status={hall.status}
     >
-      <SmallPhotoBox src={profile} />
+    <SmallPhotoBox 
+      src={profile}
+      showTag={hall.status !== "NONE"} 
+      tagText={tagTextByStatus[hall.status]}
+    />
+
       <Box>
         <Name>故 {name}</Name>
         <TextWrapper>
@@ -79,15 +89,13 @@ const Wrapper = styled.div`
   ${({ status }) =>
     status === "WAITING" &&
     css`
-      opacity: 0.5;
-      cursor: not-allowed;
       &:hover {
         transform: none;
       }
     `}
 
   &:hover {
-    transform: translateY(-4px);
+    transform: translateY(-8px);
   }
 `;
 
