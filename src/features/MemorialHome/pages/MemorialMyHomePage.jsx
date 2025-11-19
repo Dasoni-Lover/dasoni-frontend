@@ -126,7 +126,7 @@ const MemorialMyHomePage = () => {
           </>
         );
       case 1:
-        return <MyRecord />;
+        return <MyRecord hallId={hallInfo?.hallId || localStorage.getItem("myHallId")} />;
       case 2:
         return <UploadVoiceRecord />;
       default:

@@ -13,66 +13,81 @@ export default function MyRecord({ hallId }) {
   const [openAll, setOpenAll] = useState(false);
   const [activeTab, setActiveTab] = useState('request');
 
-  // 상태 분리
   const [requestList, setRequestList] = useState([]);
   const [visitorList, setVisitorList] = useState([]);
-
-  // count 상태
   const [requestCount, setRequestCount] = useState(0);
   const [visitorCount, setVisitorCount] = useState(0);
-
-  // 현재 화면에 표시될 데이터
   const [data, setData] = useState([]);
 
-  // 🔄 데이터 불러오기
+  // 🔄 초기 데이터 불러오기
   const fetchData = async () => {
     try {
-      if (activeTab === 'request') {
-        const res = await getRequestList(hallId);
-        const list = (res.requestList ?? [])
-          .map(r => ({
-            requestId: r.requestId,
-            name: r.name,
-            relation: r.relation,
-            natures: r.natures?.slice(0, 3) ?? [],
-            review: r.review,
-            detail: r.detail,
-          }))
-          .sort((a, b) => b.requestId - a.requestId); // 최신순
+      const [requestRes, visitorRes] = await Promise.all([
+        getRequestList(hallId),
+        getVisitorList(hallId),
+      ]);
 
-        setRequestList(list);
-        setData(list);
-        setRequestCount(res.requestCount ?? list.length);
-      } else {
-        const res = await getVisitorList(hallId);
-        const list = (res.visitors ?? [])
-          .map(v => ({
-            visitorId: v.userId,
-            name: v.name,
-            relation: v.relation,
-            natures: v.natures?.slice(0, 3) ?? [],
-            review: v.review,
-            detail: v.detail,
-          }))
-          .sort((a, b) => b.visitorId - a.visitorId); // 최신순
+      const requestList = (requestRes.requestList ?? [])
+        .map(r => ({
+          requestId: r.requestId,
+          name: r.name,
+          relation: r.relation,
+          natures: r.natures?.slice(0, 3) ?? [],
+          review: r.review,
+          detail: r.detail,
+        }))
+        .sort((a, b) => b.requestId - a.requestId);
 
-        setVisitorList(list);
-        setData(list);
-        setVisitorCount(res.visitorCount ?? list.length);
-      }
+      const visitorList = (visitorRes.visitors ?? [])
+        .map(v => ({
+          visitorId: v.userId,
+          name: v.name,
+          relation: v.relation,
+          natures: v.natures?.slice(0, 3) ?? [],
+          review: v.review,
+          detail: v.detail,
+        }))
+        .sort((a, b) => b.visitorId - a.visitorId);
+
+      setRequestList(requestList);
+      setVisitorList(visitorList);
+      setRequestCount(requestRes.requestCount ?? requestList.length);
+      setVisitorCount(visitorRes.visitorCount ?? visitorList.length);
+
+      setData(activeTab === 'request' ? requestList : visitorList);
     } catch (err) {
       console.error("데이터 불러오기 실패:", err);
       setRequestList([]);
       setVisitorList([]);
-      setData([]);
       setRequestCount(0);
       setVisitorCount(0);
+      setData([]);
     }
   };
 
   useEffect(() => {
     fetchData();
   }, [activeTab, hallId]);
+
+  // 🔥 요청 수락/거절 후 실시간 반영
+  const handleActionComplete = (item, isAccept) => {
+    if (!item) return;
+
+    if (isAccept) {
+      setRequestList(prev => prev.filter(r => r.requestId !== item.requestId));
+      setVisitorList(prev => [item, ...prev]);
+      setVisitorCount(prev => prev + 1);
+    } else {
+      setRequestList(prev => prev.filter(r => r.requestId !== item.requestId));
+    }
+
+    setRequestCount(prev => prev - 1);
+
+    setData(activeTab === 'request' ? 
+      requestList.filter(r => r.requestId !== item.requestId) :
+      isAccept ? [item, ...visitorList] : visitorList
+    );
+  };
 
   return (
     <Wrapper>
@@ -103,7 +118,7 @@ export default function MyRecord({ hallId }) {
         openAll={openAll}
         type={activeTab}
         hallId={hallId}
-        onActionComplete={fetchData} // 🔥 수락/거절 후 목록 갱신
+        onActionComplete={handleActionComplete} // 🔥 실시간 반영
       />
     </Wrapper>
   );
