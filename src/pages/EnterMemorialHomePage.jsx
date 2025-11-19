@@ -1,27 +1,46 @@
-import React, { useState } from "react";
+// src/pages/EnterMemorialHomePage.jsx
+import React, { useState, useEffect } from "react";
 import styled from "styled-components";
 import { CardList } from "../features/Home/components/CardList";
 import { SearchTab } from "../features/EnterMemorialHome/components/SearchTab";
 import { EnterModal } from "../features/EnterMemorialHome/components/EnterModal";
 import { color, typo } from "../styles/tokens";
+import { searchHalls } from "../api/search-hall";
 
 export const EnterMemorialHomePage = () => {
   const [modalVisible, setModalVisible] = useState(false);
+  const [searchResults, setSearchResults] = useState([]);
+  const [loadingInitial, setLoadingInitial] = useState(true);
 
-  const handleOpenModal = () => {
-    setModalVisible(true);
-  };
+  const handleOpenModal = () => setModalVisible(true);
+  const handleCloseModal = () => setModalVisible(false);
 
-  const handleCloseModal = () => {
-    setModalVisible(false);
-  };
+  // ===== 페이지 로드 시 전체 추모관 가져오기 =====
+  useEffect(() => {
+    const fetchAllHalls = async () => {
+      try {
+        const halls = await searchHalls({ name: null, birthday: null, deadDay: null });
+        setSearchResults(halls);
+      } catch (err) {
+        console.error("전체 추모관 불러오기 실패:", err);
+      } finally {
+        setLoadingInitial(false);
+      }
+    };
+
+    fetchAllHalls();
+  }, []);
 
   return (
     <Wrapper>
       <Text>추모관 입장하기</Text>
-      <SearchTab />
+      <SearchTab onSearchResult={setSearchResults} />
       <Content>
-        <CardList onOpenModal={handleOpenModal} />
+        {loadingInitial ? (
+          <LoadingText>로딩중...</LoadingText>
+        ) : (
+          <CardList halls={searchResults} onOpenModal={handleOpenModal} />
+        )}
       </Content>
 
       {modalVisible && <EnterModal onClose={handleCloseModal} />}
@@ -51,4 +70,9 @@ const Content = styled.div`
   align-items: center;
   align-self: stretch;
   margin-top: 2.5rem;
+`;
+
+const LoadingText = styled.div`
+  ${typo("bodym")};
+  color: ${color("black.50")};
 `;
