@@ -1,4 +1,4 @@
-// src/features/RequestEntry/components/RequstEntryForm.jsx
+// src/features/RequestEntry/components/RequestEntryForm.jsx
 import React from "react";
 import styled from "styled-components";
 import { color } from "../../../styles/tokens";
@@ -7,20 +7,43 @@ import RequestStep1 from "./RequestStep1";
 import RequestStep2 from "./RequestStep2";
 import RequestStep3 from "./RequestStep3";
 
-export default function RequstEntryForm({ step = 1, onStepValidChange }) {
+export default function RequestEntryForm({
+  step = 1,
+  onStepValidChange,
+  formData,
+  onFormDataChange,
+}) {
   return (
     <WhiteBox>
-      {/* 상단 진행바 */}
+      {/* 진행 바 */}
       <Row $gap={"0.58rem"}>
         {[1, 2, 3].map((i) => (
           <ProgressBar key={i} $active={step >= i} />
         ))}
       </Row>
 
-      {/* 단계별 내용 */}
-      {step === 1 && <RequestStep1 onValidChange={onStepValidChange} />}
-      {step === 2 && <RequestStep2 onValidChange={onStepValidChange} />}
-      {step === 3 && <RequestStep3 onValidChange={onStepValidChange} />}
+      {/* 단계별 UI */}
+      {step === 1 && (
+        <RequestStep1
+          onValidChange={onStepValidChange}
+          value={formData}
+          onChange={onFormDataChange}
+        />
+      )}
+      {step === 2 && (
+        <RequestStep2
+          onValidChange={onStepValidChange}
+          value={formData}
+          onChange={onFormDataChange}
+        />
+      )}
+      {step === 3 && (
+        <RequestStep3
+          onValidChange={onStepValidChange}
+          value={formData}
+          onChange={onFormDataChange}
+        />
+      )}
     </WhiteBox>
   );
 }

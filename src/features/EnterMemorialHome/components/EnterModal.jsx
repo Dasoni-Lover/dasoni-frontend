@@ -10,6 +10,8 @@ export const EnterModal = ({ hall, onClose }) => {
   const navigate = useNavigate();
 
   const handleRequest = () => {
+    console.log("EnterModal hall:", hall);
+
     // hall 정보를 넘기면서 RequestEntryPage로 이동
     navigate("/request-entry", { state: { hall } });
     onClose();
