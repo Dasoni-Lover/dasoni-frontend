@@ -49,8 +49,7 @@ export default function RequestEntryPage() {
       const relationMap = {
         "친구예요": "친구",
         "가족이에요": "가족",
-        "지인이에요": "지인",
-        "동료예요": "동료"
+        "연인이에요": "연인",
       };
 
 

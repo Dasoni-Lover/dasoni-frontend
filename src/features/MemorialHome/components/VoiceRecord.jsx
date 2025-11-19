@@ -76,8 +76,8 @@ export default function VoiceRecord({ file }) {
         <audio ref={audioRef} src={fileUrl} preload="metadata" />
       </Box>
       <ButtonWrapper>
-        <Button>파일 수정</Button>
-        <Button>파일 삭제</Button>
+        <Button>재업로드</Button>
+        <Button>삭제</Button>
       </ButtonWrapper>
     </Wrapper>
   )
@@ -176,5 +176,6 @@ const Button = styled.div`
   border: 2px solid var(--5, #E9E9E9);
   background: var(--0, #FFF);
   box-shadow: 0 0 5px 0 rgba(0, 0, 0, 0.04);
+  box-sizing: border-box;
   cursor: pointer;
 `

@@ -13,30 +13,47 @@ import downicon from "../assets/dropdown-icon.png"
 export default function MyRecord({ hallId }) {
   const [openAll, setOpenAll] = useState(false)
   const [activeTab, setActiveTab] = useState('request')
+
+  // 🔥 상태 분리
+  const [requestList, setRequestList] = useState([])
+  const [visitorList, setVisitorList] = useState([])
+
+  // 현재 화면에 표시될 데이터
   const [data, setData] = useState([])
 
-  // 🔥 activeTab 변경될 때마다 API 호출
+  // 🔥 activeTab 변경될 때마다 API 호출 + 상태 분리
   useEffect(() => {
     const fetchData = async () => {
       try {
-        let res
         if (activeTab === 'request') {
-        res = await getRequestList(hallId)
-        setData(res.data.requestList ?? [])
-      } else {
-        res = await getVisitorList(hallId)
-        const list = res.visitors?.map(v => ({
-          visitorId: v.userId,
-          name: v.name,
-          relation: v.relation,
-          natures: v.natures,
-          review: v.review,
-          detail: v.detail,
-        })) ?? []
+          const res = await getRequestList(hallId)
 
-        setData(list)
+          const list = res.requests?.map(r => ({
+            requestId: r.requestId ?? r.userId,
+            name: r.name,
+            relation: r.relation,
+            natures: r.natures,
+            review: r.review,
+            detail: r.detail,
+          })) ?? []
 
-      }
+          setRequestList(list)
+          setData(list)
+        } else {
+          const res = await getVisitorList(hallId)
+
+          const list = res.visitors?.map(v => ({
+            visitorId: v.visitorId ?? v.userId,
+            name: v.name,
+            relation: v.relation,
+            natures: v.natures,
+            review: v.review,
+            detail: v.detail,
+          })) ?? []
+
+          setVisitorList(list)
+          setData(list)
+        }
 
       } catch (err) {
         console.error("데이터 불러오기 실패:", err)
@@ -52,13 +69,13 @@ export default function MyRecord({ hallId }) {
         <ButtonWrapper>
           <UnderlineButton
             text="입장 요청"
-            count={data?.length ?? 0}
+            count={requestList.length}   // 🔥 request 전용 count
             type={activeTab === 'request' ? 'click' : 'false'}
             onClick={() => setActiveTab('request')}
           />
           <UnderlineButton
             text="추모객 명단"
-            count={data?.length ?? 0}
+            count={visitorList.length}    // 🔥 visitor 전용 count
             type={activeTab === 'visitor' ? 'click' : 'false'}
             onClick={() => setActiveTab('visitor')}
           />
@@ -74,7 +91,6 @@ export default function MyRecord({ hallId }) {
     </Wrapper>
   )
 }
-
 
 const Wrapper = styled.div`
   width: 100%;
