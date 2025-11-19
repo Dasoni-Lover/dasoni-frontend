@@ -21,12 +21,23 @@ export default function MyRecord({ hallId }) {
       try {
         let res
         if (activeTab === 'request') {
-          res = await getRequestList(hallId)
-          setData(res.data)
-        } else {
-          res = await getVisitorList(hallId)
-          setData(res.data)
-        }
+        res = await getRequestList(hallId)
+        setData(res.data.requestList ?? [])
+      } else {
+        res = await getVisitorList(hallId)
+        const list = res.visitors?.map(v => ({
+          visitorId: v.userId,
+          name: v.name,
+          relation: v.relation,
+          natures: v.natures,
+          review: v.review,
+          detail: v.detail,
+        })) ?? []
+
+        setData(list)
+
+      }
+
       } catch (err) {
         console.error("데이터 불러오기 실패:", err)
       }

@@ -12,26 +12,27 @@ export default function VisitorListItemContent({ item }) {
 
       <Wrapper>
         <Type>관계</Type>
-        <Content>{item.relationship}</Content>
+        <Content>{item.relation}</Content>
       </Wrapper>
 
       <Wrapper>
         <Type>영진님을 표현하는 단어</Type>
-        <Content>{item.keywords?.join(" · ")}</Content>
+        <Content>{item.natures?.join(" · ")}</Content>
       </Wrapper>
 
       <Wrapper>
         <Type>관계 설명</Type>
-        <Content>{item.description}</Content>
+        <Content>{item.detail}</Content>
       </Wrapper>
 
       <Wrapper>
         <Type>한 줄 소개</Type>
-        <Content>{item.introduction}</Content>
+        <Content>{item.review}</Content>
       </Wrapper>
     </Container>
   )
 }
+
 
 const Container=styled.div`
     display: flex;

@@ -8,7 +8,8 @@ export default function VisitorList({ data, openAll, type }) {
       <Container>
         {data?.map((item, index) => (
         <VisitorListItem
-          key={item.id}
+          key={type === "request" ? item.requestId : item.visitorId}
+
           openAll={openAll}
           type={type}
           item={item}

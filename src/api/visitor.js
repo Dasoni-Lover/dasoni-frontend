@@ -25,7 +25,7 @@ export const respondRequest = async (hallId, requestId, isAccept) => {
 };
 
 // 4) 기존 추모객 내보내기
-export const kickVisitor = async (hallId, visitorId) => {
-  const res = await client.post(`/api/halls/${hallId}/visitors/${visitorId}/kick`);
+export const outVisitor = async (hallId, visitorId) => {
+  const res = await client.post(`/api/halls/${hallId}/visitor/${visitorId}/kick`);
   return res.data;
 };
