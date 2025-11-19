@@ -1,12 +1,16 @@
 import React from "react";
 import styled from "styled-components";
-import { CardListItem } from "./CardListItem";
+import { CardListItemEnter } from "./CardListItemEnter";
 
-export const CardList = ({ halls = [], type }) => {
+export const CardListEnter = ({ halls = [], onOpenModal }) => {
   return (
     <Wrapper>
       {halls.map((hall, index) => (
-        <CardListItem key={index} hall={hall} type={type} />
+        <CardListItemEnter
+          key={index}
+          hall={hall}
+          onOpenModal={onOpenModal}
+        />
       ))}
     </Wrapper>
   );

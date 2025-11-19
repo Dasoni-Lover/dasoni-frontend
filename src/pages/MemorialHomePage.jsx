@@ -12,6 +12,7 @@ import BoxPostList from "../features/MemorialHome/components/BoxPostList";
 import LetterAndLinkShare from "../features/MemorialHome/components/LetterAndLinkShare";
 import LinkShareModal from "../features/MemorialHome/components/LinkShareModal";
 import PostDetailModal from "../features/MemorialHome/components/PostDetailModal";
+import AddPostModal from "../features/MemorialHome/components/AddPostModal";
 import TabButtonDropdown from "../features/MemorialHome/components/TabButtonDropdown";
 
 import AddPostButtonImg from "../features/MemorialHome/assets/btn-add-post.svg";
@@ -262,7 +263,6 @@ const FixedShareButton = styled.div`
   position: absolute;
   right: -380px;
   top: 160px;
-  z-index: 1000;
   cursor: pointer;
 
   @media (max-width: 1200px) {

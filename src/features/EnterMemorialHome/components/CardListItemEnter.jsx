@@ -1,37 +1,81 @@
-// src/features/Home/components/CardListItem.jsx
-import React from "react";
-import styled from "styled-components";
+import React, { useEffect, useState } from "react";
+import styled, { css } from "styled-components";
 import { useNavigate } from "react-router-dom";
 import { SmallPhotoBox } from "../../../components/photobox/SmallPhotoBox";
 import { color, typo } from "../../../styles/tokens";
 import profileimg from "../../../assets/icon-profile-default.svg";
+import { fetchManagedHalls } from "../../../api/user"; // ⭐ 추가
 
-export const CardListItem = ({ hall, type }) => {
+const tagTextByStatus = {
+  ENTERING: "입장 완료",
+  WAITING: "요청 중",
+  NONE: null
+};
+
+export const CardListItemEnter = ({ hall, onOpenModal }) => {
   const navigate = useNavigate();
+  const [managedHallIds, setManagedHallIds] = useState([]);
+
+  // ⭐ 내가 관리하는 추모관 목록 가져오기
+  useEffect(() => {
+    const loadManagedHalls = async () => {
+      try {
+        const data = await fetchManagedHalls();
+        const ids = data.halls.map((h) => h.hallId);
+        setManagedHallIds(ids);
+      } catch (err) {
+        console.error("관리 추모관 목록 로드 실패:", err);
+      }
+    };
+    loadManagedHalls();
+  }, []);
 
   const handleClick = () => {
-    if (type === "managed") {
-      // 내가 관리하는 추모관 → 관리자 페이지
-      navigate("/memorial-manager", {
-        state: { hallId: hall?.hallId },
-      });
-    } else {
-      // 내가 입장한 추모관 → 일반 추모관 페이지
-      navigate("/memorial", {
-        state: { hallId: hall?.hallId },
-      });
+    if (!hall) return;
+
+    switch (hall.status) {
+      case "ENTERING": {
+        // ⭐ 관리자인지 체크
+        const isManager = managedHallIds.includes(hall.hallId);
+
+        if (isManager) {
+          navigate("/memorial-manager", { state: { hallId: hall.hallId } });
+        } else {
+          navigate("/memorial", { state: { hallId: hall.hallId } });
+        }
+        break;
+      }
+
+      case "WAITING":
+        return;
+
+      case "NONE":
+        onOpenModal && onOpenModal(hall);
+        break;
+
+      default:
+        break;
     }
   };
 
   const profile = hall?.profile || profileimg;
   const name = hall?.name || "이름 미상";
   const birthday = hall?.birthday || "-";
-  const deadday = hall?.deadday || "-";
+  const deadday = hall?.deadDay || "-";
   const adminName = hall?.adminName || "-";
 
   return (
-    <Wrapper onClick={handleClick}>
-      <SmallPhotoBox src={profile} />
+    <Wrapper
+      onClick={handleClick}
+      disabled={hall.status === "WAITING"}
+      status={hall.status}
+    >
+      <SmallPhotoBox
+        src={profile}
+        showTag={hall.status !== "NONE"}
+        tagText={tagTextByStatus[hall.status]}
+      />
+
       <Box>
         <Name>故 {name}</Name>
         <TextWrapper>
@@ -69,8 +113,16 @@ const Wrapper = styled.div`
   cursor: pointer;
   transition: all 0.2s ease;
 
+  ${({ status }) =>
+    status === "WAITING" &&
+    css`
+      &:hover {
+        transform: none;
+      }
+    `}
+
   &:hover {
-    transform: translateY(-4px);
+    transform: translateY(-8px);
   }
 `;
 

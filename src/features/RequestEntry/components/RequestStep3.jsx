@@ -3,13 +3,17 @@ import React, { useEffect, useState } from "react";
 import styled from "styled-components";
 import { typo, color } from "../../../styles/tokens";
 
-export default function RequestStep3({ onValidChange }) {
-  const [intro, setIntro] = useState("");
+export default function RequestStep3({ onValidChange, value, onChange }) {
+  const [intro, setIntro] = useState(value.review || "");
 
   useEffect(() => {
     const isValid = !!intro;
     onValidChange?.(isValid);
-  }, [intro, onValidChange]);
+
+    onChange({
+      review: intro,
+    });
+  }, [intro]);
 
   return (
     <>
@@ -32,10 +36,8 @@ const StepTitle = styled.div`
 `;
 
 const IntroTextArea = styled.textarea`
-  display: flex;
   min-height: 9.5rem;
   padding: 2rem;
-  gap: 0.625rem;
   width: 100%;
   box-sizing: border-box;
   ${typo("h4")};

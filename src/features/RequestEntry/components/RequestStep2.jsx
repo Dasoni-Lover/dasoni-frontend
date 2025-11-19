@@ -5,13 +5,17 @@ import { typo, color } from "../../../styles/tokens";
 import IconEssentialEclipse from "../../../assets/icon-essential-eclipse.svg";
 import TagSelector from "../../../components/TagSelector";
 
-export default function RequestStep2({ onValidChange }) {
-  const [selectedTags, setSelectedTags] = useState([]); // 태그 최대 3개
+export default function RequestStep2({ onValidChange, value, onChange }) {
+  const [selectedTags, setSelectedTags] = useState(value.natures || []);
 
   useEffect(() => {
     const isValid = selectedTags.length === 3;
     onValidChange?.(isValid);
-  }, [selectedTags, onValidChange]);
+
+    onChange({
+      natures: selectedTags,
+    });
+  }, [selectedTags]);
 
   const tagRows = [
     {
@@ -20,25 +24,11 @@ export default function RequestStep2({ onValidChange }) {
     },
     {
       color: "#FFD299",
-      words: [
-        "긍정적인",
-        "지혜로운",
-        "낙천적인",
-        "부지런한",
-        "열정적인",
-        "웃음이 많은",
-      ],
+      words: ["긍정적인", "지혜로운", "낙천적인", "부지런한", "열정적인", "웃음이 많은"],
     },
     {
       color: "#FFAA76",
-      words: [
-        "믿음직한",
-        "생각이 깊은",
-        "의리 있는",
-        "용감한",
-        "든든한",
-        "재밌는",
-      ],
+      words: ["믿음직한", "생각이 깊은", "의리 있는", "용감한", "든든한", "재밌는"],
     },
   ];
 
@@ -71,7 +61,6 @@ const StepTitle = styled.div`
 const Label = styled.div`
   ${typo("bodym2")};
   color: ${color("black.50")};
-  flex: 1;
   margin-bottom: 1.5rem;
 `;
 

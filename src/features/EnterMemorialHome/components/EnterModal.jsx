@@ -1,24 +1,29 @@
 import React from 'react';
 import styled from 'styled-components';
 import { color, typo } from "../../../styles/tokens";
-import { CardListItem } from '../../Home/components/CardListItem';
+import { CardListItemEnter } from './CardListItemEnter';
 import Button from '../../../components/Button';
+import { useNavigate } from "react-router-dom";
 
-export const EnterModal = ({ onClose }) => {
+export const EnterModal = ({ hall, onClose }) => {
+
+  const navigate = useNavigate();
+
   const handleRequest = () => {
-    // 요청 로직이 나중에 추가될 수 있음
-    onClose(); // 요청 후 모달 닫기
+    console.log("EnterModal hall:", hall);
+
+    // hall 정보를 넘기면서 RequestEntryPage로 이동
+    navigate("/request-entry", { state: { hall } });
+    onClose();
   };
 
-  const handleCancel = () => {
-    onClose(); // 취소 시 모달 닫기
-  };
+  const handleCancel = () => onClose();
 
   return (
     <Wrapper onClick={onClose}>
       <Box onClick={(e) => e.stopPropagation()}>
         <Text>해당 추모관에 입장 요청을 보낼까요?</Text>
-        <CardListItem />
+        <CardListItemEnter hall={hall} type="none" />
         <ButtonWrapper>
           <Button text="요청하기" onClick={handleRequest} />
           <Button text="취소" color="white" onClick={handleCancel} />

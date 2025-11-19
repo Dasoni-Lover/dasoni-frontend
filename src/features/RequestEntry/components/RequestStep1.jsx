@@ -5,16 +5,21 @@ import { typo, color } from "../../../styles/tokens";
 import RelationSelector from "../../../components/RelationSelector";
 import TextField from "../../../components/TextField";
 
-export default function RequestStep1({ onValidChange }) {
-  const [relation, setRelation] = useState(null);
-  const [detail, setDetail] = useState("");
+export default function RequestStep1({ onValidChange, value, onChange }) {
+  const [relation, setRelation] = useState(value.relation || null);
+  const [detail, setDetail] = useState(value.detail || "");
 
   const relationOptions = ["가족이에요", "친구예요", "연인이에요"];
 
   useEffect(() => {
     const isValid = !!relation;
     onValidChange?.(isValid);
-  }, [relation, onValidChange]);
+
+    onChange({
+      relation,
+      detail,
+    });
+  }, [relation, detail]);
 
   return (
     <>
