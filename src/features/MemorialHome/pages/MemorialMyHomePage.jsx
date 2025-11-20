@@ -15,6 +15,7 @@ import LinkShareModal from "../components/LinkShareModal";
 import MyMemorialModal from "../components/MyMemorialModal";
 import { createMyHall, getMyHall } from "../../../api/my-hall";
 import { getHallInfo, getPhotos, getPhotoDetail } from "../../../api/memorial";
+import AddPostModal from "../components/AddPostModal";
 
 import MyRecord from "../components/MyRecord";
 import UploadVoiceRecord from "../components/UploadVoiceRecord";
@@ -30,7 +31,7 @@ const MemorialMyHomePage = () => {
   const [hasMemorialHome, setHasMemorialHome] = useState(false);
   const [hallInfo, setHallInfo] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [isAddMenuOpen, setIsAddMenuOpen] = useState(false);
+  const [isAddPostModalOpen, setIsAddPostModalOpen] = useState(false);
   const [isLinkShareModalOpen, setIsLinkShareModalOpen] = useState(false);
   const [isCreating, setIsCreating] = useState(false);
 
@@ -235,23 +236,26 @@ const MemorialMyHomePage = () => {
         </FixedShareButton>
 
         <FixedAddPostContainer>
-          {isAddMenuOpen && (
-            <FixedAddPostMenu>
-              <MenuButton onClick={goAIGeneratePage}>
-                <MenuIcon src={aiicon} />
-                <span>AI 이미지 생성</span>
-              </MenuButton>
-              <MenuButton onClick={goWritePage}>
-                <MenuIcon src={foldericon} />
-                <span>컴퓨터에서 불러오기</span>
-              </MenuButton>
-            </FixedAddPostMenu>
-          )}
+          
 
-          <FixedAddPostButton onClick={() => setIsAddMenuOpen(!isAddMenuOpen)}>
+          <FixedAddPostButton onClick={() => setIsAddPostModalOpen(true)}>
             <img src={AddPostButtonImg} alt="추가 버튼" />
           </FixedAddPostButton>
         </FixedAddPostContainer>
+        {isAddPostModalOpen && (
+  <AddPostModal
+    onClose={() => setIsAddPostModalOpen(false)}
+    onSelectAI={() => {
+      setIsAddPostModalOpen(false);
+      goAIGeneratePage();
+    }}
+    onSelectComputer={() => {
+      setIsAddPostModalOpen(false);
+      goWritePage();
+    }}
+  />
+)}
+
 
         {isLinkShareModalOpen && (
           <LinkShareModal onClose={() => setIsLinkShareModalOpen(false)} />
