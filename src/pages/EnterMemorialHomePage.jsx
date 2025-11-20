@@ -83,3 +83,4 @@ const LoadingText = styled.div`
   ${typo("bodym")};
   color: ${color("black.50")};
 `;
+

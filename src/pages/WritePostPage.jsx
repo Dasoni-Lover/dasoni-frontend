@@ -9,11 +9,13 @@ import { getHallInfo } from "../api/memorial";
 export default function WritePostPage() {
   const location = useLocation();
   const {
-    hallId = 1,
+    hallId ,
     isEdit = false,
     photoId,
     postData,
   } = location.state || {};
+    console.log("🔥 WritePostPage 받은 hallId:", hallId);
+  console.log("📦 location.state:", location.state);
 
   const [hallName, setHallName] = useState("");
 

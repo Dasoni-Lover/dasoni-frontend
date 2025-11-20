@@ -26,15 +26,23 @@ export const uploadPhotoPost = async ({
   return res.data; // { photoId: number }
 };
 
+<<<<<<< HEAD
 // 2) 추모 앨범 게시글 AI 사진 생성
 
+=======
+/**
+ * 2) 추모 앨범 게시글 AI 사진 생성
+ * POST /api/halls/{hall_id}/photos/ai
+ */
+>>>>>>> develop
 export const generateAIImage = async ({ images, prompt, hallId }) => {
   const body = {
     images,
     prompt,
   };
 
-  console.log("📤 generateAIImage payload:", body, "hallId:", hallId);
+  console.log("📤 generateAIImage payload:", JSON.stringify(body, null, 2));
+  console.log("📌 hallId:", hallId);
 
   const res = await client.post(`/api/halls/${hallId}/photos/ai`, body);
   return res.data; // { generatedImage: "base64..." }

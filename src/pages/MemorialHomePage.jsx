@@ -16,8 +16,6 @@ import AddPostModal from "../features/MemorialHome/components/AddPostModal";
 import TabButtonDropdown from "../features/MemorialHome/components/TabButtonDropdown";
 
 import AddPostButtonImg from "../features/MemorialHome/assets/btn-add-post.svg";
-import foldericon from "../features/MemorialHome/assets/folder-icon.png";
-import aiicon from "../features/MemorialHome/assets/ai-icon.png";
 
 const MemorialHomePage = () => {
   const nav = useNavigate();
@@ -32,12 +30,13 @@ const MemorialHomePage = () => {
     sortOption: "최신 업로드순",
     isAIMode: false,
   });
-  const [isAddMenuOpen, setIsAddMenuOpen] = useState(false);
   const [isLinkShareModalOpen, setIsLinkShareModalOpen] = useState(false);
   const [selectedPhoto, setSelectedPhoto] = useState(null);
   const [selectedIndex, setSelectedIndex] = useState(null); // 모달에서 현재 몇 번째인지
   const [activeTab, setActiveTab] = useState(0); // 0: 공유앨범, 1: 나와의 앨범
   const [reloadKey, setReloadKey] = useState(0); // ✅ 삭제 후 리렌더 트리거
+  const [isAddPostModalOpen, setIsAddPostModalOpen] = useState(false);
+
 
   // ✅ 사진 불러오기 (isMine / isPrivate 반영)
   useEffect(() => {
@@ -171,6 +170,8 @@ const MemorialHomePage = () => {
     setReloadKey((prev) => prev + 1);
   };
 
+  
+
   return (
     <Container>
       <BarWrapper>
@@ -199,22 +200,25 @@ const MemorialHomePage = () => {
       </FixedShareButton>
 
       <FixedAddPostContainer>
-        {isAddMenuOpen && (
-          <FixedAddPostMenu>
-            <MenuButton onClick={() => nav("/generate", { state: { hallId } })}>
-              <MenuIcon src={aiicon} alt="AI 이미지 생성" />
-              <span>AI 이미지 생성</span>
-            </MenuButton>
-            <MenuButton onClick={() => nav("/write", { state: { hallId } })}>
-              <MenuIcon src={foldericon} alt="사진 업로드" />
-              <span>컴퓨터에서 불러오기</span>
-            </MenuButton>
-          </FixedAddPostMenu>
-        )}
-        <FixedAddPostButton onClick={() => setIsAddMenuOpen(!isAddMenuOpen)}>
+        
+        <FixedAddPostButton onClick={() => setIsAddPostModalOpen(true)}>
           <img src={AddPostButtonImg} alt="추가 버튼" />
         </FixedAddPostButton>
       </FixedAddPostContainer>
+      {isAddPostModalOpen && (
+  <AddPostModal
+    onClose={() => setIsAddPostModalOpen(false)}
+    onSelectAI={() => {
+      setIsAddPostModalOpen(false);
+      nav("/generate", { state: { hallId } });
+    }}
+    onSelectComputer={() => {
+      setIsAddPostModalOpen(false);
+      nav("/write", { state: { hallId } });
+    }}
+  />
+)}
+
 
       <PostDetailModal
         isOpen={!!selectedPhoto}
