@@ -59,6 +59,24 @@ const SideBarList = ({ onAlarmClick, isAlarmOpen }) => {
     fetchSidebarInfo();
   }, []);
 
+  // ✅ 프로필 변경 전역 이벤트 구독
+  useEffect(() => {
+    const handleProfileUpdated = (e) => {
+      const newUrl = e.detail?.profileUrl;
+      if (!newUrl) return;
+
+      setSidebarInfo((prev) => ({
+        ...prev,
+        myProfile: newUrl,
+      }));
+    };
+
+    window.addEventListener("myProfileUpdated", handleProfileUpdated);
+    return () => {
+      window.removeEventListener("myProfileUpdated", handleProfileUpdated);
+    };
+  }, []);
+
   // ✅ 로그아웃을 제외한 일반 메뉴만
   const menuItems = [
     { label: "홈", path: "/home" },

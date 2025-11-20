@@ -1,18 +1,14 @@
 // src/api/memorial-album.js
 import client from "./client";
-const DEFAULT_HALL_ID = 1; // fallback
 
-/**
- * 1) 추모 앨범 게시글 업로드
- * PATCH /api/halls/{hall_id}/photos/upload
- */
+//추모 앨범 게시글 업로드
 export const uploadPhotoPost = async ({
   url,
   content,
   occurredAt,
   isPrivate,
   isAI,
-  hallId = DEFAULT_HALL_ID,
+  hallId,
 }) => {
   const body = {
     url,
@@ -30,10 +26,15 @@ export const uploadPhotoPost = async ({
   return res.data; // { photoId: number }
 };
 
+<<<<<<< HEAD
+// 2) 추모 앨범 게시글 AI 사진 생성
+
+=======
 /**
  * 2) 추모 앨범 게시글 AI 사진 생성
  * POST /api/halls/{hall_id}/photos/ai
  */
+>>>>>>> develop
 export const generateAIImage = async ({ images, prompt, hallId }) => {
   const body = {
     images,

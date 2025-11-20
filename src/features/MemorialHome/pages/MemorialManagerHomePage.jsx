@@ -12,7 +12,7 @@ import BoxPostList from "../components/BoxPostList";
 import LetterAndLinkShare from "../components/LetterAndLinkShare";
 import LinkShareModal from "../components/LinkShareModal";
 import PostDetailModal from "../components/PostDetailModal";
-import AddPostModal from "../components/AddPostModal"; 
+import AddPostModal from "../components/AddPostModal";
 import MyRecord from "../components/MyRecord";
 
 import AddPostButtonImg from "../assets/btn-add-post.svg";
@@ -149,14 +149,10 @@ export const MemorialManagerHomePage = () => {
 
   const handleModifyClick = () =>
     navigate("/memorial-manager/edit-profile", { state: { hallId } });
-  const goWritePage = () =>
-     navigate("/write", { state: { hallId } });
-  const goAIGeneratePage = () =>
-     navigate("/generate", { state: { hallId } });
+  const goWritePage = () => navigate("/write", { state: { hallId } });
+  const goAIGeneratePage = () => navigate("/generate", { state: { hallId } });
 
-  const hallTitle = hallInfo?.name
-    ? `故 ${hallInfo.name}의 추모관`
-    : "추모관";
+  const hallTitle = hallInfo?.name ? `故 ${hallInfo.name}의 추모관` : "추모관";
 
   const handlePostDeleted = () => setReloadKey((prev) => prev + 1);
 
@@ -238,7 +234,6 @@ export const MemorialManagerHomePage = () => {
   );
 };
 
-
 const Container = styled.div`
   position: relative;
 `;
@@ -304,8 +299,8 @@ const FixedShareButton = styled.div`
 
 const FixedAddPostContainer = styled.div`
   position: fixed;
-  right: 148px;
-  top: 788px;
+  right: 10vh;
+  bottom: 10vh;
   z-index: 1000;
   display: flex;
   flex-direction: column;
