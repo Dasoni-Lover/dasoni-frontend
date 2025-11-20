@@ -1,9 +1,4 @@
-<<<<<<< HEAD
-// src/features/MemorialMyHome/pages/MemorialMyHomePage.jsx
-import React, { useState, useEffect } from "react";
-=======
 import React, { useState, useEffect, useMemo } from "react";
->>>>>>> develop
 import styled from "styled-components";
 import { typo } from "../../../styles/tokens";
 import { useNavigate, useLocation } from "react-router-dom";
@@ -16,35 +11,25 @@ import LetterAndLinkShare from "../components/LetterAndLinkShare";
 import AddPostButtonImg from "../assets/btn-add-post.svg";
 import LinkShareModal from "../components/LinkShareModal";
 import MyMemorialModal from "../components/MyMemorialModal";
-<<<<<<< HEAD
 import {
   createMyHall,
   getMyHall,
   updateMyHallProfile,
 } from "../../../api/my-hall";
-import { getHallInfo } from "../../../api/memorial";
-import MyRecord from "../components/MyRecord";
-import UploadVoiceRecord from "../components/UploadVoiceRecord";
-import AddPostModal from "../components/AddPostModal";
-
-// ✅ presigned-url / S3 업로드 유틸
-import { getPresignedUrlForImage, uploadFileToS3 } from "../../../api/files";
-=======
-import { createMyHall, getMyHall } from "../../../api/my-hall";
 import { getHallInfo, getPhotos, getPhotoDetail } from "../../../api/memorial";
-import AddPostModal from "../components/AddPostModal";
-
 import MyRecord from "../components/MyRecord";
 import UploadVoiceRecord from "../components/UploadVoiceRecord";
+import AddPostModal from "../components/AddPostModal";
 import BoxPostList from "../components/BoxPostList";
 import PostDetailModal from "../components/PostDetailModal";
->>>>>>> develop
+import { getPresignedUrlForImage, uploadFileToS3 } from "../../../api/files";
 
 const MemorialMyHomePage = () => {
   const navigate = useNavigate();
   const location = useLocation();
 
-  const hallId = location.state?.hallId ?? localStorage.getItem("myHallId") ?? 1;
+  const hallId =
+    location.state?.hallId ?? localStorage.getItem("myHallId") ?? 1;
 
   const [hasMemorialHome, setHasMemorialHome] = useState(false);
   const [hallInfo, setHallInfo] = useState(null);
@@ -52,11 +37,7 @@ const MemorialMyHomePage = () => {
   const [isAddPostModalOpen, setIsAddPostModalOpen] = useState(false);
   const [isLinkShareModalOpen, setIsLinkShareModalOpen] = useState(false);
   const [isCreating, setIsCreating] = useState(false);
-<<<<<<< HEAD
   const [isUpdatingProfile, setIsUpdatingProfile] = useState(false);
-=======
-
->>>>>>> develop
   const [activeTab, setActiveTab] = useState(0);
 
   const [photos, setPhotos] = useState([]);
@@ -69,14 +50,11 @@ const MemorialMyHomePage = () => {
   const [selectedIndex, setSelectedIndex] = useState(null);
   const [reloadKey, setReloadKey] = useState(0);
 
-//내추모관 확인
+  // ===================== 내 추모관 존재 여부 확인 =====================
   useEffect(() => {
     getMyHall()
       .then(async (res) => {
-<<<<<<< HEAD
         console.log("[getMyHall] 응답:", res);
-=======
->>>>>>> develop
         if (res.myHallExists) {
           setHasMemorialHome(true);
           setIsModalOpen(false);
@@ -90,30 +68,27 @@ const MemorialMyHomePage = () => {
         }
       })
       .catch(() => setIsModalOpen(true));
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-//추모관 정보조회
+  // ===================== 추모관 정보 조회 =====================
   const fetchHallInfo = async (hid) => {
     try {
-<<<<<<< HEAD
-      console.log("[fetchHallInfo] 호출 hallId:", hallId);
-      const info = await getHallInfo(hallId);
-      console.log("[fetchHallInfo] 서버 응답:", info);
-=======
+      console.log("[fetchHallInfo] 호출 hallId:", hid);
       const info = await getHallInfo(hid);
-      setHallInfo(info?.data);
+      console.log("[fetchHallInfo] 서버 응답:", info);
+      setHallInfo(info);
     } catch (e) {
-      console.error("추모관 정보 불러오기 실패:", e);
+      console.error("[fetchHallInfo] 에러:", e);
     }
   };
->>>>>>> develop
 
   useEffect(() => {
     if (!hallId) return;
-    fetchHallInfo(hallId);
+    fetchHallInfo(Number(hallId));
   }, [hallId]);
 
-//사진조회
+  // ===================== 사진 조회 =====================
   useEffect(() => {
     if (activeTab !== 0) return;
 
@@ -136,7 +111,7 @@ const MemorialMyHomePage = () => {
     fetchPhotosData();
   }, [activeTab, hallId, reloadKey]);
 
-//필터적용
+  // ===================== 필터 적용 (AI 모드 등) =====================
   const filteredPhotos = useMemo(() => {
     let result = [...photos];
 
@@ -144,10 +119,15 @@ const MemorialMyHomePage = () => {
       result = result.filter((p) => p.isAI);
     }
 
-<<<<<<< HEAD
-  const goWritePage = () => nav("/write");
-  const goAIGeneratePage = () => nav("/generate");
+    // 필요하다면 sortOption에 따라 정렬 추가 가능
+    return result;
+  }, [photos, filter]);
 
+  // ===================== 글쓰기 / AI 생성 페이지 이동 =====================
+  const goWritePage = () => navigate("/write");
+  const goAIGeneratePage = () => navigate("/generate");
+
+  // ===================== 내 추모관 생성 =====================
   const handleCreateClick = () => {
     if (isCreating || hasMemorialHome) return;
 
@@ -155,12 +135,12 @@ const MemorialMyHomePage = () => {
     createMyHall()
       .then(async (res) => {
         console.log("[createMyHall] 응답:", res);
-        const hallId = res?.hallId;
-        if (hallId) {
-          localStorage.setItem("myHallId", String(hallId));
+        const newHallId = res?.hallId;
+        if (newHallId) {
+          localStorage.setItem("myHallId", String(newHallId));
           setHasMemorialHome(true);
           setIsModalOpen(false);
-          setTimeout(() => fetchHallInfo(hallId), 500);
+          setTimeout(() => fetchHallInfo(newHallId), 500);
         }
       })
       .catch((error) => {
@@ -170,6 +150,7 @@ const MemorialMyHomePage = () => {
       .finally(() => setIsCreating(false));
   };
 
+  // ===================== 프로필 이미지 변경 =====================
   const handleProfileFileSelect = async (file) => {
     if (!file) return;
     if (isUpdatingProfile) return;
@@ -205,7 +186,7 @@ const MemorialMyHomePage = () => {
       // 4) 최신 hallInfo 다시 조회
       const myHallId = localStorage.getItem("myHallId");
       if (myHallId) {
-        await fetchHallInfo(myHallId);
+        await fetchHallInfo(Number(myHallId));
       }
     } catch (error) {
       console.error(
@@ -218,48 +199,12 @@ const MemorialMyHomePage = () => {
     }
   };
 
-  // 탭 변경 핸들러
+  // ===================== 탭 변경 =====================
   const handleTabChange = (index) => {
     setActiveTab(index);
   };
 
-  // 탭별로 렌더링할 콘텐츠 결정
-  const renderTabContent = () => {
-    switch (activeTab) {
-      case 0:
-        return (
-          <>
-            <TabButtonDropdown />
-            <NoPost />
-          </>
-        );
-      case 1:
-        return <MyRecord />;
-      case 2:
-        return <UploadVoiceRecord />;
-=======
-    switch (filter.sortOption) {
-      case "최신 업로드순":
-        result.sort((a, b) => new Date(b.uploadDate) - new Date(a.uploadDate));
-        break;
-      case "오래된 업로드순":
-        result.sort((a, b) => new Date(a.uploadDate) - new Date(b.uploadDate));
-        break;
-      case "최신 사진순":
-        result.sort((a, b) => new Date(b.takenDate) - new Date(a.takenDate));
-        break;
-      case "오래된 사진순":
-        result.sort((a, b) => new Date(a.takenDate) - new Date(b.takenDate));
-        break;
->>>>>>> develop
-      default:
-        break;
-    }
-
-    return result;
-  }, [photos, filter]);
-
-//상세조회
+  // ===================== 사진 상세 조회 모달 열기 =====================
   const openPhotoAtIndex = async (index) => {
     const target = filteredPhotos[index];
     if (!target) return;
@@ -288,28 +233,19 @@ const MemorialMyHomePage = () => {
 
   const handlePrev = () => {
     if (filteredPhotos.length === 0) return;
-    const prevIndex = selectedIndex === 0
-      ? filteredPhotos.length - 1
-      : selectedIndex - 1;
+    const prevIndex =
+      selectedIndex === 0 ? filteredPhotos.length - 1 : selectedIndex - 1;
     openPhotoAtIndex(prevIndex);
   };
 
   const handleNext = () => {
     if (filteredPhotos.length === 0) return;
-    const nextIndex = selectedIndex === filteredPhotos.length - 1
-      ? 0
-      : selectedIndex + 1;
+    const nextIndex =
+      selectedIndex === filteredPhotos.length - 1 ? 0 : selectedIndex + 1;
     openPhotoAtIndex(nextIndex);
   };
 
   const handlePostDeleted = () => setReloadKey((v) => v + 1);
-
-// 이동
-  const goWritePage = () =>
-    navigate("/write", { state: { hallId } });
-
-  const goAIGeneratePage = () =>
-    navigate("/generate", { state: { hallId } });
 
   return (
     <Container>
@@ -325,7 +261,9 @@ const MemorialMyHomePage = () => {
                 isEditable={hasMemorialHome}
                 name={hallInfo?.name || "이름 없음"}
                 date={
-                  hallInfo ? `${hallInfo?.birthday || ""} ~ ${hallInfo?.deadday || ""}` : ""
+                  hallInfo
+                    ? `${hallInfo?.birthday || ""} ~ ${hallInfo?.deadday || ""}`
+                    : ""
                 }
                 src={hallInfo?.profile}
                 onFileSelect={handleProfileFileSelect}
@@ -336,7 +274,7 @@ const MemorialMyHomePage = () => {
             <HallTab
               role="owner"
               activeIndex={activeTab}
-              onTabChange={setActiveTab}
+              onTabChange={handleTabChange}
             />
 
             {activeTab === 0 && (
@@ -349,9 +287,7 @@ const MemorialMyHomePage = () => {
               </>
             )}
 
-            {activeTab === 1 && (
-              <MyRecord hallId={hallId} />
-            )}
+            {activeTab === 1 && <MyRecord hallId={hallId} />}
 
             {activeTab === 2 && <UploadVoiceRecord />}
           </Content>
@@ -365,26 +301,24 @@ const MemorialMyHomePage = () => {
         </FixedShareButton>
 
         <FixedAddPostContainer>
-          
-
           <FixedAddPostButton onClick={() => setIsAddPostModalOpen(true)}>
             <img src={AddPostButtonImg} alt="추가 버튼" />
           </FixedAddPostButton>
         </FixedAddPostContainer>
-        {isAddPostModalOpen && (
-  <AddPostModal
-    onClose={() => setIsAddPostModalOpen(false)}
-    onSelectAI={() => {
-      setIsAddPostModalOpen(false);
-      goAIGeneratePage();
-    }}
-    onSelectComputer={() => {
-      setIsAddPostModalOpen(false);
-      goWritePage();
-    }}
-  />
-)}
 
+        {isAddPostModalOpen && (
+          <AddPostModal
+            onClose={() => setIsAddPostModalOpen(false)}
+            onSelectAI={() => {
+              setIsAddPostModalOpen(false);
+              goAIGeneratePage();
+            }}
+            onSelectComputer={() => {
+              setIsAddPostModalOpen(false);
+              goWritePage();
+            }}
+          />
+        )}
 
         {isLinkShareModalOpen && (
           <LinkShareModal onClose={() => setIsLinkShareModalOpen(false)} />
@@ -394,22 +328,7 @@ const MemorialMyHomePage = () => {
       {isModalOpen && (
         <MyMemorialModal
           isOpen={isModalOpen}
-          onCreateClick={async () => {
-            if (isCreating) return;
-            setIsCreating(true);
-
-            try {
-              const res = await createMyHall();
-              localStorage.setItem("myHallId", String(res.hallId));
-              setHasMemorialHome(true);
-              setIsModalOpen(false);
-              fetchHallInfo(res.hallId);
-            } catch (e) {
-              alert("추모관 생성 실패");
-            } finally {
-              setIsCreating(false);
-            }
-          }}
+          onCreateClick={handleCreateClick}
         />
       )}
 
@@ -428,7 +347,6 @@ const MemorialMyHomePage = () => {
 
 export default MemorialMyHomePage;
 
-<<<<<<< HEAD
 // ================= 스타일 =================
 const Container = styled.div`
   position: relative;
@@ -439,25 +357,15 @@ const BlurWrapper = styled.div`
   transition: filter 0.2s ease; */
 `;
 
-=======
-/* ---------- 스타일 (원본 그대로) ---------- */
-const Container = styled.div`
-  position: relative;
-`;
-const BlurWrapper = styled.div``;
->>>>>>> develop
 const ContentWrapper = styled.div`
   display: flex;
   flex-direction: column;
   align-items: center;
   flex: 1;
-<<<<<<< HEAD
 
   @media (max-width: 1200px) {
     align-items: flex-start;
   }
-=======
->>>>>>> develop
 `;
 
 const BarWrapper = styled.div`
@@ -469,13 +377,10 @@ const BarWrapper = styled.div`
   > * {
     width: 1096px;
   }
-<<<<<<< HEAD
 
   @media (max-width: 1200px) {
     justify-content: flex-start;
   }
-=======
->>>>>>> develop
 `;
 
 const Content = styled.div`
@@ -492,13 +397,10 @@ const FixedShareButton = styled.div`
   right: -380px;
   top: 160px;
   cursor: pointer;
-<<<<<<< HEAD
 
   @media (max-width: 1200px) {
     display: none;
   }
-=======
->>>>>>> develop
 `;
 
 const FixedAddPostContainer = styled.div`
@@ -509,18 +411,14 @@ const FixedAddPostContainer = styled.div`
   display: flex;
   flex-direction: column;
   align-items: center;
-<<<<<<< HEAD
 
   @media (max-width: 1200px) {
     display: none;
   }
-=======
->>>>>>> develop
 `;
 
 const FixedAddPostButton = styled.div`
   cursor: pointer;
-<<<<<<< HEAD
   transition: transform 0.2s ease;
 
   img {
@@ -531,11 +429,6 @@ const FixedAddPostButton = styled.div`
 
   &:hover {
     transform: scale(1.05);
-=======
-  img {
-    width: 128px;
-    height: 128px;
->>>>>>> develop
   }
 `;
 
@@ -547,7 +440,6 @@ const FixedAddPostMenu = styled.div`
   display: flex;
   flex-direction: column;
   gap: 8px;
-<<<<<<< HEAD
   animation: slideUp 0.25s ease forwards;
 
   @keyframes slideUp {
@@ -560,8 +452,6 @@ const FixedAddPostMenu = styled.div`
       transform: translateY(0) translateX(50%);
     }
   }
-=======
->>>>>>> develop
 `;
 
 const MenuButton = styled.button`
@@ -576,15 +466,12 @@ const MenuButton = styled.button`
   color: #313131;
   ${typo("h4")};
   cursor: pointer;
-<<<<<<< HEAD
   box-shadow: 0 0 7.6px 0 rgba(0, 0, 0, 0.18);
 
   span {
     flex: 1;
     text-align: center;
   }
-=======
->>>>>>> develop
 `;
 
 const MenuIcon = styled.img`
