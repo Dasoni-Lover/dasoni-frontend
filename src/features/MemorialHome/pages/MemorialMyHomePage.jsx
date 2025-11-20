@@ -9,8 +9,6 @@ import HallTab from "../components/HallTab";
 import TabButtonDropdown from "../components/TabButtonDropdown";
 import LetterAndLinkShare from "../components/LetterAndLinkShare";
 import AddPostButtonImg from "../assets/btn-add-post.svg";
-import foldericon from "../assets/folder-icon.png";
-import aiicon from "../assets/ai-icon.png";
 import LinkShareModal from "../components/LinkShareModal";
 import MyMemorialModal from "../components/MyMemorialModal";
 import { createMyHall, getMyHall } from "../../../api/my-hall";
