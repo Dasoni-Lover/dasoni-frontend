@@ -1,9 +1,10 @@
+// src/features/MemorialMyHome/components/VoiceRecord.jsx
 import React, { useRef, useState, useEffect } from "react";
 import styled from "styled-components";
 import playicon from "../assets/icon-play.svg";
 import pauseicon from "../assets/icon-pause.svg"; // 아직 미생성
 
-export default function VoiceRecord({ file }) {
+export default function VoiceRecord({ file, onReupload }) {
   const audioRef = useRef(null);
   const [isPlaying, setIsPlaying] = useState(false);
   const [currentTime, setCurrentTime] = useState(0);
@@ -56,11 +57,15 @@ export default function VoiceRecord({ file }) {
   };
 
   const handleProgressClick = (e) => {
-    const rect = e.target.getBoundingClientRect();
+    const rect =
+      e.target.getBoundingClientClientRect?.() ??
+      e.target.getBoundingClientRect();
     const clickX = e.clientX - rect.left;
     const width = rect.width;
     const newTime = (clickX / width) * duration;
-    audioRef.current.currentTime = newTime;
+    if (audioRef.current) {
+      audioRef.current.currentTime = newTime;
+    }
   };
 
   return (
@@ -82,7 +87,7 @@ export default function VoiceRecord({ file }) {
         <audio ref={audioRef} src={fileUrl} preload="metadata" />
       </Box>
       <ButtonWrapper>
-        <Button>재업로드</Button>
+        <Button onClick={onReupload}>재업로드</Button>
         <Button>삭제</Button>
       </ButtonWrapper>
     </Wrapper>

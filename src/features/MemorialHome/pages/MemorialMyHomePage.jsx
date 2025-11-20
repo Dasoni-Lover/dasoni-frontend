@@ -325,8 +325,8 @@ const FixedShareButton = styled.div`
 
 const FixedAddPostContainer = styled.div`
   position: fixed;
-  right: 148px;
-  top: 788px;
+  right: 10vh;
+  bottom: 10vh;
   z-index: 1000;
   display: flex;
   flex-direction: column;

@@ -2,12 +2,17 @@
 import React, { useState, useRef, useEffect } from "react";
 import styled from "styled-components";
 import Button from "../../../components/Button";
-import { uploadVoiceFile, getVoiceFile } from "../../../api/voice";
+import {
+  uploadVoiceFile,
+  getVoiceFile,
+  updateVoiceFile,
+} from "../../../api/voice";
 import VoiceRecord from "./VoiceRecord";
 
 export default function UploadVoiceRecord() {
   const [selectedFile, setSelectedFile] = useState(null);
   const [isUploading, setIsUploading] = useState(false);
+  const [hasRemoteVoice, setHasRemoteVoice] = useState(false); // 서버에 이미 음성 있는지 여부
   const fileInputRef = useRef(null);
 
   // ✅ 녹음파일관리 탭이 렌더될 때 서버에 저장된 음성 파일 조회
@@ -20,8 +25,10 @@ export default function UploadVoiceRecord() {
         const data = await getVoiceFile(hallId); // { url: "..." }
         if (!data || !data.url) return;
 
-        // 서버에 저장된 url로부터 Blob → File 변환해서
-        // 기존 VoiceRecord UI 로직을 그대로 사용
+        // 서버에 음성 파일이 존재함
+        setHasRemoteVoice(true);
+
+        // url로부터 Blob → File 변환해서 기존 UI 그대로 사용
         const response = await fetch(data.url);
         if (!response.ok) {
           console.warn("기존 음성 파일 다운로드 실패:", response.status);
@@ -42,12 +49,21 @@ export default function UploadVoiceRecord() {
     loadExistingVoice();
   }, []);
 
-  const handleUploadClick = () => {
+  // ✅ 공통: 숨겨진 input 클릭해서 파일 선택창 열기
+  const openFilePicker = () => {
+    if (isUploading) return;
     if (fileInputRef.current) {
+      fileInputRef.current.value = ""; // 같은 파일 다시 선택 가능하게 초기화
       fileInputRef.current.click();
     }
   };
 
+  // "파일 업로드" 버튼 클릭 → 파일 선택창
+  const handleUploadClick = () => {
+    openFilePicker();
+  };
+
+  // input[type=file] 변경 시 (최초 업로드 & 재업로드 공통)
   const handleFileChange = async (e) => {
     const file = e.target.files?.[0];
     if (!file) return;
@@ -64,25 +80,32 @@ export default function UploadVoiceRecord() {
       const hallId = localStorage.getItem("myHallId");
       if (!hallId) throw new Error("추모관 ID가 없습니다.");
 
-      // presigned URL + S3 업로드 + 백엔드 등록
-      const uploadedUrl = await uploadVoiceFile(hallId, file);
-      console.log("업로드 성공:", uploadedUrl);
-      // 업로드 후에도 selectedFile은 그대로 유지되므로
-      // VoiceRecord에서 즉시 재생 가능
+      if (hasRemoteVoice) {
+        // ✅ 이미 서버에 파일이 있다 → PATCH /voice/update
+        const updatedUrl = await updateVoiceFile(hallId, file);
+        console.log("재업로드(갱신) 성공:", updatedUrl);
+      } else {
+        // ✅ 최초 업로드 → POST /voice/upload
+        const uploadedUrl = await uploadVoiceFile(hallId, file);
+        console.log("업로드 성공:", uploadedUrl);
+        setHasRemoteVoice(true); // 이제부터는 재업로드 모드
+      }
     } catch (err) {
-      console.error("업로드 실패:", err);
+      console.error("업로드/재업로드 실패:", err);
       alert("업로드에 실패했습니다. 다시 시도해주세요.");
       setSelectedFile(null);
+      if (fileInputRef.current) {
+        fileInputRef.current.value = "";
+      }
     } finally {
       setIsUploading(false);
     }
   };
 
+  // ✅ 재업로드 버튼 클릭 시: 그냥 파일 선택창만 띄우기
+  // (새 파일 선택하면 handleFileChange에서 selectedFile & API 처리)
   const handleReupload = () => {
-    setSelectedFile(null);
-    if (fileInputRef.current) {
-      fileInputRef.current.value = "";
-    }
+    openFilePicker();
   };
 
   return (
@@ -100,16 +123,18 @@ export default function UploadVoiceRecord() {
             onClick={handleUploadClick}
             disabled={isUploading}
           />
-          <HiddenInput
-            ref={fileInputRef}
-            type="file"
-            accept="audio/mpeg"
-            onChange={handleFileChange}
-          />
         </Wrapper>
       ) : (
         <VoiceRecord file={selectedFile} onReupload={handleReupload} />
       )}
+
+      {/* 🔹 실제 파일 input (UI에 안 보이고, 업로드/재업로드 공용으로 사용) */}
+      <HiddenInput
+        ref={fileInputRef}
+        type="file"
+        accept="audio/mpeg"
+        onChange={handleFileChange}
+      />
     </Container>
   );
 }
