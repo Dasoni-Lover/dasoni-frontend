@@ -13,7 +13,7 @@ export const getVisitorList = async (hallId) => {
   return res.data;
 };
 
-// 3) 입장 요청 수락 / 거절 (단일 엔드포인트)
+// 3) 입장 요청 수락 / 거절 
 // isAccept: true → 수락
 // isAccept: false → 거절
 export const respondRequest = async (hallId, requestId, isAccept) => {
@@ -24,8 +24,3 @@ export const respondRequest = async (hallId, requestId, isAccept) => {
   return res.data; // {}
 };
 
-// 4) 기존 추모객 내보내기
-export const outVisitor = async (hallId, visitorId) => {
-  const res = await client.post(`/api/halls/${hallId}/visitor/${visitorId}/kick`);
-  return res.data;
-};
