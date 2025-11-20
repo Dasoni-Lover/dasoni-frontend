@@ -77,7 +77,7 @@ const MemorialMyHomePage = () => {
       console.log("[fetchHallInfo] 호출 hallId:", hid);
       const info = await getHallInfo(hid);
       console.log("[fetchHallInfo] 서버 응답:", info);
-      setHallInfo(info);
+      setHallInfo(info.data); // ✨ data만 상태에 저장
     } catch (e) {
       console.error("[fetchHallInfo] 에러:", e);
     }
@@ -124,8 +124,11 @@ const MemorialMyHomePage = () => {
   }, [photos, filter]);
 
   // ===================== 글쓰기 / AI 생성 페이지 이동 =====================
-  const goWritePage = () => navigate("/write");
-  const goAIGeneratePage = () => navigate("/generate");
+  const goWritePage = () =>
+    navigate("/write", { state: { hallId: Number(hallId) } });
+
+  const goAIGeneratePage = () =>
+    navigate("/generate", { state: { hallId: Number(hallId) } });
 
   // ===================== 내 추모관 생성 =====================
   const handleCreateClick = () => {
