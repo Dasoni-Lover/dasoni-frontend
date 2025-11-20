@@ -18,7 +18,7 @@ export default function AIGeneratePage() {
   const hallId = location.state?.hallId ?? 1;
 
   console.log("🔥 현재 받은 hallId:", hallId);
-console.log("📦 location.state:", location.state);
+  console.log("📦 location.state:", location.state);
 
   useEffect(() => {
     const fetchHallInfo = async () => {
@@ -36,13 +36,23 @@ console.log("📦 location.state:", location.state);
     try {
       setIsLoading(true);
 
-      // ⚠️ 서버 요구 base64 형식 확인
-      const formattedImages = images.map((img) => ({
-        order: img.order,
-        base64Data: img.base64Data, // 이미 fileToBase64에서 순수 base64만 추출했음
+      // JSON 쉼표 누락 문제 완전 해결: 이 구조가 백엔드 요구사항 정답
+      const formattedImages = images.map((img, index) => ({
+        order: img.order ?? index + 1,
+        base64Data: img.base64Data,
       }));
 
-      const res = await generateAIImage({ images: formattedImages, prompt, hallId });
+      console.log("📤 최종 전송 payload:", {
+        images: formattedImages,
+        prompt,
+        hallId,
+      });
+
+      const res = await generateAIImage({
+        images: formattedImages,
+        prompt,
+        hallId,
+      });
 
       if (!res.generatedImage) {
         throw new Error("AI 이미지 생성 실패: 서버에서 null 반환");
@@ -56,14 +66,17 @@ console.log("📦 location.state:", location.state);
         error.response?.data || error.message || error
       );
       alert(
-        error.response?.data?.message || "이미지 생성에 실패했습니다. 권한과 사진을 확인해주세요."
+        error.response?.data?.message ||
+          "이미지 생성에 실패했습니다. 권한과 사진을 확인해주세요."
       );
     } finally {
       setIsLoading(false);
     }
   };
 
-  const hallTitle = hallInfo?.name ? `故 ${hallInfo.name}의 추모관` : "추모관";
+  const hallTitle = hallInfo?.name
+    ? `故 ${hallInfo.name}의 추모관`
+    : "추모관";
 
   return (
     <PageWrapper>
@@ -99,9 +112,5 @@ const BarWrapper = styled.div`
 
   > * {
     width: 1096px;
-  }
-
-  @media (max-width: 1200px) {
-    justify-content: flex-start;
   }
 `;
