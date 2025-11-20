@@ -85,8 +85,20 @@ const MemorialMyHomePage = () => {
     }
   };
 
-  const goWritePage = () => nav("/write");
-  const goAIGeneratePage = () => nav("/generate");
+const goWritePage = () => {
+  const hallId =
+    hallInfo?.hallId || localStorage.getItem("myHallId") || 1;
+
+  nav("/write", { state: { hallId } });
+};
+
+const goAIGeneratePage = () => {
+  const hallId =
+    hallInfo?.hallId || localStorage.getItem("myHallId") || 1;
+
+  nav("/generate", { state: { hallId } });
+};
+
 
   const handleCreateClick = () => {
     if (isCreating || hasMemorialHome) return;

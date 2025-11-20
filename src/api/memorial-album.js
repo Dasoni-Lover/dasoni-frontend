@@ -37,7 +37,7 @@ export const uploadPhotoPost = async ({
 export const generateAIImage = async ({
   images,
   prompt,
-  hallId = DEFAULT_HALL_ID,
+  hallId ,
 }) => {
   const body = {
     images,

@@ -32,66 +32,47 @@ export default function AIGenerateForm({ onGenerate }) {
     nav("/home");
   };
   // File → base64 문자열로 변환 (dataURL에서 "base64," 뒤만 사용)
-  const fileToBase64 = (file) =>
-    new Promise((resolve, reject) => {
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        const result = reader.result;
-        if (typeof result === "string") {
-          const [, base64] = result.split(",");
-          resolve(base64 || result);
-        } else {
-          reject(new Error("파일을 base64로 변환할 수 없습니다."));
-        }
-      };
-      reader.onerror = reject;
-      reader.readAsDataURL(file);
-    });
-
-  const handleClickGenerate = async () => {
-    if (!deceasedFile) {
-      alert("고인 사진은 필수입니다.");
-      return;
-    }
-
-    try {
-      const images = [];
-
-      // 1️⃣ 고인 사진 (필수, order: 1)
-      const base64Deceased = await fileToBase64(deceasedFile);
-      images.push({
-        order: 1,
-        base64Data: base64Deceased,
-      });
-
-      // 2️⃣ 본인 사진 (선택, order: 2)
-      if (myFile) {
-        const base64My = await fileToBase64(myFile);
-        images.push({
-          order: 2,
-          base64Data: base64My,
-        });
+const fileToBase64 = (file) =>
+  new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onloadend = () => {
+      const result = reader.result;
+      if (typeof result === "string") {
+        const base64 = result.split(",")[1]; // ⚠️ "data:image/png;base64," 제거
+        resolve(base64);
+      } else {
+        reject(new Error("파일을 base64로 변환할 수 없습니다."));
       }
+    };
+    reader.onerror = reject;
+    reader.readAsDataURL(file);
+  });
 
-      // 3️⃣ 배경 사진 (선택, order: 3)
-      if (bgFile) {
-        const base64Bg = await fileToBase64(bgFile);
-        images.push({
-          order: 3,
-          base64Data: base64Bg,
-        });
-      }
+const handleClickGenerate = async () => {
+  if (!deceasedFile) {
+    alert("고인 사진은 필수입니다.");
+    return;
+  }
 
-      // 상위(AIGeneratePage)로 전달
-      onGenerate({
-        images,
-        prompt,
-      });
-    } catch (e) {
-      console.error("이미지 변환 중 오류:", e);
-      alert("이미지 변환 중 오류가 발생했습니다. 다시 시도해 주세요.");
-    }
-  };
+  try {
+    const images = [];
+
+    // 1️⃣ 고인 사진
+    images.push({ order: 1, base64Data: await fileToBase64(deceasedFile) });
+
+    // 2️⃣ 본인 사진 (선택)
+    if (myFile) images.push({ order: 2, base64Data: await fileToBase64(myFile) });
+
+    // 3️⃣ 배경 사진 (선택)
+    if (bgFile) images.push({ order: 3, base64Data: await fileToBase64(bgFile) });
+
+    onGenerate({ images, prompt });
+  } catch (e) {
+    console.error("이미지 변환 중 오류:", e);
+    alert("이미지 변환 중 오류가 발생했습니다. 다시 시도해 주세요.");
+  }
+};
+
 
   return (
     <div>
