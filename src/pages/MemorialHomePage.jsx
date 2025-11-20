@@ -16,8 +16,6 @@ import AddPostModal from "../features/MemorialHome/components/AddPostModal";
 import TabButtonDropdown from "../features/MemorialHome/components/TabButtonDropdown";
 
 import AddPostButtonImg from "../features/MemorialHome/assets/btn-add-post.svg";
-import foldericon from "../features/MemorialHome/assets/folder-icon.png";
-import aiicon from "../features/MemorialHome/assets/ai-icon.png";
 
 const MemorialHomePage = () => {
   const nav = useNavigate();
@@ -32,7 +30,6 @@ const MemorialHomePage = () => {
     sortOption: "최신 업로드순",
     isAIMode: false,
   });
-  const [isAddMenuOpen, setIsAddMenuOpen] = useState(false);
   const [isLinkShareModalOpen, setIsLinkShareModalOpen] = useState(false);
   const [selectedPhoto, setSelectedPhoto] = useState(null);
   const [selectedIndex, setSelectedIndex] = useState(null); // 모달에서 현재 몇 번째인지
