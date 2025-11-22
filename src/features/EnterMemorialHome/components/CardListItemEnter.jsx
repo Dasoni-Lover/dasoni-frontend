@@ -12,7 +12,7 @@ const tagTextByStatus = {
   NONE: null
 };
 
-export const CardListItemEnter = ({ hall, onOpenModal }) => {
+export const CardListItemEnter = ({ hall, onOpenModal, hoverable = true }) => {
   const navigate = useNavigate();
   const [managedHallIds, setManagedHallIds] = useState([]);
 
@@ -69,6 +69,7 @@ export const CardListItemEnter = ({ hall, onOpenModal }) => {
       onClick={handleClick}
       disabled={hall.status === "WAITING"}
       status={hall.status}
+      hoverable={hoverable}
     >
       <SmallPhotoBox
         src={profile}
@@ -113,6 +114,7 @@ const Wrapper = styled.div`
   cursor: pointer;
   transition: all 0.2s ease;
 
+  /* WAITING일 때 hover가 아예 없도록 */
   ${({ status }) =>
     status === "WAITING" &&
     css`
@@ -121,10 +123,16 @@ const Wrapper = styled.div`
       }
     `}
 
-  &:hover {
-    transform: translateY(-8px);
-  }
+  /* 기본 hover (hoverable이 true일 때만 적용) */
+  ${({ hoverable }) =>
+    hoverable &&
+    css`
+      &:hover {
+        transform: translateY(-8px);
+      }
+    `}
 `;
+
 
 const Box = styled.div`
   display: flex;
