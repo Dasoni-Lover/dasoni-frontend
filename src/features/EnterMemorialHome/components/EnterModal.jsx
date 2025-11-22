@@ -23,7 +23,7 @@ export const EnterModal = ({ hall, onClose }) => {
     <Wrapper onClick={onClose}>
       <Box onClick={(e) => e.stopPropagation()}>
         <Text>해당 추모관에 입장 요청을 보낼까요?</Text>
-        <CardListItemEnter hall={hall} type="none" />
+        <CardListItemEnter hall={hall} type="none" hoverable={false} />
         <ButtonWrapper>
           <Button text="요청하기" onClick={handleRequest} />
           <Button text="취소" color="white" onClick={handleCancel} />
