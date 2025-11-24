@@ -21,7 +21,7 @@ export default function Header({ showAuthButtons }) {
 
   const [isLoggedIn, setIsLoggedIn] = useState(false);
 
-  // ✅ 프로필 정보 가져오는 함수 분리
+  // 프로필 정보 가져오는 함수 분리
   const fetchProfileInfo = async () => {
     const token = getAccessToken();
 
@@ -54,13 +54,12 @@ export default function Header({ showAuthButtons }) {
     }
   };
 
-  // ✅ 1) 경로 바뀔 때마다 토큰/프로필 다시 확인
+  // 1) 경로 바뀔 때마다 토큰/프로필 다시 확인
   useEffect(() => {
     fetchProfileInfo();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [location.pathname]);
 
-  // ✅ 2) 로그인/로그아웃 전역 이벤트 구독(즉시 반영)
+  // 2) 로그인/로그아웃 전역 이벤트 구독(즉시 반영)
   useEffect(() => {
     const handleAuthChanged = () => {
       fetchProfileInfo();
@@ -68,10 +67,9 @@ export default function Header({ showAuthButtons }) {
 
     window.addEventListener("authChanged", handleAuthChanged);
     return () => window.removeEventListener("authChanged", handleAuthChanged);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  // ✅ 프로필 변경 전역 이벤트 구독
+  // 프로필 변경 전역 이벤트 구독
   useEffect(() => {
     const handleProfileUpdated = (e) => {
       const newUrl = e.detail?.profileUrl;
@@ -114,7 +112,7 @@ export default function Header({ showAuthButtons }) {
       console.warn("로그아웃 실패(서버):", error);
     } finally {
       clearAuthTokens();
-      // ✅ 전역 이벤트로 헤더 즉시 초기화
+      // 전역 이벤트로 헤더 즉시 초기화
       window.dispatchEvent(new Event("authChanged"));
 
       navigate("/");

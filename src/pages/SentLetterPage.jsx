@@ -13,7 +13,7 @@ import { getHallInfo } from "../api/memorial"; // ✅ 추모관 정보 가져오
 
 export const SentLetterPage = () => {
   const location = useLocation();
-  const hallId = location.state?.hallId; // ✅ MemorialHomePage → LetterAndLinkShare → 여기로 전달된 hallId
+  const hallId = location.state?.hallId; // ✅ MemorialHallPage → LetterAndLinkShare → 여기로 전달된 hallId
   const navigate = useNavigate();
 
   const [letterText, setLetterText] = useState("");
@@ -169,7 +169,7 @@ export const SentLetterPage = () => {
         onCancel={handleCloseModal}
       />
 
-      <SideDrawer  hallId={hallId}/>
+      <SideDrawer hallId={hallId} />
     </Wrapper>
   );
 };

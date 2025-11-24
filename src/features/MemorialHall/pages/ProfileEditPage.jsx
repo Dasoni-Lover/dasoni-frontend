@@ -1,4 +1,4 @@
-// src/features/MemorialHome/pages/ProfileEditPage.jsx
+// src/features/MemorialHall/pages/ProfileEditPage.jsx
 import React, { useState, useEffect } from "react";
 import styled from "styled-components";
 import Header from "../../../components/header/Header";

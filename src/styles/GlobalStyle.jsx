@@ -8,7 +8,7 @@ import Header from "../components/header/Header";
 export default function GlobalStyle({ children }) {
   const location = useLocation();
 
-  // ✅ 페이지별 컨텐츠 최대 너비 유지
+  // 페이지별 컨텐츠 최대 너비 유지
   const CONTENT_MAX_WIDTH_BY_PATH = {
     "/": 600,
     "/login": 502,
@@ -18,7 +18,7 @@ export default function GlobalStyle({ children }) {
   const getContentMaxWidth = (path) => CONTENT_MAX_WIDTH_BY_PATH[path] || 1096;
   const contentMaxWidth = getContentMaxWidth(location.pathname);
 
-  // ✅ 로그인/회원가입/랜딩에서는 헤더 인증 버튼 보여주기
+  // 로그인/회원가입/랜딩에서는 헤더 인증 버튼 보여주기
   const showAuthButtons =
     location.pathname === "/" ||
     location.pathname === "/login" ||

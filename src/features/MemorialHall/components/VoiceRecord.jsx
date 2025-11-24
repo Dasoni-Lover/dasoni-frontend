@@ -1,4 +1,4 @@
-// src/features/MemorialMyHome/components/VoiceRecord.jsx
+// src/features/MemorialMyHall/components/VoiceRecord.jsx
 import React, { useRef, useState, useEffect } from "react";
 import styled from "styled-components";
 import playicon from "../assets/icon-play.svg";

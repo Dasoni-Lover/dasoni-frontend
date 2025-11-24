@@ -1,4 +1,4 @@
-// src/features/MemorialHome/components/DefaultProfile.jsx
+// src/features/MemorialHall/components/DefaultProfile.jsx
 import React from "react";
 import styled from "styled-components";
 import { color, typo } from "../../../styles/tokens";

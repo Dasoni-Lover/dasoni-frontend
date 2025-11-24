@@ -3,7 +3,7 @@ import App from "./App";
 import { authGuard } from "./utils/authGuard";
 
 /* 온보딩 관련 */
-import { FirstPage } from "./pages/FirstPage";
+import FirstPage from "./pages/FirstPage";
 import LogInPage from "./pages/LogInPage";
 import RegisterPage from "./pages/RegisterPage";
 
@@ -11,12 +11,12 @@ import RegisterPage from "./pages/RegisterPage";
 import { HomePage } from "./pages/HomePage";
 
 /* 추모관 관련 */
-import MemorialHomePage from "./pages/MemorialHomePage";
-import MemorialMyHomePage from "./features/MemorialHome/pages/MemorialMyHomePage";
-import { MemorialManagerHomePage } from "./features/MemorialHome/pages/MemorialManagerHomePage";
-import { ProfileEditPage } from "./features/MemorialHome/pages/ProfileEditPage";
-import OpenMemorialHomePage from "./pages/OpenMemorialHomePage";
-import { EnterMemorialHomePage } from "./pages/EnterMemorialHomePage";
+import MemorialHallPage from "./pages/MemorialHallPage";
+import MemorialMyHallPage from "./pages/MemorialMyHallPage";
+import { MemorialManagerHallPage } from "./pages/MemorialManagerHallPage";
+import { ProfileEditPage } from "./features/MemorialHall/pages/ProfileEditPage";
+import OpenMemorialHallPage from "./pages/OpenMemorialHallPage";
+import { EnterMemorialHallPage } from "./pages/EnterMemorialHallPage";
 import RequestEntryPage from "./pages/RequestEntryPage";
 
 /* 글 작성 */
@@ -48,15 +48,15 @@ const router = createBrowserRouter([
       { path: "/home", element: <HomePage />, loader: authGuard },
 
       /* 추모관 관련 */
-      { path: "/memorial", element: <MemorialHomePage />, loader: authGuard },
+      { path: "/memorial", element: <MemorialHallPage />, loader: authGuard },
       {
         path: "/memorial-my",
-        element: <MemorialMyHomePage />,
+        element: <MemorialMyHallPage />,
         loader: authGuard,
       },
       {
         path: "/memorial-manager",
-        element: <MemorialManagerHomePage />,
+        element: <MemorialManagerHallPage />,
         loader: authGuard,
       },
       {
@@ -64,8 +64,8 @@ const router = createBrowserRouter([
         element: <ProfileEditPage />,
         loader: authGuard,
       },
-      { path: "/open", element: <OpenMemorialHomePage />, loader: authGuard },
-      { path: "/enter", element: <EnterMemorialHomePage />, loader: authGuard },
+      { path: "/open", element: <OpenMemorialHallPage />, loader: authGuard },
+      { path: "/enter", element: <EnterMemorialHallPage />, loader: authGuard },
       {
         path: "/request-entry",
         element: <RequestEntryPage />,

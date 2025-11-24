@@ -1,37 +1,36 @@
 import React, { useState, useEffect, useMemo } from "react";
 import styled from "styled-components";
-import { typo } from "../../../styles/tokens";
+import { typo } from "../styles/tokens";
 import { useNavigate, useLocation } from "react-router-dom";
 
-import BarNavigate from "../../../components/BarNavigate";
-import DefaultProfile from "../components/DefaultProfile";
-import HallTab from "../components/HallTab";
-import TabButtonDropdown from "../components/TabButtonDropdown";
-import LetterAndLinkShare from "../components/LetterAndLinkShare";
-import AddPostButtonImg from "../assets/btn-add-post.svg";
-import LinkShareModal from "../components/LinkShareModal";
-import MyMemorialModal from "../components/MyMemorialModal";
-import {
-  createMyHall,
-  getMyHall,
-  updateMyHallProfile,
-} from "../../../api/my-hall";
-import { getHallInfo, getPhotos, getPhotoDetail } from "../../../api/memorial";
-import MyRecord from "../components/MyRecord";
-import UploadVoiceRecord from "../components/UploadVoiceRecord";
-import AddPostModal from "../components/AddPostModal";
-import BoxPostList from "../components/BoxPostList";
-import PostDetailModal from "../components/PostDetailModal";
-import { getPresignedUrlForImage, uploadFileToS3 } from "../../../api/files";
+import { createMyHall, getMyHall, updateMyHallProfile } from "../api/my-hall";
+import { getHallInfo, getPhotos, getPhotoDetail } from "../api/memorial";
+import { getPresignedUrlForImage, uploadFileToS3 } from "../api/files";
 
-const MemorialMyHomePage = () => {
+import BarNavigate from "../components/BarNavigate";
+
+import DefaultProfile from "../features/MemorialHall/components/DefaultProfile";
+import HallTab from "../features/MemorialHall/components/HallTab";
+import TabButtonDropdown from "../features/MemorialHall/components/TabButtonDropdown";
+import LetterAndLinkShare from "../features/MemorialHall/components/LetterAndLinkShare";
+import AddPostButtonImg from "../features/MemorialHall/assets/btn-add-post.svg";
+import LinkShareModal from "../features/MemorialHall/components/LinkShareModal";
+import MyMemorialModal from "../features/MemorialHall/components/MyMemorialModal";
+
+import MyRecord from "../features/MemorialHall/components/MyRecord";
+import UploadVoiceRecord from "../features/MemorialHall/components/UploadVoiceRecord";
+import AddPostModal from "../features/MemorialHall/components/AddPostModal";
+import BoxPostList from "../features/MemorialHall/components/BoxPostList";
+import PostDetailModal from "../features/MemorialHall/components/PostDetailModal";
+
+const MemorialMyHallPage = () => {
   const navigate = useNavigate();
   const location = useLocation();
 
   const hallId =
     location.state?.hallId ?? localStorage.getItem("myHallId") ?? 1;
 
-  const [hasMemorialHome, setHasMemorialHome] = useState(false);
+  const [hasMemorialHall, setHasMemorialHall] = useState(false);
   const [hallInfo, setHallInfo] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isAddPostModalOpen, setIsAddPostModalOpen] = useState(false);
@@ -56,14 +55,14 @@ const MemorialMyHomePage = () => {
       .then(async (res) => {
         console.log("[getMyHall] 응답:", res);
         if (res.myHallExists) {
-          setHasMemorialHome(true);
+          setHasMemorialHall(true);
           setIsModalOpen(false);
           if (res.hallId) {
             localStorage.setItem("myHallId", String(res.hallId));
             fetchHallInfo(res.hallId);
           }
         } else {
-          setHasMemorialHome(false);
+          setHasMemorialHall(false);
           setIsModalOpen(true);
         }
       })
@@ -132,7 +131,7 @@ const MemorialMyHomePage = () => {
 
   // ===================== 내 추모관 생성 =====================
   const handleCreateClick = () => {
-    if (isCreating || hasMemorialHome) return;
+    if (isCreating || hasMemorialHall) return;
 
     setIsCreating(true);
     createMyHall()
@@ -141,7 +140,7 @@ const MemorialMyHomePage = () => {
         const newHallId = res?.hallId;
         if (newHallId) {
           localStorage.setItem("myHallId", String(newHallId));
-          setHasMemorialHome(true);
+          setHasMemorialHall(true);
           setIsModalOpen(false);
           setTimeout(() => fetchHallInfo(newHallId), 500);
         }
@@ -261,7 +260,7 @@ const MemorialMyHomePage = () => {
           <Content>
             <ProfileBox>
               <DefaultProfile
-                isEditable={hasMemorialHome}
+                isEditable={hasMemorialHall}
                 name={hallInfo?.name || "이름 없음"}
                 date={
                   hallInfo
@@ -348,7 +347,7 @@ const MemorialMyHomePage = () => {
   );
 };
 
-export default MemorialMyHomePage;
+export default MemorialMyHallPage;
 
 // ================= 스타일 =================
 const Container = styled.div`

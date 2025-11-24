@@ -1,26 +1,27 @@
-// src/features/MemorialHome/pages/MemorialManagerHomePage.jsx
+// src/pages/MemorialManagerHallPage.jsx
 import React, { useState, useEffect } from "react";
 import styled from "styled-components";
-import { color, typo } from "../../../styles/tokens";
+import { color, typo } from "../styles/tokens";
 import { useNavigate, useLocation } from "react-router-dom";
 
-import BarNavigate from "../../../components/BarNavigate";
-import Profile from "../components/Profile";
-import HallTab from "../components/HallTab";
-import TabButtonDropdown from "../components/TabButtonDropdown";
-import BoxPostList from "../components/BoxPostList";
-import LetterAndLinkShare from "../components/LetterAndLinkShare";
-import LinkShareModal from "../components/LinkShareModal";
-import PostDetailModal from "../components/PostDetailModal";
-import AddPostModal from "../components/AddPostModal";
-import MyRecord from "../components/MyRecord";
+import BarNavigate from "../components/BarNavigate";
 
-import AddPostButtonImg from "../assets/btn-add-post.svg";
-import modifyicon from "../../../assets/edit-btn.svg";
+import Profile from "../features/MemorialHall/components/Profile";
+import HallTab from "../features/MemorialHall/components/HallTab";
+import TabButtonDropdown from "../features/MemorialHall/components/TabButtonDropdown";
+import BoxPostList from "../features/MemorialHall/components/BoxPostList";
+import LetterAndLinkShare from "../features/MemorialHall/components/LetterAndLinkShare";
+import LinkShareModal from "../features/MemorialHall/components/LinkShareModal";
+import PostDetailModal from "../features/MemorialHall/components/PostDetailModal";
+import AddPostModal from "../features/MemorialHall/components/AddPostModal";
+import MyRecord from "../features/MemorialHall/components/MyRecord";
 
-import { getHallInfo, getPhotos, getPhotoDetail } from "../../../api/memorial";
+import AddPostButtonImg from "../features/MemorialHall/assets/btn-add-post.svg";
+import modifyicon from "../assets/edit-btn.svg";
 
-export const MemorialManagerHomePage = () => {
+import { getHallInfo, getPhotos, getPhotoDetail } from "../api/memorial";
+
+export const MemorialManagerHallPage = () => {
   const [isAddModalOpen, setIsAddModalOpen] = useState(false); // ⭐ 메뉴 → 모달로 교체
   const [isLinkShareModalOpen, setIsLinkShareModalOpen] = useState(false);
   const [hallInfo, setHallInfo] = useState(null);

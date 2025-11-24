@@ -1,51 +1,63 @@
-// src/features/MemorialHome/components/VisitorListItem.jsx
-import React, { useState, useRef, useEffect } from 'react';
-import styled from 'styled-components';
-import { color, typo } from '../../../styles/tokens';
-import Button from '../../../components/Button';
-import ConfirmModal from '../../../components/ConfirmModal';
-import VisitorListItemContent from './VisitorListItemContent';
-import { respondRequest } from '../../../api/visitor';
+// src/features/MemorialHall/components/VisitorListItem.jsx
+import React, { useState, useRef, useEffect } from "react";
+import styled from "styled-components";
+import { color, typo } from "../../../styles/tokens";
+import Button from "../../../components/Button";
+import ConfirmModal from "../../../components/ConfirmModal";
+import VisitorListItemContent from "./VisitorListItemContent";
+import { respondRequest } from "../../../api/visitor";
 
-import downicon from '../assets/dropdown-icon.png';
-import righticon from '../assets/open-icon.svg';
+import downicon from "../assets/dropdown-icon.png";
+import righticon from "../assets/open-icon.svg";
 
-export default function VisitorListItem({ openAll, type, item, index, hallId, onActionComplete }) {
+export default function VisitorListItem({
+  openAll,
+  type,
+  item,
+  index,
+  hallId,
+  onActionComplete,
+}) {
   const [isOpen, setIsOpen] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [contentWidth, setContentWidth] = useState('auto');
+  const [contentWidth, setContentWidth] = useState("auto");
   const idWrapperRef = useRef(null);
 
   useEffect(() => {
-    if (idWrapperRef.current) setContentWidth(`${idWrapperRef.current.offsetWidth}px`);
+    if (idWrapperRef.current)
+      setContentWidth(`${idWrapperRef.current.offsetWidth}px`);
   }, []);
 
   useEffect(() => setIsOpen(openAll), [openAll]);
 
-const handleRequest = async (isAccept) => {
-  try {
-    console.log('=== handleRequest 호출 ===');
-    console.log('요청 대상 item:', item);
-    console.log('수락 여부 isAccept:', isAccept); // 🔥 여기에 수락(true)/거절(false) 찍힘
+  const handleRequest = async (isAccept) => {
+    try {
+      console.log("=== handleRequest 호출 ===");
+      console.log("요청 대상 item:", item);
+      console.log("수락 여부 isAccept:", isAccept); // 🔥 여기에 수락(true)/거절(false) 찍힘
 
-    const res = await respondRequest(hallId, item.requestId, isAccept);
-    console.log('응답 결과:', res);
+      const res = await respondRequest(hallId, item.requestId, isAccept);
+      console.log("응답 결과:", res);
 
-    alert(isAccept ? '입장 요청이 수락되었습니다.' : '입장 요청이 거절되었습니다.');
+      alert(
+        isAccept ? "입장 요청이 수락되었습니다." : "입장 요청이 거절되었습니다."
+      );
 
-    if (onActionComplete) onActionComplete(item, isAccept);
-  } catch (err) {
-    console.error('요청 처리 실패:', err);
-    alert('요청 처리에 실패했습니다.');
-  }
-};
-
+      if (onActionComplete) onActionComplete(item, isAccept);
+    } catch (err) {
+      console.error("요청 처리 실패:", err);
+      alert("요청 처리에 실패했습니다.");
+    }
+  };
 
   return (
     <Container>
       <TopRow>
         <Wrapper>
-          <Open src={isOpen ? downicon : righticon} onClick={() => setIsOpen(!isOpen)} />
+          <Open
+            src={isOpen ? downicon : righticon}
+            onClick={() => setIsOpen(!isOpen)}
+          />
           <IdWrapper ref={idWrapperRef}>
             <Id>{index}</Id>
             <Name>{item.name}</Name>
@@ -53,10 +65,21 @@ const handleRequest = async (isAccept) => {
         </Wrapper>
 
         <ButtonWrapper>
-          {type === 'request' ? (
+          {type === "request" ? (
             <>
-              <Button text="수락" size="S" width="6.25rem" onClick={() => handleRequest(true)} />
-              <Button text="거절" size="S" width="6.25rem" color="white" onClick={() => handleRequest(false)} />
+              <Button
+                text="수락"
+                size="S"
+                width="6.25rem"
+                onClick={() => handleRequest(true)}
+              />
+              <Button
+                text="거절"
+                size="S"
+                width="6.25rem"
+                color="white"
+                onClick={() => handleRequest(false)}
+              />
             </>
           ) : (
             <Button
@@ -130,8 +153,8 @@ const IdWrapper = styled.div`
 `;
 
 const Id = styled.div`
-  ${typo('bodyb')};
-  color: ${color('black.70')};
+  ${typo("bodyb")};
+  color: ${color("black.70")};
 `;
 
 const Name = styled.div`
