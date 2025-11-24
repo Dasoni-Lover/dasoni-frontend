@@ -23,7 +23,7 @@ export default function Header({ showAuthButtons }) {
   // 로그인 여부
   const [isLoggedIn, setIsLoggedIn] = useState(false);
 
-  // 마운트 시 / 로그인 상태일 때 사이드바 정보 불러오기
+  // 마운트 시 / 로그인 상태일 때 프로필 정보 불러오기
   useEffect(() => {
     const token = getAccessToken();
     if (!token) {
