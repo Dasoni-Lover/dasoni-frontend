@@ -1,7 +1,7 @@
 // src/features/MemorialHome/pages/ProfileEditPage.jsx
 import React, { useState, useEffect } from "react";
 import styled from "styled-components";
-import Header from "../../../components/Header";
+import Header from "../../../components/header/Header";
 import { color, typo } from "../../../styles/tokens";
 import { InputField } from "../../../components/InputField";
 import { EditSmallPhotoBox } from "../../../components/photobox/EditSmallPhotoBox";
@@ -184,7 +184,12 @@ export const ProfileEditPage = () => {
           <ButtonWrapper>
             <Button text="저장하기" size="M" onClick={handleSave} />
             <Border>
-              <Button text="취소" size="M" color="white" onClick={() => nav(-1)} />
+              <Button
+                text="취소"
+                size="M"
+                color="white"
+                onClick={() => nav(-1)}
+              />
             </Border>
           </ButtonWrapper>
         </Container>

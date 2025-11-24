@@ -1,4 +1,4 @@
-// src/components/sidebar/MiniAlarm.jsx
+// src/components//MiniAlarm.jsx
 import React, { useState } from "react";
 import alarmGrey from "../../assets/icon-bell-grey.svg";
 import alarmBlack from "../../assets/icon-bell-black.svg";

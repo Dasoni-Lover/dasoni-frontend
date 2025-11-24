@@ -1,10 +1,9 @@
-// src/components/sidebar/MiniProflie.jsx
+// src/components/header/MiniProflie.jsx
 import React from "react";
 import styled from "styled-components";
 import profileimg from "../../assets/icon-profile-default.svg";
 import { color, typo } from "../../styles/tokens";
 
-// SideBarList 에서 name, profileImg 내려줌
 // 로그인 안 되어 있으면 기본값(name='로그인 해주세요', profileImg=null)
 const MiniProfile = ({ name, profileImg, isLogin }) => {
   const displayName = name || "로그인 해주세요";
@@ -43,4 +42,5 @@ const ProfileImage = styled.img`
 const Nickname = styled.span`
   ${({ $isLogin }) => ($isLogin ? typo("h3") : typo("h4"))};
   color: ${color("black.50")};
+  white-space: nowrap;
 `;

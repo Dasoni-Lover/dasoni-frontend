@@ -1,17 +1,14 @@
-import React, { useState, useEffect, createContext } from "react";
-import Header from "../components/Header";
+import React from "react";
 import styled, { createGlobalStyle } from "styled-components";
-import SideBar from "../components/sidebar/SideBar";
 import Footer from "../components/Footer";
 import { useLocation } from "react-router-dom";
 import NanumOeHarMeoNiGeurSsi from "../assets/fonts/NanumOeHarMeoNiGeurSsi.ttf";
-
-// ✅ 사이드바 상태를 전역으로 공유하기 위한 Context
-export const SidebarContext = createContext();
+import Header from "../components/header/Header";
 
 export default function GlobalStyle({ children }) {
   const location = useLocation();
 
+  // ✅ 페이지별 컨텐츠 최대 너비 유지
   const CONTENT_MAX_WIDTH_BY_PATH = {
     "/": 600,
     "/login": 502,
@@ -21,51 +18,19 @@ export default function GlobalStyle({ children }) {
   const getContentMaxWidth = (path) => CONTENT_MAX_WIDTH_BY_PATH[path] || 1096;
   const contentMaxWidth = getContentMaxWidth(location.pathname);
 
-  const shouldSidebarBeClosed =
-    location.pathname === "/login" ||
-    location.pathname === "/register" ||
-    location.pathname === "/";
-
-  const [isOpen, setIsOpen] = useState(!shouldSidebarBeClosed);
-  const [shouldShiftContent, setShouldShiftContent] = useState(false);
-
-  useEffect(() => {
-    setIsOpen(!shouldSidebarBeClosed);
-  }, [location.pathname, shouldSidebarBeClosed]);
-
-  useEffect(() => {
-    const handleResize = () => {
-      const SIDEBAR_OPEN_WIDTH = 300 + 40;
-      const SIDEBAR_CLOSED_WIDTH = 60;
-      const viewportWidth = window.innerWidth;
-      const sidebarWidth = isOpen ? SIDEBAR_OPEN_WIDTH : SIDEBAR_CLOSED_WIDTH;
-      const horizontalMargin = Math.max(0, viewportWidth - contentMaxWidth);
-      const leftMargin = horizontalMargin / 2;
-      const willCoverContent = leftMargin < sidebarWidth;
-      setShouldShiftContent(willCoverContent);
-    };
-
-    handleResize();
-    window.addEventListener("resize", handleResize);
-    return () => window.removeEventListener("resize", handleResize);
-  }, [isOpen, contentMaxWidth]);
-
+  // ✅ 로그인/회원가입/랜딩에서는 헤더 인증 버튼 보여주기
   const showAuthButtons =
     location.pathname === "/" ||
     location.pathname === "/login" ||
     location.pathname === "/register";
 
   return (
-    <SidebarContext.Provider value={{ isOpen, setIsOpen }}>
+    <>
       <FontGlobalStyle />
-      <Wrapper $isOpen={isOpen} $shouldShiftContent={shouldShiftContent}>
+      <Wrapper>
         <Header showAuthButtons={showAuthButtons} />
-        <SideBar isOpen={isOpen} toggleSidebar={() => setIsOpen(!isOpen)} />
         <MainContent>
-          <ContentWrapper
-            $isOpen={isOpen}
-            $shouldShiftContent={shouldShiftContent}
-          >
+          <ContentWrapper $contentMaxWidth={contentMaxWidth}>
             {children}
           </ContentWrapper>
 
@@ -77,7 +42,7 @@ export default function GlobalStyle({ children }) {
             )}
         </MainContent>
       </Wrapper>
-    </SidebarContext.Provider>
+    </>
   );
 }
 
@@ -95,11 +60,6 @@ const Wrapper = styled.div`
   position: relative;
   flex-direction: column;
   min-height: 100vh;
-  padding-left: ${({ $isOpen, $shouldShiftContent }) => {
-    if (!$shouldShiftContent) return "0";
-    // 🔥 콘텐츠를 사이드바 영역 오른쪽에서부터 시작하게
-    return $isOpen ? "300px" : "60px"; // 열려있으면 300, 닫혀도 60 확보
-  }};
 `;
 
 const MainContent = styled.div`
@@ -113,13 +73,12 @@ const ContentWrapper = styled.div`
   flex: 1;
   display: flex;
   flex-direction: column;
-  align-items: ${({ $shouldShiftContent }) =>
-    $shouldShiftContent ? "flex-start" : "center"};
+  align-items: center;
   width: 100%;
+  max-width: ${({ $contentMaxWidth }) => `${$contentMaxWidth}px`};
+  margin: 0 auto;
   transition: all 0.5s ease;
   margin-top: 6.25rem;
-  padding-left: ${({ $isOpen, $shouldShiftContent }) =>
-    $isOpen && $shouldShiftContent ? "2rem" : "0"};
 `;
 
 const FooterWrapper = styled.footer`
