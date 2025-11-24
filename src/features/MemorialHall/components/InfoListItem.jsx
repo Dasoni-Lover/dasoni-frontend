@@ -19,17 +19,22 @@ const Wrapper = styled.div`
   gap: 0.25rem;
 
   justify-content: space-between;
-  align-items: flex-start;
+  align-items: center;
 `;
 
 const Type = styled.div`
   ${typo("bodym")};
-  color: ${color("black.30")};
+  color: ${color("black.70")};
 `;
 
 const Content = styled.div`
-  ${typo("bodyb")};
-  color: ${color("black.50")};
+  color: ${color("black.80")};
+  font-family: "NanumOeHarMeoNiGeurSsi";
+  font-size: 2rem;
+  font-style: normal;
+  font-weight: 400;
+  line-height: 2.9rem;
+  white-space: nowrap;
 `;
 
 export default InfoListItem;

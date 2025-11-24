@@ -22,8 +22,8 @@ const Wrapper = styled.div`
 
 const Img = styled.img`
   display: flex;
-  width: 22.25rem;
-  height: 22.25rem;
+  width: 12.5rem;
+  height: 12.5rem;
   aspect-ratio: 1 / 1;
   object-fit: cover;
   border-radius: 10px;

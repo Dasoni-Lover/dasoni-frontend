@@ -32,11 +32,10 @@ const Profile = ({ data }) => {
           phone={formatPhone(phone)}
           adminName={adminName}
         />
-        <Content>{review || "함께있을 때 즐거웠던 사람"}</Content>
       </Wrapper>
 
       {/* ✅ InfoList에 하이픈 포함된 전화번호 전달 */}
-      <InfoList nature={nature} place={place} phone={formatPhone(phone)} />
+      <InfoList review={review} nature={nature} />
     </Container>
   );
 };
