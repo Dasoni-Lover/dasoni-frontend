@@ -39,6 +39,9 @@ export default function LogInPage() {
       // ✅ 토큰 저장 헬퍼 사용
       setAuthTokens(data);
 
+      // ✅ 헤더 즉시 갱신 트리거
+      window.dispatchEvent(new Event("authChanged"));
+
       alert("로그인에 성공했습니다.");
       navigate("/home");
     } catch (error) {

@@ -1,4 +1,4 @@
-// src/features/MemorialHome/components/PostDetailModal.jsx
+// src/features/MemorialHall/components/PostDetailModal.jsx
 import React, { useState } from "react";
 import styled, { css } from "styled-components";
 import { color, typo } from "../../../styles/tokens";

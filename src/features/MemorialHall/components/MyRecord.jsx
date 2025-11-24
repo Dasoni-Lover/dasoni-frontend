@@ -1,8 +1,8 @@
-// src/features/MemorialHome/components/MyRecord.jsx
-import React, { useState, useEffect } from 'react';
-import styled from 'styled-components';
-import { UnderlineButton } from './UnderlineButtton';
-import FoldableButton from './FoldableButton';
+// src/features/MemorialHall/components/MyRecord.jsx
+import React, { useState, useEffect } from "react";
+import styled from "styled-components";
+import { UnderlineButton } from "./UnderlineButtton";
+import FoldableButton from "./FoldableButton";
 import VisitorList from "./VisitorList";
 import { getRequestList, getVisitorList } from "../../../api/visitor";
 
@@ -11,7 +11,7 @@ import downicon from "../assets/dropdown-icon.png";
 
 export default function MyRecord({ hallId }) {
   const [openAll, setOpenAll] = useState(false);
-  const [activeTab, setActiveTab] = useState('request');
+  const [activeTab, setActiveTab] = useState("request");
 
   const [requestList, setRequestList] = useState([]);
   const [visitorList, setVisitorList] = useState([]);
@@ -28,7 +28,7 @@ export default function MyRecord({ hallId }) {
       ]);
 
       const requestList = (requestRes.requestList ?? [])
-        .map(r => ({
+        .map((r) => ({
           requestId: r.requestId,
           name: r.name,
           relation: r.relation,
@@ -39,7 +39,7 @@ export default function MyRecord({ hallId }) {
         .sort((a, b) => b.requestId - a.requestId);
 
       const visitorList = (visitorRes.visitors ?? [])
-        .map(v => ({
+        .map((v) => ({
           visitorId: v.userId,
           name: v.name,
           relation: v.relation,
@@ -54,7 +54,7 @@ export default function MyRecord({ hallId }) {
       setRequestCount(requestRes.requestCount ?? requestList.length);
       setVisitorCount(visitorRes.visitorCount ?? visitorList.length);
 
-      setData(activeTab === 'request' ? requestList : visitorList);
+      setData(activeTab === "request" ? requestList : visitorList);
     } catch (err) {
       console.error("데이터 불러오기 실패:", err);
       setRequestList([]);
@@ -74,18 +74,25 @@ export default function MyRecord({ hallId }) {
     if (!item) return;
 
     if (isAccept) {
-      setRequestList(prev => prev.filter(r => r.requestId !== item.requestId));
-      setVisitorList(prev => [item, ...prev]);
-      setVisitorCount(prev => prev + 1);
+      setRequestList((prev) =>
+        prev.filter((r) => r.requestId !== item.requestId)
+      );
+      setVisitorList((prev) => [item, ...prev]);
+      setVisitorCount((prev) => prev + 1);
     } else {
-      setRequestList(prev => prev.filter(r => r.requestId !== item.requestId));
+      setRequestList((prev) =>
+        prev.filter((r) => r.requestId !== item.requestId)
+      );
     }
 
-    setRequestCount(prev => prev - 1);
+    setRequestCount((prev) => prev - 1);
 
-    setData(activeTab === 'request' ? 
-      requestList.filter(r => r.requestId !== item.requestId) :
-      isAccept ? [item, ...visitorList] : visitorList
+    setData(
+      activeTab === "request"
+        ? requestList.filter((r) => r.requestId !== item.requestId)
+        : isAccept
+        ? [item, ...visitorList]
+        : visitorList
     );
   };
 
@@ -96,20 +103,28 @@ export default function MyRecord({ hallId }) {
           <UnderlineButton
             text="입장 요청"
             count={requestCount}
-            type={activeTab === 'request' ? 'click' : 'false'}
-            onClick={() => setActiveTab('request')}
+            type={activeTab === "request" ? "click" : "false"}
+            onClick={() => setActiveTab("request")}
           />
           <UnderlineButton
             text="추모객 명단"
             count={visitorCount}
-            type={activeTab === 'visitor' ? 'click' : 'false'}
-            onClick={() => setActiveTab('visitor')}
+            type={activeTab === "visitor" ? "click" : "false"}
+            onClick={() => setActiveTab("visitor")}
           />
         </ButtonWrapper>
 
         <DropDownWrapper>
-          <FoldableButton text="모두 접기" src={upicon} onClick={() => setOpenAll(false)} />
-          <FoldableButton text="모두 펼치기" src={downicon} onClick={() => setOpenAll(true)} />
+          <FoldableButton
+            text="모두 접기"
+            src={upicon}
+            onClick={() => setOpenAll(false)}
+          />
+          <FoldableButton
+            text="모두 펼치기"
+            src={downicon}
+            onClick={() => setOpenAll(true)}
+          />
         </DropDownWrapper>
       </Container>
 
@@ -151,6 +166,6 @@ const Container = styled.div`
   justify-content: space-between;
   align-items: flex-end;
   padding-top: 2rem;
-  border-bottom: 1px solid #E9E9E9;
+  border-bottom: 1px solid #e9e9e9;
   margin-bottom: 0.75rem;
 `;

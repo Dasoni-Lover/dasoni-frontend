@@ -1,4 +1,4 @@
-// src/features/MemorialMyHome/components/UploadVoiceRecord.jsx
+// src/features/MemorialMyHall/components/UploadVoiceRecord.jsx
 import React, { useState, useRef, useEffect } from "react";
 import styled from "styled-components";
 import Button from "../../../components/Button";

@@ -1,12 +1,12 @@
 import React, { useState, useEffect } from "react";
 import styled from "styled-components";
-import { CardListEnter } from "../features/EnterMemorialHome/components/CardListEnter";
-import { SearchTab } from "../features/EnterMemorialHome/components/SearchTab";
-import { EnterModal } from "../features/EnterMemorialHome/components/EnterModal";
+import { CardListEnter } from "../features/EnterMemorialHall/components/CardListEnter";
+import { SearchTab } from "../features/EnterMemorialHall/components/SearchTab";
+import { EnterModal } from "../features/EnterMemorialHall/components/EnterModal";
 import { color, typo } from "../styles/tokens";
 import { searchHalls } from "../api/search-hall";
 
-export const EnterMemorialHomePage = () => {
+export const EnterMemorialHallPage = () => {
   const [modalVisible, setModalVisible] = useState(false);
   const [selectedHall, setSelectedHall] = useState(null);
   const [searchResults, setSearchResults] = useState([]);
@@ -24,7 +24,11 @@ export const EnterMemorialHomePage = () => {
   useEffect(() => {
     const fetchAllHalls = async () => {
       try {
-        const halls = await searchHalls({ name: null, birthday: null, deadDay: null });
+        const halls = await searchHalls({
+          name: null,
+          birthday: null,
+          deadDay: null,
+        });
         setSearchResults(halls);
       } catch (err) {
         console.error("전체 추모관 불러오기 실패:", err);
@@ -83,4 +87,3 @@ const LoadingText = styled.div`
   ${typo("bodym")};
   color: ${color("black.50")};
 `;
-

@@ -1,4 +1,4 @@
-// src/features/OpenMemorialHome/components/OpenStep3.jsx
+// src/features/OpenMemorialHall/components/OpenStep3.jsx
 import React, { useEffect, useState } from "react";
 import styled from "styled-components";
 import { typo, color } from "../../../styles/tokens";

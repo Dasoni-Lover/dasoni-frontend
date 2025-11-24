@@ -1,4 +1,4 @@
-// src/features/OpenMemorialHome/components/OpenMemorialHomeForm.jsx
+// src/features/OpenMemorialHall/components/OpenMemorialHallForm.jsx
 import React from "react";
 import styled from "styled-components";
 import { color } from "../../../styles/tokens";
@@ -15,7 +15,7 @@ import OpenStep4 from "./OpenStep4";
  * formData: 전체 폼 데이터
  * setFormData: 폼 데이터 업데이트 함수
  */
-export default function OpenMemorialHomeForm({
+export default function OpenMemorialHallForm({
   step = 1,
   onStepValidChange,
   formData,

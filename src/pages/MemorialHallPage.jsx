@@ -1,4 +1,4 @@
-// src/pages/MemorialHomePage.jsx
+// src/pages/MemorialHallPage.jsx
 import React, { useState, useEffect } from "react";
 import styled from "styled-components";
 import { typo } from "../styles/tokens";
@@ -6,18 +6,18 @@ import { useNavigate, useLocation } from "react-router-dom";
 import { getPhotos, getHallInfo, getPhotoDetail } from "../api/memorial";
 
 import BarNavigate from "../components/BarNavigate";
-import Profile from "../features/MemorialHome/components/Profile";
-import HallTab from "../features/MemorialHome/components/HallTab";
-import BoxPostList from "../features/MemorialHome/components/BoxPostList";
-import LetterAndLinkShare from "../features/MemorialHome/components/LetterAndLinkShare";
-import LinkShareModal from "../features/MemorialHome/components/LinkShareModal";
-import PostDetailModal from "../features/MemorialHome/components/PostDetailModal";
-import AddPostModal from "../features/MemorialHome/components/AddPostModal";
-import TabButtonDropdown from "../features/MemorialHome/components/TabButtonDropdown";
+import Profile from "../features/MemorialHall/components/Profile";
+import HallTab from "../features/MemorialHall/components/HallTab";
+import BoxPostList from "../features/MemorialHall/components/BoxPostList";
+import LetterAndLinkShare from "../features/MemorialHall/components/LetterAndLinkShare";
+import LinkShareModal from "../features/MemorialHall/components/LinkShareModal";
+import PostDetailModal from "../features/MemorialHall/components/PostDetailModal";
+import AddPostModal from "../features/MemorialHall/components/AddPostModal";
+import TabButtonDropdown from "../features/MemorialHall/components/TabButtonDropdown";
 
-import AddPostButtonImg from "../features/MemorialHome/assets/btn-add-post.svg";
+import AddPostButtonImg from "../features/MemorialHall/assets/btn-add-post.svg";
 
-const MemorialHomePage = () => {
+const MemorialHallPage = () => {
   const nav = useNavigate();
   const location = useLocation();
 
@@ -36,7 +36,6 @@ const MemorialHomePage = () => {
   const [activeTab, setActiveTab] = useState(0); // 0: 공유앨범, 1: 나와의 앨범
   const [reloadKey, setReloadKey] = useState(0); // ✅ 삭제 후 리렌더 트리거
   const [isAddPostModalOpen, setIsAddPostModalOpen] = useState(false);
-
 
   // ✅ 사진 불러오기 (isMine / isPrivate 반영)
   useEffect(() => {
@@ -170,8 +169,6 @@ const MemorialHomePage = () => {
     setReloadKey((prev) => prev + 1);
   };
 
-  
-
   return (
     <Container>
       <BarWrapper>
@@ -200,25 +197,23 @@ const MemorialHomePage = () => {
       </FixedShareButton>
 
       <FixedAddPostContainer>
-        
         <FixedAddPostButton onClick={() => setIsAddPostModalOpen(true)}>
           <img src={AddPostButtonImg} alt="추가 버튼" />
         </FixedAddPostButton>
       </FixedAddPostContainer>
       {isAddPostModalOpen && (
-  <AddPostModal
-    onClose={() => setIsAddPostModalOpen(false)}
-    onSelectAI={() => {
-      setIsAddPostModalOpen(false);
-      nav("/generate", { state: { hallId } });
-    }}
-    onSelectComputer={() => {
-      setIsAddPostModalOpen(false);
-      nav("/write", { state: { hallId } });
-    }}
-  />
-)}
-
+        <AddPostModal
+          onClose={() => setIsAddPostModalOpen(false)}
+          onSelectAI={() => {
+            setIsAddPostModalOpen(false);
+            nav("/generate", { state: { hallId } });
+          }}
+          onSelectComputer={() => {
+            setIsAddPostModalOpen(false);
+            nav("/write", { state: { hallId } });
+          }}
+        />
+      )}
 
       <PostDetailModal
         isOpen={!!selectedPhoto}
@@ -236,7 +231,7 @@ const MemorialHomePage = () => {
   );
 };
 
-export default MemorialHomePage;
+export default MemorialHallPage;
 
 /* 🎨 스타일 */
 

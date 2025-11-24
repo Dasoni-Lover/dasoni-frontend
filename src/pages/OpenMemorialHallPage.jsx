@@ -1,17 +1,17 @@
-// src/pages/OpenMemorialHomePage.jsx
+// src/pages/OpenMemorialHallPage.jsx
 import React, { useState } from "react";
 import { Column, Row } from "../styles/flex";
 import styled from "styled-components";
 import { color, typo } from "../styles/tokens";
 import CancelProcessButton from "../components/CancelProcessButton";
-import OpenMemorialHomeForm from "../features/OpenMemorialHome/components/OpenMemorialHomeForm";
+import OpenMemorialHallForm from "../features/OpenMemorialHall/components/OpenMemorialHallForm";
 import Button from "../components/Button";
 import ConfirmModal from "../components/ConfirmModal";
 import { useNavigate } from "react-router-dom";
 import { createOtherHall } from "../api/other-hall";
 import { getPresignedUrlForImage, uploadFileToS3 } from "../api/files"; // ✅ 공용 presigned 유틸
 
-export default function OpenMemorialHomePage() {
+export default function OpenMemorialHallPage() {
   const [step, setStep] = useState(1);
   const MAX_STEP = 4;
 
@@ -63,8 +63,8 @@ export default function OpenMemorialHomePage() {
         return base; // "가족", "연인", "친구" 중 하나를 반환
       default:
         return base;
- }
- };
+    }
+  };
 
   const handleNext = async () => {
     if (!isStepValid || isSubmitting) return;
@@ -178,7 +178,7 @@ export default function OpenMemorialHomePage() {
 
       <Row $justify={"space-between"}>
         {/* ✅ 폼에서 현재 단계의 유효 여부 + formData 제어 */}
-        <OpenMemorialHomeForm
+        <OpenMemorialHallForm
           step={step}
           onStepValidChange={setIsStepValid}
           formData={formData}

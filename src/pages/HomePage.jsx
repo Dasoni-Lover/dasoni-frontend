@@ -1,7 +1,7 @@
 // src/pages/HomePage.jsx
 import React, { useEffect, useState } from "react";
 import styled from "styled-components";
-import HallTab from "../features/MemorialHome/components/HallTab";
+import HallTab from "../features/MemorialHall/components/HallTab";
 import { CardList } from "../features/Home/components/CardList";
 import { MemorialHallCount } from "../features/Home/components/MemorialHallCount";
 import { color, typo } from "../styles/tokens";

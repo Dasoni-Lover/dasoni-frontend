@@ -15,8 +15,8 @@ export const registerUser = async (body) => {
   return res.data;
 };
 
-// 사이드바 정보 조회
-export const getSidebarInfo = async () => {
+// 프로필 정보 조회(사이드바 -> 헤더로 이동)
+export const getProfileInfo = async () => {
   const res = await client.get("/api/halls/sidebar");
   return res.data;
 };
