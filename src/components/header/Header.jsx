@@ -13,19 +13,18 @@ export default function Header({ showAuthButtons }) {
   const navigate = useNavigate();
   const location = useLocation();
 
-  // 헤더 상단 표시 정보 상태
   const [profileInfo, setProfileInfo] = useState({
-    name: "로그인", // ▶ 로그아웃 기본 텍스트
+    name: "로그인",
     myProfile: null,
     notiCount: 0,
   });
 
-  // 로그인 여부
   const [isLoggedIn, setIsLoggedIn] = useState(false);
 
-  // 마운트 시 / 로그인 상태일 때 프로필 정보 불러오기
-  useEffect(() => {
+  // ✅ 프로필 정보 가져오는 함수 분리
+  const fetchProfileInfo = async () => {
     const token = getAccessToken();
+
     if (!token) {
       setIsLoggedIn(false);
       setProfileInfo({
@@ -36,27 +35,40 @@ export default function Header({ showAuthButtons }) {
       return;
     }
 
-    const fetchProfileInfo = async () => {
-      try {
-        const data = await getProfileInfo(); // { name, myProfile, notiCount }
-        setProfileInfo({
-          name: data?.name || "로그인",
-          myProfile: data?.myProfile || null,
-          notiCount: typeof data?.notiCount === "number" ? data.notiCount : 0,
-        });
-        setIsLoggedIn(true);
-      } catch (error) {
-        console.warn("사이드바 정보 불러오기 실패:", error);
-        setProfileInfo({
-          name: "로그인",
-          myProfile: null,
-          notiCount: 0,
-        });
-        setIsLoggedIn(false);
-      }
+    try {
+      const data = await getProfileInfo();
+      setProfileInfo({
+        name: data?.name || "로그인",
+        myProfile: data?.myProfile || null,
+        notiCount: typeof data?.notiCount === "number" ? data.notiCount : 0,
+      });
+      setIsLoggedIn(true);
+    } catch (error) {
+      console.warn("헤더 프로필 정보 불러오기 실패:", error);
+      setProfileInfo({
+        name: "로그인",
+        myProfile: null,
+        notiCount: 0,
+      });
+      setIsLoggedIn(false);
+    }
+  };
+
+  // ✅ 1) 경로 바뀔 때마다 토큰/프로필 다시 확인
+  useEffect(() => {
+    fetchProfileInfo();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [location.pathname]);
+
+  // ✅ 2) 로그인/로그아웃 전역 이벤트 구독(즉시 반영)
+  useEffect(() => {
+    const handleAuthChanged = () => {
+      fetchProfileInfo();
     };
 
-    fetchProfileInfo();
+    window.addEventListener("authChanged", handleAuthChanged);
+    return () => window.removeEventListener("authChanged", handleAuthChanged);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   // ✅ 프로필 변경 전역 이벤트 구독
@@ -77,7 +89,6 @@ export default function Header({ showAuthButtons }) {
     };
   }, []);
 
-  // ✅ 로그아웃을 제외한 일반 메뉴만
   const menuItems = [
     { label: "홈", path: "/home" },
     { label: "입장하기", path: "/enter" },
@@ -98,14 +109,16 @@ export default function Header({ showAuthButtons }) {
 
   const handleLogoutClick = async () => {
     try {
-      await logoutUser(); // 서버 로그아웃
+      await logoutUser();
     } catch (error) {
       console.warn("로그아웃 실패(서버):", error);
     } finally {
-      clearAuthTokens(); // 클라이언트 토큰 삭제
+      clearAuthTokens();
+      // ✅ 전역 이벤트로 헤더 즉시 초기화
+      window.dispatchEvent(new Event("authChanged"));
+
       navigate("/");
       alert("로그아웃 되었습니다.");
-      window.location.reload(); // 사이드바 즉시 초기화
     }
   };
 
@@ -126,6 +139,7 @@ export default function Header({ showAuthButtons }) {
               </NavButton>
             ))}
           </Row>
+
           <Row>
             <MiniProfile
               name={isLoggedIn ? profileInfo.name : "로그인 해주세요"}
@@ -134,7 +148,7 @@ export default function Header({ showAuthButtons }) {
             />
             <LogoutWrapper>
               <LogoutText onClick={handleLogoutClick}>
-                <img src={IconLogout} />
+                <img src={IconLogout} alt="logout icon" />
                 logout
               </LogoutText>
             </LogoutWrapper>
@@ -237,10 +251,8 @@ const LogoutWrapper = styled.div`
   gap: 0.65rem;
 `;
 
-// 실제 로그아웃 버튼 스타일
 const LogoutText = styled.div`
   display: flex;
-
   align-items: center;
   gap: 0.75rem;
   cursor: pointer;
