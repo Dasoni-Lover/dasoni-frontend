@@ -4,18 +4,20 @@ import styled from "styled-components";
 import HallTab from "../features/MemorialHall/components/HallTab";
 import { CardList } from "../features/Home/components/CardList";
 import { MemorialHallCount } from "../features/Home/components/MemorialHallCount";
-import { NoneList } from "../features/Home/components/NoneList"
+import { NoneList } from "../features/Home/components/NoneList";
 import { color, typo } from "../styles/tokens";
 import { fetchMyHalls, fetchManagedHalls } from "../api/user";
 
 export const HomePage = () => {
   const [myHalls, setMyHalls] = useState([]);
   const [managedHalls, setManagedHalls] = useState([]);
+  const [filteredHalls, setFilteredHalls] = useState(null);
   const [activeTab, setActiveTab] = useState(0);
 
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
 
+  // 🔹 fetch
   useEffect(() => {
     const loadHalls = async () => {
       try {
@@ -32,8 +34,6 @@ export const HomePage = () => {
       } catch (e) {
         console.error("추모관 목록 불러오기 실패:", e);
         setError(e);
-        setMyHalls([]);
-        setManagedHalls([]);
       } finally {
         setIsLoading(false);
       }
@@ -42,8 +42,31 @@ export const HomePage = () => {
     loadHalls();
   }, []);
 
-  const currentHalls = activeTab === 0 ? myHalls : managedHalls;
-  const isEmpty = currentHalls.length === 0;
+  // 🔹 현재 탭 데이터
+  const originalHalls = activeTab === 0 ? myHalls : managedHalls;
+  const hallsToShow = filteredHalls ?? originalHalls;
+
+  const isOriginalEmpty = originalHalls.length === 0;
+  const isSearchEmpty = filteredHalls !== null && filteredHalls.length === 0;
+
+  // 🔹 탭 바뀌면 검색 초기화
+  useEffect(() => {
+    setFilteredHalls(null);
+  }, [activeTab]);
+
+  // 🔹 검색 처리
+  const handleSearch = (keyword) => {
+    if (!keyword) {
+      setFilteredHalls(null);
+      return;
+    }
+
+    const filtered = originalHalls.filter((hall) =>
+      hall.name.includes(keyword)
+    );
+
+    setFilteredHalls(filtered);
+  };
 
   return (
     <Wrapper>
@@ -51,27 +74,30 @@ export const HomePage = () => {
 
       <HallTab role="home" activeIndex={activeTab} onTabChange={setActiveTab} />
 
-      {isLoading && <div style={{ marginTop: "2rem" }}>로딩 중...</div>}
-      {error && (
-        <div style={{ color: "red", marginTop: "1rem" }}>
-          데이터를 불러오는 중 오류가 발생했습니다.
-        </div>
-      )}
-
       <Content>
-        {/* 🔹 갯수가 있을 때만 MemorialHallCount 보임 */}
-        {!isEmpty && (
-          <MemorialHallCount count={currentHalls.length} tab={activeTab} />
+        {!isOriginalEmpty && (
+          <MemorialHallCount
+            count={originalHalls.length}
+            tab={activeTab}
+            onSearch={handleSearch}
+          />
         )}
 
-        {/* 🔹 갯수가 0개면 NoneList 표시 */}
-        {isEmpty ? (
+        {/* 🔹 원본이 완전히 없을 때만 NoneList 표시 */}
+        {isOriginalEmpty ? (
           <NoneList tab={activeTab} />
         ) : (
           <CardList
-            halls={currentHalls}
+            halls={hallsToShow} // 검색 결과 0개면 [] 전달됨
             type={activeTab === 1 ? "managed" : "my"}
           />
+        )}
+
+        {/* 🔹 검색결과 0개면 아래처럼 아무 카드도 없지만 NoneList는 안 뜸 */}
+        {isSearchEmpty && (
+          <div style={{ marginTop: "1rem", color: color("black.20") }}>
+    
+          </div>
         )}
       </Content>
     </Wrapper>
@@ -82,7 +108,6 @@ const Wrapper = styled.div`
   display: flex;
   width: 82.5rem;
   flex-direction: column;
-  align-items: flex-start;
 `;
 
 const Text = styled.div`
@@ -98,6 +123,5 @@ const Content = styled.div`
   flex-direction: column;
   align-items: center;
   gap: 2rem;
-  align-self: stretch;
   margin-top: 2.5rem;
 `;
