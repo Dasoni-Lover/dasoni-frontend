@@ -98,6 +98,15 @@ export default function Header({ showAuthButtons }) {
     if (item.label === "홈") {
       return location.pathname === "/" || location.pathname === "/home";
     }
+
+    if (item.label === "나의 추모관") {
+      const fromMyHall = location.state?.from === "myHall";
+      return (
+        location.pathname === "/memorial-my" ||
+        (location.pathname === "/memorial" && fromMyHall)
+      );
+    }
+
     return location.pathname === item.path;
   };
 

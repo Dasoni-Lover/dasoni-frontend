@@ -26,17 +26,20 @@ import MyMemorialModal from "../features/MemorialHall/components/MyMemorialModal
 import AddPostButtonImg from "../features/MemorialHall/assets/btn-add-post.svg";
 import modifyicon from "../assets/edit-btn.svg";
 
-const MemorialHallPage = () => {
+export default function MemorialHallPage() {
   const nav = useNavigate();
   const location = useLocation();
 
-  // ✅ 기존 흐름 유지: state로 넘어온 hallId 우선, 없으면 1
-  const hallIdFromState = location.state?.hallId;
-  const hallIdFromStorage = localStorage.getItem("myHallId");
-  const hallId = hallIdFromState ?? hallIdFromStorage ?? 1;
+  // ✅ 기존 흐름 유지: state로 넘어온 hallId 우선, 없으면 (나의 추모관 플로우에서 mine으로 hallId를 확정)
+  const hallIdFromState = location.state?.hallId ?? null;
+
+  // ✅ 실제 조회에 사용할 hallId (me 플로우에서는 /api/halls/mine으로 받은 hallId만 사용)
+  const [effectiveHallId, setEffectiveHallId] = useState(
+    hallIdFromState ? Number(hallIdFromState) : null
+  );
 
   // ===================== 공통 상태 =====================
-  const [role, setRole] = useState("follower"); // follower | admin | me
+  const [role, setRole] = useState(null); // follower | admin | me
   const [hallInfo, setHallInfo] = useState(null);
   const [photos, setPhotos] = useState([]);
 
@@ -60,13 +63,65 @@ const MemorialHallPage = () => {
   const [isCreating, setIsCreating] = useState(false);
   const [isUpdatingProfile, setIsUpdatingProfile] = useState(false);
 
-  // ===================== 1) 추모관 정보 조회 (role 확보) =====================
+  // ===================== 0) 진입 시 "나의 추모관" 플로우 선처리 =====================
+  // ✅ 기존 코드처럼:
+  // 1) state hallId가 없으면 -> /api/halls/mine으로 내 추모관 존재 여부 먼저 확인
+  // 2) 없으면 모달 띄우고 getHallInfo 호출 금지
+  // 3) 있으면 mine.hallId를 effectiveHallId로 세팅하고 그걸로만 추모관 조회
   useEffect(() => {
+    const initMyHallFlow = async () => {
+      try {
+        // ✅ 방문자/관리자 플로우: hallId가 명확히 넘어오면 mine 체크 없이 바로 진행
+        if (hallIdFromState) {
+          setEffectiveHallId(Number(hallIdFromState));
+          return;
+        }
+
+        // ✅ 나의 추모관 플로우: mine 먼저 확인
+        const mine = await getMyHall();
+        console.log("[getMyHall] 응답:", mine);
+
+        if (!mine.myHallExists) {
+          // 아직 내 추모관이 없으면 모달만 띄우고 종료
+          setRole("me");
+          setHasMemorialHall(false);
+          setIsMyMemorialModalOpen(true);
+          setEffectiveHallId(null); // ❗ hallInfo/photos 조회 금지
+          return;
+        }
+
+        // 내 추모관이 있으면 hallId 확정
+        setRole("me");
+        setHasMemorialHall(true);
+        setIsMyMemorialModalOpen(false);
+
+        if (mine.hallId) {
+          localStorage.setItem("myHallId", String(mine.hallId));
+          setEffectiveHallId(Number(mine.hallId));
+        }
+      } catch (e) {
+        console.error("[initMyHallFlow] mine 체크 실패:", e);
+        // mine 체크 실패도 "내 추모관 없음" 케이스처럼 처리
+        setRole("me");
+        setHasMemorialHall(false);
+        setIsMyMemorialModalOpen(true);
+        setEffectiveHallId(null);
+      }
+    };
+
+    initMyHallFlow();
+  }, [hallIdFromState]);
+
+  // ===================== 1) 추모관 정보 조회 (role 확보) =====================
+  // ✅ effectiveHallId가 확정된 뒤에만 호출
+  useEffect(() => {
+    if (!effectiveHallId) return;
+
     const fetchHallInfo = async () => {
       try {
-        const res = await getHallInfo(Number(hallId));
+        const res = await getHallInfo(Number(effectiveHallId));
         // res: { role, data }
-        setRole(res?.role || "follower");
+        setRole(res?.role || role || "follower");
         setHallInfo(res?.data || null);
       } catch (err) {
         console.error("추모관 정보 불러오기 실패:", err);
@@ -74,11 +129,15 @@ const MemorialHallPage = () => {
     };
 
     fetchHallInfo();
-  }, [hallId]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [effectiveHallId]);
 
   // ===================== 2) role === "me" 일 때 내 추모관 존재 여부 확인 =====================
+  // ✅ me 플로우는 initMyHallFlow에서 이미 처리하므로,
+  //    여기서는 role이 me인데도 hallId가 없을 수 있는 예외 상황만 보완
   useEffect(() => {
     if (role !== "me") return;
+    if (effectiveHallId) return; // hallId 확정되면 skip
 
     getMyHall()
       .then(async (res) => {
@@ -88,6 +147,7 @@ const MemorialHallPage = () => {
 
           if (res.hallId) {
             localStorage.setItem("myHallId", String(res.hallId));
+            setEffectiveHallId(Number(res.hallId));
           }
         } else {
           setHasMemorialHall(false);
@@ -98,12 +158,14 @@ const MemorialHallPage = () => {
         setHasMemorialHall(false);
         setIsMyMemorialModalOpen(true);
       });
-  }, [role]);
+  }, [role, effectiveHallId]);
 
   // ===================== 3) 사진 조회 =====================
   useEffect(() => {
     const fetchPhotos = async () => {
       try {
+        if (!effectiveHallId) return;
+
         // role별 탭/요청 분기
         // follower: 탭 0(공유), 1(나와의 앨범)
         // admin: 탭 0(공유), 1(나와의), 2(녹음)
@@ -142,7 +204,7 @@ const MemorialHallPage = () => {
           requestBody.isMine = false;
         }
 
-        const data = await getPhotos(Number(hallId), requestBody);
+        const data = await getPhotos(Number(effectiveHallId), requestBody);
         setPhotos(data);
       } catch (err) {
         console.error("사진 불러오기 실패:", err);
@@ -150,7 +212,7 @@ const MemorialHallPage = () => {
     };
 
     fetchPhotos();
-  }, [role, activeTab, hallId, reloadKey]);
+  }, [role, activeTab, effectiveHallId, reloadKey]);
 
   // ===================== 4) 필터/정렬 적용 =====================
   const filteredPhotos = useMemo(() => {
@@ -185,7 +247,7 @@ const MemorialHallPage = () => {
     const target = filteredPhotos[index];
     if (!target) return;
     try {
-      const detail = await getPhotoDetail(Number(hallId), target.id);
+      const detail = await getPhotoDetail(Number(effectiveHallId), target.id);
 
       setSelectedPhoto({
         id: target.id,
@@ -245,8 +307,11 @@ const MemorialHallPage = () => {
       );
 
       // 최신 정보 재조회
-      const res = await getHallInfo(Number(hallId));
-      setHallInfo(res?.data || null);
+      if (effectiveHallId) {
+        const res = await getHallInfo(Number(effectiveHallId));
+        setHallInfo(res?.data || null);
+        setRole(res?.role || role || "me");
+      }
     } catch (error) {
       console.error("프로필 이미지 업데이트 실패:", error);
       alert("프로필 이미지 변경에 실패했습니다.");
@@ -268,11 +333,11 @@ const MemorialHallPage = () => {
           setHasMemorialHall(true);
           setIsMyMemorialModalOpen(false);
 
-          const info = await getHallInfo(Number(newHallId));
-          setRole(info?.role || "me");
-          setHallInfo(info?.data || null);
+          // ✅ create 이후 hallId 확정 → 그 hallId로 getHallInfo 흐름 타게 함
+          setRole("me");
+          setEffectiveHallId(Number(newHallId));
 
-          nav("/memorial", { state: { hallId: newHallId } });
+          nav("/memorial", { state: { hallId: newHallId, from: "myHall" } });
         }
       })
       .catch((error) => {
@@ -301,13 +366,13 @@ const MemorialHallPage = () => {
 
   // ===================== 9) 네비게이션 =====================
   const goWritePage = () =>
-    nav("/write", { state: { hallId: Number(hallId) } });
+    nav("/write", { state: { hallId: Number(effectiveHallId) } });
   const goAIGeneratePage = () =>
-    nav("/generate", { state: { hallId: Number(hallId) } });
+    nav("/generate", { state: { hallId: Number(effectiveHallId) } });
 
   const handleModifyClick = () =>
     nav("/memorial-manager/edit-profile", {
-      state: { hallId: Number(hallId) },
+      state: { hallId: Number(effectiveHallId) },
     });
 
   return (
@@ -343,6 +408,7 @@ const MemorialHallPage = () => {
                   src={hallInfo?.profile}
                   onFileSelect={handleProfileFileSelect}
                 />
+                {/* 필요하다면 isUpdatingProfile일 때 로딩 스피너나 문구 추가 가능 */}
               </ProfileBox>
             ) : (
               hallInfo && <Profile data={hallInfo} />
@@ -357,11 +423,11 @@ const MemorialHallPage = () => {
 
             {/* ✅ role별 탭 내용 */}
             {role === "admin" && activeTab === 2 && (
-              <MyRecord hallId={Number(hallId)} />
+              <MyRecord hallId={Number(effectiveHallId)} />
             )}
 
             {role === "me" && activeTab === 1 && (
-              <MyRecord hallId={Number(hallId)} />
+              <MyRecord hallId={Number(effectiveHallId)} />
             )}
 
             {role === "me" && activeTab === 2 && <UploadVoiceRecord />}
@@ -385,16 +451,18 @@ const MemorialHallPage = () => {
             <LetterAndLinkShare
               onLinkShareClick={() => setIsLinkShareModalOpen(true)}
               page="default"
-              hallId={Number(hallId)}
+              hallId={Number(effectiveHallId)}
             />
           )}
 
           {role === "admin" && (
             <LetterAndLinkShare
               onLinkShareClick={() => setIsLinkShareModalOpen(true)}
-              onLetterClick={() => nav("/letter", { state: { hallId } })}
+              onLetterClick={() =>
+                nav("/letter", { state: { hallId: Number(effectiveHallId) } })
+              }
               page="manager"
-              hallId={Number(hallId)}
+              hallId={Number(effectiveHallId)}
             />
           )}
 
@@ -402,7 +470,7 @@ const MemorialHallPage = () => {
             <LetterAndLinkShare
               onLinkShareClick={() => setIsLinkShareModalOpen(true)}
               page="my"
-              hallId={Number(hallId)}
+              hallId={Number(effectiveHallId)}
             />
           )}
         </FixedShareButton>
@@ -452,16 +520,14 @@ const MemorialHallPage = () => {
         isOpen={!!selectedPhoto}
         post={selectedPhoto}
         onClose={() => setSelectedPhoto(null)}
-        hallId={Number(hallId)}
+        hallId={Number(effectiveHallId)}
         onPrev={handlePrev}
         onNext={handleNext}
         onDeleted={handlePostDeleted}
       />
     </Container>
   );
-};
-
-export default MemorialHallPage;
+}
 
 /* 🎨 스타일 */
 
