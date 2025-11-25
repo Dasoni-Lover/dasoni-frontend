@@ -11,5 +11,5 @@ const Img = styled.img`
   border-radius: 5px;
   border: 2px solid #e9e9e9;
   box-sizing: border-box;
-  cursor: pointer;
+  object-fit: cover; /* 비율 유지하며 자르기 */
 `;

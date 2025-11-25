@@ -4,17 +4,20 @@ import styled from "styled-components";
 import HallTab from "../features/MemorialHall/components/HallTab";
 import { CardList } from "../features/Home/components/CardList";
 import { MemorialHallCount } from "../features/Home/components/MemorialHallCount";
+import { NoneList } from "../features/Home/components/NoneList";
 import { color, typo } from "../styles/tokens";
 import { fetchMyHalls, fetchManagedHalls } from "../api/user";
 
 export const HomePage = () => {
-  const [myHalls, setMyHalls] = useState([]); // 내가 입장한 추모관
-  const [managedHalls, setManagedHalls] = useState([]); // 내가 관리하는 추모관
-  const [activeTab, setActiveTab] = useState(0); // 0: 입장, 1: 관리
+  const [myHalls, setMyHalls] = useState([]);
+  const [managedHalls, setManagedHalls] = useState([]);
+  const [filteredHalls, setFilteredHalls] = useState(null);
+  const [activeTab, setActiveTab] = useState(0);
 
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
 
+  // 🔹 fetch
   useEffect(() => {
     const loadHalls = async () => {
       try {
@@ -26,16 +29,11 @@ export const HomePage = () => {
           fetchManagedHalls(),
         ]);
 
-        const myList = my?.halls || [];
-        const managedList = managed?.halls || [];
-
-        setMyHalls(myList);
-        setManagedHalls(managedList);
+        setMyHalls(my?.halls || []);
+        setManagedHalls(managed?.halls || []);
       } catch (e) {
         console.error("추모관 목록 불러오기 실패:", e);
         setError(e);
-        setMyHalls([]);
-        setManagedHalls([]);
       } finally {
         setIsLoading(false);
       }
@@ -44,35 +42,63 @@ export const HomePage = () => {
     loadHalls();
   }, []);
 
-  // 현재 선택된 탭에 따라 보여줄 리스트
-  const currentHalls = activeTab === 0 ? myHalls : managedHalls;
+  // 🔹 현재 탭 데이터
+  const originalHalls = activeTab === 0 ? myHalls : managedHalls;
+  const hallsToShow = filteredHalls ?? originalHalls;
+
+  const isOriginalEmpty = originalHalls.length === 0;
+  const isSearchEmpty = filteredHalls !== null && filteredHalls.length === 0;
+
+  // 🔹 탭 바뀌면 검색 초기화
+  useEffect(() => {
+    setFilteredHalls(null);
+  }, [activeTab]);
+
+  // 🔹 검색 처리
+  const handleSearch = (keyword) => {
+    if (!keyword) {
+      setFilteredHalls(null);
+      return;
+    }
+
+    const filtered = originalHalls.filter((hall) =>
+      hall.name.includes(keyword)
+    );
+
+    setFilteredHalls(filtered);
+  };
 
   return (
     <Wrapper>
       <Text>홈</Text>
-      {/* 탭 상태를 HomePage에서 제어 */}
-      <HallTab role="home" activeIndex={activeTab} onTabChange={setActiveTab} />
-      {isLoading && <div style={{ marginTop: "2rem" }}>로딩 중...</div>}
-      {error && (
-        <div style={{ color: "red", marginTop: "1rem" }}>
-          데이터를 불러오는 중 오류가 발생했습니다.
-        </div>
-      )}
-      <Content>
-        {/* 현재 선택된 탭의 추모관 개수 */}
-        <MemorialHallCount count={currentHalls.length} tab={activeTab} />
 
-        {currentHalls.length === 0 && activeTab === 0 ? (
-          <NoneText>입장한 추모관이 없어요</NoneText>
-        ) : null}
-        {currentHalls.length === 0 && activeTab === 1 ? (
-          <NoneText>개설한 추모관이 없어요</NoneText>
-        ) : null}
-        {/* 현재 선택된 탭의 추모관 목록 */}
-        <CardList
-          halls={currentHalls}
-          type={activeTab === 1 ? "managed" : "my"} // ✅ 관리 탭이면 managed
-        />
+      <HallTab role="home" activeIndex={activeTab} onTabChange={setActiveTab} />
+
+      <Content>
+        {!isOriginalEmpty && (
+          <MemorialHallCount
+            count={originalHalls.length}
+            tab={activeTab}
+            onSearch={handleSearch}
+          />
+        )}
+
+        {/* 🔹 원본이 완전히 없을 때만 NoneList 표시 */}
+        {isOriginalEmpty ? (
+          <NoneList tab={activeTab} />
+        ) : (
+          <CardList
+            halls={hallsToShow} // 검색 결과 0개면 [] 전달됨
+            type={activeTab === 1 ? "managed" : "my"}
+          />
+        )}
+
+        {/* 🔹 검색결과 0개면 아래처럼 아무 카드도 없지만 NoneList는 안 뜸 */}
+        {isSearchEmpty && (
+          <div style={{ marginTop: "1rem", color: color("black.20") }}>
+    
+          </div>
+        )}
       </Content>
     </Wrapper>
   );
@@ -80,9 +106,8 @@ export const HomePage = () => {
 
 const Wrapper = styled.div`
   display: flex;
-  width: 68.5rem;
+  width: 82.5rem;
   flex-direction: column;
-  align-items: flex-start;
 `;
 
 const Text = styled.div`
@@ -98,12 +123,5 @@ const Content = styled.div`
   flex-direction: column;
   align-items: center;
   gap: 2rem;
-  align-self: stretch;
   margin-top: 2.5rem;
-`;
-
-const NoneText = styled.div`
-  ${typo("h4")};
-  color: ${color("black.30")};
-  margin-top: 9rem;
 `;

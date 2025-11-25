@@ -2,9 +2,20 @@ import React from "react";
 import styled from "styled-components";
 import { color, typo } from "../styles/tokens";
 
-export const InputField = ({ placeholder, value, onChange, width = "50%" }) => {
+export const InputField = ({
+  placeholder,
+  value,
+  onChange,
+  width = "50%",
+  borderColor = "#e9e9e9",   // ⭐ 디폴트 기존값
+  bgColor = "#f8f8f8",        // ⭐ 디폴트 기존값
+}) => {
   return (
-    <Wrapper $width={width}>
+    <Wrapper
+      $width={width}
+      $borderColor={borderColor}
+      $bgColor={bgColor}
+    >
       <StyledInput
         type="text"
         placeholder={placeholder}
@@ -24,8 +35,11 @@ const Wrapper = styled.div`
   gap: 0.625rem;
   flex: 1 0 0;
   border-radius: 0.375rem;
-  border: 2px solid var(--5, #e9e9e9);
-  background: var(--Lightgrey, #f8f8f8);
+
+  /* ⭐ 프롭스로 받은 borderColor / bgColor 사용 */
+  border: 2px solid ${({ $borderColor }) => $borderColor};
+  background: ${({ $bgColor }) => $bgColor};
+
   box-sizing: border-box;
 `;
 
@@ -45,5 +59,6 @@ const StyledInput = styled.input`
 `;
 
 
+
 //<InputField placeholder="고인의 이름을 입력하세요" />
-//<InputField placeholder="아이디를 입력하세요" width="100%" />
+//<InputField placeholder="아이디를 입력하세요" width="100%" borderColor="#ddd" bgColor="#fff"/>

@@ -5,44 +5,29 @@ import ReactDatePicker, { registerLocale } from "react-datepicker";
 import { ko } from "date-fns/locale";
 import "react-datepicker/dist/react-datepicker.css";
 
-import IconCalendar from "../features/WritePost/assets/icon-calendar.svg";
+import DefaultIconCalendar from "../assets/calendar-icon-black.svg";
+import DefaultClearIcon from "../assets/input-false-icon.svg";
 import { color, typo } from "../styles/tokens";
-
-/**
- * 📅 <DatePicker /> — 공통 날짜 선택 컴포넌트
- *
- * ✅ 기본 사용법:
- * ```jsx
- * import DatePicker from "../components/DatePicker";
- *
- * const [date, setDate] = useState(null);
- *
- * <DatePicker
- *   selected={date}                 // 선택된 날짜 (Date 객체)
- *   onChange={setDate}              // 날짜 변경 핸들러
- *   placeholder="YYYY/M/D"          // placeholder 텍스트 (선택사항)
- *   dateFormat="yyyy/M/d"           // 표시 형식 (선택사항)
- *   minDate={new Date()}            // 최소 선택 가능 날짜 (선택사항)
- *   maxDate={new Date("2025-12-31")} // 최대 선택 가능 날짜 (선택사항)
- *   showMonthDropdown               // 월 드롭다운 표시 (선택사항)
- *   showYearDropdown                // 연도 드롭다운 표시 (선택사항)
- * />
- * ```
- *
- * ⚙️ Props 요약:
- * - `selected`: Date | null — 현재 선택된 날짜
- * - `onChange`: (date: Date) => void — 날짜 선택 시 호출되는 함수
- * - `placeholder`: string — 입력 필드 placeholder (기본값: "YYYY/M/D")
- * - `dateFormat`: string — 표시할 날짜 형식 (기본값: "yyyy/M/d")
- * - 나머지 props(`minDate`, `maxDate`, `showYearDropdown` 등)는 react-datepicker의 모든 옵션 지원
- */
 
 // react-datepicker 한글 적용
 registerLocale("ko", ko);
 
 /* ───────────── 커스텀 인풋 (react-datepicker용) ───────────── */
 const DateInput = forwardRef(
-  ({ value, onClick, placeholder, borderColor, $height }, ref) => {
+  (
+    {
+      value,
+      onClick,
+      placeholder,
+      borderColor,
+      $height,
+      onClear,
+      calendarIcon,
+      showClear,
+      clearIcon,
+    },
+    ref
+  ) => {
     return (
       <DateField
         onClick={onClick}
@@ -50,26 +35,50 @@ const DateInput = forwardRef(
         $borderColor={borderColor}
         $height={$height}
       >
-        <input readOnly value={value || ""} placeholder={placeholder} />
-        <CalendarButton type="button" aria-label="날짜 선택">
-          <img src={IconCalendar} alt="calendar icon" />
+        {/* 왼쪽: 달력 아이콘 */}
+        <CalendarButton type="button">
+          <img src={calendarIcon} alt="calendar icon" />
         </CalendarButton>
+
+        {/* 가운데: 날짜 텍스트 */}
+        <InputArea>
+          <input readOnly value={value || ""} placeholder={placeholder} />
+        </InputArea>
+
+        {/* 오른쪽: X(초기화) 버튼 — 날짜 있고 showClear일 때만 */}
+        {value && showClear && (
+          <ClearButton
+            type="button"
+            onClick={(e) => {
+              e.stopPropagation(); // 달력 열림 방지
+              onClear();
+            }}
+          >
+            <img src={clearIcon} alt="clear" />
+          </ClearButton>
+        )}
       </DateField>
     );
   }
 );
 
+/* ───────────── DatePicker ───────────── */
 function DatePicker({
   selected,
   onChange,
   placeholder = "YYYY/M/D",
   dateFormat = "yyyy/M/d",
   borderColor,
-  width = "100%", // 부모에 맞춰 기본 100%
-  height = "48px", // 기본 높이
-  // 🔹 기본값: 년/월 드롭다운 ON
+  width = "100%",
+  height = "48px",
   showMonthDropdown = true,
   showYearDropdown = true,
+
+  /* showClear 디폴트 → false 로 변경 */
+  calendarIcon = DefaultIconCalendar,
+  showClear = false,
+  clearIcon = DefaultClearIcon,
+
   ...props
 }) {
   return (
@@ -79,18 +88,21 @@ function DatePicker({
         onChange={onChange}
         dateFormat={dateFormat}
         placeholderText={placeholder}
-        // customInput에 prop 전달: height는 $height로 전달
         customInput={
           <DateInput
             placeholder={placeholder}
             borderColor={borderColor}
             $height={height}
+            value={selected ? formatDate(selected) : ""}
+            onClear={() => onChange(null)}
+            calendarIcon={calendarIcon}
+            showClear={showClear}
+            clearIcon={clearIcon}
           />
         }
         popperPlacement="bottom-start"
         locale="ko"
         showPopperArrow={false}
-        // 🔹 년/월 드롭다운 기본 적용
         showMonthDropdown={showMonthDropdown}
         showYearDropdown={showYearDropdown}
         dropdownMode="select"
@@ -102,64 +114,67 @@ function DatePicker({
 
 export default DatePicker;
 
-/* 스타일 */
+/* 날짜 포맷 */
+function formatDate(date) {
+  try {
+    return new Intl.DateTimeFormat("ko-KR", {
+      year: "numeric",
+      month: "numeric",
+      day: "numeric",
+    }).format(date);
+  } catch {
+    return "";
+  }
+}
+
+/* ───────────── 스타일 ───────────── */
+
 const DatePickerWrapper = styled.div`
   width: ${({ $width }) => $width};
-  box-sizing: border-box;
 
-  /* react-datepicker 내부 wrapper 강제 고정 */
   .react-datepicker-wrapper,
   .react-datepicker__input-container {
-    width: 100% !important;
-    display: block !important;
-    box-sizing: border-box !important;
-  }
-
-  /* react-datepicker가 내부에 input을 렌더할 경우 대비 */
-  .react-datepicker__input-container input {
-    width: 100% !important;
-    box-sizing: border-box !important;
-  }
-
-  .react-datepicker {
-    border: 1px solid ${color("black.10")};
-    border-radius: 10px;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
-    font-family: inherit;
-  }
-  .react-datepicker__header {
-    background: ${color("white")};
-    border-bottom: 1px solid ${color("black.10")};
-  }
-  .react-datepicker__day--selected,
-  .react-datepicker__day--keyboard-selected {
-    background: ${color("black.90")};
+    width: 100%;
   }
 `;
 
-const DateField = styled.button`
+const DateField = styled.div`
   width: 100%;
-  box-sizing: border-box; /* 중요: padding/border 포함해 100% 계산 */
-  height: ${({ $height }) => $height || "48px"};
+  height: ${({ $height }) => $height};
   border-radius: 4px;
   border: 1px solid ${({ $borderColor }) => $borderColor || color("black.10")};
   background: ${color("white")};
   display: grid;
-  grid-template-columns: 1fr 44px;
+  grid-template-columns: 2.7rem 1fr 2rem;
   align-items: center;
-  padding: 0 0 0 12px;
-  text-align: left;
+  padding: 0.62rem 0.94rem;
+  box-sizing: border-box;
   cursor: pointer;
+  position: relative;
+`;
+
+const CalendarButton = styled.div`
+  width: 1.7rem;
+  height: 1.7rem;
+  display: grid;
+  place-items: center;
+  box-sizing: border-box;
+`;
+
+const InputArea = styled.div`
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
 
   input {
+    width: 100%;
+    border: 0;
+    background: transparent;
     ${typo("bodym")};
     color: ${color("black.70")};
-    border: 0;
     outline: none;
-    background: transparent;
     cursor: pointer;
-    width: 100%;
-    box-sizing: border-box;
 
     &::placeholder {
       color: ${color("black.30")};
@@ -167,17 +182,20 @@ const DateField = styled.button`
   }
 `;
 
-const CalendarButton = styled.span`
-  width: 44px;
-  height: 100%;
+const ClearButton = styled.button`
+  width: 1.7rem;
+  height: 1.7rem;
+  border: none;
+  background: transparent;
   display: grid;
   place-items: center;
-  background: ${color("black.90")};
-  border-radius: 0 10px 10px 0;
-  color: ${color("white")};
-
-  img {
-    width: 18px;
-    height: 18px;
-  }
+  cursor: pointer;
 `;
+
+
+{/* <DatePicker
+  selected={date}
+  onChange={setDate}
+  calendarIcon={YellowCalendar}
+  showClear={false}
+/> */}
