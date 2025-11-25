@@ -29,28 +29,26 @@ const LetterAndLinkShare = ({ onLinkShareClick, page, hallId }) => {
   return (
     <Wrapper>
       {/* 공유하기 카드 */}
-      <Card>
+      <Card
+        onMouseEnter={() => setIsLinkHover(true)}
+        onMouseLeave={() => setIsLinkHover(false)}
+        onClick={onLinkShareClick}
+      >
         <Text>추모관 공유하기</Text>
-        <ShareIcon
-          src={isLinkHover ? linksharehover : linksharebtn}
-          onMouseEnter={() => setIsLinkHover(true)}
-          onMouseLeave={() => setIsLinkHover(false)}
-          onClick={onLinkShareClick}
-        />
+        <ShareIcon src={isLinkHover ? linksharehover : linksharebtn} />
       </Card>
 
       {/* 간격 */}
       <Spacer />
 
       {/* 편지쓰기 카드 */}
-      <Card>
+      <Card
+        onMouseEnter={() => setIsLetterHover(true)}
+        onMouseLeave={() => setIsLetterHover(false)}
+        onClick={handleLetterClick}
+      >
         <Text>편지 보내기</Text>
-        <LetterIcon
-          src={isLetterHover ? letterhover : letterbtn}
-          onMouseEnter={() => setIsLetterHover(true)}
-          onMouseLeave={() => setIsLetterHover(false)}
-          onClick={handleLetterClick}
-        />
+        <LetterIcon src={isLetterHover ? letterhover : letterbtn} />
       </Card>
     </Wrapper>
   );
