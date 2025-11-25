@@ -22,8 +22,7 @@ export const EnterModal = ({ hall, onClose }) => {
   return (
     <Wrapper onClick={onClose}>
       <Box onClick={(e) => e.stopPropagation()}>
-        <Text>해당 추모관에 입장 요청을 보낼까요?</Text>
-        <CardListItemEnter hall={hall} type="none" hoverable={false} />
+        <Text>故{hall.name} 에 입장 요청을 보낼까요?</Text>
         <ButtonWrapper>
           <Button text="요청하기" onClick={handleRequest} />
           <Button text="취소" color="white" onClick={handleCancel} />
@@ -50,7 +49,7 @@ const Wrapper = styled.div`
 const Box = styled.div`
   display: flex;
   width: 43.9375rem;
-  height: 42.1875rem;
+  height: 23.4375rem;
   padding: 5.25rem 4.75rem 2.75rem 4.75rem;
   flex-direction: column;
   justify-content: center;
