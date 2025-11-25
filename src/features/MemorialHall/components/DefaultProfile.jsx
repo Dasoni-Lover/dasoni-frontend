@@ -39,7 +39,7 @@ const DefaultProfile = ({
             {birthday}. ~ {deadday}.
           </Date>
         )}
-        <Row gap={"1rem"} style={{ marginTop: "0.75rem" }}>
+        <Row gap={"1rem"}>
           {place && <HallInfoTag title="모신 곳" content={place} />}
           {phone && (
             <HallInfoTag title="관련 연락처" content={adminNamePhone} />
@@ -71,12 +71,12 @@ const Box = styled.div`
   flex-direction: column;
   justify-content: flex-start;
   align-items: center;
-  gap: 0.5rem;
 `;
 
 const Name = styled.div`
   ${typo("h1")};
   color: ${color("black.70")};
+  margin-bottom: 0.5rem;
 `;
 
 const Date = styled.div`

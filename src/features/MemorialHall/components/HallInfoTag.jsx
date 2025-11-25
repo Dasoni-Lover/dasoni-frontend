@@ -19,6 +19,7 @@ const Wrapper = styled.div`
   border-radius: 0.3125rem;
   border: 1px solid var(--Lightgrey, #f8f8f8);
   background: #fff;
+  margin-top: 1.25rem;
 `;
 
 const Title = styled.div`
