@@ -108,7 +108,11 @@ export default function Header({ showAuthButtons }) {
   };
 
   const handleMenuClick = (item) => {
-    navigate(item.path);
+    if (item.label === "나의 추모관") {
+      navigate(item.path, { state: { from: "myHall" } });
+    } else {
+      navigate(item.path);
+    }
   };
 
   const handleLogoutClick = async () => {
