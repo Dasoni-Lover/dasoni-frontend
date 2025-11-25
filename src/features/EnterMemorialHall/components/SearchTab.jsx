@@ -45,34 +45,16 @@ export const SearchTab = ({ onSearchResult }) => {
   return (
     <Wrapper>
       <Box>
+        <Box1>
         <Type>고인의 성함</Type>
         <InputField
-          width="100%"
-          placeholder="고인 성함"
+          width="54.9375rem"
+          placeholder="고인의 성함을 입력하세요"
           value={name}
           onChange={(e) => setName(e.target.value)}
+          borderColor="#FFBC67" bgColor="#fff"
         />
-      </Box>
-      <Box>
-        <Type>고인의 생일</Type>
-        <DatePicker
-          selected={birthdate}
-          onChange={setBirthDate}
-          placeholder="1993/02/11"
-          width="100%"
-          height="2.65rem"
-        />
-      </Box>
-      <Box>
-        <Type>고인의 기일</Type>
-        <DatePicker
-          selected={deaddate}
-          onChange={setDeadDate}
-          placeholder="2021/04/24"
-          width="100%"
-          height="2.65rem"
-        />
-      </Box>
+      </Box1>
       <ButtonBox>
         <Button
           text={loading ? "검색중..." : "검색하기"}
@@ -83,27 +65,73 @@ export const SearchTab = ({ onSearchResult }) => {
           disabled={loading}
         />
       </ButtonBox>
+      </Box>
+      <Container>
+        <Box2>
+        <Type>고인의 생일</Type>
+        <DatePicker
+          selected={birthdate}
+          onChange={setBirthDate}
+          placeholder="YYYY/MM/DD"
+          width="15.625rem"
+          height="3.25rem"
+        />
+      </Box2>
+      <Box2>
+        <Type>고인의 기일</Type>
+        <DatePicker
+          selected={deaddate}
+          onChange={setDeadDate}
+          placeholder="2021/04/24"
+          width="15.625rem"
+          height="3.25rem"
+        />
+      </Box2>
+      </Container>
+      
     </Wrapper>
   );
 };
 
 const Wrapper = styled.div`
   display: flex;
-  flex-direction: row;
-  padding: 1.25rem;
+  flex-direction: column;
+  padding: 1.875rem;
   justify-content: space-between;
-  align-items: flex-end;
+  align-items: flex-start;
   gap: 1.25rem;
   align-self: stretch;
-  border-radius: 0.75rem;
+  border-radius: 1.25rem;
+  background: #FFF4E6;
 `;
 
-const Box = styled.div`
+const Box=styled.div`
   display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-  gap: 0.4375rem;
-  width: 15rem;
+  padding-right: 1.25rem;
+  justify-content: space-between;
+  align-items: center;
+  align-self: stretch;
+`
+
+const Box1 = styled.div`
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 1.62rem;
+  box-sizing: border-box;
+`;
+
+const Container=styled.div`
+  display: flex;
+  align-items: center;
+  gap: 3.25rem;
+`
+
+const Box2 = styled.div`
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 1.62rem;
   box-sizing: border-box;
 `;
 
@@ -112,10 +140,11 @@ const ButtonBox = styled.div`
   flex-direction: column;
   align-items: flex-start;
   box-sizing: border-box;
-  width: 15rem;
+  width: 13.75rem;
+  height: 2.75rem;
 `;
 
 const Type = styled.div`
   ${typo("bodym")};
-  color: ${color("black.50")};
+  color: ${color("black.70")};
 `;
