@@ -3,14 +3,14 @@ import styled, { css } from "styled-components";
 import { useNavigate } from "react-router-dom";
 import { color, typo } from "../../../styles/tokens";
 import profileimg from "../../../assets/icon-profile-default.svg";
-import { fetchManagedHalls } from "../../../api/user"; 
-import Button from "../../../components/Button"
+import { fetchManagedHalls } from "../../../api/user";
+import Button from "../../../components/Button";
 import { MediumPhotoBox } from "../../../components/photobox/MediumPhotoBox";
 
 const tagTextByStatus = {
-  ENTERING: "입장 완료",
-  WAITING: "요청 중",
-  NONE: null
+  ENTERING: "입장하기",
+  WAITING: "입장 요청 대기 중",
+  NONE: "입장 요청 보내기",
 };
 
 export const CardListItemEnter = ({ hall, onOpenModal, hoverable = true }) => {
@@ -31,12 +31,12 @@ export const CardListItemEnter = ({ hall, onOpenModal, hoverable = true }) => {
     loadManagedHalls();
   }, []);
 
-  const handleClick = () => {
+  // ⭐ 버튼 클릭 시 동작
+  const handleButtonClick = () => {
     if (!hall) return;
 
     switch (hall.status) {
       case "ENTERING": {
-        // ⭐ 관리자인지 체크
         const isManager = managedHallIds.includes(hall.hallId);
 
         if (isManager) {
@@ -48,7 +48,7 @@ export const CardListItemEnter = ({ hall, onOpenModal, hoverable = true }) => {
       }
 
       case "WAITING":
-        return;
+        return; // 비활성화라서 실행 안 되지만 혹시 모르므로
 
       case "NONE":
         onOpenModal && onOpenModal(hall);
@@ -65,31 +65,35 @@ export const CardListItemEnter = ({ hall, onOpenModal, hoverable = true }) => {
   const deadday = hall?.deadDay || "-";
   const adminName = hall?.adminName || "-";
 
+  // ⭐ status 기반 버튼 설정
+  const buttonText = tagTextByStatus[hall.status];
+  const buttonActive = hall.status !== "WAITING"; // WAITING만 비활성화
+
   return (
-    <Wrapper
-      onClick={handleClick}
-      disabled={hall.status === "WAITING"}
-      status={hall.status}
-      hoverable={hoverable}
-    >
-      <MediumPhotoBox
-        src={profile}
-      />
+    <Wrapper status={hall.status} hoverable={hoverable}>
+      <MediumPhotoBox src={profile} />
 
       <Box>
         <Name>故 {name}</Name>
+
         <TextWrapper>
           <TextBox>
             <Text>{birthday}</Text>
             <Text>~</Text>
             <Text>{deadday}</Text>
           </TextBox>
+
           <ContentWrapper>
             <Type>관리자</Type>
             <Text2>{adminName}</Text2>
           </ContentWrapper>
+
           <ButtonWrapper>
-              <Button text="입장하기"/>
+            <Button
+              text={buttonText}
+              active={buttonActive}
+              onClick={handleButtonClick}
+            />
           </ButtonWrapper>
         </TextWrapper>
       </Box>
@@ -109,14 +113,11 @@ const Wrapper = styled.div`
   box-sizing: border-box;
   margin: 0;
   border-radius: 1.25rem;
-  border: 1px solid var(--5, #E9E9E9);
-  background: #FFF;
+  border: 1px solid #e9e9e9;
+  background: #fff;
   box-shadow: 0 0 16px 0 rgba(0, 0, 0, 0.08);
-  cursor: pointer;
   transition: all 0.2s ease;
-  box-sizing: border-box;
 
-  /* WAITING일 때 hover가 아예 없도록 */
   ${({ status }) =>
     status === "WAITING" &&
     css`
@@ -125,7 +126,6 @@ const Wrapper = styled.div`
       }
     `}
 
-  /* 기본 hover (hoverable이 true일 때만 적용) */
   ${({ hoverable }) =>
     hoverable &&
     css`
@@ -134,7 +134,6 @@ const Wrapper = styled.div`
       }
     `}
 `;
-
 
 const Box = styled.div`
   display: flex;
@@ -161,24 +160,19 @@ const TextWrapper = styled.div`
   align-items: flex-start;
 `;
 
-const TextBox=styled.div`
+const TextBox = styled.div`
   display: flex;
   flex-direction: row;
-  justify-content: flex-start;
-  width: 100%;
-  box-sizing: border-box;
   margin-bottom: 0.5rem;
-`
+`;
 
 const ContentWrapper = styled.div`
   display: flex;
-padding: 0 0.25rem;
-align-items: center;
-gap: 0.25rem;
-width: 100%;
-align-self: stretch;
+  padding: 0 0.25rem;
+  align-items: center;
+  gap: 0.25rem;
+  width: 100%;
 `;
-
 
 const Type = styled.div`
   ${typo("bodym")};
@@ -191,8 +185,8 @@ const Text2 = styled.div`
   color: ${color("black.50")};
 `;
 
-const ButtonWrapper=styled.div`
+const ButtonWrapper = styled.div`
   display: flex;
   width: 100%;
   margin-top: 1.25rem;
-`
+`;
