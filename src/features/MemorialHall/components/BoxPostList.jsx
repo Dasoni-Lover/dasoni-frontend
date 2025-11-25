@@ -30,7 +30,7 @@ const Wrapper = styled.div`
     $hasPhotos
       ? `
     display: grid;
-    grid-template-columns: repeat(3, 1fr);
+    grid-template-columns: repeat(4, 1fr);
     gap: 0.75rem;
     margin-bottom: 18.3125rem;
   `
@@ -43,8 +43,8 @@ const Wrapper = styled.div`
 `;
 
 const Img = styled.img`
-  width: 22.25rem;
-  height: 22.25rem;
+  width: 19.75rem;
+  height: 19.75rem;
   border-radius: 5px;
   border: 2px solid #e9e9e9;
   object-fit: cover;

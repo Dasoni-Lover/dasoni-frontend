@@ -628,7 +628,7 @@ const BarWrapper = styled.div`
 `;
 
 const ModifyButton = styled.div`
-  width: 1096px;
+  width: 1320px;
   display: flex;
   justify-content: flex-end;
   align-items: center;
@@ -658,7 +658,7 @@ const ModifyText = styled.div`
 `;
 
 const Content = styled.div`
-  width: 1096px;
+  width: 1320px;
   transition: all 0.3s ease;
 
   @media (max-width: 1200px) {
