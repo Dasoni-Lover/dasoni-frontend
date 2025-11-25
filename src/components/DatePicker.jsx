@@ -5,8 +5,8 @@ import ReactDatePicker, { registerLocale } from "react-datepicker";
 import { ko } from "date-fns/locale";
 import "react-datepicker/dist/react-datepicker.css";
 
-import IconCalendar from "../assets/calendar-icon-yellow.svg";
-import FalseIcon from "../assets/input-false-icon.svg";
+import DefaultIconCalendar from "../assets/calendar-icon-black.svg";
+import DefaultClearIcon from "../assets/input-false-icon.svg";
 import { color, typo } from "../styles/tokens";
 
 // react-datepicker 한글 적용
@@ -14,7 +14,20 @@ registerLocale("ko", ko);
 
 /* ───────────── 커스텀 인풋 (react-datepicker용) ───────────── */
 const DateInput = forwardRef(
-  ({ value, onClick, placeholder, borderColor, $height, onClear }, ref) => {
+  (
+    {
+      value,
+      onClick,
+      placeholder,
+      borderColor,
+      $height,
+      onClear,
+      calendarIcon,
+      showClear,
+      clearIcon,
+    },
+    ref
+  ) => {
     return (
       <DateField
         onClick={onClick}
@@ -24,20 +37,16 @@ const DateInput = forwardRef(
       >
         {/* 왼쪽: 달력 아이콘 */}
         <CalendarButton type="button">
-          <img src={IconCalendar} alt="calendar icon" />
+          <img src={calendarIcon} alt="calendar icon" />
         </CalendarButton>
 
         {/* 가운데: 날짜 텍스트 */}
         <InputArea>
-          <input
-            readOnly
-            value={value || ""}
-            placeholder={placeholder}
-          />
+          <input readOnly value={value || ""} placeholder={placeholder} />
         </InputArea>
 
-        {/* 오른쪽: X(초기화) 버튼 — 날짜 있을 때만 */}
-        {value && (
+        {/* 오른쪽: X(초기화) 버튼 — 날짜 있고 showClear일 때만 */}
+        {value && showClear && (
           <ClearButton
             type="button"
             onClick={(e) => {
@@ -45,7 +54,7 @@ const DateInput = forwardRef(
               onClear();
             }}
           >
-            <img src={FalseIcon} alt="clear" />
+            <img src={clearIcon} alt="clear" />
           </ClearButton>
         )}
       </DateField>
@@ -53,6 +62,7 @@ const DateInput = forwardRef(
   }
 );
 
+/* ───────────── DatePicker ───────────── */
 function DatePicker({
   selected,
   onChange,
@@ -63,6 +73,12 @@ function DatePicker({
   height = "48px",
   showMonthDropdown = true,
   showYearDropdown = true,
+
+  /* showClear 디폴트 → false 로 변경 */
+  calendarIcon = DefaultIconCalendar,
+  showClear = false,
+  clearIcon = DefaultClearIcon,
+
   ...props
 }) {
   return (
@@ -77,8 +93,11 @@ function DatePicker({
             placeholder={placeholder}
             borderColor={borderColor}
             $height={height}
-            value={selected ? formatDate(selected, dateFormat) : ""}
-            onClear={() => onChange(null)}   // ❗날짜 초기화
+            value={selected ? formatDate(selected) : ""}
+            onClear={() => onChange(null)}
+            calendarIcon={calendarIcon}
+            showClear={showClear}
+            clearIcon={clearIcon}
           />
         }
         popperPlacement="bottom-start"
@@ -92,8 +111,10 @@ function DatePicker({
     </DatePickerWrapper>
   );
 }
+
 export default DatePicker;
 
+/* 날짜 포맷 */
 function formatDate(date) {
   try {
     return new Intl.DateTimeFormat("ko-KR", {
@@ -106,7 +127,8 @@ function formatDate(date) {
   }
 }
 
-/* 스타일 */
+/* ───────────── 스타일 ───────────── */
+
 const DatePickerWrapper = styled.div`
   width: ${({ $width }) => $width};
 
@@ -123,7 +145,7 @@ const DateField = styled.div`
   border: 1px solid ${({ $borderColor }) => $borderColor || color("black.10")};
   background: ${color("white")};
   display: grid;
-  grid-template-columns: 2.7rem 1fr 2rem; /* 왼쪽 아이콘 / 텍스트 / X버튼 */
+  grid-template-columns: 2.7rem 1fr 2rem;
   align-items: center;
   padding: 0.62rem 0.94rem;
   box-sizing: border-box;
@@ -132,8 +154,8 @@ const DateField = styled.div`
 `;
 
 const CalendarButton = styled.div`
-width: 1.70294rem;
-height: 1.70294rem;
+  width: 1.7rem;
+  height: 1.7rem;
   display: grid;
   place-items: center;
   box-sizing: border-box;
@@ -168,5 +190,12 @@ const ClearButton = styled.button`
   display: grid;
   place-items: center;
   cursor: pointer;
-
 `;
+
+
+{/* <DatePicker
+  selected={date}
+  onChange={setDate}
+  calendarIcon={YellowCalendar}
+  showClear={false}
+/> */}

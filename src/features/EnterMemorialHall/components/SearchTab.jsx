@@ -5,6 +5,7 @@ import { InputField } from "../../../components/InputField";
 import Button from "../../../components/Button";
 import DatePicker from "../../../components/DatePicker";
 import { searchHalls } from "../../../api/search-hall";
+import YellowCalendar from "../../../assets/calendar-icon-yellow.svg"
 
 export const SearchTab = ({ onSearchResult }) => {
   const [name, setName] = useState("");
@@ -84,6 +85,8 @@ export const SearchTab = ({ onSearchResult }) => {
             placeholder="YYYY/MM/DD"
             width="15.625rem"
             height="3.25rem"
+            showClear={true}
+            calendarIcon={YellowCalendar}
           />
         </Box2>
 
@@ -95,6 +98,8 @@ export const SearchTab = ({ onSearchResult }) => {
             placeholder={todayPlaceholder} // ← 오늘 날짜 적용!
             width="15.625rem"
             height="3.25rem"
+            showClear={true}
+            calendarIcon={YellowCalendar}
           />
         </Box2>
       </Container>
