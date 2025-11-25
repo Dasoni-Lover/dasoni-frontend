@@ -219,7 +219,7 @@ export default function MemorialHallPage() {
     let result = [...photos];
 
     if (filter.isAIMode) {
-      result = result.filter((p) => p.isAI);
+      result = result.filter((p) => !p.isAI);
     }
 
     switch (filter.sortOption) {
@@ -478,7 +478,7 @@ export default function MemorialHallPage() {
             )}
           </FixedShareButton>
 
-          {/* ✅ Add Post Floating */}
+          {/* ✅ 게시글 작성 + 플로팅 버튼 */}
           {showFloatingAddPost && (
             <FixedAddPostContainer>
               <FixedAddPostButton onClick={() => setIsAddPostModalOpen(true)}>
@@ -666,8 +666,8 @@ const FixedAddPostButton = styled.div`
   transition: transform 0.2s ease;
 
   img {
-    width: 128px;
-    height: 128px;
+    width: 6.25rem;
+    height: 6.25rem;
     object-fit: contain;
   }
 

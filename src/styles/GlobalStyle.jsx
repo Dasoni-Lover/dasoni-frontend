@@ -83,5 +83,4 @@ const ContentWrapper = styled.div`
 
 const FooterWrapper = styled.footer`
   position: relative;
-  z-index: 1;
 `;
