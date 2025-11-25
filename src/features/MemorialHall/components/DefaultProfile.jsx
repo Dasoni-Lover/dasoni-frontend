@@ -18,6 +18,7 @@ const DefaultProfile = ({
   place,
   phone,
   adminName,
+  isMyHall = false, // 나의 추모관 여부 (기본 false)
 }) => {
   const profileSrc = src || defaultProfileImg;
 
@@ -30,15 +31,37 @@ const DefaultProfile = ({
       ? phone
       : "";
 
+  // 이름: 나의 추모관이면 '故' 제거
+  const displayName = isMyHall ? name : `故 ${name}`;
+
+  // 날짜 포맷팅
+  const formatDate = (birthday, deadday, isMyHall) => {
+    if (!birthday) return "";
+
+    const birthStr = `${birthday}.`; // 생일 뒤에 항상 점 추가
+
+    // 나의 추모관: "생일. ~" 형식만 표시
+    if (isMyHall) {
+      return `${birthStr} ~`;
+    }
+
+    // 일반 추모관: 생일과 기일 모두 있으면 "생일. ~ 기일." 형식
+    if (deadday) {
+      const deathStr = `${deadday}.`;
+      return `${birthStr} ~ ${deathStr}`;
+    }
+
+    // 기일이 없으면 생일만
+    return birthStr;
+  };
+
+  const dateText = formatDate(birthday, deadday, isMyHall);
+
   return (
     <Wrapper>
       <Box>
-        <Name>故 {name}</Name>
-        {birthday && (
-          <Date>
-            {birthday}. ~ {deadday}.
-          </Date>
-        )}
+        <Name>{displayName}</Name>
+        {dateText && <Date>{dateText}</Date>}
         <Row gap={"1rem"}>
           {place && <HallInfoTag title="모신 곳" content={place} />}
           {phone && (

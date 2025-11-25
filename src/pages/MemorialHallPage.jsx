@@ -410,7 +410,11 @@ export default function MemorialHallPage() {
       <BlurWrapper $blur={isMyMemorialModalOpen}>
         <Container>
           <BarWrapper>
-            <BarNavigate paths={["홈", isMe ? "나의 추모관" : hallTitle]} />
+            {isMe ? (
+              <Title>나의 추모관</Title>
+            ) : (
+              <BarNavigate paths={["홈", hallTitle]} />
+            )}
           </BarWrapper>
 
           <ContentWrapper>
@@ -424,20 +428,19 @@ export default function MemorialHallPage() {
 
             <Content>
               {/* ✅ 프로필 UI */}
-              {isMe ? (
+              {isMe ? ( // 나의 추모관인 경우
                 <ProfileBox>
                   <DefaultProfile
                     isEditable={hasMemorialHall}
+                    isMyHall // 나의 추모관 여부 전달
                     name={hallInfo?.name || "이름 없음"}
-                    date={
-                      hallInfo
-                        ? `${hallInfo?.birthday || ""} ~ ${
-                            hallInfo?.deadday || ""
-                          }`
-                        : ""
-                    }
+                    birthday={hallInfo?.birthday}
+                    deadday={hallInfo?.deadday}
                     src={hallInfo?.profile}
                     onFileSelect={handleProfileFileSelect}
+                    place={hallInfo?.place}
+                    phone={hallInfo?.phone}
+                    adminName={hallInfo?.adminName}
                   />
                   {/* 필요하다면 isUpdatingProfile일 때 로딩 스피너나 문구 추가 가능 */}
                 </ProfileBox>
@@ -614,17 +617,23 @@ const ContentWrapper = styled.div`
 `;
 
 const BarWrapper = styled.div`
-  margin-top: 30px;
-  margin-bottom: 52px;
+  margin-top: 2rem;
+  margin-bottom: 3rem;
   display: flex;
 
   > * {
-    width: 1096px;
+    width: 1320px;
   }
 
   @media (max-width: 1200px) {
     justify-content: flex-start;
   }
+`;
+
+const Title = styled.div`
+  margin-top: 2rem;
+  ${typo("h1")};
+  color: black;
 `;
 
 const ModifyButton = styled.div`
