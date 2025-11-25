@@ -1,67 +1,148 @@
 // src/pages/MemorialHallPage.jsx
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useMemo } from "react";
 import styled from "styled-components";
-import { typo } from "../styles/tokens";
+import { typo, color } from "../styles/tokens";
 import { useNavigate, useLocation } from "react-router-dom";
+
 import { getPhotos, getHallInfo, getPhotoDetail } from "../api/memorial";
+import { createMyHall, getMyHall, updateMyHallProfile } from "../api/my-hall";
+import { getPresignedUrlForImage, uploadFileToS3 } from "../api/files";
 
 import BarNavigate from "../components/BarNavigate";
+
 import Profile from "../features/MemorialHall/components/Profile";
+import DefaultProfile from "../features/MemorialHall/components/DefaultProfile";
 import HallTab from "../features/MemorialHall/components/HallTab";
+import TabButtonDropdown from "../features/MemorialHall/components/TabButtonDropdown";
 import BoxPostList from "../features/MemorialHall/components/BoxPostList";
 import LetterAndLinkShare from "../features/MemorialHall/components/LetterAndLinkShare";
 import LinkShareModal from "../features/MemorialHall/components/LinkShareModal";
 import PostDetailModal from "../features/MemorialHall/components/PostDetailModal";
 import AddPostModal from "../features/MemorialHall/components/AddPostModal";
-import TabButtonDropdown from "../features/MemorialHall/components/TabButtonDropdown";
+import MyRecord from "../features/MemorialHall/components/MyRecord";
+import UploadVoiceRecord from "../features/MemorialHall/components/UploadVoiceRecord";
+import MyMemorialModal from "../features/MemorialHall/components/MyMemorialModal";
 
 import AddPostButtonImg from "../features/MemorialHall/assets/btn-add-post.svg";
+import modifyicon from "../assets/edit-btn.svg";
 
 const MemorialHallPage = () => {
   const nav = useNavigate();
   const location = useLocation();
 
-  // ✅ Home 카드에서 넘어올 때 state로 전달된 hallId 사용, 없으면 1
-  const hallId = location.state?.hallId ?? 1;
+  // ✅ 기존 흐름 유지: state로 넘어온 hallId 우선, 없으면 1
+  const hallIdFromState = location.state?.hallId;
+  const hallIdFromStorage = localStorage.getItem("myHallId");
+  const hallId = hallIdFromState ?? hallIdFromStorage ?? 1;
 
-  const [photos, setPhotos] = useState([]);
+  // ===================== 공통 상태 =====================
+  const [role, setRole] = useState("follower"); // follower | admin | me
   const [hallInfo, setHallInfo] = useState(null);
+  const [photos, setPhotos] = useState([]);
+
   const [filter, setFilter] = useState({
     sortOption: "최신 업로드순",
     isAIMode: false,
   });
-  const [isLinkShareModalOpen, setIsLinkShareModalOpen] = useState(false);
+
+  const [activeTab, setActiveTab] = useState(0);
+  const [reloadKey, setReloadKey] = useState(0);
+
   const [selectedPhoto, setSelectedPhoto] = useState(null);
-  const [selectedIndex, setSelectedIndex] = useState(null); // 모달에서 현재 몇 번째인지
-  const [activeTab, setActiveTab] = useState(0); // 0: 공유앨범, 1: 나와의 앨범
-  const [reloadKey, setReloadKey] = useState(0); // ✅ 삭제 후 리렌더 트리거
+  const [selectedIndex, setSelectedIndex] = useState(null);
+
+  const [isLinkShareModalOpen, setIsLinkShareModalOpen] = useState(false);
   const [isAddPostModalOpen, setIsAddPostModalOpen] = useState(false);
 
-  // ✅ 사진 불러오기 (isMine / isPrivate 반영)
+  // ===================== me(본인) 전용 상태 =====================
+  const [hasMemorialHall, setHasMemorialHall] = useState(false);
+  const [isMyMemorialModalOpen, setIsMyMemorialModalOpen] = useState(false);
+  const [isCreating, setIsCreating] = useState(false);
+  const [isUpdatingProfile, setIsUpdatingProfile] = useState(false);
+
+  // ===================== 1) 추모관 정보 조회 (role 확보) =====================
+  useEffect(() => {
+    const fetchHallInfo = async () => {
+      try {
+        const res = await getHallInfo(Number(hallId));
+        // res: { role, data }
+        setRole(res?.role || "follower");
+        setHallInfo(res?.data || null);
+      } catch (err) {
+        console.error("추모관 정보 불러오기 실패:", err);
+      }
+    };
+
+    fetchHallInfo();
+  }, [hallId]);
+
+  // ===================== 2) role === "me" 일 때 내 추모관 존재 여부 확인 =====================
+  useEffect(() => {
+    if (role !== "me") return;
+
+    getMyHall()
+      .then(async (res) => {
+        if (res.myHallExists) {
+          setHasMemorialHall(true);
+          setIsMyMemorialModalOpen(false);
+
+          if (res.hallId) {
+            localStorage.setItem("myHallId", String(res.hallId));
+          }
+        } else {
+          setHasMemorialHall(false);
+          setIsMyMemorialModalOpen(true);
+        }
+      })
+      .catch(() => {
+        setHasMemorialHall(false);
+        setIsMyMemorialModalOpen(true);
+      });
+  }, [role]);
+
+  // ===================== 3) 사진 조회 =====================
   useEffect(() => {
     const fetchPhotos = async () => {
       try {
-        const isShareTab = activeTab === 0;
-        const isMyTab = activeTab === 1;
+        // role별 탭/요청 분기
+        // follower: 탭 0(공유), 1(나와의 앨범)
+        // admin: 탭 0(공유), 1(나와의), 2(녹음)
+        // me: 탭 0(공유), 1(녹음), 2(업로드)
 
-        // 👉 요구사항:
-        // - 나와의 앨범: isMine = true
-        // - 공유 앨범: isPrivate = false
-        const requestBody = {
+        if (role === "admin" && activeTab === 2) return;
+        if (role === "me" && activeTab !== 0) return;
+
+        let requestBody = {
           isBydate: true,
           isAI: false,
-          isPrivate: isShareTab ? false : true, // 공유앨범일 때 false, 나머지는 true
-          isMine: isMyTab, // 나와의 앨범일 때 true, 공유앨범일 때 false
+          isPrivate: false,
+          isMine: false,
         };
 
-        console.log("📸 사진 조회 요청 (visitor):", {
-          hallId,
-          activeTab,
-          requestBody,
-          reloadKey,
-        });
+        if (role === "follower") {
+          const isShareTab = activeTab === 0;
+          const isMyTab = activeTab === 1;
 
-        const data = await getPhotos(hallId, requestBody);
+          requestBody.isPrivate = isShareTab ? false : true;
+          requestBody.isMine = isMyTab;
+        }
+
+        if (role === "admin") {
+          if (activeTab === 0) {
+            requestBody.isPrivate = false;
+            requestBody.isMine = false;
+          } else if (activeTab === 1) {
+            requestBody.isPrivate = true;
+            requestBody.isMine = true;
+          }
+        }
+
+        if (role === "me") {
+          requestBody.isPrivate = false;
+          requestBody.isMine = false;
+        }
+
+        const data = await getPhotos(Number(hallId), requestBody);
         setPhotos(data);
       } catch (err) {
         console.error("사진 불러오기 실패:", err);
@@ -69,10 +150,10 @@ const MemorialHallPage = () => {
     };
 
     fetchPhotos();
-  }, [activeTab, hallId, reloadKey]); // ✅ reloadKey 추가
+  }, [role, activeTab, hallId, reloadKey]);
 
-  // ✅ 정렬 및 AI 필터 적용 (isPrivate / isMine은 서버에서 필터됨)
-  const filteredPhotos = React.useMemo(() => {
+  // ===================== 4) 필터/정렬 적용 =====================
+  const filteredPhotos = useMemo(() => {
     let result = [...photos];
 
     if (filter.isAIMode) {
@@ -99,34 +180,14 @@ const MemorialHallPage = () => {
     return result;
   }, [photos, filter]);
 
-  // ✅ 추모관 정보 불러오기
-  useEffect(() => {
-    const fetchHallInfo = async () => {
-      try {
-        const data = await getHallInfo(hallId);
-        setHallInfo(data);
-      } catch (err) {
-        console.error("추모관 정보 불러오기 실패:", err);
-      }
-    };
-    console.log("현재 hallId:", hallId);
-    fetchHallInfo();
-  }, [hallId]);
-
-  // ✅ BarNavigate에 쓸 추모관 제목 (고인 이름 기반)
-  const hallTitle = hallInfo?.data?.name
-    ? `故 ${hallInfo.data.name}의 추모관`
-    : "추모관";
-
-  // ✅ 특정 index의 게시글을 상세조회해서 모달에 띄우는 함수
+  // ===================== 5) 상세 모달 =====================
   const openPhotoAtIndex = async (index) => {
     const target = filteredPhotos[index];
     if (!target) return;
-
     try {
-      const detail = await getPhotoDetail(hallId, target.id);
+      const detail = await getPhotoDetail(Number(hallId), target.id);
 
-      const mappedPost = {
+      setSelectedPhoto({
         id: target.id,
         image: detail.url,
         title: detail.occurredAt || "",
@@ -136,9 +197,7 @@ const MemorialHallPage = () => {
         profileImage: detail.myProfile,
         isMine: detail.isMine,
         isAdmin: detail.isAdmin,
-      };
-
-      setSelectedPhoto(mappedPost);
+      });
       setSelectedIndex(index);
     } catch (err) {
       console.error("게시글 상세 불러오기 실패:", err);
@@ -146,15 +205,13 @@ const MemorialHallPage = () => {
     }
   };
 
-  const handlePhotoClick = (photo, index) => {
-    openPhotoAtIndex(index);
-  };
+  const handlePhotoClick = (_, index) => openPhotoAtIndex(index);
 
   const handlePrev = () => {
     if (selectedIndex === null || filteredPhotos.length === 0) return;
-    const nextIndex =
+    const prevIndex =
       selectedIndex === 0 ? filteredPhotos.length - 1 : selectedIndex - 1;
-    openPhotoAtIndex(nextIndex);
+    openPhotoAtIndex(prevIndex);
   };
 
   const handleNext = () => {
@@ -164,69 +221,242 @@ const MemorialHallPage = () => {
     openPhotoAtIndex(nextIndex);
   };
 
-  // ✅ 모달에서 삭제 후 호출되는 콜백
-  const handlePostDeleted = () => {
-    setReloadKey((prev) => prev + 1);
+  const handlePostDeleted = () => setReloadKey((prev) => prev + 1);
+
+  // ===================== 6) me 프로필 업로드 =====================
+  const handleProfileFileSelect = async (file) => {
+    if (!file || isUpdatingProfile) return;
+
+    try {
+      setIsUpdatingProfile(true);
+
+      const { uploadUrl, fileUrl, contentType } = await getPresignedUrlForImage(
+        file
+      );
+
+      await uploadFileToS3(uploadUrl, file, contentType);
+
+      await updateMyHallProfile(fileUrl);
+
+      window.dispatchEvent(
+        new CustomEvent("myProfileUpdated", {
+          detail: { profileUrl: fileUrl },
+        })
+      );
+
+      // 최신 정보 재조회
+      const res = await getHallInfo(Number(hallId));
+      setHallInfo(res?.data || null);
+    } catch (error) {
+      console.error("프로필 이미지 업데이트 실패:", error);
+      alert("프로필 이미지 변경에 실패했습니다.");
+    } finally {
+      setIsUpdatingProfile(false);
+    }
   };
+
+  // ===================== 7) me 추모관 생성 =====================
+  const handleCreateClick = () => {
+    if (isCreating || hasMemorialHall) return;
+
+    setIsCreating(true);
+    createMyHall()
+      .then(async (res) => {
+        const newHallId = res?.hallId;
+        if (newHallId) {
+          localStorage.setItem("myHallId", String(newHallId));
+          setHasMemorialHall(true);
+          setIsMyMemorialModalOpen(false);
+
+          const info = await getHallInfo(Number(newHallId));
+          setRole(info?.role || "me");
+          setHallInfo(info?.data || null);
+
+          nav("/memorial", { state: { hallId: newHallId } });
+        }
+      })
+      .catch((error) => {
+        console.error("본인 추모관 개설 실패:", error);
+        alert("추모관 개설에 실패했습니다.");
+      })
+      .finally(() => setIsCreating(false));
+  };
+
+  // ===================== 8) role별 UI 값 =====================
+  const hallTitle = hallInfo?.name ? `故 ${hallInfo.name}의 추모관` : "추모관";
+
+  const tabRoleProp =
+    role === "follower" ? "visitor" : role === "admin" ? "manager" : "owner";
+
+  const isManager = role === "admin";
+  const isMe = role === "me";
+
+  const showDropdownAndList =
+    role === "follower" ||
+    (role === "admin" && activeTab !== 2) ||
+    (role === "me" && activeTab === 0);
+
+  // floating add-post는 follower/admin/me 모두 사용
+  const showFloatingAddPost = true;
+
+  // ===================== 9) 네비게이션 =====================
+  const goWritePage = () =>
+    nav("/write", { state: { hallId: Number(hallId) } });
+  const goAIGeneratePage = () =>
+    nav("/generate", { state: { hallId: Number(hallId) } });
+
+  const handleModifyClick = () =>
+    nav("/memorial-manager/edit-profile", {
+      state: { hallId: Number(hallId) },
+    });
 
   return (
     <Container>
-      <BarWrapper>
-        <BarNavigate paths={["홈", hallTitle]} />
-      </BarWrapper>
+      <BlurWrapper $blur={isMyMemorialModalOpen}>
+        <BarWrapper>
+          <BarNavigate paths={["홈", isMe ? "나의 추모관" : hallTitle]} />
+        </BarWrapper>
 
-      <Content>
-        {hallInfo && <Profile data={hallInfo.data} />}
+        <ContentWrapper>
+          {/* ✅ 관리자만 '추모관 정보 수정' 버튼 */}
+          {isManager && (
+            <ModifyButton onClick={handleModifyClick}>
+              <ModifyIcon src={modifyicon} />
+              <ModifyText>추모관 정보 수정</ModifyText>
+            </ModifyButton>
+          )}
 
-        <HallTab
-          role="visitor"
-          activeIndex={activeTab}
-          onTabChange={setActiveTab}
-        />
+          <Content>
+            {/* ✅ 프로필 UI */}
+            {isMe ? (
+              <ProfileBox>
+                <DefaultProfile
+                  isEditable={hasMemorialHall}
+                  name={hallInfo?.name || "이름 없음"}
+                  date={
+                    hallInfo
+                      ? `${hallInfo?.birthday || ""} ~ ${
+                          hallInfo?.deadday || ""
+                        }`
+                      : ""
+                  }
+                  src={hallInfo?.profile}
+                  onFileSelect={handleProfileFileSelect}
+                />
+              </ProfileBox>
+            ) : (
+              hallInfo && <Profile data={hallInfo} />
+            )}
 
-        <TabButtonDropdown onFilterChange={setFilter} />
-        <BoxPostList photos={filteredPhotos} onPostClick={handlePhotoClick} />
-      </Content>
+            {/* ✅ 탭 */}
+            <HallTab
+              role={tabRoleProp}
+              activeIndex={activeTab}
+              onTabChange={setActiveTab}
+            />
 
-      <FixedShareButton>
-        <LetterAndLinkShare
-          onLinkShareClick={() => setIsLinkShareModalOpen(true)}
-          page="default"
-          hallId={hallId}
-        />
-      </FixedShareButton>
+            {/* ✅ role별 탭 내용 */}
+            {role === "admin" && activeTab === 2 && (
+              <MyRecord hallId={Number(hallId)} />
+            )}
 
-      <FixedAddPostContainer>
-        <FixedAddPostButton onClick={() => setIsAddPostModalOpen(true)}>
-          <img src={AddPostButtonImg} alt="추가 버튼" />
-        </FixedAddPostButton>
-      </FixedAddPostContainer>
-      {isAddPostModalOpen && (
-        <AddPostModal
-          onClose={() => setIsAddPostModalOpen(false)}
-          onSelectAI={() => {
-            setIsAddPostModalOpen(false);
-            nav("/generate", { state: { hallId } });
-          }}
-          onSelectComputer={() => {
-            setIsAddPostModalOpen(false);
-            nav("/write", { state: { hallId } });
-          }}
+            {role === "me" && activeTab === 1 && (
+              <MyRecord hallId={Number(hallId)} />
+            )}
+
+            {role === "me" && activeTab === 2 && <UploadVoiceRecord />}
+
+            {/* ✅ 사진 리스트 영역 */}
+            {showDropdownAndList && (
+              <>
+                <TabButtonDropdown onFilterChange={setFilter} />
+                <BoxPostList
+                  photos={filteredPhotos}
+                  onPostClick={handlePhotoClick}
+                />
+              </>
+            )}
+          </Content>
+        </ContentWrapper>
+
+        {/* ✅ 공유/편지 버튼 */}
+        <FixedShareButton>
+          {role === "follower" && (
+            <LetterAndLinkShare
+              onLinkShareClick={() => setIsLinkShareModalOpen(true)}
+              page="default"
+              hallId={Number(hallId)}
+            />
+          )}
+
+          {role === "admin" && (
+            <LetterAndLinkShare
+              onLinkShareClick={() => setIsLinkShareModalOpen(true)}
+              onLetterClick={() => nav("/letter", { state: { hallId } })}
+              page="manager"
+              hallId={Number(hallId)}
+            />
+          )}
+
+          {role === "me" && (
+            <LetterAndLinkShare
+              onLinkShareClick={() => setIsLinkShareModalOpen(true)}
+              page="my"
+              hallId={Number(hallId)}
+            />
+          )}
+        </FixedShareButton>
+
+        {/* ✅ Add Post Floating */}
+        {showFloatingAddPost && (
+          <FixedAddPostContainer>
+            <FixedAddPostButton onClick={() => setIsAddPostModalOpen(true)}>
+              <img src={AddPostButtonImg} alt="추가 버튼" />
+            </FixedAddPostButton>
+          </FixedAddPostContainer>
+        )}
+
+        {isAddPostModalOpen && (
+          <AddPostModal
+            onClose={() => setIsAddPostModalOpen(false)}
+            onSelectAI={() => {
+              setIsAddPostModalOpen(false);
+              goAIGeneratePage();
+            }}
+            onSelectComputer={() => {
+              setIsAddPostModalOpen(false);
+              goWritePage();
+            }}
+          />
+        )}
+
+        {/* ✅ LinkShareModal */}
+        {isLinkShareModalOpen && (
+          <LinkShareModal
+            onClose={() => setIsLinkShareModalOpen(false)}
+            page={role === "admin" ? "manager" : undefined}
+          />
+        )}
+      </BlurWrapper>
+
+      {/* ✅ me인데 내 추모관 없을 때만 생성 모달 */}
+      {isMe && isMyMemorialModalOpen && (
+        <MyMemorialModal
+          isOpen={isMyMemorialModalOpen}
+          onCreateClick={handleCreateClick}
         />
       )}
 
+      {/* ✅ Post Detail Modal */}
       <PostDetailModal
         isOpen={!!selectedPhoto}
         post={selectedPhoto}
         onClose={() => setSelectedPhoto(null)}
-        hallId={hallId}
+        hallId={Number(hallId)}
         onPrev={handlePrev}
         onNext={handleNext}
-        onDeleted={handlePostDeleted} // ✅ 삭제 후 리스트 새로고침
+        onDeleted={handlePostDeleted}
       />
-      {isLinkShareModalOpen && (
-        <LinkShareModal onClose={() => setIsLinkShareModalOpen(false)} />
-      )}
     </Container>
   );
 };
@@ -237,6 +467,21 @@ export default MemorialHallPage;
 
 const Container = styled.div`
   position: relative;
+`;
+
+const BlurWrapper = styled.div`
+  /* 필요하면 blur 활성화 */
+`;
+
+const ContentWrapper = styled.div`
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  flex: 1;
+
+  @media (max-width: 1200px) {
+    align-items: flex-start;
+  }
 `;
 
 const BarWrapper = styled.div`
@@ -253,9 +498,47 @@ const BarWrapper = styled.div`
   }
 `;
 
+const ModifyButton = styled.div`
+  width: 1096px;
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  &:hover {
+    transform: translateY(-1.5px);
+  }
+
+  @media (max-width: 1200px) {
+    width: 100%;
+  }
+`;
+
+const ModifyIcon = styled.img`
+  width: 24px;
+  height: 24px;
+  padding: 6px;
+`;
+
+const ModifyText = styled.div`
+  ${typo("h4")};
+  color: ${color("black.70")};
+  ${ModifyButton}:hover & {
+    color: ${color("black.100")};
+  }
+`;
+
 const Content = styled.div`
   width: 1096px;
   transition: all 0.3s ease;
+
+  @media (max-width: 1200px) {
+    width: 100%;
+  }
+`;
+
+const ProfileBox = styled.div`
+  margin-bottom: 52px;
 `;
 
 const FixedShareButton = styled.div`
@@ -296,53 +579,4 @@ const FixedAddPostButton = styled.div`
   &:hover {
     transform: scale(1.05);
   }
-`;
-
-const FixedAddPostMenu = styled.div`
-  position: absolute;
-  bottom: 160px;
-  right: 50%;
-  transform: translateX(50%);
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 8px;
-  animation: slideUp 0.25s ease forwards;
-
-  @keyframes slideUp {
-    from {
-      opacity: 0;
-      transform: translateY(10px) translateX(50%);
-    }
-    to {
-      opacity: 1;
-      transform: translateY(0) translateX(50%);
-    }
-  }
-`;
-
-const MenuButton = styled.button`
-  display: flex;
-  padding: 0 0.8125rem;
-  align-items: center;
-  justify-content: center;
-  height: 2.75rem;
-  width: 13.75rem;
-  border: 1px solid var(--5, #e9e9e9);
-  border-radius: 5px;
-  background: #ffbc67;
-  color: #313131;
-  ${typo("h4")};
-  cursor: pointer;
-  box-shadow: 0 0 7.6px 0 rgba(0, 0, 0, 0.18);
-
-  span {
-    flex: 1;
-    text-align: center;
-  }
-`;
-
-const MenuIcon = styled.img`
-  height: 2.1rem;
-  flex-shrink: 0;
 `;
