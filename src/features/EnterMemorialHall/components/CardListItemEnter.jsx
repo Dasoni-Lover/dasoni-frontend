@@ -79,7 +79,7 @@ export const CardListItemEnter = ({ hall, onOpenModal, hoverable = true }) => {
         <TextWrapper>
           <TextBox>
             <Text>{birthday}</Text>
-            <Text>~</Text>
+            <Text>&nbsp;~&nbsp;</Text>
             <Text>{deadday}</Text>
           </TextBox>
 

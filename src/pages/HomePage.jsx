@@ -80,7 +80,7 @@ export const HomePage = () => {
 
 const Wrapper = styled.div`
   display: flex;
-  width: 68.5rem;
+  width: 82.5rem;
   flex-direction: column;
   align-items: flex-start;
 `;
