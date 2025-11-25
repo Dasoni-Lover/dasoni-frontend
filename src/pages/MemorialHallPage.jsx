@@ -673,7 +673,7 @@ const ProfileBox = styled.div`
 const FixedShareButton = styled.div`
   position: absolute;
   right: -10%;
-  top: 20%;
+  top: 13rem;
 
   @media (max-width: 1200px) {
     display: none;
