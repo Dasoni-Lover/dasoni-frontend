@@ -37,14 +37,18 @@ export default function ConfirmModal({
         <ButtonGroup>
           <Button text={confirmText} size="L" onClick={onConfirm} />
           {cancelText ? (
-            <Button text={cancelText} size="L" color="white" onClick={onCancel} />
+            <Button
+              text={cancelText}
+              size="L"
+              color="white"
+              onClick={onCancel}
+            />
           ) : null}
         </ButtonGroup>
       </ModalContainer>
     </Overlay>
   );
 }
-
 
 const Overlay = styled.div`
   position: fixed;
@@ -53,7 +57,7 @@ const Overlay = styled.div`
   display: flex;
   align-items: center;
   justify-content: center;
-  z-index: 3000;
+  z-index: 100000000;
 `;
 
 const ModalContainer = styled.div`

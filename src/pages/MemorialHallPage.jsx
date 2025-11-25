@@ -16,12 +16,12 @@ import HallTab from "../features/MemorialHall/components/HallTab";
 import TabButtonDropdown from "../features/MemorialHall/components/TabButtonDropdown";
 import BoxPostList from "../features/MemorialHall/components/BoxPostList";
 import LetterAndLinkShare from "../features/MemorialHall/components/LetterAndLinkShare";
-import LinkShareModal from "../features/MemorialHall/components/LinkShareModal";
 import PostDetailModal from "../features/MemorialHall/components/PostDetailModal";
 import AddPostModal from "../features/MemorialHall/components/AddPostModal";
 import MyRecord from "../features/MemorialHall/components/MyRecord";
 import UploadVoiceRecord from "../features/MemorialHall/components/UploadVoiceRecord";
 import MyMemorialModal from "../features/MemorialHall/components/MyMemorialModal";
+import ConfirmModal from "../components/ConfirmModal";
 
 import AddPostButtonImg from "../features/MemorialHall/assets/btn-add-post.svg";
 import modifyicon from "../assets/edit-btn.svg";
@@ -218,6 +218,7 @@ export default function MemorialHallPage() {
   const filteredPhotos = useMemo(() => {
     let result = [...photos];
 
+    // ✅ isAIMode: true면 AI 이미지를 숨김(제외)
     if (filter.isAIMode) {
       result = result.filter((p) => !p.isAI);
     }
@@ -375,6 +376,34 @@ export default function MemorialHallPage() {
       state: { hallId: Number(effectiveHallId) },
     });
 
+  // ===================== 🔗 링크 공유 클릭 시: 주소 복사 + 모달 오픈 =====================
+  const handleLinkShareClick = async () => {
+    const currentUrl = window.location.href;
+
+    try {
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        await navigator.clipboard.writeText(currentUrl);
+      } else {
+        // fallback (일부 환경용)
+        const textarea = document.createElement("textarea");
+        textarea.value = currentUrl;
+        textarea.style.position = "fixed";
+        textarea.style.left = "-9999px";
+        document.body.appendChild(textarea);
+        textarea.select();
+        document.execCommand("copy");
+        document.body.removeChild(textarea);
+      }
+    } catch (err) {
+      console.error("클립보드 복사 실패:", err);
+      alert("링크 복사에 실패했습니다. 직접 주소를 복사해 주세요.");
+      return;
+    }
+
+    // 복사 성공 시 확인 모달 오픈
+    setIsLinkShareModalOpen(true);
+  };
+
   return (
     <PageWrapper>
       <GradiantBackGround />
@@ -452,7 +481,7 @@ export default function MemorialHallPage() {
           <FixedShareButton>
             {role === "follower" && (
               <LetterAndLinkShare
-                onLinkShareClick={() => setIsLinkShareModalOpen(true)}
+                onLinkShareClick={handleLinkShareClick}
                 page="default"
                 hallId={Number(effectiveHallId)}
               />
@@ -460,7 +489,7 @@ export default function MemorialHallPage() {
 
             {role === "admin" && (
               <LetterAndLinkShare
-                onLinkShareClick={() => setIsLinkShareModalOpen(true)}
+                onLinkShareClick={handleLinkShareClick}
                 onLetterClick={() =>
                   nav("/letter", { state: { hallId: Number(effectiveHallId) } })
                 }
@@ -471,14 +500,14 @@ export default function MemorialHallPage() {
 
             {role === "me" && (
               <LetterAndLinkShare
-                onLinkShareClick={() => setIsLinkShareModalOpen(true)}
+                onLinkShareClick={handleLinkShareClick}
                 page="my"
                 hallId={Number(effectiveHallId)}
               />
             )}
           </FixedShareButton>
 
-          {/* ✅ 게시글 작성 + 플로팅 버튼 */}
+          {/* ✅ 게시글 작성 (+ 플로팅 버튼) */}
           {showFloatingAddPost && (
             <FixedAddPostContainer>
               <FixedAddPostButton onClick={() => setIsAddPostModalOpen(true)}>
@@ -501,11 +530,14 @@ export default function MemorialHallPage() {
             />
           )}
 
-          {/* ✅ LinkShareModal */}
+          {/* 링크 공유 ConfirmModal */}
           {isLinkShareModalOpen && (
-            <LinkShareModal
-              onClose={() => setIsLinkShareModalOpen(false)}
-              page={role === "admin" ? "manager" : undefined}
+            <ConfirmModal
+              isOpen={isLinkShareModalOpen}
+              title="추모관 링크가 복사되었어요"
+              description="함께 추모하고 싶은 사람에게 공유해 주세요"
+              onConfirm={() => setIsLinkShareModalOpen(false)}
+              onCancel={() => setIsLinkShareModalOpen(false)}
             />
           )}
         </BlurWrapper>
