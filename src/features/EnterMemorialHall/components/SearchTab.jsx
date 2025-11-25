@@ -12,10 +12,16 @@ export const SearchTab = ({ onSearchResult }) => {
   const [deaddate, setDeadDate] = useState(null);
   const [loading, setLoading] = useState(false);
 
-  // 한 자리 수 → 2자리 문자열로 변환
+  // 한 자리 수 → 2자리 문자열
   const padZero = (num) => String(num).padStart(2, "0");
 
-  // Date 객체 → "YYYY.MM.DD" 문자열 변환
+  // today placeholder 생성
+  const today = new Date();
+  const todayPlaceholder = `${today.getFullYear()}/${padZero(
+    today.getMonth() + 1
+  )}/${padZero(today.getDate())}`;
+
+  // Date → "YYYY.MM.DD"
   const formatDate = (date) => {
     if (!date) return null;
     const y = date.getFullYear();
@@ -46,49 +52,52 @@ export const SearchTab = ({ onSearchResult }) => {
     <Wrapper>
       <Box>
         <Box1>
-        <Type>고인의 성함</Type>
-        <InputField
-          width="54.9375rem"
-          placeholder="고인의 성함을 입력하세요"
-          value={name}
-          onChange={(e) => setName(e.target.value)}
-          borderColor="#FFBC67" bgColor="#fff"
-        />
-      </Box1>
-      <ButtonBox>
-        <Button
-          text={loading ? "검색중..." : "검색하기"}
-          size="M"
-          icon="search"
-          style={{ padding: "0.46rem" }}
-          onClick={handleSearch}
-          disabled={loading}
-        />
-      </ButtonBox>
+          <Type>고인의 성함</Type>
+          <InputField
+            width="54.9375rem"
+            placeholder="고인의 성함을 입력하세요"
+            value={name}
+            onChange={(e) => setName(e.target.value)}
+            borderColor="#FFBC67"
+            bgColor="#fff"
+          />
+        </Box1>
+
+        <ButtonBox>
+          <Button
+            text={loading ? "검색중..." : "검색하기"}
+            size="M"
+            icon="search"
+            style={{ padding: "0.46rem" }}
+            onClick={handleSearch}
+            disabled={loading}
+          />
+        </ButtonBox>
       </Box>
+
       <Container>
         <Box2>
-        <Type>고인의 생일</Type>
-        <DatePicker
-          selected={birthdate}
-          onChange={setBirthDate}
-          placeholder="YYYY/MM/DD"
-          width="15.625rem"
-          height="3.25rem"
-        />
-      </Box2>
-      <Box2>
-        <Type>고인의 기일</Type>
-        <DatePicker
-          selected={deaddate}
-          onChange={setDeadDate}
-          placeholder="2021/04/24"
-          width="15.625rem"
-          height="3.25rem"
-        />
-      </Box2>
+          <Type>고인의 생일</Type>
+          <DatePicker
+            selected={birthdate}
+            onChange={setBirthDate}
+            placeholder="YYYY/MM/DD"
+            width="15.625rem"
+            height="3.25rem"
+          />
+        </Box2>
+
+        <Box2>
+          <Type>고인의 기일</Type>
+          <DatePicker
+            selected={deaddate}
+            onChange={setDeadDate}
+            placeholder={todayPlaceholder} // ← 오늘 날짜 적용!
+            width="15.625rem"
+            height="3.25rem"
+          />
+        </Box2>
       </Container>
-      
     </Wrapper>
   );
 };
@@ -102,16 +111,16 @@ const Wrapper = styled.div`
   gap: 1.25rem;
   align-self: stretch;
   border-radius: 1.25rem;
-  background: #FFF4E6;
+  background: #fff4e6;
 `;
 
-const Box=styled.div`
+const Box = styled.div`
   display: flex;
   padding-right: 1.25rem;
   justify-content: space-between;
   align-items: center;
   align-self: stretch;
-`
+`;
 
 const Box1 = styled.div`
   display: flex;
@@ -121,11 +130,11 @@ const Box1 = styled.div`
   box-sizing: border-box;
 `;
 
-const Container=styled.div`
+const Container = styled.div`
   display: flex;
   align-items: center;
   gap: 3.25rem;
-`
+`;
 
 const Box2 = styled.div`
   display: flex;
