@@ -183,7 +183,7 @@ const Wrapper = styled.header`
   align-items: center;
   padding: 0 4.38rem;
   background: white;
-  z-index: 999;
+  z-index: 5;
   border-bottom: 1px solid var(--5, #e9e9e9);
 `;
 

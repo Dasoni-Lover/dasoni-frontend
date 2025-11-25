@@ -407,9 +407,8 @@ export default function MemorialHallPage() {
   return (
     <PageWrapper>
       <GradiantBackGround />
-
-      <Container>
-        <BlurWrapper $blur={isMyMemorialModalOpen}>
+      <BlurWrapper $blur={isMyMemorialModalOpen}>
+        <Container>
           <BarWrapper>
             <BarNavigate paths={["홈", isMe ? "나의 추모관" : hallTitle]} />
           </BarWrapper>
@@ -515,52 +514,54 @@ export default function MemorialHallPage() {
               </FixedAddPostButton>
             </FixedAddPostContainer>
           )}
+        </Container>
+      </BlurWrapper>
 
-          {isAddPostModalOpen && (
-            <AddPostModal
-              onClose={() => setIsAddPostModalOpen(false)}
-              onSelectAI={() => {
-                setIsAddPostModalOpen(false);
-                goAIGeneratePage();
-              }}
-              onSelectComputer={() => {
-                setIsAddPostModalOpen(false);
-                goWritePage();
-              }}
-            />
-          )}
-
-          {/* 링크 공유 ConfirmModal */}
-          {isLinkShareModalOpen && (
-            <ConfirmModal
-              isOpen={isLinkShareModalOpen}
-              title="추모관 링크가 복사되었어요"
-              description="함께 추모하고 싶은 사람에게 공유해 주세요"
-              onConfirm={() => setIsLinkShareModalOpen(false)}
-              onCancel={() => setIsLinkShareModalOpen(false)}
-            />
-          )}
-        </BlurWrapper>
-
-        {/* ✅ me인데 내 추모관 없을 때만 생성 모달 */}
-        {isMe && isMyMemorialModalOpen && (
-          <MyMemorialModal
-            isOpen={isMyMemorialModalOpen}
-            onCreateClick={handleCreateClick}
-          />
-        )}
-
-        {/* ✅ Post Detail Modal */}
-        <PostDetailModal
-          isOpen={!!selectedPhoto}
-          post={selectedPhoto}
-          onClose={() => setSelectedPhoto(null)}
-          hallId={Number(effectiveHallId)}
-          onPrev={handlePrev}
-          onNext={handleNext}
-          onDeleted={handlePostDeleted}
+      {/* 여기부터 모달 관련 */}
+      {/* 게시글 작성 버튼(+버튼) 클릭시 게시글 작성 모달 */}
+      {isAddPostModalOpen && (
+        <AddPostModal
+          onClose={() => setIsAddPostModalOpen(false)}
+          onSelectAI={() => {
+            setIsAddPostModalOpen(false);
+            goAIGeneratePage();
+          }}
+          onSelectComputer={() => {
+            setIsAddPostModalOpen(false);
+            goWritePage();
+          }}
         />
-      </Container>
+      )}
+
+      {/* 링크 공유 ConfirmModal */}
+      {isLinkShareModalOpen && (
+        <ConfirmModal
+          isOpen={isLinkShareModalOpen}
+          title="추모관 링크가 복사되었어요"
+          description="함께 추모하고 싶은 사람에게 공유해 주세요"
+          onConfirm={() => setIsLinkShareModalOpen(false)}
+          onCancel={() => setIsLinkShareModalOpen(false)}
+        />
+      )}
+
+      {/* ✅ me인데 내 추모관 없을 때만 생성 모달 */}
+      {isMe && isMyMemorialModalOpen && (
+        <MyMemorialModal
+          isOpen={isMyMemorialModalOpen}
+          onCreateClick={handleCreateClick}
+        />
+      )}
+
+      {/* ✅ Post Detail Modal */}
+      <PostDetailModal
+        isOpen={!!selectedPhoto}
+        post={selectedPhoto}
+        onClose={() => setSelectedPhoto(null)}
+        hallId={Number(effectiveHallId)}
+        onPrev={handlePrev}
+        onNext={handleNext}
+        onDeleted={handlePostDeleted}
+      />
     </PageWrapper>
   );
 }
