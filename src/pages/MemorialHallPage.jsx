@@ -376,163 +376,193 @@ export default function MemorialHallPage() {
     });
 
   return (
-    <Container>
-      <BlurWrapper $blur={isMyMemorialModalOpen}>
-        <BarWrapper>
-          <BarNavigate paths={["홈", isMe ? "나의 추모관" : hallTitle]} />
-        </BarWrapper>
+    <PageWrapper>
+      <GradiantBackGround />
 
-        <ContentWrapper>
-          {/* ✅ 관리자만 '추모관 정보 수정' 버튼 */}
-          {isManager && (
-            <ModifyButton onClick={handleModifyClick}>
-              <ModifyIcon src={modifyicon} />
-              <ModifyText>추모관 정보 수정</ModifyText>
-            </ModifyButton>
-          )}
+      <Container>
+        <BlurWrapper $blur={isMyMemorialModalOpen}>
+          <BarWrapper>
+            <BarNavigate paths={["홈", isMe ? "나의 추모관" : hallTitle]} />
+          </BarWrapper>
 
-          <Content>
-            {/* ✅ 프로필 UI */}
-            {isMe ? (
-              <ProfileBox>
-                <DefaultProfile
-                  isEditable={hasMemorialHall}
-                  name={hallInfo?.name || "이름 없음"}
-                  date={
-                    hallInfo
-                      ? `${hallInfo?.birthday || ""} ~ ${
-                          hallInfo?.deadday || ""
-                        }`
-                      : ""
-                  }
-                  src={hallInfo?.profile}
-                  onFileSelect={handleProfileFileSelect}
-                />
-                {/* 필요하다면 isUpdatingProfile일 때 로딩 스피너나 문구 추가 가능 */}
-              </ProfileBox>
-            ) : (
-              hallInfo && <Profile data={hallInfo} />
+          <ContentWrapper>
+            {/* ✅ 관리자만 '추모관 정보 수정' 버튼 */}
+            {isManager && (
+              <ModifyButton onClick={handleModifyClick}>
+                <ModifyIcon src={modifyicon} />
+                <ModifyText>추모관 정보 수정</ModifyText>
+              </ModifyButton>
             )}
 
-            {/* ✅ 탭 */}
-            <HallTab
-              role={tabRoleProp}
-              activeIndex={activeTab}
-              onTabChange={setActiveTab}
-            />
+            <Content>
+              {/* ✅ 프로필 UI */}
+              {isMe ? (
+                <ProfileBox>
+                  <DefaultProfile
+                    isEditable={hasMemorialHall}
+                    name={hallInfo?.name || "이름 없음"}
+                    date={
+                      hallInfo
+                        ? `${hallInfo?.birthday || ""} ~ ${
+                            hallInfo?.deadday || ""
+                          }`
+                        : ""
+                    }
+                    src={hallInfo?.profile}
+                    onFileSelect={handleProfileFileSelect}
+                  />
+                  {/* 필요하다면 isUpdatingProfile일 때 로딩 스피너나 문구 추가 가능 */}
+                </ProfileBox>
+              ) : (
+                hallInfo && <Profile data={hallInfo} />
+              )}
 
-            {/* ✅ role별 탭 내용 */}
-            {role === "admin" && activeTab === 2 && (
-              <MyRecord hallId={Number(effectiveHallId)} />
+              {/* ✅ 탭 */}
+              <HallTab
+                role={tabRoleProp}
+                activeIndex={activeTab}
+                onTabChange={setActiveTab}
+              />
+
+              {/* ✅ role별 탭 내용 */}
+              {role === "admin" && activeTab === 2 && (
+                <MyRecord hallId={Number(effectiveHallId)} />
+              )}
+
+              {role === "me" && activeTab === 1 && (
+                <MyRecord hallId={Number(effectiveHallId)} />
+              )}
+
+              {role === "me" && activeTab === 2 && <UploadVoiceRecord />}
+
+              {/* ✅ 사진 리스트 영역 */}
+              {showDropdownAndList && (
+                <>
+                  <TabButtonDropdown onFilterChange={setFilter} />
+                  <BoxPostList
+                    photos={filteredPhotos}
+                    onPostClick={handlePhotoClick}
+                  />
+                </>
+              )}
+            </Content>
+          </ContentWrapper>
+
+          {/* ✅ 공유/편지 버튼 */}
+          <FixedShareButton>
+            {role === "follower" && (
+              <LetterAndLinkShare
+                onLinkShareClick={() => setIsLinkShareModalOpen(true)}
+                page="default"
+                hallId={Number(effectiveHallId)}
+              />
             )}
 
-            {role === "me" && activeTab === 1 && (
-              <MyRecord hallId={Number(effectiveHallId)} />
+            {role === "admin" && (
+              <LetterAndLinkShare
+                onLinkShareClick={() => setIsLinkShareModalOpen(true)}
+                onLetterClick={() =>
+                  nav("/letter", { state: { hallId: Number(effectiveHallId) } })
+                }
+                page="manager"
+                hallId={Number(effectiveHallId)}
+              />
             )}
 
-            {role === "me" && activeTab === 2 && <UploadVoiceRecord />}
-
-            {/* ✅ 사진 리스트 영역 */}
-            {showDropdownAndList && (
-              <>
-                <TabButtonDropdown onFilterChange={setFilter} />
-                <BoxPostList
-                  photos={filteredPhotos}
-                  onPostClick={handlePhotoClick}
-                />
-              </>
+            {role === "me" && (
+              <LetterAndLinkShare
+                onLinkShareClick={() => setIsLinkShareModalOpen(true)}
+                page="my"
+                hallId={Number(effectiveHallId)}
+              />
             )}
-          </Content>
-        </ContentWrapper>
+          </FixedShareButton>
 
-        {/* ✅ 공유/편지 버튼 */}
-        <FixedShareButton>
-          {role === "follower" && (
-            <LetterAndLinkShare
-              onLinkShareClick={() => setIsLinkShareModalOpen(true)}
-              page="default"
-              hallId={Number(effectiveHallId)}
+          {/* ✅ Add Post Floating */}
+          {showFloatingAddPost && (
+            <FixedAddPostContainer>
+              <FixedAddPostButton onClick={() => setIsAddPostModalOpen(true)}>
+                <img src={AddPostButtonImg} alt="추가 버튼" />
+              </FixedAddPostButton>
+            </FixedAddPostContainer>
+          )}
+
+          {isAddPostModalOpen && (
+            <AddPostModal
+              onClose={() => setIsAddPostModalOpen(false)}
+              onSelectAI={() => {
+                setIsAddPostModalOpen(false);
+                goAIGeneratePage();
+              }}
+              onSelectComputer={() => {
+                setIsAddPostModalOpen(false);
+                goWritePage();
+              }}
             />
           )}
 
-          {role === "admin" && (
-            <LetterAndLinkShare
-              onLinkShareClick={() => setIsLinkShareModalOpen(true)}
-              onLetterClick={() =>
-                nav("/letter", { state: { hallId: Number(effectiveHallId) } })
-              }
-              page="manager"
-              hallId={Number(effectiveHallId)}
+          {/* ✅ LinkShareModal */}
+          {isLinkShareModalOpen && (
+            <LinkShareModal
+              onClose={() => setIsLinkShareModalOpen(false)}
+              page={role === "admin" ? "manager" : undefined}
             />
           )}
+        </BlurWrapper>
 
-          {role === "me" && (
-            <LetterAndLinkShare
-              onLinkShareClick={() => setIsLinkShareModalOpen(true)}
-              page="my"
-              hallId={Number(effectiveHallId)}
-            />
-          )}
-        </FixedShareButton>
-
-        {/* ✅ Add Post Floating */}
-        {showFloatingAddPost && (
-          <FixedAddPostContainer>
-            <FixedAddPostButton onClick={() => setIsAddPostModalOpen(true)}>
-              <img src={AddPostButtonImg} alt="추가 버튼" />
-            </FixedAddPostButton>
-          </FixedAddPostContainer>
-        )}
-
-        {isAddPostModalOpen && (
-          <AddPostModal
-            onClose={() => setIsAddPostModalOpen(false)}
-            onSelectAI={() => {
-              setIsAddPostModalOpen(false);
-              goAIGeneratePage();
-            }}
-            onSelectComputer={() => {
-              setIsAddPostModalOpen(false);
-              goWritePage();
-            }}
+        {/* ✅ me인데 내 추모관 없을 때만 생성 모달 */}
+        {isMe && isMyMemorialModalOpen && (
+          <MyMemorialModal
+            isOpen={isMyMemorialModalOpen}
+            onCreateClick={handleCreateClick}
           />
         )}
 
-        {/* ✅ LinkShareModal */}
-        {isLinkShareModalOpen && (
-          <LinkShareModal
-            onClose={() => setIsLinkShareModalOpen(false)}
-            page={role === "admin" ? "manager" : undefined}
-          />
-        )}
-      </BlurWrapper>
-
-      {/* ✅ me인데 내 추모관 없을 때만 생성 모달 */}
-      {isMe && isMyMemorialModalOpen && (
-        <MyMemorialModal
-          isOpen={isMyMemorialModalOpen}
-          onCreateClick={handleCreateClick}
+        {/* ✅ Post Detail Modal */}
+        <PostDetailModal
+          isOpen={!!selectedPhoto}
+          post={selectedPhoto}
+          onClose={() => setSelectedPhoto(null)}
+          hallId={Number(effectiveHallId)}
+          onPrev={handlePrev}
+          onNext={handleNext}
+          onDeleted={handlePostDeleted}
         />
-      )}
-
-      {/* ✅ Post Detail Modal */}
-      <PostDetailModal
-        isOpen={!!selectedPhoto}
-        post={selectedPhoto}
-        onClose={() => setSelectedPhoto(null)}
-        hallId={Number(effectiveHallId)}
-        onPrev={handlePrev}
-        onNext={handleNext}
-        onDeleted={handlePostDeleted}
-      />
-    </Container>
+      </Container>
+    </PageWrapper>
   );
 }
 
 /* 🎨 스타일 */
 
-const Container = styled.div`
+const PageWrapper = styled.div`
   position: relative;
+  width: 100%;
+  min-height: 100%; /* 문서 흐름 유지 */
+`;
+
+const Container = styled.div`
+  position: relative; /* Footer 밀리게 */
+  z-index: 1; /*  배경 위로 */
+  width: 100%;
+`;
+
+const GradiantBackGround = styled.div`
+  position: absolute; /*  콘텐츠 뒤로 깔기 */
+  top: 0;
+  left: 50%;
+  z-index: 0; /* 가장 뒤 */
+  width: 100vw; /* 화면 전체 폭 */
+  transform: translateX(-50%); /* 가운데 기준으로 꽉 펴기 */
+  height: 34.25rem;
+
+  background: linear-gradient(
+    90deg,
+    #fff1f2 9.13%,
+    #fff6eb 76.44%,
+    #ffefe5 100%
+  );
+  box-shadow: 0 0 46.7px 0 rgba(0, 0, 0, 0.05) inset;
 `;
 
 const BlurWrapper = styled.div`

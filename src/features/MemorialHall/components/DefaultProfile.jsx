@@ -50,7 +50,9 @@ const DefaultProfile = ({
       {isEditable ? (
         <EditSmallPhotoBox src={profileSrc} onFileSelect={onFileSelect} />
       ) : (
-        <SmallPhotoBox src={profileSrc} />
+        <PhotoWrapper>
+          <Img src={profileSrc} alt="photo" />
+        </PhotoWrapper>
       )}
     </Wrapper>
   );
@@ -82,4 +84,19 @@ const Name = styled.div`
 const Date = styled.div`
   ${typo("h3")};
   color: ${color("black.70")};
+`;
+
+const PhotoWrapper = styled.div`
+  position: relative;
+  display: inline-block;
+`;
+
+const Img = styled.img`
+  display: flex;
+  width: 22.5rem;
+  height: 22.5rem;
+  aspect-ratio: 1 / 1;
+  object-fit: cover;
+  border-radius: 10px;
+  border: solid 2px #e9e9e9;
 `;
