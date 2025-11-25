@@ -4,7 +4,7 @@ import styled from "styled-components";
 import { color, typo } from "../../../styles/tokens";
 import { SmallPhotoBox } from "../../../components/photobox/SmallPhotoBox";
 import { EditSmallPhotoBox } from "../../../components/photobox/EditSmallPhotoBox";
-import defaultProfileImg from "../../../assets/icon-profile-default.svg";
+import defaultProfileImg from "../assets/icon-memorial-hall-profile-default.svg";
 import HallInfoTag from "./HallInfoTag";
 import { Row } from "../../../styles/flex";
 
