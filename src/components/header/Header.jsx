@@ -91,7 +91,7 @@ export default function Header({ showAuthButtons }) {
     { label: "홈", path: "/home" },
     { label: "입장하기", path: "/enter" },
     { label: "개설하기", path: "/open" },
-    { label: "나의 추모관", path: "/memorial-my" },
+    { label: "나의 추모관", path: "/memorial" },
   ];
 
   const getIsActive = (item) => {
@@ -101,10 +101,7 @@ export default function Header({ showAuthButtons }) {
 
     if (item.label === "나의 추모관") {
       const fromMyHall = location.state?.from === "myHall";
-      return (
-        location.pathname === "/memorial-my" ||
-        (location.pathname === "/memorial" && fromMyHall)
-      );
+      return location.pathname === "/memorial" && fromMyHall;
     }
 
     return location.pathname === item.path;

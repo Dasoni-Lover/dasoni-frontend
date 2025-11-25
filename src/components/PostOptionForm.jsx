@@ -75,7 +75,7 @@ export default function PostOptionForm({
         await updatePhoto(hallId, photoId, payload);
 
         alert("게시물이 수정되었습니다.");
-        nav("/memorial-manager", {
+        nav("/memorial", {
           state: { hallId },
           replace: true, // (선택) 뒤로가기 시 글작성 화면으로 안 돌아오게
         });
@@ -110,7 +110,7 @@ export default function PostOptionForm({
       const res = await uploadPhotoPost(payload);
       console.log("게시글 업로드 완료:", res);
       alert("게시물이 등록되었습니다.");
-      nav("/memorial-manager", {
+      nav("/memorial", {
         state: { hallId },
         replace: true, // (선택)
       });

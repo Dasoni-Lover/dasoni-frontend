@@ -48,17 +48,7 @@ const router = createBrowserRouter([
       /* 추모관 관련 */
       { path: "/memorial", element: <MemorialHallPage />, loader: authGuard },
       {
-        path: "/memorial-my",
-        element: <MemorialHallPage />,
-        loader: authGuard,
-      },
-      {
-        path: "/memorial-manager",
-        element: <MemorialHallPage />,
-        loader: authGuard,
-      },
-      {
-        path: "/memorial-manager/edit-profile",
+        path: "/memorial/edit-profile",
         element: <ProfileEditPage />,
         loader: authGuard,
       },

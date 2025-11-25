@@ -371,7 +371,7 @@ export default function MemorialHallPage() {
     nav("/generate", { state: { hallId: Number(effectiveHallId) } });
 
   const handleModifyClick = () =>
-    nav("/memorial-manager/edit-profile", {
+    nav("/memorial/edit-profile", {
       state: { hallId: Number(effectiveHallId) },
     });
 
