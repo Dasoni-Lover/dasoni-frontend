@@ -433,7 +433,7 @@ export default function MemorialHallPage() {
                   <DefaultProfile
                     isEditable={hasMemorialHall}
                     isMyHall // 나의 추모관 여부 전달
-                    name={hallInfo?.name || "이름 없음"}
+                    name={hallInfo?.name || "개설 전 추모관"}
                     birthday={hallInfo?.birthday}
                     deadday={hallInfo?.deadday}
                     src={hallInfo?.profile}
