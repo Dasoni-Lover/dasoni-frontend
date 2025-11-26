@@ -1,15 +1,15 @@
-import React from "react";
+import React, { useState } from "react";
 import styled from "styled-components";
 import { color, typo } from "../../../styles/tokens";
-import IconDownload from "../../../assets/icon-download.svg";
 import { Column, Row } from "../../../styles/flex";
 import Button from "../../../components/Button";
 import { useNavigate } from "react-router-dom";
+import CancelProcessButton from "../../../components/CancelProcessButton";
+import ConfirmModal from "../../../components/ConfirmModal";
 
 export default function GenerateComplete({ setIsGenerated, generatedImage }) {
   const nav = useNavigate();
 
-  const goBack = () => nav(-1);
   const goGenerate = () => setIsGenerated(false);
 
   const goWritePost = () => {
@@ -18,14 +18,35 @@ export default function GenerateComplete({ setIsGenerated, generatedImage }) {
     });
   };
 
+  const [isCanceled, setIsCanceled] = useState(false);
+  const handleCancelProcess = () => setIsCanceled(true);
+  const goHome = () => nav("/home");
+
+  // 생성되 이미지 저장 핸들러
+  const handleDownload = () => {
+    if (!generatedImage) return;
+
+    const a = document.createElement("a");
+    a.href = generatedImage;
+
+    // 유저한테 파일명 먼저 물어보기
+    const inputName = prompt("저장할 파일명을 입력하세요", "memorial-image");
+    if (!inputName) return;
+
+    a.download = `${inputName}.png`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+  };
+
   return (
     <Row>
       <Column>
-        <Row $justify={"start"}>
-          <DownloadButtonWrapper>
-            <img src={IconDownload} alt="download" />
-            <DownloadText>다운로드</DownloadText>
-          </DownloadButtonWrapper>
+        <Row $justify={"end"} style={{ marginBottom: "3.38rem" }}>
+          <CancelProcessButton
+            title="작성 그만두기"
+            onClick={handleCancelProcess}
+          />
         </Row>
 
         <Row $gap={"2.8rem"} style={{ marginBottom: "13rem" }}>
@@ -43,30 +64,31 @@ export default function GenerateComplete({ setIsGenerated, generatedImage }) {
                 size="L"
                 color="white"
                 text="다시 생성"
-                icon={true}
+                icon="restart"
                 onClick={goGenerate}
               />
-              <Button size="L" color="white" text="취소" onClick={goBack} />
+              <Button
+                size="L"
+                color="white"
+                text="다운로드"
+                icon="download"
+                onClick={handleDownload}
+              />
             </Column>
           </Column>
         </Row>
       </Column>
+      <ConfirmModal
+        isOpen={isCanceled}
+        title="추모관 개설을 그만둘까요?"
+        confirmText="그만두기"
+        cancelText="취소"
+        onConfirm={goHome}
+        onCancel={() => setIsCanceled(false)}
+      />
     </Row>
   );
 }
-
-const DownloadButtonWrapper = styled.div`
-  cursor: pointer;
-  display: flex;
-  padding: 0.5rem 1.25rem 0.5rem 1rem;
-  align-items: center;
-  gap: 0.125rem;
-`;
-
-const DownloadText = styled.div`
-  ${typo("h4")};
-  color: ${color("black.50")};
-`;
 
 const GeneratedImg = styled.img`
   width: 32.5rem;
@@ -75,6 +97,7 @@ const GeneratedImg = styled.img`
   border: 3px solid var(--5, #e9e9e9);
   background: lightgray 50% / cover no-repeat;
   box-shadow: 0 4px 22.6px 0 rgba(0, 0, 0, 0.25);
+  object-fit: cover;
 `;
 
 const InformText = styled.div`

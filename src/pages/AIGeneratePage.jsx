@@ -74,9 +74,7 @@ export default function AIGeneratePage() {
     }
   };
 
-  const hallTitle = hallInfo?.name
-    ? `故 ${hallInfo.name}의 추모관`
-    : "추모관";
+  const hallTitle = hallInfo?.name ? `故 ${hallInfo.name}의 추모관` : "추모관";
 
   return (
     <PageWrapper>
@@ -107,7 +105,6 @@ const PageWrapper = styled.div`
 
 const BarWrapper = styled.div`
   margin-top: 30px;
-  margin-bottom: 52px;
   display: flex;
 
   > * {

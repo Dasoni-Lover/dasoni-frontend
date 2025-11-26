@@ -27,9 +27,7 @@ export default function Loding({ isOpen, onCancel }) {
     <Overlay onClick={onCancel}>
       <ModalContainer onClick={(e) => e.stopPropagation()}>
         <TextWrapper>
-          <Title>
-            요청에 따라 이미지를 생성 <br />하고 있어요
-          </Title>
+          <Title>요청에 따라 이미지를 생성하고 있어요</Title>
           <Content>소중한 기억을 복원해 드릴게요.</Content>
         </TextWrapper>
 

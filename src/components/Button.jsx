@@ -4,6 +4,8 @@ import { color, typo } from "../styles/tokens";
 import IconFolder from "../assets/icon-folder.svg";
 import IconAdd from "../assets/icon-add.svg";
 import IconSearch from "../assets/icon-search.svg";
+import IconRestart from "../assets/icon-restart.svg";
+import IconDownload from "../assets/icon-download-black.svg";
 
 export default function Button({
   text,
@@ -19,6 +21,8 @@ export default function Button({
     add: IconAdd,
     folder: IconFolder,
     search: IconSearch,
+    restart: IconRestart,
+    download: IconDownload,
   };
 
   const iconSrc =
