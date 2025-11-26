@@ -18,8 +18,8 @@ export const CardListEnter = ({ halls = [], onOpenModal }) => {
 
 const Wrapper = styled.div`
   display: grid;
-  grid-template-columns: repeat(2, 32.5rem);
-  gap: 1.94rem 1.25rem;
+  grid-template-columns: repeat(3, 25.625rem);
+  gap: 1.9375rem 2.25rem;
   justify-content: center;
   align-items: start;
   width: 100%;
