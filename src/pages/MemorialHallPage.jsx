@@ -167,16 +167,21 @@ export default function MemorialHallPage() {
       try {
         if (!effectiveHallId) return;
 
-        // role별 탭/요청 분기
-        // follower: 탭 0(공유), 1(나와의 앨범)
-        // admin: 탭 0(공유), 1(나와의), 2(녹음)
-        // me: 탭 0(공유), 1(녹음), 2(업로드)
+        // 🔥 정렬 옵션에 따라 isBydate 결정
+        const sortOption = filter.sortOption;
 
+        // isBydate :
+        //  - true  : 날짜 순 (사진 기준)
+        //  - false : 업로드 순
+        const isBydate =
+          sortOption === "최신 사진순" || sortOption === "오래된 사진순";
+
+        // role별 탭/요청 분기
         if (role === "admin" && activeTab === 2) return;
         if (role === "me" && activeTab !== 0) return;
 
         let requestBody = {
-          isBydate: true,
+          isBydate, // 🔥 여기만 포인트
           isAI: true,
           isPrivate: false,
           isMine: false,
@@ -213,7 +218,8 @@ export default function MemorialHallPage() {
     };
 
     fetchPhotos();
-  }, [role, activeTab, effectiveHallId, reloadKey]);
+    // 🔥 정렬 옵션 바뀔 때도 다시 호출되도록 의존성에 sortOption 추가
+  }, [role, activeTab, effectiveHallId, reloadKey, filter.sortOption]);
 
   // ===================== 4) 필터/정렬 적용 =====================
   const filteredPhotos = useMemo(() => {

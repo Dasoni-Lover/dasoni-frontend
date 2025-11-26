@@ -42,7 +42,6 @@ export default function GenerateComplete({
 
       img.onload = () => {
         const canvas = document.createElement("canvas");
-        const size = Math.max(img.width, img.height);
 
         canvas.width = img.width;
         canvas.height = img.height;
@@ -137,7 +136,7 @@ export default function GenerateComplete({
         <Row $gap={"2.8rem"} style={{ marginBottom: "13rem" }}>
           <GeneratedImg src={displayImage} alt="생성된 이미지" />
           <Column style={{ width: "24.5rem" }} $justify={"space-between"}>
-            <InformText>{`요청하신 사항에 맞추어 \n이미지를 생성했어요`}</InformText>
+            <InformText></InformText>
             <Column $gap={"1.25rem"}>
               <Button
                 size="L"
