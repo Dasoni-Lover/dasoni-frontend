@@ -25,6 +25,11 @@ export const AlarmList = () => {
         content="내일은 기념일이에요! 오늘 편지를 작성하면 내일 답장을 받을 수 있어요" 
         tagOn={true} 
       />
+      <AlarmListitem 
+        tagText="기념일 알림" 
+        content="내일은 기념일이에요! 오늘 편지를 작성하면 내일 답장을 받을 수 있어요" 
+        tagOn={true} 
+      />
     </Container>
   );
 };
@@ -32,9 +37,17 @@ export const AlarmList = () => {
 const Container = styled.div`
   display: flex;
   flex-direction: column;
-  height: 100%;
+  height: 100%;  /* ⭐ Wrapper의 남은 높이를 그대로 사용 */
+  width: 100%;
   overflow-y: auto;
   scroll-behavior: smooth;
+  box-sizing: border-box;
+  border-radius: 0 0 1.875rem 1.875rem;
+
+  /* 스크롤바 숨기기 */
+  &::-webkit-scrollbar {
+    display: none;
+  }
+  -ms-overflow-style: none; 
+  scrollbar-width: none; 
 `;
-
-

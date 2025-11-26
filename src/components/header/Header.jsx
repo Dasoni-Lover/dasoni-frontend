@@ -8,6 +8,9 @@ import { clearAuthTokens, getAccessToken, logoutUser } from "../../api/auth";
 import { getProfileInfo } from "../../api/user";
 import MiniProfile from "./MiniProflie";
 import IconLogout from "../../assets/icon-logout.svg";
+import AlarmPanel from "../alarm/AlarmPanel";
+import alarm from "../../assets/bell-icon-gray.svg";
+import alarmclick from "../../assets/bell-icon-yellow.svg";
 
 export default function Header({ showAuthButtons }) {
   const navigate = useNavigate();
@@ -20,8 +23,8 @@ export default function Header({ showAuthButtons }) {
   });
 
   const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [isAlarmOpen, setIsAlarmOpen] = useState(false); // ⭐ 알람 패널 열림/닫힘 상태
 
-  // 프로필 정보 가져오는 함수 분리
   const fetchProfileInfo = async () => {
     const token = getAccessToken();
 
@@ -54,12 +57,10 @@ export default function Header({ showAuthButtons }) {
     }
   };
 
-  // 1) 경로 바뀔 때마다 토큰/프로필 다시 확인
   useEffect(() => {
     fetchProfileInfo();
   }, [location.pathname]);
 
-  // 2) 로그인/로그아웃 전역 이벤트 구독(즉시 반영)
   useEffect(() => {
     const handleAuthChanged = () => {
       fetchProfileInfo();
@@ -69,7 +70,6 @@ export default function Header({ showAuthButtons }) {
     return () => window.removeEventListener("authChanged", handleAuthChanged);
   }, []);
 
-  // 프로필 변경 전역 이벤트 구독
   useEffect(() => {
     const handleProfileUpdated = (e) => {
       const newUrl = e.detail?.profileUrl;
@@ -122,12 +122,15 @@ export default function Header({ showAuthButtons }) {
       console.warn("로그아웃 실패(서버):", error);
     } finally {
       clearAuthTokens();
-      // 전역 이벤트로 헤더 즉시 초기화
       window.dispatchEvent(new Event("authChanged"));
-
       navigate("/");
       alert("로그아웃 되었습니다.");
     }
+  };
+
+  // ⭐ Alarm Icon 클릭 시 열림/닫힘 + 아이콘 변경
+  const handleAlarmClick = () => {
+    setIsAlarmOpen((prev) => !prev);
   };
 
   return (
@@ -148,12 +151,22 @@ export default function Header({ showAuthButtons }) {
             ))}
           </Row>
 
-          <Row>
+          <Row style={{ position: "relative" }}>
+            {/* ⭐ 알람 아이콘 */}
+            <AlarmIcon
+              src={isAlarmOpen ? alarmclick : alarm}
+              onClick={handleAlarmClick}
+            />
+
+            {/* ⭐ AlarmPanel 패널 토글 */}
+            {isAlarmOpen && <AlarmPanel />}
+
             <MiniProfile
               name={isLoggedIn ? profileInfo.name : "로그인 해주세요"}
               profileImg={profileInfo.myProfile}
               isLogin={isLoggedIn}
             />
+
             <LogoutWrapper>
               <LogoutText onClick={handleLogoutClick}>
                 <img src={IconLogout} alt="logout icon" />
@@ -212,15 +225,10 @@ const LoginButton = styled.button`
   border-radius: 0.625rem;
   border: 2px solid var(--5, #e9e9e9);
   background: #fff;
-
   color: var(--80, #0e0e0e);
-  text-align: center;
   font-family: Pretendard;
   font-size: 1.25rem;
-  font-style: normal;
   font-weight: 700;
-  line-height: 130%;
-
   cursor: pointer;
 `;
 
@@ -233,25 +241,25 @@ const RegisterButton = styled.button`
   border-radius: 0.625rem;
   border: 2px solid var(--70, #313131);
   background: var(--70, #313131);
-
   color: #fff;
-  text-align: center;
   font-family: Pretendard;
   font-size: 1.25rem;
-  font-style: normal;
   font-weight: 700;
-  line-height: 130%;
-
   cursor: pointer;
 `;
 
 const NavButton = styled.div`
   ${typo("h4")};
   color: ${({ $active }) => ($active ? color("black.80") : color("black.30"))};
-
   cursor: pointer;
   white-space: nowrap;
   transition: color 0.25s ease;
+`;
+
+const AlarmIcon = styled.img`
+  width: 2.5rem;
+  height: 2.5rem;
+  cursor: pointer;
 `;
 
 const LogoutWrapper = styled.div`
@@ -268,7 +276,6 @@ const LogoutText = styled.div`
   color: ${color("black.30")};
   border-radius: 0.25rem;
   width: 13.25rem;
-  box-sizing: border-box;
   transition: all 0.2s ease;
 
   &:hover {

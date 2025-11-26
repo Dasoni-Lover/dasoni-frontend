@@ -7,14 +7,13 @@ import deleteicon from "../../assets/delete-icon.svg";
 export const AlarmListitem = ({
   tagText = "입장승인",
   content = "입장이 승인 되었어요. 언제든 방문하여 소중한 추억을 함께 나눠주세요.",
-  tagOn = true, // on/off
   title = "故 박영수 추모관",
 }) => {
   return (
     <Wrapper>
       <Left>
         <Box>
-          <Tag text={tagText} on={tagOn} />
+          <Tag text={tagText} />
           <Title>{title}</Title>
         </Box>
         <Content>{content}</Content>
@@ -26,12 +25,13 @@ export const AlarmListitem = ({
 
 const Wrapper = styled.div`
   display: flex;
-  width: 31.25rem;
+  width: 27.4375rem;
   padding: 1rem 1.625rem;
+  gap: 1.25rem;
   justify-content: space-between;
   align-items: center;
   border-bottom: 1px solid var(--5, #E9E9E9);
-  background: var(--0, #FFF);
+  background: #FFF4E6;
   box-sizing: border-box;
 `;
 
@@ -41,15 +41,14 @@ const Left = styled.div`
   flex-direction: column;
   justify-content: center;
   align-items: flex-start;
-  flex-shrink: 0;
 `;
 
 const Box = styled.div`
   display: flex;
+  height: 2.88rem;
   align-items: center;
   gap: 0.5rem;
   align-self: stretch;
-  padding: 0.625rem 0;
 `;
 
 const Title = styled.div`
@@ -66,5 +65,8 @@ const Icon = styled.img`
   width: 1.5rem;
   height: 1.5rem;
   flex-shrink: 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 `;
 
