@@ -24,6 +24,7 @@ export default function PostOptionForm({
   initialDate = null,
   initialScope = "public",
   photoFile,
+  isAI = false,
 }) {
   const [scope, setScope] = useState(initialScope);
   const [date, setDate] = useState(initialDate);
@@ -103,7 +104,7 @@ export default function PostOptionForm({
         content: content.trim(),
         occurredAt,
         isPrivate: scope === "private",
-        isAI: false,
+        isAI: isAI,
         hallId,
       };
 

@@ -26,6 +26,7 @@ export default function GenerateComplete({
       state: {
         hallId,
         generatedImage: imageToUse,
+        isAI: true,
       },
     });
   };
