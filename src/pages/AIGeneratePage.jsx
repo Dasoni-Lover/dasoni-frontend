@@ -89,6 +89,7 @@ export default function AIGeneratePage() {
         <GenerateComplete
           setIsGenerated={setIsGenerated}
           generatedImage={generatedImage}
+          hallId={hallId}
         />
       ) : (
         <AIGenerateForm onGenerate={handleGenerate} />

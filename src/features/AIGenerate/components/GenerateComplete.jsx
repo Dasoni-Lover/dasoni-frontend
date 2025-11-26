@@ -7,11 +7,15 @@ import { useNavigate } from "react-router-dom";
 import CancelProcessButton from "../../../components/CancelProcessButton";
 import ConfirmModal from "../../../components/ConfirmModal";
 
-export default function GenerateComplete({ setIsGenerated, generatedImage }) {
+export default function GenerateComplete({
+  setIsGenerated,
+  generatedImage,
+  hallId,
+}) {
   const nav = useNavigate();
 
   const [isCanceled, setIsCanceled] = useState(false);
-  const [badgedImage, setBadgedImage] = useState(null); // 🟠 뱃지 붙인 최종 이미지
+  const [badgedImage, setBadgedImage] = useState(null); // 뱃지 붙인 최종 이미지
 
   const goGenerate = () => setIsGenerated(false);
 
@@ -19,7 +23,10 @@ export default function GenerateComplete({ setIsGenerated, generatedImage }) {
     // 배지 붙은 이미지가 있으면 그걸, 아니면 원본 이미지 사용
     const imageToUse = badgedImage || generatedImage;
     nav("/write", {
-      state: { generatedImage: imageToUse },
+      state: {
+        hallId,
+        generatedImage: imageToUse,
+      },
     });
   };
 
