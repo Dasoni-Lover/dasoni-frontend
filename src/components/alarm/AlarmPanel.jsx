@@ -25,7 +25,7 @@ const Panel = styled.div`
   top: 5.06rem;
   right: 16.75rem; 
   width: 27.4375rem;
-  height: 33.25rem;
+  max-height: 33.25rem;
   border-radius: 1.875rem;
   border: 1px solid var(--outline, #F2E8DF);
   background: var(--0, #FFF);
