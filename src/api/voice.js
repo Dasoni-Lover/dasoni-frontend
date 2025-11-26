@@ -74,3 +74,14 @@ export const updateVoiceFile = async (hallId, file) => {
   // 혹시 쓸 수도 있으니 fileUrl을 리턴해 둠
   return fileUrl;
 };
+
+/**
+ * 녹음 파일 삭제
+ *  - DELETE /api/halls/{hall_id}/letters/voice/delete
+ */
+export const deleteVoiceFile = async (hallId) => {
+  if (!hallId) throw new Error("추모관 ID가 없습니다.");
+
+  const res = await client.delete(`/api/halls/${hallId}/voice/delete`);
+  return res.data;
+};

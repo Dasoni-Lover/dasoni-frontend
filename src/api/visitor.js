@@ -13,7 +13,7 @@ export const getVisitorList = async (hallId) => {
   return res.data;
 };
 
-// 3) 입장 요청 수락 / 거절 
+// 3) 입장 요청 수락 / 거절
 // isAccept: true → 수락
 // isAccept: false → 거절
 export const respondRequest = async (hallId, requestId, isAccept) => {
@@ -24,3 +24,8 @@ export const respondRequest = async (hallId, requestId, isAccept) => {
   return res.data; // {}
 };
 
+// 4) 방문자 내보내기
+export const kickVisitor = async (hallId, userId) => {
+  const res = await client.patch(`/api/halls/${hallId}/visitor/${userId}/out`);
+  return res.data;
+};

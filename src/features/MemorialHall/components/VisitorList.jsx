@@ -8,6 +8,7 @@ export default function VisitorList({
   type,
   hallId,
   onActionComplete,
+  onKickComplete,
 }) {
   return (
     <Box>
@@ -19,8 +20,9 @@ export default function VisitorList({
             type={type}
             item={item}
             index={index + 1}
-            hallId={hallId} // 🔥
-            onActionComplete={onActionComplete} // 🔥
+            hallId={hallId}
+            onActionComplete={onActionComplete}
+            onKickComplete={onKickComplete}
           />
         ))}
       </Container>

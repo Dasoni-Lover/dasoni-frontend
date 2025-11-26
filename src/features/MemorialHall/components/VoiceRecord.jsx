@@ -5,7 +5,7 @@ import playicon from "../assets/icon-play.svg";
 import pauseicon from "../assets/icon-pause.svg"; // 아직 미생성
 import { color, typo } from "../../../styles/tokens";
 
-export default function VoiceRecord({ file, onReupload }) {
+export default function VoiceRecord({ file, onReupload, onDelete }) {
   const audioRef = useRef(null);
   const [isPlaying, setIsPlaying] = useState(false);
   const [currentTime, setCurrentTime] = useState(0);
@@ -58,9 +58,7 @@ export default function VoiceRecord({ file, onReupload }) {
   };
 
   const handleProgressClick = (e) => {
-    const rect =
-      e.target.getBoundingClientClientRect?.() ??
-      e.target.getBoundingClientRect();
+    const rect = e.currentTarget.getBoundingClientRect();
     const clickX = e.clientX - rect.left;
     const width = rect.width;
     const newTime = (clickX / width) * duration;
@@ -89,7 +87,7 @@ export default function VoiceRecord({ file, onReupload }) {
       </Box>
       <ButtonWrapper>
         <Button onClick={onReupload}>재업로드</Button>
-        <Button>삭제</Button>
+        <Button onClick={onDelete}>삭제</Button>
       </ButtonWrapper>
     </Wrapper>
   );

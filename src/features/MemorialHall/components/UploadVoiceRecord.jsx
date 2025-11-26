@@ -6,6 +6,7 @@ import {
   uploadVoiceFile,
   getVoiceFile,
   updateVoiceFile,
+  deleteVoiceFile,
 } from "../../../api/voice";
 import VoiceRecord from "./VoiceRecord";
 import { color, typo } from "../../../styles/tokens";
@@ -110,6 +111,36 @@ export default function UploadVoiceRecord() {
     openFilePicker();
   };
 
+  // 삭제 버튼 클릭 → DELETE API + 상태 초기화
+  const handleDelete = async () => {
+    if (isUploading) return;
+
+    const confirmDelete = window.confirm("업로드된 음성 파일을 삭제할까요?");
+    if (!confirmDelete) return;
+
+    try {
+      setIsUploading(true);
+      const hallId = localStorage.getItem("myHallId");
+      if (!hallId) throw new Error("추모관 ID가 없습니다.");
+
+      await deleteVoiceFile(hallId);
+
+      // 상태 초기화
+      setSelectedFile(null);
+      setHasRemoteVoice(false);
+      if (fileInputRef.current) {
+        fileInputRef.current.value = "";
+      }
+
+      alert("음성 파일이 삭제되었습니다.");
+    } catch (err) {
+      console.error("음성 파일 삭제 실패:", err);
+      alert("삭제에 실패했습니다. 다시 시도해주세요.");
+    } finally {
+      setIsUploading(false);
+    }
+  };
+
   return (
     <Container>
       <Column $gap={"0.5rem"} style={{ padding: "0 1.25rem" }}>
@@ -136,7 +167,11 @@ export default function UploadVoiceRecord() {
           />
         </UploadBox>
       ) : (
-        <VoiceRecord file={selectedFile} onReupload={handleReupload} />
+        <VoiceRecord
+          file={selectedFile}
+          onReupload={handleReupload}
+          onDelete={handleDelete}
+        />
       )}
 
       {/* 🔹 실제 파일 input (UI에 안 보이고, 업로드/재업로드 공용으로 사용) */}
