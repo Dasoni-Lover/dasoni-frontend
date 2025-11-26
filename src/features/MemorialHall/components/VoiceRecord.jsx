@@ -3,6 +3,7 @@ import React, { useRef, useState, useEffect } from "react";
 import styled from "styled-components";
 import playicon from "../assets/icon-play.svg";
 import pauseicon from "../assets/icon-pause.svg"; // 아직 미생성
+import { color, typo } from "../../../styles/tokens";
 
 export default function VoiceRecord({ file, onReupload }) {
   const audioRef = useRef(null);
@@ -97,12 +98,12 @@ export default function VoiceRecord({ file, onReupload }) {
 const Wrapper = styled.div`
   display: flex;
   padding: 1.875rem 2.5rem;
-  justify-content: space-between;
+  gap: 2rem;
   align-items: center;
   align-self: stretch;
   border-radius: 1.25rem;
   border: 1px solid var(--5, #e9e9e9);
-  background: var(--Lightgrey, #f8f8f8);
+  background: #fff4e6;
   box-sizing: border-box;
 `;
 
@@ -112,8 +113,8 @@ const Box = styled.div`
   display: flex;
   align-items: center;
   flex-shrink: 0;
-  border-radius: 1.25rem;
-  background: var(--10, #ddd);
+  border-radius: 0.75rem;
+  background: #fff;
   padding: 0 1rem;
   box-sizing: border-box;
 `;
@@ -177,14 +178,16 @@ const ButtonWrapper = styled.div`
 
 const Button = styled.div`
   display: flex;
-  width: 13.75rem;
-  height: 2.75rem;
+  width: 6.25rem;
+  height: 2.25rem;
   justify-content: center;
   align-items: center;
   border-radius: 0.3125rem;
-  border: 2px solid var(--5, #e9e9e9);
+  border: 1px solid var(--5, #e9e9e9);
   background: var(--0, #fff);
   box-shadow: 0 0 5px 0 rgba(0, 0, 0, 0.04);
   box-sizing: border-box;
   cursor: pointer;
+  ${typo("h4")};
+  color: ${color("black.70")};
 `;

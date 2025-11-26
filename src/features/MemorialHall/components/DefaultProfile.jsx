@@ -2,7 +2,6 @@
 import React from "react";
 import styled from "styled-components";
 import { color, typo } from "../../../styles/tokens";
-import { SmallPhotoBox } from "../../../components/photobox/SmallPhotoBox";
 import { EditSmallPhotoBox } from "../../../components/photobox/EditSmallPhotoBox";
 import defaultProfileImg from "../assets/icon-memorial-hall-profile-default.svg";
 import HallInfoTag from "./HallInfoTag";
@@ -62,7 +61,7 @@ const DefaultProfile = ({
       <Box>
         <Name>{displayName}</Name>
         {dateText && <Date>{dateText}</Date>}
-        <Row gap={"1rem"}>
+        <Row $gap={"1rem"}>
           {place && <HallInfoTag title="모신 곳" content={place} />}
           {phone && (
             <HallInfoTag title="관련 연락처" content={adminNamePhone} />

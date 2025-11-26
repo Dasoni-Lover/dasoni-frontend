@@ -8,6 +8,8 @@ import {
   updateVoiceFile,
 } from "../../../api/voice";
 import VoiceRecord from "./VoiceRecord";
+import { color, typo } from "../../../styles/tokens";
+import { Column, Row } from "../../../styles/flex";
 
 export default function UploadVoiceRecord() {
   const [selectedFile, setSelectedFile] = useState(null);
@@ -110,20 +112,29 @@ export default function UploadVoiceRecord() {
 
   return (
     <Container>
+      <Column $gap={"0.5rem"} style={{ padding: "0 1.25rem" }}>
+        <H3>AI 음성 답장을 위한 음성 파일을 업로드 해주세요</H3>
+        <BodyM>사후 AI 기술로 음성 답장을 생성하는 데 사용돼요</BodyM>
+      </Column>
+      <GuideBox>
+        <BodyB>이런 파일을 업로드 해주세요</BodyB>
+        <BodyM>∙ 고인의 목소리만 담겨야 해요</BodyM>
+        <BodyM>∙ 최소 30초 이상 분량이어야 해요</BodyM>
+        <BodyM>∙ .mp3 파일 형식이어야 해요</BodyM>
+      </GuideBox>
+
       {!selectedFile ? (
-        <Wrapper>
-          <Text>
-            본인의 목소리만 담긴 <Highlight>30초 이상</Highlight> 분량의 mp3
-            파일을 업로드 해주세요
-          </Text>
+        <UploadBox>
+          <H4>현재 업로드한 파일이 없어요</H4>
           <Button
-            text={isUploading ? "업로드 중..." : "파일 업로드"}
-            width="24.5rem"
-            icon={true}
+            text={isUploading ? "업로드 중..." : "파일 업로드하기"}
+            width="14rem"
+            size="M"
+            icon="add"
             onClick={handleUploadClick}
             disabled={isUploading}
           />
-        </Wrapper>
+        </UploadBox>
       ) : (
         <VoiceRecord file={selectedFile} onReupload={handleReupload} />
       )}
@@ -140,22 +151,26 @@ export default function UploadVoiceRecord() {
 }
 
 const Container = styled.div`
-  margin-top: 2.75rem;
+  margin-top: 2rem;
   width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 1.75rem;
 `;
 
-const Wrapper = styled.div`
+const UploadBox = styled.div`
   display: flex;
-  padding: 1.875rem 0;
+  padding: 2.5rem 0;
   flex-direction: column;
   justify-content: center;
   align-items: center;
-  gap: 1.75rem;
+  gap: 1.2rem;
   align-self: stretch;
   box-sizing: border-box;
   border-radius: 1.25rem;
-  border: 1px solid var(--5, #e9e9e9);
-  background: var(--Lightgrey, #f8f8f8);
+  border: 1px solid ${color("black.5")};
+  box-shadow: 0 0 12px 0 rgba(0, 0, 0, 0.02);
+  background: #fff4e6;
 `;
 
 const Text = styled.div`
@@ -179,4 +194,36 @@ const Highlight = styled.span`
 
 const HiddenInput = styled.input`
   display: none;
+`;
+
+const H3 = styled.div`
+  ${typo("h3")}
+  color : ${color("black.80")}
+`;
+
+const BodyM = styled.div`
+  ${typo("bodym")}
+  color:${color("black.50")}
+`;
+
+const BodyB = styled.div`
+  ${typo("bodyb")}
+  color:${color("black.70")}
+`;
+
+const GuideBox = styled.div`
+  display: flex;
+  padding: 1.875rem 2rem;
+  gap: 0.3rem;
+  flex-direction: column;
+  align-items: flex-start;
+  align-self: stretch;
+  border-radius: 0.75rem;
+  border: 1px solid var(--5, #e9e9e9);
+  background: #fff;
+`;
+
+const H4 = styled.div`
+  ${typo("h4")}
+  color : ${color("black.50")}
 `;
