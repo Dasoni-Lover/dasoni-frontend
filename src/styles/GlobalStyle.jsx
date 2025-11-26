@@ -19,6 +19,7 @@ export default function GlobalStyle({ children }) {
   const contentMaxWidth = getContentMaxWidth(location.pathname);
 
   const isLoginPage = location.pathname === "/login";
+  const isRegisterPage = location.pathname === "/register";
 
   // 로그인/회원가입/랜딩에서는 헤더 인증 버튼 보여주기
   const showAuthButtons =
@@ -32,7 +33,7 @@ export default function GlobalStyle({ children }) {
       <Wrapper>
         <Header showAuthButtons={showAuthButtons} />
         {/* /login일 때만 배경 FFBC67 */}
-        <MainContent $isLogin={isLoginPage}>
+        <MainContent $isLogin={isLoginPage} $isRegister={isRegisterPage}>
           <ContentWrapper $contentMaxWidth={contentMaxWidth}>
             {children}
           </ContentWrapper>
@@ -70,8 +71,12 @@ const MainContent = styled.div`
   display: flex;
   flex-direction: column;
   justify-content: space-between;
-  /* 🔥 로그인 페이지에서만 배경색 변경 */
-  background-color: ${({ $isLogin }) => ($isLogin ? "#FFBC67" : "transparent")};
+  background: ${({ $isLogin, $isRegister }) =>
+    $isRegister
+      ? "radial-gradient(650.38% 156.37% at 0% 3.41%, #FFC085 9.49%, #FFE2C7 29.81%, #FFF 82.69%)"
+      : $isLogin
+      ? "#FFBC67"
+      : "transparent"};
 `;
 
 const ContentWrapper = styled.div`

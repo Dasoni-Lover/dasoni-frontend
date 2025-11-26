@@ -48,6 +48,6 @@ const StyledInput = styled.input`
   outline: none;
 
   &::placeholder {
-    color: #7c7c7c;
+    color: ${color("black.10")};
   }
 `;
