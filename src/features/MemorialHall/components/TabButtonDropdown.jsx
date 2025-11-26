@@ -7,9 +7,9 @@ const TabButtonDropdown = ({ onFilterChange }) => {
   const [isOpen, setIsOpen] = useState(false);
   const [selected, setSelected] = useState("최신 업로드순");
 
-  // 기존 isAIMode 이름 유지
+  // 기존 isHideAI 이름 유지
   // 의미는 "AI 이미지 숨기기" (true면 AI 제외)
-  const [isAIMode, setIsAIMode] = useState(false);
+  const [isHideAI, setisHideAI] = useState(false);
 
   const dropdownRef = useRef(null);
 
@@ -26,18 +26,18 @@ const TabButtonDropdown = ({ onFilterChange }) => {
   const handleSelect = (option) => {
     setSelected(option);
     setIsOpen(false);
-    //  부모로 전달 (isAIMode = AI 숨기기 여부)
-    onFilterChange({ sortOption: option, isAIMode });
+    //  부모로 전달 (isHideAI = AI 숨기기 여부)
+    onFilterChange({ sortOption: option, isHideAI });
   };
 
   // AI 숨기기 토글
   const handleToggleAI = () => {
-    setIsAIMode((prev) => {
+    setisHideAI((prev) => {
       const newVal = !prev;
       // 🚫 렌더 중 즉시 호출 X → 🚀 다음 tick에 실행
       setTimeout(() => {
-        // isAIMode: true면 AI 이미지를 숨김(제외)
-        onFilterChange({ sortOption: selected, isAIMode: newVal });
+        // isHideAI: true면 AI 이미지를 숨김(제외)
+        onFilterChange({ sortOption: selected, isHideAI: newVal });
       }, 0);
       return newVal;
     });
@@ -47,10 +47,10 @@ const TabButtonDropdown = ({ onFilterChange }) => {
     <Wrapper ref={dropdownRef}>
       {/* AI 토글 (AI 이미지 숨기기) */}
       <ToggleWrapper onClick={handleToggleAI}>
-        <ToggleTrack $isOn={isAIMode}>
-          <ToggleCircle $isOn={isAIMode} />
+        <ToggleTrack $isOn={isHideAI}>
+          <ToggleCircle $isOn={isHideAI} />
         </ToggleTrack>
-        <ToggleText $isOn={isAIMode}>AI 이미지 숨기기</ToggleText>
+        <ToggleText $isOn={isHideAI}>AI 이미지 숨기기</ToggleText>
       </ToggleWrapper>
 
       {/* 드롭다운 */}

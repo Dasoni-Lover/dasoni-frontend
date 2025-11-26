@@ -46,7 +46,7 @@ export default function MemorialHallPage() {
 
   const [filter, setFilter] = useState({
     sortOption: "최신 업로드순",
-    isAIMode: false,
+    isHideAI: false,
   });
 
   const [activeTab, setActiveTab] = useState(0);
@@ -177,7 +177,7 @@ export default function MemorialHallPage() {
 
         let requestBody = {
           isBydate: true,
-          isAI: false,
+          isAI: true,
           isPrivate: false,
           isMine: false,
         };
@@ -219,8 +219,8 @@ export default function MemorialHallPage() {
   const filteredPhotos = useMemo(() => {
     let result = [...photos];
 
-    // ✅ isAIMode: true면 AI 이미지를 숨김(제외)
-    if (filter.isAIMode) {
+    // ✅ isHideAI: true면 AI 이미지를 숨김(제외)
+    if (filter.isHideAI) {
       result = result.filter((p) => !p.isAI);
     }
 
