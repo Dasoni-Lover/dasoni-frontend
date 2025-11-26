@@ -53,9 +53,9 @@ const Img = styled.img`
 
 const EditIcon = styled.img`
   position: absolute;
-  width: 36px;
-  height: 36px;
-  right: 15px;
-  bottom: 15px;
+  width: 56px;
+  height: 56px;
+  right: 2rem;
+  bottom: 2rem;
   cursor: pointer;
 `;
