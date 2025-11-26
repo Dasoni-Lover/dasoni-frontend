@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import styled from "styled-components";
 import { AlarmListitem } from "./AlarmListitem";
-import { fetchNotifications } from "../../api/notification";
+import { fetchNotifications, deleteNotification } from "../../api/notification";
 
 export const AlarmList = () => {
   const [notifications, setNotifications] = useState([]);
@@ -15,15 +15,26 @@ export const AlarmList = () => {
     }
   };
 
+  const handleDelete = async (id) => {
+    try {
+      await deleteNotification(id);
+
+      // 삭제된 알림만 제외
+      setNotifications((prev) =>
+        prev.filter((item) => item.notificationId !== id)
+      );
+    } catch (err) {
+      console.error("알림 삭제 실패:", err);
+    }
+  };
+
   useEffect(() => {
     loadNotifications();
   }, []);
 
   return (
     <Container>
-      {notifications.length === 0 && (
-        <Empty>알림이 없습니다.</Empty>
-      )}
+      {notifications.length === 0 && <Empty>알림이 없습니다.</Empty>}
 
       {notifications.map((item) => (
         <AlarmListitem
@@ -31,7 +42,7 @@ export const AlarmList = () => {
           tagText={item.kind}
           title={item.title}
           content={item.body}
-          tagOn={true}
+          onDelete={() => handleDelete(item.notificationId)}
         />
       ))}
     </Container>

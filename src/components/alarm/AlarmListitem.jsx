@@ -6,8 +6,9 @@ import deleteicon from "../../assets/delete-icon.svg";
 
 export const AlarmListitem = ({
   tagText = "입장승인",
-  content = "입장이 승인 되었어요. 언제든 방문하여 소중한 추억을 함께 나눠주세요.",
+  content = "입장이 승인 되었어요.",
   title = "故 박영수 추모관",
+  onDelete,
 }) => {
   return (
     <Wrapper>
@@ -18,7 +19,8 @@ export const AlarmListitem = ({
         </Box>
         <Content>{content}</Content>
       </Left>
-      <Icon src={deleteicon} />
+
+      <Icon src={deleteicon} onClick={onDelete} />
     </Wrapper>
   );
 };
@@ -65,8 +67,5 @@ const Icon = styled.img`
   width: 1.5rem;
   height: 1.5rem;
   flex-shrink: 0;
-  display: flex;
-  justify-content: center;
-  align-items: center;
+  cursor: pointer;
 `;
-
