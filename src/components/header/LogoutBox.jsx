@@ -1,32 +1,82 @@
 // src/components/header/LogoutBox.jsx
-import React from "react";
+import React, { useRef } from "react";
 import styled from "styled-components";
 import { color, typo } from "../../styles/tokens";
 import logout from "../../assets/icon-logout.svg";
-import edit from "../../assets/edit-btn.svg"
-import profileimg from "../../assets/edit-btn.svg"
+import edit from "../../assets/edit-btn.svg";
+import { getPresignedUrlForImage, uploadFileToS3 } from "../../api/files";
+import { updateMyHallProfile } from "../../api/my-hall";   // ⭐ 추가할 API 경로로 수정해줘!
 
-export default function LogoutBox({ onLogout, onClose }) {
-  const handleClick = () => {
-    onLogout();   // 로그아웃 실행
-    onClose();    // 창 닫기
+export default function LogoutBox({ onLogout, onClose, profileImg }) {
+  const fileInputRef = useRef(null);
+
+  // Edit 버튼 클릭 (파일 선택창 열기)
+  const handleEditClick = () => {
+    if (fileInputRef.current) {
+      fileInputRef.current.click();
+    }
+  };
+
+  // 실제 파일 선택 후 처리: S3 업로드 → 내 추모관 프로필 API 호출
+  const handleFileChange = async (e) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    try {
+      // 1. presigned-url발급
+      const { uploadUrl, fileUrl, contentType } = await getPresignedUrlForImage(file);
+
+      // 2. S3 업로드
+      await uploadFileToS3(uploadUrl, file, contentType);
+
+      // 3. 내 추모관 프로필 수정 PATCH 호출
+      await updateMyHallProfile(fileUrl);
+
+      // 4. 헤더의 프로필 이미지 업데이트
+      window.dispatchEvent(
+        new CustomEvent("myProfileUpdated", {
+          detail: { profileUrl: fileUrl }
+        })
+      );
+
+      alert("프로필 이미지가 변경되었습니다.");
+
+    } catch (error) {
+      console.error("프로필 이미지 변경 실패:", error);
+      alert("이미지 변경 중 오류가 발생했습니다.");
+    }
+  };
+
+  const handleLogout = () => {
+    onLogout();
+    onClose();
   };
 
   return (
     <Container>
+      {/* 숨겨진 파일 인풋 */}
+      <input
+        type="file"
+        accept="image/*"
+        ref={fileInputRef}
+        style={{ display: "none" }}
+        onChange={handleFileChange}
+      />
+
       <Text>계정</Text>
 
       <Box>
         <PhotoBox>
-            <Photo src={profileimg}/>
-            <Name>박영진</Name>
+          <Photo src={profileImg} />
+          <Name>박영진</Name>
         </PhotoBox>
-        <Editcontainer>
-          <Edit src={edit}/>
+
+        <Editcontainer onClick={handleEditClick}>
+          <Edit src={edit} />
         </Editcontainer>
       </Box>
 
-      <Wrapper onClick={handleClick} style={{ cursor: "pointer" }}>
+      <Wrapper onClick={handleLogout}>
         <IconContainer>
           <Icon src={logout} />
         </IconContainer>
@@ -35,6 +85,7 @@ export default function LogoutBox({ onLogout, onClose }) {
     </Container>
   );
 }
+
 
 
 const Container = styled.div`
@@ -100,6 +151,7 @@ const Photo=styled.img`
     height: 3.125rem;
     border-radius: 0.1875rem;
     border: 1px solid var(--5, #E9E9E9);
+    object-fit: cover; 
 `
 const Name=styled.div`
   ${typo("h3")};
@@ -126,6 +178,7 @@ const Wrapper = styled.div`
   box-shadow: 0 0 2px 0 rgba(0, 0, 0, 0.11);
   box-sizing: border-box;
   border-radius: 0 0 1.25rem 1.25rem;
+  cursor: pointer;
 `;
 
 const IconContainer = styled.div`

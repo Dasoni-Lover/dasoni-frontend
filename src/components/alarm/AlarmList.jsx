@@ -37,12 +37,11 @@ export const AlarmList = () => {
 const Container = styled.div`
   display: flex;
   flex-direction: column;
-  height: 100%;  /* ⭐ Wrapper의 남은 높이를 그대로 사용 */
+  height: 100%;  /* Wrapper의 남은 높이를 그대로 사용 */
   width: 100%;
   overflow-y: auto;
   scroll-behavior: smooth;
   box-sizing: border-box;
-  border-radius: 0 0 1.875rem 1.875rem;
 
   /* 스크롤바 숨기기 */
   &::-webkit-scrollbar {

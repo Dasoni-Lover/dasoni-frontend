@@ -155,7 +155,7 @@ export default function Header({ showAuthButtons }) {
                 onClick={handleAlarmClick}
               />
 
-              {isAlarmOpen && <AlarmPanel />}
+              {isAlarmOpen && <AlarmPanel onClose={() => setIsAlarmOpen(false)}/>}
 
               <div onClick={handleProfileClick}>
                 <MiniProfile
@@ -181,6 +181,7 @@ export default function Header({ showAuthButtons }) {
       {/* MiniProfile 아래에 LogoutBox 표시 */}
       {isLogoutBoxOpen && (
         <LogoutBox
+        profileImg={profileInfo.myProfile}
           onLogout={async () => {
             try {
               await logoutUser();
@@ -193,7 +194,9 @@ export default function Header({ showAuthButtons }) {
               alert("로그아웃 되었습니다.");
             }
           }}
-          onClose={() => setIsLogoutBoxOpen(false)} 
+          onClose={() => setIsLogoutBoxOpen(false)
+            
+          } 
         />
       )}
     </>
@@ -209,7 +212,7 @@ const Wrapper = styled.header`
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding:  0 0 0 2.25rem;
+  padding:  0  2.25rem 0 2.25rem;
   background: white;
   z-index: 5;
   border-bottom: 1px solid var(--5, #e9e9e9);
@@ -280,7 +283,7 @@ const AlarmIcon = styled.img`
 `;
 
 const OpenBox=styled.div`
-  padding-right: 7.5rem;
+  padding-right: 5.25rem;
   display: flex;
   gap: 2.12rem;
   flex-direction: row;
