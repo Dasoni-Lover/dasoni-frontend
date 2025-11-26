@@ -32,8 +32,8 @@ const Wrapper = styled.div`
   gap: 0.625rem;
   flex: 1 0 0;
   border-radius: 0.25rem;
-  border: 2px solid
-    ${({ $border }) => ($border === "red" ? color("red") : "#a8a8a8")}; /* ✅ 조건부 border color */
+  border: 1px solid
+    ${({ $border }) => ($border === "red" ? color("red") : color("black.10"))}; /* ✅ 조건부 border color */
   background: #fff;
   box-sizing: border-box;
 `;
