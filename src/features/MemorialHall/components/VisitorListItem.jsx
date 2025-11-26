@@ -5,7 +5,7 @@ import { color, typo } from "../../../styles/tokens";
 import Button from "../../../components/Button";
 import ConfirmModal from "../../../components/ConfirmModal";
 import VisitorListItemContent from "./VisitorListItemContent";
-import { respondRequest } from "../../../api/visitor";
+import { respondRequest, kickVisitor } from "../../../api/visitor";
 
 import downicon from "../assets/dropdown-icon.png";
 import righticon from "../assets/open-icon.svg";
@@ -17,6 +17,7 @@ export default function VisitorListItem({
   index,
   hallId,
   onActionComplete,
+  onKickComplete,
 }) {
   const [isOpen, setIsOpen] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -47,6 +48,20 @@ export default function VisitorListItem({
     } catch (err) {
       console.error("요청 처리 실패:", err);
       alert("요청 처리에 실패했습니다.");
+    }
+  };
+
+  const handleKick = async () => {
+    try {
+      await kickVisitor(hallId, item.visitorId);
+      alert("추모객을 내보냈어요.");
+
+      if (onKickComplete) onKickComplete(item);
+
+      setIsModalOpen(false);
+    } catch (err) {
+      console.error("추모객 내보내기 실패:", err);
+      alert("추모객 내보내기에 실패했습니다.");
     }
   };
 
@@ -105,7 +120,7 @@ export default function VisitorListItem({
         description="추모객은 다시 요청을 보낼 수 있어요"
         confirmText="내보내기"
         cancelText="취소"
-        onConfirm={() => console.log("추모객 내보내기")}
+        onConfirm={handleKick}
         onCancel={() => setIsModalOpen(false)}
         subImage={downicon}
         subText={item.name}

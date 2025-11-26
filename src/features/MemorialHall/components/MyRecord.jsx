@@ -95,6 +95,20 @@ export default function MyRecord({ hallId }) {
         : visitorList
     );
   };
+  // 🔥 방문자 내보내기 후 실시간 반영
+  const handleKickComplete = (item) => {
+    if (!item) return;
+
+    setVisitorList((prev) =>
+      prev.filter((v) => v.visitorId !== item.visitorId)
+    );
+    setVisitorCount((prev) => Math.max(0, prev - 1));
+
+    // 현재 탭이 "추모객 명단"일 때 화면에서 바로 제거
+    if (activeTab === "visitor") {
+      setData((prev) => prev.filter((v) => v.visitorId !== item.visitorId));
+    }
+  };
 
   return (
     <Wrapper>
@@ -133,7 +147,8 @@ export default function MyRecord({ hallId }) {
         openAll={openAll}
         type={activeTab}
         hallId={hallId}
-        onActionComplete={handleActionComplete} // 🔥 실시간 반영
+        onActionComplete={handleActionComplete} // 요청 수락/거절
+        onKickComplete={handleKickComplete} //  내보내기
       />
     </Wrapper>
   );
