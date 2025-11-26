@@ -25,6 +25,7 @@ import ConfirmModal from "../components/ConfirmModal";
 
 import AddPostButtonImg from "../features/MemorialHall/assets/btn-add-post.svg";
 import modifyicon from "../assets/edit-btn.svg";
+import IconAITextGuide from "../features/MemorialHall/assets/icon-ai-text-guide.svg";
 
 export default function MemorialHallPage() {
   const nav = useNavigate();
@@ -512,6 +513,10 @@ export default function MemorialHallPage() {
           {/* ✅ 게시글 작성 (+ 플로팅 버튼) */}
           {showFloatingAddPost && (
             <FixedAddPostContainer>
+              <AITextGuide>
+                <img src={IconAITextGuide} />
+                AI 이미지를 생성해 글을 작성해 보세요
+              </AITextGuide>
               <FixedAddPostButton onClick={() => setIsAddPostModalOpen(true)}>
                 <img src={AddPostButtonImg} alt="추가 버튼" />
               </FixedAddPostButton>
@@ -698,6 +703,8 @@ const FixedAddPostContainer = styled.div`
   flex-direction: column;
   align-items: center;
 
+  gap: 1rem;
+
   @media (max-width: 1200px) {
     display: none;
   }
@@ -716,4 +723,22 @@ const FixedAddPostButton = styled.div`
   &:hover {
     transform: scale(1.05);
   }
+`;
+
+const AITextGuide = styled.div`
+  display: flex;
+  padding: 0.6rem 1rem;
+  align-items: center;
+
+  gap: 0.5rem;
+  border-radius: 0.5rem;
+  border: 2px solid #4bb5ee;
+  background: linear-gradient(
+    90deg,
+    rgba(125, 193, 233, 0.2) 0%,
+    rgba(125, 138, 233, 0.2) 100%
+  );
+  box-shadow: 0 0 12px 0 rgba(0, 0, 0, 0.04);
+  ${typo("h4")}
+  color : ${color("black.50")}
 `;
