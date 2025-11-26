@@ -6,6 +6,8 @@ import { color, typo } from "../styles/tokens";
 import Button from "../components/Button";
 import { InputFieldWhite } from "../components/InputFieldWhite";
 import { loginUser, setAuthTokens } from "../api/auth";
+import ImgLetter from "../features/Onboarding/assets/img-letter.svg";
+import ImgRainbowHouse from "../features/Onboarding/assets/img-rainbow-house.svg";
 
 export default function LogInPage() {
   const navigate = useNavigate();
@@ -54,6 +56,8 @@ export default function LogInPage() {
 
   return (
     <Wrapper>
+      <LetterImg src={ImgLetter} />
+      <HouseImg src={ImgRainbowHouse} />
       <OutBox>
         <Box>
           <TextWrapper>
@@ -108,19 +112,35 @@ export default function LogInPage() {
 }
 
 const Wrapper = styled.div`
+  position: relative;
   display: flex;
   flex-direction: column;
   justify-content: center;
   align-items: center;
   width: 100%;
-  margin-top: 11.44rem;
+  margin: auto 0;
 
   @media (max-width: 1200px) {
     justify-content: flex-start;
   }
 `;
 
+const LetterImg = styled.img`
+  position: absolute;
+  z-index: 1;
+  right: -20%;
+  bottom: 20%;
+`;
+
+const HouseImg = styled.img`
+  position: absolute;
+  z-index: 1;
+  left: -50%;
+  top: 10%;
+`;
+
 const OutBox = styled.div`
+  z-index: 2;
   display: inline-flex;
   padding: 2.1875rem 2.875rem;
   justify-content: center;
@@ -128,7 +148,7 @@ const OutBox = styled.div`
   gap: 0.625rem;
   border-radius: 1rem;
   border: 1px solid #f4f4f4;
-  background: #f8f8f8;
+  background: rgba(255, 255, 255, 0.78);
 `;
 
 const Box = styled.div`

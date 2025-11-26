@@ -192,10 +192,11 @@ const ClearButton = styled.button`
   cursor: pointer;
 `;
 
-
-{/* <DatePicker
+{
+  /* <DatePicker
   selected={date}
   onChange={setDate}
   calendarIcon={YellowCalendar}
   showClear={false}
-/> */}
+/> */
+}

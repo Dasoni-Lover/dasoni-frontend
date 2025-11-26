@@ -1,15 +1,19 @@
+// src/pages/RegisterPage.jsx
 import React, { useState, useRef, useEffect } from "react";
 import styled from "styled-components";
 import { useNavigate } from "react-router-dom";
 import { color, typo } from "../styles/tokens";
 import { InputFieldWhite } from "../components/InputFieldWhite";
 import Button from "../components/Button";
-import profileimg from "../features/Onboarding/assets/default-profile-img.svg";
+import ImgProfile from "../features/Onboarding/assets/default-profile-img.svg";
 import DatePicker from "../components/DatePicker";
 import dropdownicon from "../assets/row-icon.svg";
 import { checkDuplicateId, registerUser } from "../api/user";
 import { getPresignedUrlForImage, uploadFileToS3 } from "../api/files";
 import ConfirmModal from "../components/ConfirmModal";
+import { Column } from "../styles/flex";
+import { PointText } from "../components/PointText";
+import ImgRainbowHouse from "../features/Onboarding/assets/img-rainbow-house.svg";
 
 export default function RegisterPage() {
   const navigate = useNavigate();
@@ -21,7 +25,7 @@ export default function RegisterPage() {
 
   // ✅ 프로필 이미지 상태
   const [profileImageFile, setProfileImageFile] = useState(null);
-  const [profilePreview, setProfilePreview] = useState(profileimg);
+  const [profilePreview, setProfilePreview] = useState(ImgProfile);
   const fileInputRef = useRef(null);
 
   // ✅ 입력값 상태
@@ -90,7 +94,7 @@ export default function RegisterPage() {
 
     try {
       setIsCheckingId(true);
-      const data = await checkDuplicateId(logId.trim()); // ← user.js 사용
+      const data = await checkDuplicateId(logId.trim());
 
       setHasCheckedId(true);
       setIsIdAvailable(data.isAvailable);
@@ -101,6 +105,12 @@ export default function RegisterPage() {
       setIsCheckingId(false);
     }
   };
+
+  // ✅ 비밀번호 일치 여부
+  const isPasswordMatch =
+    password.length > 0 &&
+    passwordConfirm.length > 0 &&
+    password === passwordConfirm;
 
   // ✅ 회원가입 API
   const handleRegister = async () => {
@@ -142,7 +152,6 @@ export default function RegisterPage() {
       let myProfile = "";
 
       if (profileImageFile) {
-        // ✅ 공용 유틸 사용
         const { uploadUrl, fileUrl, contentType } =
           await getPresignedUrlForImage(profileImageFile);
 
@@ -159,7 +168,7 @@ export default function RegisterPage() {
         myProfile,
       };
 
-      const data = await registerUser(body); // ← user.js 사용
+      const data = await registerUser(body);
       console.log("register response:", data);
 
       setIsSuccess(true);
@@ -179,73 +188,131 @@ export default function RegisterPage() {
     }
   };
 
+  // 회원가입 버튼 활성화 조건
+  const isFormValid =
+    name.trim() &&
+    logId.trim() &&
+    hasCheckedId &&
+    isIdAvailable === true &&
+    password &&
+    passwordConfirm &&
+    password === passwordConfirm &&
+    (selectedGender === "남성" || selectedGender === "여성") &&
+    date;
+
   return (
     <Wrapper>
+      <HouseImg src={ImgRainbowHouse} />
       <OutBox>
         <Box>
           <TextWrapper>
-            <Title>기억이 머무는 다솜 마을에 오신 걸 환영해요</Title>
-            <Content>회원가입하여 추모관 서비스를 이용해 보세요</Content>
+            <Title>회원가입</Title>
+            <Content>기억이 머무는 다솜 마을에 오신 걸 환영해요</Content>
           </TextWrapper>
 
           <Container>
-            <ProfileWrapper>
-              {/* ✅ 기본 이미지는 그대로, 선택하면 preview로 변경 */}
-              <ProfileImg src={profilePreview} />
-              <SelectButton onClick={() => fileInputRef.current?.click()}>
-                프로필사진 설정하기
-              </SelectButton>
-              {/* ✅ 숨겨진 파일 input (UI 안 바뀜) */}
-              <input
-                type="file"
-                accept="image/*"
-                ref={fileInputRef}
-                style={{ display: "none" }}
-                onChange={handleProfileChange}
-              />
-            </ProfileWrapper>
-
             <MainWrapper>
-              <Half>
-                <InputBox>
-                  <Type>아이디</Type>
-                  <IdCheck>
-                    <InputFieldWhite
-                      placeholder="아이디를 설정해 주세요"
-                      width="auto"
-                      value={logId}
-                      onChange={handleChangeLogId}
-                      border={isIdAvailable === false ? "red" : undefined}
+              <InputBox>
+                <PointText question="이름" bold={true} width="8.75rem" />
+                <InputFieldWhite
+                  placeholder="이름을 실명으로 입력해 주세요"
+                  width="100%"
+                  value={name}
+                  onChange={(e) => setName(e.target.value)}
+                />
+              </InputBox>
+
+              {/* 성별 드롭다운 */}
+              <InputBox ref={dropdownRef}>
+                <PointText question="성별" bold={true} width="8.75rem" />
+                <DropdownContainer>
+                  <DropdownButton
+                    type="button"
+                    onClick={() => setIsOpen((prev) => !prev)}
+                    $isPlaceholder={selectedGender === "성별을 선택해 주세요"} // 🔥 추가
+                  >
+                    <span>{selectedGender}</span>
+                    <Icon
+                      src={dropdownicon}
+                      alt="dropdown icon"
+                      $isOpen={isOpen}
                     />
-                    <ButtonSize>
-                      <Button
-                        text={isCheckingId ? "확인중..." : "중복확인"}
-                        size="S"
-                        active={!hasCheckedId}
-                        onClick={handleCheckId}
-                      />
-                    </ButtonSize>
-                  </IdCheck>
-                  {hasCheckedId ? (
+                  </DropdownButton>
+
+                  {isOpen && (
+                    <DropdownMenu>
+                      <DropdownItem onClick={() => handleSelect("남성")}>
+                        남자
+                      </DropdownItem>
+                      <DropdownItem onClick={() => handleSelect("여성")}>
+                        여자
+                      </DropdownItem>
+                    </DropdownMenu>
+                  )}
+                </DropdownContainer>
+              </InputBox>
+
+              <InputBox>
+                <PointText question="생일" bold={true} width="8.75rem" />
+                <DatePicker
+                  selected={date}
+                  onChange={setDate}
+                  borderColor="#A8A8A8"
+                  width="15.6rem"
+                />
+              </InputBox>
+
+              {/* ✅ 아이디 + 중복확인 + 메시지 영역 */}
+              <Column style={{ width: "100%" }}>
+                <InputBox>
+                  <PointText question="아이디" bold={true} width="8.75rem" />
+                  <InputFieldWhite
+                    placeholder="아이디를 설정해 주세요"
+                    value={logId}
+                    onChange={handleChangeLogId}
+                    border={isIdAvailable === false ? "red" : undefined}
+                  />
+                  <ButtonSize>
+                    <Button
+                      text={isCheckingId ? "확인중..." : "중복확인"}
+                      size="S"
+                      active={!hasCheckedId}
+                      onClick={handleCheckId}
+                    />
+                  </ButtonSize>
+                </InputBox>
+
+                {/* 항상 일정 높이 확보 */}
+                <CheckedMessagePlaceholder>
+                  {hasCheckedId && (
                     <CheckedMessage $isAvailable={isIdAvailable}>
                       {isIdAvailable
                         ? "사용할 수 있는 아이디에요"
                         : "사용할 수 없는 아이디에요"}
                     </CheckedMessage>
-                  ) : null}
-                </InputBox>
+                  )}
+                </CheckedMessagePlaceholder>
+              </Column>
+
+              <InputBox>
+                <PointText question="비밀번호" bold={true} width="8.75rem" />
+                <InputFieldWhite
+                  placeholder="비밀번호를 설정해 주세요"
+                  width="100%"
+                  type="password"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                />
+              </InputBox>
+
+              {/* ✅ 비밀번호 확인 + 일치 메시지 영역 */}
+              <Column style={{ width: "100%" }}>
                 <InputBox>
-                  <Type>비밀번호</Type>
-                  <InputFieldWhite
-                    placeholder="비밀번호를 설정해 주세요"
-                    width="100%"
-                    type="password"
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
+                  <PointText
+                    question="비밀번호 확인"
+                    bold={true}
+                    width="8.75rem"
                   />
-                </InputBox>
-                <InputBox>
-                  <Type>비밀번호 확인</Type>
                   <InputFieldWhite
                     placeholder="비밀번호를 다시 한 번 입력해 주세요"
                     width="100%"
@@ -254,54 +321,34 @@ export default function RegisterPage() {
                     onChange={(e) => setPasswordConfirm(e.target.value)}
                   />
                 </InputBox>
-              </Half>
 
-              <Half>
-                <InputBox>
-                  <Type>이름</Type>
-                  <InputFieldWhite
-                    placeholder="이름을 실명으로 입력해 주세요"
-                    width="100%"
-                    value={name}
-                    onChange={(e) => setName(e.target.value)}
+                {/* 항상 일정 높이 확보 */}
+                <PasswordMessagePlaceholder>
+                  {isPasswordMatch && (
+                    <CheckedMessage $isAvailable={true}>
+                      비밀번호가 일치해요
+                    </CheckedMessage>
+                  )}
+                </PasswordMessagePlaceholder>
+              </Column>
+
+              <InputBox>
+                <Type>프로필 사진</Type>
+                <ProfileWrapper>
+                  <ProfileImg
+                    src={profilePreview}
+                    onClick={() => fileInputRef.current?.click()}
                   />
-                </InputBox>
 
-                {/* 성별 드롭다운 */}
-                <InputBox ref={dropdownRef}>
-                  <Type>성별</Type>
-                  <DropdownContainer>
-                    <DropdownButton onClick={() => setIsOpen((prev) => !prev)}>
-                      <span>{selectedGender}</span>
-                      <Icon
-                        src={dropdownicon}
-                        alt="dropdown icon"
-                        $isOpen={isOpen}
-                      />
-                    </DropdownButton>
-
-                    {isOpen && (
-                      <DropdownMenu>
-                        <DropdownItem onClick={() => handleSelect("남성")}>
-                          남자
-                        </DropdownItem>
-                        <DropdownItem onClick={() => handleSelect("여성")}>
-                          여자
-                        </DropdownItem>
-                      </DropdownMenu>
-                    )}
-                  </DropdownContainer>
-                </InputBox>
-
-                <InputBox>
-                  <Type>생일</Type>
-                  <DatePicker
-                    selected={date}
-                    onChange={setDate}
-                    borderColor="#A8A8A8"
+                  <input
+                    type="file"
+                    accept="image/*"
+                    ref={fileInputRef}
+                    style={{ display: "none" }}
+                    onChange={handleProfileChange}
                   />
-                </InputBox>
-              </Half>
+                </ProfileWrapper>
+              </InputBox>
             </MainWrapper>
           </Container>
 
@@ -310,6 +357,7 @@ export default function RegisterPage() {
               text={isRegistering ? "회원가입 중..." : "회원가입"}
               onClick={handleRegister}
               disabled={isRegistering}
+              active={isFormValid && !isRegistering}
             />
             <MiniWrapper>
               <Question>이미 계정이 있으신가요?</Question>
@@ -336,25 +384,34 @@ export default function RegisterPage() {
 /* ------------------- 스타일 ------------------- */
 
 const Wrapper = styled.div`
+  position: relative;
   display: flex;
   flex-direction: column;
   justify-content: center;
   align-items: center;
   width: 100%;
-  margin-top: 4.31rem;
+  margin: auto 0;
+
   @media (max-width: 1200px) {
     align-items: flex-start;
   }
 `;
 
+const HouseImg = styled.img`
+  position: absolute;
+  z-index: 1;
+  left: -50%;
+  top: 10%;
+`;
+
 const OutBox = styled.div`
   display: inline-flex;
-  padding: 2.1875rem 2.875rem;
+  padding: 2.5rem 7.5rem 5rem 3.125rem;
   justify-content: center;
   align-items: center;
   border-radius: 1rem;
-  border: 1px solid #f4f4f4;
-  background: #f8f8f8;
+  border: 1px solid ${color("black.10")};
+  background: #fff;
 `;
 
 const Box = styled.div`
@@ -363,7 +420,7 @@ const Box = styled.div`
   flex-direction: column;
   justify-content: center;
   align-items: center;
-  gap: 3.75rem;
+  gap: 2.75rem;
 `;
 
 const TextWrapper = styled.div`
@@ -371,7 +428,6 @@ const TextWrapper = styled.div`
   flex-direction: column;
   justify-content: center;
   align-items: flex-start;
-  gap: 0.375rem;
   align-self: stretch;
 `;
 
@@ -381,12 +437,8 @@ const Title = styled.div`
 `;
 
 const Content = styled.div`
-  color: #7a7a7a;
-  text-align: center;
-  font-family: Pretendard;
-  font-size: 1.25rem;
-  font-weight: 500;
-  line-height: 130%;
+  ${typo("h4")};
+  color: ${color("black.50")};
 `;
 
 const Container = styled.div`
@@ -399,7 +451,7 @@ const Container = styled.div`
 
 const ProfileWrapper = styled.div`
   display: flex;
-  width: 9.375rem;
+  width: 12.5rem;
   flex-direction: column;
   justify-content: center;
   align-items: center;
@@ -407,31 +459,29 @@ const ProfileWrapper = styled.div`
 `;
 
 const ProfileImg = styled.img`
-  height: 9.375rem;
+  height: 12.5rem;
   align-self: stretch;
   aspect-ratio: 1/1;
   fill: #f2f2f2;
-`;
-
-const SelectButton = styled.div`
-  color: #308dff;
-  font-family: Pretendard;
-  font-size: 1rem;
-  font-weight: 500;
   cursor: pointer;
-`;
-
-const IdCheck = styled.div`
-  display: flex;
-  flex-direction: row;
-  gap: 0.44rem;
 `;
 
 const CheckedMessage = styled.div`
   ${typo("bodym")};
   color: ${({ $isAvailable }) =>
-    $isAvailable === false ? color("red") : color("black.30")};
+    $isAvailable === false ? color("red") : "#22874F"};
+  margin-left: 8.75rem;
+  margin-top: 0.5rem;
 `;
+
+/** ✅ 메시지 영역 높이를 항상 확보하는 래퍼 */
+const CheckedMessagePlaceholder = styled.div`
+  height: 1.75rem; /* 한 줄 메시지 + marginTop 감안해서 약간 넉넉하게 */
+  display: flex;
+  align-items: flex-start;
+`;
+
+const PasswordMessagePlaceholder = styled(CheckedMessagePlaceholder)``;
 
 const ButtonSize = styled.div`
   width: 6.25rem;
@@ -439,42 +489,34 @@ const ButtonSize = styled.div`
   flex-direction: column;
   justify-content: center;
   align-items: center;
+  margin-left: 0.5rem;
 `;
 
 const MainWrapper = styled.div`
   display: flex;
   align-items: center;
-  gap: 2.5rem;
-  align-self: stretch;
-`;
-
-const Half = styled.div`
-  display: flex;
-  width: 24.5rem;
   flex-direction: column;
-  align-items: flex-start;
-  gap: 1.25rem;
+  gap: 1.5rem;
+  align-self: stretch;
 `;
 
 const InputBox = styled.div`
   display: flex;
-  flex-direction: column;
-  align-items: stretch;
-  gap: 0.4375rem;
   width: 100%;
+  align-items: center;
 `;
 
 const Type = styled.div`
-  color: #0e0e0e;
-  font-family: Pretendard;
-  font-size: 1rem;
-  font-weight: 500;
-  line-height: 130%;
+  ${typo("bodym2")};
+  color: ${color("black.70")};
+  width: 8.75rem;
 `;
 
 /* 드롭다운 스타일 */
 const DropdownContainer = styled.div`
   position: relative;
+  width: 100%;
+  flex: 1;
 `;
 
 const DropdownButton = styled.button`
@@ -485,17 +527,18 @@ const DropdownButton = styled.button`
   height: 3rem;
   padding: 0 1rem;
   background: white;
-  border: 1px solid #a8a8a8;
+  border: 1px solid ${color("black.10")};
   border-radius: 6px;
-  color: ${color("black.70")};
-  font-family: Pretendard;
+  color: ${color("black.10")};
   font-size: 1rem;
   cursor: pointer;
+  color: ${({ $isPlaceholder }) =>
+    $isPlaceholder ? color("black.10") : color("black.70")};
 `;
 
 const Icon = styled.img`
-  width: 0.75rem;
-  height: 0.75rem;
+  width: 1.3rem;
+  height: 1.3rem;
   transition: transform 0.2s ease;
   transform: rotate(${(props) => (props.$isOpen ? "180deg" : "0deg")});
 `;
@@ -531,6 +574,7 @@ const ClickBox = styled.div`
   flex-direction: column;
   align-items: center;
   gap: 1.25rem;
+  margin-top: 4.75rem;
 `;
 
 const MiniWrapper = styled.div`
