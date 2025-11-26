@@ -23,7 +23,7 @@ export default MiniProfile;
 
 const Box = styled.div`
   display: flex;
-  padding: 0 0.5rem;
+  cursor: pointer;
 `;
 
 const ProfileContainer = styled.div`
