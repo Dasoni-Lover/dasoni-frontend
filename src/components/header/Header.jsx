@@ -91,18 +91,28 @@ export default function Header({ showAuthButtons }) {
     { label: "홈", path: "/home" },
     { label: "입장하기", path: "/enter" },
     { label: "개설하기", path: "/open" },
-    { label: "나의 추모관", path: "/memorial-my" },
+    { label: "나의 추모관", path: "/memorial" },
   ];
 
   const getIsActive = (item) => {
     if (item.label === "홈") {
       return location.pathname === "/" || location.pathname === "/home";
     }
+
+    if (item.label === "나의 추모관") {
+      const fromMyHall = location.state?.from === "myHall";
+      return location.pathname === "/memorial" && fromMyHall;
+    }
+
     return location.pathname === item.path;
   };
 
   const handleMenuClick = (item) => {
-    navigate(item.path);
+    if (item.label === "나의 추모관") {
+      navigate(item.path, { state: { from: "myHall" } });
+    } else {
+      navigate(item.path);
+    }
   };
 
   const handleLogoutClick = async () => {
@@ -177,7 +187,7 @@ const Wrapper = styled.header`
   align-items: center;
   padding: 0 4.38rem;
   background: white;
-  z-index: 999;
+  z-index: 5;
   border-bottom: 1px solid var(--5, #e9e9e9);
 `;
 

@@ -13,7 +13,7 @@ export const CardListItem = ({ hall, type }) => {
   const handleClick = () => {
     if (type === "managed") {
       // 내가 관리하는 추모관 → 관리자 페이지
-      navigate("/memorial-manager", {
+      navigate("/memorial", {
         state: { hallId: hall?.hallId },
       });
     } else {

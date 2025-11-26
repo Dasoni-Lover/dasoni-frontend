@@ -9,12 +9,13 @@ import { getHallInfo } from "../api/memorial";
 export default function WritePostPage() {
   const location = useLocation();
   const {
-    hallId ,
+    hallId,
     isEdit = false,
     photoId,
     postData,
+    isAI = false,
   } = location.state || {};
-    console.log("🔥 WritePostPage 받은 hallId:", hallId);
+  console.log("🔥 WritePostPage 받은 hallId:", hallId);
   console.log("📦 location.state:", location.state);
 
   const [hallName, setHallName] = useState("");
@@ -51,6 +52,7 @@ export default function WritePostPage() {
         photoId={photoId}
         initialData={postData} // ✅ content, occurredAt, isPrivate
         initialImageUrl={initialImageUrl} // ✅ 기존 사진 썸네일
+        isAI={isAI}
       />
     </div>
   );

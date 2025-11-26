@@ -9,7 +9,7 @@ const Footer = () => {
 const Wrapper = styled.div`
   width: 100%;
   height: 5rem;
-  background: var(--Lightgrey, #F8F8F8);
+  background: var(--Lightgrey, #f8f8f8);
 
   ${typo("bodym2")};
   color: #ddd;

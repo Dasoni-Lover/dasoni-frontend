@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import styled from "styled-components";
 import { useNavigate } from "react-router-dom";
 import { color, typo } from "../../../styles/tokens";
+
 import letterbtn from "../assets/letter-btn.svg";
 import linksharebtn from "../assets/linkshare-btn.svg";
 import letterhover from "../assets/letter-hover.svg";
@@ -17,68 +18,83 @@ const LetterAndLinkShare = ({ onLinkShareClick, page, hallId }) => {
   const [isLinkHover, setIsLinkHover] = useState(false);
   const navigate = useNavigate();
 
-  // Letter 클릭 시 페이지에 따라 네비게이트
   const handleLetterClick = () => {
-    // default + manager 에서는 편지쓰기 페이지로 이동
     if (page === "default" || page === "manager") {
       navigate("/sent-letter", { state: { hallId } });
-    } else if(page === "my"){
+    } else if (page === "my") {
       navigate("/leave-letter", { state: { hallId } });
-    }else {
-      console.log(`⚠️ ${page} 모드에서는 이동하지 않습니다.`);
     }
   };
 
   return (
     <Wrapper>
-      <LinkShare
-        src={isLinkHover ? linksharehover : linksharebtn}
-        onClick={onLinkShareClick}
+      {/* 공유하기 카드 */}
+      <Card
         onMouseEnter={() => setIsLinkHover(true)}
         onMouseLeave={() => setIsLinkHover(false)}
-      />
-      <Letter
-        src={isLetterHover ? letterhover : letterbtn}
+        onClick={onLinkShareClick}
+      >
+        <Text>추모관 공유하기</Text>
+        <ShareIcon src={isLinkHover ? linksharehover : linksharebtn} />
+      </Card>
+
+      {/* 간격 */}
+      <Spacer />
+
+      {/* 편지쓰기 카드 */}
+      <Card
         onMouseEnter={() => setIsLetterHover(true)}
         onMouseLeave={() => setIsLetterHover(false)}
         onClick={handleLetterClick}
-      />
-      <Text>마우스를 올려보세요!</Text>
+      >
+        <Text>편지 보내기</Text>
+        <LetterIcon src={isLetterHover ? letterhover : letterbtn} />
+      </Card>
     </Wrapper>
   );
 };
 
 export default LetterAndLinkShare;
 
-// ======================= styled =======================
+/* ======================= styled ======================= */
+
 const Wrapper = styled.div`
   display: flex;
-  width: 10.3125rem;
-  height: 15.8125rem;
-  padding-right: 1rem;
   flex-direction: column;
-  justify-content: center;
-  align-items: flex-end;
 `;
 
-const LinkShare = styled.img`
-  width: 6.3125rem;
-  height: 4.875rem;
-  padding-right: 0.82rem;
-  filter: drop-shadow(2px 4px 2px rgba(0, 0, 0, 0.25));
+const Card = styled.div`
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
   cursor: pointer;
-  margin-bottom: 0.5rem;
+
+  width: 100%;
+  height: 6.8rem; /* 카드 높이 */
+  padding: 0 2rem;
+
+  background: white;
+  border-radius: 0.75rem;
+  box-shadow: 0 0 1px 0 rgba(0, 0, 0, 0.21);
 `;
 
-const Letter = styled.img`
-  width: 10.125rem;
-  height: 9.5rem;
-  filter: drop-shadow(1.5px 3px 2px rgba(0, 0, 0, 0.25));
-  cursor: pointer;
+const Spacer = styled.div`
+  height: 1.06rem; /* 카드 간격 */
 `;
 
 const Text = styled.div`
-  ${typo("bodym")};
-  color: ${color("black.50")};
-  margin-top: 1.13rem;
+  ${typo("h3")}
+  color: ${color("black.70")};
+`;
+
+const ShareIcon = styled.img`
+  width: 4.44rem; /* 스샷의 새 아이콘 크기 */
+  height: 4.44rem;
+  cursor: pointer;
+`;
+
+const LetterIcon = styled.img`
+  width: 4.5rem;
+  height: 4.5rem;
+  cursor: pointer;
 `;

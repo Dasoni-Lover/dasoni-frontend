@@ -40,7 +40,7 @@ export const CardListItemEnter = ({ hall, onOpenModal, hoverable = true }) => {
         const isManager = managedHallIds.includes(hall.hallId);
 
         if (isManager) {
-          navigate("/memorial-manager", { state: { hallId: hall.hallId } });
+          navigate("/memorial", { state: { hallId: hall.hallId } });
         } else {
           navigate("/memorial", { state: { hallId: hall.hallId } });
         }

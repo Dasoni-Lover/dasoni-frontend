@@ -12,6 +12,7 @@ export default function WritePostForm({
   photoId,
   initialData,
   initialImageUrl,
+  isAI = false,
 }) {
   const location = useLocation();
   const generatedImage = location.state?.generatedImage || null; // ✅ data URL (prefix 포함)
@@ -91,6 +92,7 @@ export default function WritePostForm({
         initialDate={initialDate}
         initialScope={initialScope}
         photoFile={photoFile} // ✅ 업로드용 파일 전달
+        isAI={isAI}
       />
     </Row>
   );

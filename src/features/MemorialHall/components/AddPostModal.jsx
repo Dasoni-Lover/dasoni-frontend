@@ -128,6 +128,12 @@ const Button = styled.div`
   background: #f8f8f8;
   box-sizing: border-box;
   cursor: pointer;
+
+  &:hover {
+    background: #fff4e6;
+  }
+
+  transition: 0.2s ease;
 `;
 
 const IconWrapper = styled.div`

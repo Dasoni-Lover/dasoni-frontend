@@ -74,7 +74,7 @@ export default function AIGenerateForm({ onGenerate }) {
 
   return (
     <div>
-      <Row $justify={"end"}>
+      <Row $justify={"end"} style={{ marginBottom: "3.25rem" }}>
         <CancelProcessButton
           title={"작성 그만두기"}
           onClick={handleCancelProcess}
@@ -101,7 +101,13 @@ export default function AIGenerateForm({ onGenerate }) {
       />
 
       <Row style={{ margin: "4rem 0" }} $justify={"center"} $gap={"1.25rem"}>
-        <Button size="M" text="취소" color="white" width="13.75rem" onClick={goBack} />
+        <Button
+          size="M"
+          text="취소"
+          color="white"
+          width="13.75rem"
+          onClick={goBack}
+        />
         <Button
           size="M"
           text="생성하기"

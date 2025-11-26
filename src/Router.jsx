@@ -12,8 +12,6 @@ import { HomePage } from "./pages/HomePage";
 
 /* 추모관 관련 */
 import MemorialHallPage from "./pages/MemorialHallPage";
-import MemorialMyHallPage from "./pages/MemorialMyHallPage";
-import { MemorialManagerHallPage } from "./pages/MemorialManagerHallPage";
 import { ProfileEditPage } from "./features/MemorialHall/pages/ProfileEditPage";
 import OpenMemorialHallPage from "./pages/OpenMemorialHallPage";
 import { EnterMemorialHallPage } from "./pages/EnterMemorialHallPage";
@@ -50,17 +48,7 @@ const router = createBrowserRouter([
       /* 추모관 관련 */
       { path: "/memorial", element: <MemorialHallPage />, loader: authGuard },
       {
-        path: "/memorial-my",
-        element: <MemorialMyHallPage />,
-        loader: authGuard,
-      },
-      {
-        path: "/memorial-manager",
-        element: <MemorialManagerHallPage />,
-        loader: authGuard,
-      },
-      {
-        path: "/memorial-manager/edit-profile",
+        path: "/memorial/edit-profile",
         element: <ProfileEditPage />,
         loader: authGuard,
       },

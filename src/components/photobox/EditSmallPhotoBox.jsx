@@ -38,8 +38,8 @@ export const EditSmallPhotoBox = ({ src, onFileSelect }) => {
 const Wrapper = styled.div`
   position: relative;
   display: inline-block;
-  width: 12.5rem;
-  height: 12.5rem;
+  width: 22.5rem;
+  height: 22.5rem;
 `;
 
 const Img = styled.img`
@@ -53,9 +53,9 @@ const Img = styled.img`
 
 const EditIcon = styled.img`
   position: absolute;
-  width: 36px;
-  height: 36px;
-  right: 15px;
-  bottom: 15px;
+  width: 56px;
+  height: 56px;
+  right: 2rem;
+  bottom: 2rem;
   cursor: pointer;
 `;
