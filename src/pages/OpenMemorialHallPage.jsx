@@ -13,7 +13,7 @@ import { getPresignedUrlForImage, uploadFileToS3 } from "../api/files"; // ✅ �
 
 export default function OpenMemorialHallPage() {
   const [step, setStep] = useState(1);
-  const MAX_STEP = 4;
+  const MAX_STEP = 5;
 
   const [isStepValid, setIsStepValid] = useState(false);
   const isLastStep = step === MAX_STEP;
@@ -34,6 +34,8 @@ export default function OpenMemorialHallPage() {
     relation: "",
     natures: [],
     review: "",
+    // ✅ Step5: 추모관 검색 허용 여부 (true: 허용, false: 미허용, null: 미선택)
+    isSearchOpen: null,
   });
 
   const [createdHallId, setCreatedHallId] = useState(null);

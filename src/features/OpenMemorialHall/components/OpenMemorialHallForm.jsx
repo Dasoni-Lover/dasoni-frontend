@@ -8,9 +8,10 @@ import OpenStep1 from "./OpenStep1";
 import OpenStep2 from "./OpenStep2";
 import OpenStep3 from "./OpenStep3";
 import OpenStep4 from "./OpenStep4";
+import OpenStep5 from "./OpenStep5";
 
 /**
- * step: 1~4
+ * step: 1~5
  * onStepValidChange: (boolean) => void
  * formData: 전체 폼 데이터
  * setFormData: 폼 데이터 업데이트 함수
@@ -25,11 +26,10 @@ export default function OpenMemorialHallForm({
     <WhiteBox>
       {/* 상단 진행바 */}
       <Row $gap={"0.58rem"}>
-        {[1, 2, 3, 4].map((i) => (
+        {[1, 2, 3, 4, 5].map((i) => (
           <ProgressBar key={i} $active={step >= i} />
         ))}
       </Row>
-
       {/* 단계별 내용 */}
       {step === 1 && (
         <OpenStep1
@@ -54,6 +54,13 @@ export default function OpenMemorialHallForm({
       )}
       {step === 4 && (
         <OpenStep4
+          onValidChange={onStepValidChange}
+          formData={formData}
+          setFormData={setFormData}
+        />
+      )}
+      {step === 5 && (
+        <OpenStep5
           onValidChange={onStepValidChange}
           formData={formData}
           setFormData={setFormData}
