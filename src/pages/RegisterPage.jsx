@@ -464,6 +464,7 @@ const ProfileImg = styled.img`
   aspect-ratio: 1/1;
   fill: #f2f2f2;
   cursor: pointer;
+  object-fit: cover;
 `;
 
 const CheckedMessage = styled.div`
