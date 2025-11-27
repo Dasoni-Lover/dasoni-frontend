@@ -15,12 +15,12 @@ export default function GenerateComplete({
   const nav = useNavigate();
 
   const [isCanceled, setIsCanceled] = useState(false);
-  const [badgedImage, setBadgedImage] = useState(null); // 뱃지 붙인 최종 이미지
+  const [badgedImage, setBadgedImage] = useState(null); // 뱃지 붙인 최종 이미지 (서비스 내부 표시용)
 
   const goGenerate = () => setIsGenerated(false);
 
   const goWritePost = () => {
-    // 배지 붙은 이미지가 있으면 그걸, 아니면 원본 이미지 사용
+    // ✅ 서비스 내부에서는 AI 뱃지가 붙은 이미지를 사용
     const imageToUse = badgedImage || generatedImage;
     nav("/write", {
       state: {
@@ -34,55 +34,56 @@ export default function GenerateComplete({
   const handleCancelProcess = () => setIsCanceled(true);
   const goHome = () => nav("/home");
 
-  // 이미지에 AI 뱃지 그려주는 함수
+  // 이미지에 AI 뱃지 그려주는 함수 (서비스 내부 표시용)_1:1 버전
   const addAIBadgeToImage = (src) =>
     new Promise((resolve, reject) => {
       const img = new Image();
       img.crossOrigin = "anonymous"; // CORS 허용된 경우 캔버스 사용 가능
 
       img.onload = () => {
+        // 1) 1:1 캔버스 만들기 (기준은 짧은 변)
+        const size = Math.min(img.width, img.height);
         const canvas = document.createElement("canvas");
-
-        canvas.width = img.width;
-        canvas.height = img.height;
+        canvas.width = size;
+        canvas.height = size;
 
         const ctx = canvas.getContext("2d");
 
-        // 1) 원본 이미지 그리기
-        ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+        // 2) 원본 이미지에서 중앙 부분을 1:1로 crop
+        const sx = (img.width - size) / 2;
+        const sy = (img.height - size) / 2;
 
-        // 2) 뱃지 위치/크기 계산 (우하단)
-        const badgeRadius = Math.min(canvas.width, canvas.height) * 0.08; // 이미지 크기에 비례
+        ctx.drawImage(img, sx, sy, size, size, 0, 0, size, size);
+
+        // 3) AI 뱃지 붙이기
+        const badgeRadius = size * 0.07; // 1:1 기준 비율
         const padding = badgeRadius * 0.6;
-        const cx = canvas.width - badgeRadius - padding;
-        const cy = canvas.height - badgeRadius - padding;
 
-        // 3) 동그란 배경
+        const cx = size - badgeRadius - padding;
+        const cy = size - badgeRadius - padding;
+
+        // 배경 원
         ctx.beginPath();
         ctx.arc(cx, cy, badgeRadius, 0, Math.PI * 2);
-        ctx.fillStyle = "#FFEEF0"; // 배경색
+        ctx.fillStyle = "#000";
         ctx.fill();
-        ctx.lineWidth = 4;
-        ctx.strokeStyle = "#FFC896"; // 테두리색
         ctx.stroke();
 
-        // 4) "AI" 텍스트
-        ctx.fillStyle = "#EF8F53";
-        ctx.font = `${badgeRadius * 0.9}px Pretendard, system-ui, sans-serif`;
+        // AI 텍스트
+        ctx.fillStyle = "#fff";
+        ctx.font = `${badgeRadius * 1.1}px Pretendard, system-ui, sans-serif`;
         ctx.textAlign = "center";
         ctx.textBaseline = "middle";
         ctx.fillText("AI", cx, cy + 1);
 
-        // 5) 최종 이미지를 dataURL로 변환
-        const resultUrl = canvas.toDataURL("image/png");
-        resolve(resultUrl);
+        resolve(canvas.toDataURL("image/png"));
       };
 
       img.onerror = (e) => reject(e);
       img.src = src;
     });
 
-  // 컴포넌트 마운트/생성 이미지 변경 시, AI 뱃지 버전 생성
+  // 컴포넌트 마운트/생성 이미지 변경 시, AI 뱃지 버전 생성 (서비스 내부용)
   useEffect(() => {
     if (!generatedImage) return;
 
@@ -96,7 +97,7 @@ export default function GenerateComplete({
       })
       .catch((err) => {
         console.error("AI 뱃지 생성 실패:", err);
-        // 실패해도 최소한 원본 이미지는 계속 사용 가능하도록 둠
+        // 실패해도 최소한 원본 이미지는 계속 사용 가능
       });
 
     return () => {
@@ -104,13 +105,12 @@ export default function GenerateComplete({
     };
   }, [generatedImage]);
 
-  // 생성된 이미지 저장 핸들러
+  // ✅ 생성된 이미지 "다운로드"는 항상 원본(generatedImage)만 사용
   const handleDownload = () => {
-    const imageToDownload = badgedImage || generatedImage;
-    if (!imageToDownload) return;
+    if (!generatedImage) return;
 
     const a = document.createElement("a");
-    a.href = imageToDownload;
+    a.href = generatedImage; // <- 뱃지 안 붙인 원본만 다운로드
 
     const inputName = prompt("저장할 파일명을 입력하세요", "memorial-image");
     if (!inputName) return;
@@ -121,6 +121,7 @@ export default function GenerateComplete({
     document.body.removeChild(a);
   };
 
+  // 서비스 화면에 표시할 이미지는 뱃지 버전 우선
   const displayImage = badgedImage || generatedImage;
 
   return (
