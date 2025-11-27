@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import styled from "styled-components";
+import { color,typo } from "../../styles/tokens";
 import { AlarmListitem } from "./AlarmListitem";
 import { fetchNotifications, deleteNotification } from "../../api/notification";
 
@@ -34,7 +35,7 @@ export const AlarmList = () => {
 
   return (
     <Container>
-      {notifications.length === 0 && <Empty>알림이 없습니다.</Empty>}
+      {notifications.length === 0 && <Empty>새로운 알림이 없어요.</Empty>}
 
       {notifications.map((item) => (
         <AlarmListitem
@@ -62,7 +63,20 @@ const Container = styled.div`
 `;
 
 const Empty = styled.div`
-  padding: 2rem;
-  text-align: center;
-  color: #999;
+  display: flex;
+  height: 7.75rem;
+  box-sizing: border-box;
+  padding: 1.25rem;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 1.1875rem;
+  flex: 0 0 auto;
+  align-self: stretch;
+  border-radius: 1.25rem;
+  border: 1px solid var(--5, #E9E9E9);
+  background: #FFF4E6;
+  box-shadow: 0 0 12px 0 rgba(0, 0, 0, 0.02);
+  ${typo("h4")};
+  color: ${color("black.50")};
 `;
