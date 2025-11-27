@@ -123,7 +123,10 @@ export default function PostOptionForm({
   };
 
   return (
-    <Column $justify={"space-between"}>
+    <Column
+      $justify={"space-between"}
+      style={hideScope ? { height: "18.5rem" } : undefined}
+    >
       <Column>
         <Column $gap={"0.75rem"}>
           <Row>
