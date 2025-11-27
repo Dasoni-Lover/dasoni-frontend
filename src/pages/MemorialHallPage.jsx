@@ -385,7 +385,9 @@ export default function MemorialHallPage() {
 
   // ===================== 9) 네비게이션 =====================
   const goWritePage = () =>
-    nav("/write", { state: { hallId: Number(effectiveHallId) } });
+    nav("/write", {
+      state: { hallId: Number(effectiveHallId), fromMyHall: isMe },
+    });
   const goAIGeneratePage = () =>
     nav("/generate", { state: { hallId: Number(effectiveHallId) } });
 
@@ -530,11 +532,19 @@ export default function MemorialHallPage() {
           {/* ✅ 게시글 작성 (+ 플로팅 버튼) */}
           {showFloatingAddPost && (
             <FixedAddPostContainer>
-              <AITextGuide>
-                <img src={IconAITextGuide} />
-                AI 이미지를 생성해 글을 작성해 보세요
-              </AITextGuide>
-              <FixedAddPostButton onClick={() => setIsAddPostModalOpen(true)}>
+              {/* 나의 추모관이 아닐 때만 AI 가이드 문구 노출 */}
+              {!isMe && (
+                <AITextGuide>
+                  <img src={IconAITextGuide} />
+                  AI 이미지를 생성해 글을 작성해 보세요
+                </AITextGuide>
+              )}
+
+              <FixedAddPostButton
+                // 나의 추모관이면: 바로 글쓰기 페이지로 이동
+                // 그 외(role !== "me") : 기존처럼 AddPostModal 열기
+                onClick={isMe ? goWritePage : () => setIsAddPostModalOpen(true)}
+              >
                 <img src={AddPostButtonImg} alt="추가 버튼" />
               </FixedAddPostButton>
             </FixedAddPostContainer>

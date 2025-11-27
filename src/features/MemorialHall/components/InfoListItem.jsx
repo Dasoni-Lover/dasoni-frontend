@@ -29,7 +29,7 @@ const Type = styled.div`
 
 const Content = styled.div`
   color: ${color("black.80")};
-  font-family: "NanumOeHarMeoNiGeurSsi";
+  font-family: "Nanum OeHarMeoNiGeurSsi";
   font-size: 2rem;
   font-style: normal;
   font-weight: 400;
