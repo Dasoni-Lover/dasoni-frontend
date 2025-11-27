@@ -12,6 +12,9 @@ import { useNavigate, useLocation } from "react-router-dom";
 import { updateHallProfile, getHallInfo } from "../../../api/memorial";
 import { getPresignedUrlForImage, uploadFileToS3 } from "../../../api/files";
 import defaultprofile from "../../../assets/default-profile-icon.svg";
+import IconRadioFilled from "../../../assets/icon-radio-filled.svg";
+import IconRadioBlank from "../../../assets/icon-radio-blank.svg";
+import { Column, Row } from "../../../styles/flex";
 
 export const ProfileEditPage = () => {
   const nav = useNavigate();
@@ -25,6 +28,9 @@ export const ProfileEditPage = () => {
   const [deathDate, setDeathDate] = useState(null);
   const [place, setPlace] = useState("");
   const [phone, setPhone] = useState("");
+
+  // 검색 허용 여부 (추가)
+  const [isSearchOpen, setIsSearchOpen] = useState(null); // true / false
 
   // 기존 이미지 URL (preview용)
   const [profileImageUrl, setProfileImageUrl] = useState(null);
@@ -62,6 +68,7 @@ export const ProfileEditPage = () => {
         setProfileImageUrl(data?.profile || null);
         setBirthDate(data?.birthday || null);
         setDeathDate(data?.deadday || null);
+        setIsSearchOpen(typeof data?.open === "boolean" ? data.open : null); // ✅ 기존 open 값
       } catch (e) {
         console.error("추모관 정보 불러오기 실패:", e);
       }
@@ -96,6 +103,8 @@ export const ProfileEditPage = () => {
         deadday: deathDate ? toDotFormat4(deathDate) : null,
         place: place || null,
         phone: phone || null,
+        // ✅ 검색 허용 여부 전달 (선택 안 했으면 기존 값 유지하고 싶다면 백엔드 정책에 맞춰 조정)
+        open: typeof isSearchOpen === "boolean" ? isSearchOpen : null,
       };
 
       await updateHallProfile(hallId, body);
@@ -105,6 +114,10 @@ export const ProfileEditPage = () => {
       console.error("프로필 수정 실패:", e);
       alert("수정에 실패했습니다.");
     }
+  };
+
+  const handleSelectSearchOpen = (value) => {
+    setIsSearchOpen(value);
   };
 
   return (
@@ -131,7 +144,7 @@ export const ProfileEditPage = () => {
 
             <InputWrapper>
               <PointTextWrapper>
-                <PointText question="고인의 생일을 알려주세요" />
+                <PointText question="고인의 생일" />
               </PointTextWrapper>
               <DateWrapper>
                 <DatePicker
@@ -144,7 +157,7 @@ export const ProfileEditPage = () => {
 
             <InputWrapper>
               <PointTextWrapper>
-                <PointText question="고인의 기일을 알려주세요" />
+                <PointText question="고인의 기일" />
               </PointTextWrapper>
               <DateWrapper>
                 <DatePicker
@@ -156,7 +169,7 @@ export const ProfileEditPage = () => {
             </InputWrapper>
 
             <InputWrapper>
-              <Text>고인의 프로필 사진을 업로드해 주세요</Text>
+              <Text>고인의 프로필 사진</Text>
               <EditSmallPhotoBox
                 src={profileImageUrl || defaultprofile}
                 onFileSelect={handleFileSelect} // File 객체 그대로 전달
@@ -164,7 +177,7 @@ export const ProfileEditPage = () => {
             </InputWrapper>
 
             <InputWrapper>
-              <Text>고인을 모신 곳을 알려주세요</Text>
+              <Text>고인을 모신 곳</Text>
               <InputField
                 value={place}
                 onChange={(e) => setPlace(e.target.value)}
@@ -173,12 +186,65 @@ export const ProfileEditPage = () => {
             </InputWrapper>
 
             <InputWrapper>
-              <Text>개설자의 연락처를 알려주세요</Text>
+              <Text>개설자 연락처</Text>
               <InputField
                 value={phone}
                 onChange={(e) => setPhone(formatPhone(e.target.value))}
                 placeholder="ex) 010-0000-0000"
               />
+            </InputWrapper>
+
+            {/* ✅ 추모관 검색 허용 여부 라디오 */}
+            <InputWrapper>
+              <Text>추모관 검색 허용 여부</Text>
+              <RadioGroup>
+                {/* 검색 허용 */}
+                <RadioBox
+                  role="button"
+                  tabIndex={0}
+                  onClick={() => handleSelectSearchOpen(true)}
+                >
+                  <Row $gap={"1rem"} $align={"start"}>
+                    <RadioIcon
+                      src={
+                        isSearchOpen === true ? IconRadioFilled : IconRadioBlank
+                      }
+                      alt="검색 허용"
+                    />
+                    <Column $gap={"0.125rem"}>
+                      <RadioText>검색 허용하기</RadioText>
+                      <RadioInfo>
+                        다른 이용자가 고인의 이름으로 추모관을 검색해 방문할 수
+                        있어요.
+                      </RadioInfo>
+                    </Column>
+                  </Row>
+                </RadioBox>
+
+                {/* 검색 허용하지 않음 */}
+                <RadioBox
+                  role="button"
+                  tabIndex={0}
+                  onClick={() => handleSelectSearchOpen(false)}
+                >
+                  <Row $gap={"1rem"} $align={"start"}>
+                    <RadioIcon
+                      src={
+                        isSearchOpen === false
+                          ? IconRadioFilled
+                          : IconRadioBlank
+                      }
+                      alt="검색 허용하지 않기"
+                    />
+                    <Column $gap={"0.125rem"}>
+                      <RadioText>검색 허용하지 않기</RadioText>
+                      <RadioInfo>
+                        초대 링크를 받은 사람만 추모관에 들어올 수 있어요.
+                      </RadioInfo>
+                    </Column>
+                  </Row>
+                </RadioBox>
+              </RadioGroup>
             </InputWrapper>
           </Box>
 
@@ -285,4 +351,31 @@ const Border = styled.div`
   border: 2px solid #e9e9e9;
   background: #fff;
   box-shadow: 0 0 5px rgba(0, 0, 0, 0.04);
+`;
+
+// ✅ 라디오 관련 스타일
+const RadioGroup = styled.div`
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  padding: 1.5rem;
+  border-radius: 0.5rem;
+  background: ${color("lightgrey")};
+  gap: 1.5rem;
+`;
+
+const RadioBox = styled.div`
+  cursor: pointer;
+`;
+
+const RadioIcon = styled.img``;
+
+const RadioText = styled.div`
+  ${typo("bodym")};
+  color: ${color("black.70")};
+`;
+
+const RadioInfo = styled.div`
+  ${typo("bodym")};
+  color: ${color("black.30")};
 `;
