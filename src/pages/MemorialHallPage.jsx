@@ -114,7 +114,7 @@ export default function MemorialHallPage() {
   }, [hallIdFromState]);
 
   // ===================== 1) 추모관 정보 조회 (role 확보) =====================
-  // ✅ effectiveHallId가 확정된 뒤에만 호출
+  // effectiveHallId가 확정된 뒤에만 호출
   useEffect(() => {
     if (!effectiveHallId) return;
 

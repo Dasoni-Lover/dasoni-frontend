@@ -140,8 +140,6 @@ useEffect(() => {
 
 
 
-
-
 // ⭐ 라우트 변경 시 닫기
 useEffect(() => {
   setIsLogoutBoxOpen(false);
