@@ -1,15 +1,29 @@
-import React from "react";
+import React, { useRef, useEffect } from "react";
 import styled from "styled-components";
 import Button from "../Button";
 import { color, typo } from "../../styles/tokens";
 import { AlarmList } from "./AlarmList";
 
 const AlarmPanel = ({ onClose }) => {
+  const panelRef = useRef(null);
+
+  // ⭐ 바깥 클릭 감지
+  useEffect(() => {
+    const handleClickOutside = (e) => {
+      if (panelRef.current && !panelRef.current.contains(e.target)) {
+        onClose();
+      }
+    };
+
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, [onClose]);
+
   return (
-    <Panel>
+    <Panel ref={panelRef}>
       <Header>
         <Title>알림</Title>
-        <Button text="닫기" width="6.25rem" color="white" size = "S" onClick={onClose}/>
+        <Button text="닫기" width="6.25rem" color="white" size="S" onClick={onClose}/>
       </Header>
       <Wrapper>
         <AlarmList />
@@ -19,6 +33,7 @@ const AlarmPanel = ({ onClose }) => {
 };
 
 export default AlarmPanel;
+
 
 const Panel = styled.div`
   position: fixed;

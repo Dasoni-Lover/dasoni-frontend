@@ -120,6 +120,7 @@ export default function Header({ showAuthButtons }) {
     setIsAlarmOpen((prev) => !prev);
     setIsLogoutBoxOpen(false);
   };
+  
 
   // ⭐ MiniProfile 클릭 → LogoutBox 토글
   const handleProfileClick = () => {
@@ -128,12 +129,18 @@ export default function Header({ showAuthButtons }) {
     setIsAlarmOpen(false);
   };
 
+  
+
   // ⭐ 부모(Header)의 상태 변화 시 LogoutBox 자동 닫기
 useEffect(() => {
   if (isAlarmOpen) {
     setIsLogoutBoxOpen(false);
   }
 }, [isAlarmOpen]);
+
+
+
+
 
 // ⭐ 라우트 변경 시 닫기
 useEffect(() => {
