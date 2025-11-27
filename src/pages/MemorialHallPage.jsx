@@ -224,12 +224,9 @@ export default function MemorialHallPage() {
       case "오래된 사진순":
         result.sort((a, b) => getTs(a) - getTs(b));
         break;
-<<<<<<< HEAD
 
       default:
         break;
-=======
->>>>>>> develop
     }
     return result;
   }, [photos, filter]);
@@ -357,7 +354,8 @@ export default function MemorialHallPage() {
   const handleLinkShareClick = async () => {
     const currentUrl = window.location.href;
     try {
-      if (navigator.clipboard?.writeText) await navigator.clipboard.writeText(currentUrl);
+      if (navigator.clipboard?.writeText)
+        await navigator.clipboard.writeText(currentUrl);
       else {
         const textarea = document.createElement("textarea");
         textarea.value = currentUrl;
@@ -383,7 +381,11 @@ export default function MemorialHallPage() {
       <BlurWrapper $blur={isMyMemorialModalOpen}>
         <Container>
           <BarWrapper>
-            {isMe ? <Title>나의 추모관</Title> : <BarNavigate paths={["홈", hallTitle]} />}
+            {isMe ? (
+              <Title>나의 추모관</Title>
+            ) : (
+              <BarNavigate paths={["홈", hallTitle]} />
+            )}
           </BarWrapper>
 
           <ContentWrapper>
@@ -414,16 +416,27 @@ export default function MemorialHallPage() {
                 hallInfo && <Profile data={hallInfo} />
               )}
 
-              <HallTab role={tabRoleProp} activeIndex={activeTab} onTabChange={setActiveTab} />
+              <HallTab
+                role={tabRoleProp}
+                activeIndex={activeTab}
+                onTabChange={setActiveTab}
+              />
 
-              {role === "admin" && activeTab === 2 && <MyRecord hallId={Number(effectiveHallId)} />}
-              {role === "me" && activeTab === 1 && <MyRecord hallId={Number(effectiveHallId)} />}
+              {role === "admin" && activeTab === 2 && (
+                <MyRecord hallId={Number(effectiveHallId)} />
+              )}
+              {role === "me" && activeTab === 1 && (
+                <MyRecord hallId={Number(effectiveHallId)} />
+              )}
               {role === "me" && activeTab === 2 && <UploadVoiceRecord />}
 
               {showDropdownAndList && (
                 <>
                   <TabButtonDropdown onFilterChange={setFilter} />
-                  <BoxPostList photos={filteredPhotos} onPostClick={handlePhotoClick} />
+                  <BoxPostList
+                    photos={filteredPhotos}
+                    onPostClick={handlePhotoClick}
+                  />
                 </>
               )}
             </Content>
@@ -484,7 +497,10 @@ export default function MemorialHallPage() {
       )}
 
       {isMe && isMyMemorialModalOpen && (
-        <MyMemorialModal isOpen={isMyMemorialModalOpen} onCreateClick={handleCreateClick} />
+        <MyMemorialModal
+          isOpen={isMyMemorialModalOpen}
+          onCreateClick={handleCreateClick}
+        />
       )}
 
       <PostDetailModal
