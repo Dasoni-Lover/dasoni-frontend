@@ -4,52 +4,57 @@ import { color, typo } from "../../styles/tokens";
 import { Tag } from "../Tag";
 import deleteicon from "../../assets/delete-icon.svg";
 
-export const AlarmListitem = ({
-  tagText = "입장승인",
-  content = "입장이 승인 되었어요. 언제든 방문하여 소중한 추억을 함께 나눠주세요.",
-  tagOn = true, // on/off
-  title = "故 박영수 추모관",
-}) => {
+export const AlarmListitem = ({ tagText, title, content, onDelete, onClick, hallId }) => {
   return (
-    <Wrapper>
-      <Left>
+    <Wrapper >
+      <Left onClick={onClick}>
         <Box>
-          <Tag text={tagText} on={tagOn} />
-          <Title>{title}</Title>
+          <Tag text={tagText} />
+          <Title>故 {title}</Title>
         </Box>
         <Content>{content}</Content>
       </Left>
-      <Icon src={deleteicon} />
+
+      <Icon
+        src={deleteicon}
+        onClick={(e) => {
+          e.stopPropagation();
+          onDelete();
+        }}
+      />
     </Wrapper>
   );
 };
 
+
 const Wrapper = styled.div`
   display: flex;
-  width: 31.25rem;
+  width: 27.4375rem;
   padding: 1rem 1.625rem;
+  gap: 1.25rem;
   justify-content: space-between;
   align-items: center;
-  border-bottom: 1px solid var(--5, #E9E9E9);
-  background: var(--0, #FFF);
+  border-bottom: 1px solid #e9e9e9;
+  background: #fff4e6;
   box-sizing: border-box;
+  cursor: pointer;
+
+  &:hover {
+    background: #ffefd8;
+  }
 `;
 
 const Left = styled.div`
   display: flex;
   width: 20.6875rem;
   flex-direction: column;
-  justify-content: center;
-  align-items: flex-start;
-  flex-shrink: 0;
 `;
 
 const Box = styled.div`
   display: flex;
+  height: 2.88rem;
   align-items: center;
   gap: 0.5rem;
-  align-self: stretch;
-  padding: 0.625rem 0;
 `;
 
 const Title = styled.div`
@@ -65,6 +70,5 @@ const Content = styled.div`
 const Icon = styled.img`
   width: 1.5rem;
   height: 1.5rem;
-  flex-shrink: 0;
+  cursor: pointer;
 `;
-

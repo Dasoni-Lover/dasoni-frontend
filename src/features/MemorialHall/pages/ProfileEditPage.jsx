@@ -17,6 +17,7 @@ export const ProfileEditPage = () => {
   const nav = useNavigate();
   const location = useLocation();
   const hallId = location.state?.hallId;
+  console.log("ProfileEditPage hallId:", hallId);
 
   // 상태값
   const [name, setName] = useState("");

@@ -1,3 +1,4 @@
+// src/components/header/Header.jsx
 import React, { useEffect, useState } from "react";
 import styled from "styled-components";
 import { useLocation, useNavigate } from "react-router-dom";
@@ -7,7 +8,11 @@ import { color, typo } from "../../styles/tokens";
 import { clearAuthTokens, getAccessToken, logoutUser } from "../../api/auth";
 import { getProfileInfo } from "../../api/user";
 import MiniProfile from "./MiniProflie";
-import IconLogout from "../../assets/icon-logout.svg";
+import AlarmPanel from "../alarm/AlarmPanel";
+import alarm from "../../assets/bell-icon-gray.svg";
+import alarmclick from "../../assets/bell-icon-yellow.svg";
+
+import LogoutBox from "./LogoutBox";
 
 export default function Header({ showAuthButtons }) {
   const navigate = useNavigate();
@@ -20,8 +25,9 @@ export default function Header({ showAuthButtons }) {
   });
 
   const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [isAlarmOpen, setIsAlarmOpen] = useState(false);
+  const [isLogoutBoxOpen, setIsLogoutBoxOpen] = useState(false); // ⭐ 추가
 
-  // 프로필 정보 가져오는 함수 분리
   const fetchProfileInfo = async () => {
     const token = getAccessToken();
 
@@ -54,12 +60,10 @@ export default function Header({ showAuthButtons }) {
     }
   };
 
-  // 1) 경로 바뀔 때마다 토큰/프로필 다시 확인
   useEffect(() => {
     fetchProfileInfo();
   }, [location.pathname]);
 
-  // 2) 로그인/로그아웃 전역 이벤트 구독(즉시 반영)
   useEffect(() => {
     const handleAuthChanged = () => {
       fetchProfileInfo();
@@ -69,7 +73,7 @@ export default function Header({ showAuthButtons }) {
     return () => window.removeEventListener("authChanged", handleAuthChanged);
   }, []);
 
-  // 프로필 변경 전역 이벤트 구독
+  // ⭐ 프로필 이미지 업데이트
   useEffect(() => {
     const handleProfileUpdated = (e) => {
       const newUrl = e.detail?.profileUrl;
@@ -82,9 +86,7 @@ export default function Header({ showAuthButtons }) {
     };
 
     window.addEventListener("myProfileUpdated", handleProfileUpdated);
-    return () => {
-      window.removeEventListener("myProfileUpdated", handleProfileUpdated);
-    };
+    return () => window.removeEventListener("myProfileUpdated", handleProfileUpdated);
   }, []);
 
   const menuItems = [
@@ -98,12 +100,10 @@ export default function Header({ showAuthButtons }) {
     if (item.label === "홈") {
       return location.pathname === "/" || location.pathname === "/home";
     }
-
     if (item.label === "나의 추모관") {
       const fromMyHall = location.state?.from === "myHall";
       return location.pathname === "/memorial" && fromMyHall;
     }
-
     return location.pathname === item.path;
   };
 
@@ -115,64 +115,112 @@ export default function Header({ showAuthButtons }) {
     }
   };
 
-  const handleLogoutClick = async () => {
-    try {
-      await logoutUser();
-    } catch (error) {
-      console.warn("로그아웃 실패(서버):", error);
-    } finally {
-      clearAuthTokens();
-      // 전역 이벤트로 헤더 즉시 초기화
-      window.dispatchEvent(new Event("authChanged"));
+  // Alarm 아이콘 토글
+  const handleAlarmClick = () => {
+    setIsAlarmOpen((prev) => !prev);
+    setIsLogoutBoxOpen(false);
+  };
+  
 
-      navigate("/");
-      alert("로그아웃 되었습니다.");
-    }
+  // MiniProfile 클릭 → LogoutBox 토글
+  const handleProfileClick = () => {
+    if (!isLoggedIn) return;
+    setIsLogoutBoxOpen((prev) => !prev);
+    setIsAlarmOpen(false);
   };
 
+  
+
+  // 부모(Header)의 상태 변화 시 LogoutBox 자동 닫기
+useEffect(() => {
+  if (isAlarmOpen) {
+    setIsLogoutBoxOpen(false);
+  }
+}, [isAlarmOpen]);
+
+
+
+// 라우트 변경 시 닫기
+useEffect(() => {
+  setIsLogoutBoxOpen(false);
+  setIsAlarmOpen(false);
+}, [location.pathname]);
+
+
   return (
-    <Wrapper>
-      <Logo src={logo} onClick={() => navigate("/home")} />
+    <>
+      <Wrapper>
+        <Logo src={logo} onClick={() => navigate("/home")} />
 
-      {!showAuthButtons && (
-        <>
-          <Row $gap={"4.3rem"}>
-            {menuItems.map((item) => (
-              <NavButton
-                key={item.path}
-                onClick={() => handleMenuClick(item)}
-                $active={getIsActive(item)}
-              >
-                {item.label}
-              </NavButton>
-            ))}
-          </Row>
+        {!showAuthButtons && (
+          <>
+            <Box>
+            <Row $gap={"4.3rem"}>
+              {menuItems.map((item) => (
+                <NavButton
+                  key={item.path}
+                  onClick={() => handleMenuClick(item)}
+                  $active={getIsActive(item)}
+                >
+                  {item.label}
+                </NavButton>
+              ))}
+            </Row>
+            </Box>
 
-          <Row>
-            <MiniProfile
-              name={isLoggedIn ? profileInfo.name : "로그인 해주세요"}
-              profileImg={profileInfo.myProfile}
-              isLogin={isLoggedIn}
-            />
-            <LogoutWrapper>
-              <LogoutText onClick={handleLogoutClick}>
-                <img src={IconLogout} alt="logout icon" />
-                logout
-              </LogoutText>
-            </LogoutWrapper>
-          </Row>
-        </>
+            <OpenBox>
+              <AlarmIcon
+                src={isAlarmOpen ? alarmclick : alarm}
+                onClick={handleAlarmClick}
+                data-ignore-close="true" 
+              />
+
+              {isAlarmOpen && <AlarmPanel onClose={() => setIsAlarmOpen(false)}/>}
+
+              <div onClick={handleProfileClick} data-ignore-close="true" >
+                <MiniProfile
+                  name={isLoggedIn ? profileInfo.name : "로그인 해주세요"}
+                  profileImg={profileInfo.myProfile}
+                  isLogin={isLoggedIn}
+                />
+              </div>
+            </OpenBox>
+          </>
+        )}
+
+        {showAuthButtons && (
+          <ButtonGroup>
+            <LoginButton onClick={() => navigate("/login")}>로그인</LoginButton>
+            <RegisterButton onClick={() => navigate("/register")}>
+              회원가입
+            </RegisterButton>
+          </ButtonGroup>
+        )}
+      </Wrapper>
+
+      {/* MiniProfile 아래에 LogoutBox 표시 */}
+      {isLogoutBoxOpen && (
+        <LogoutBox
+        name={profileInfo.name}
+        profileImg={profileInfo.myProfile}
+          onLogout={async () => {
+            try {
+              await logoutUser();
+            } catch (e) {
+              console.error("로그아웃 실패:", e);
+            } finally {
+              clearAuthTokens();
+              window.dispatchEvent(new Event("authChanged"));
+              navigate("/");
+              alert("로그아웃 되었습니다.");
+            }
+          }}
+          onClose={() => setIsLogoutBoxOpen(false)
+            
+          } 
+        />
       )}
-
-      {showAuthButtons && (
-        <ButtonGroup>
-          <LoginButton onClick={() => navigate("/login")}>로그인</LoginButton>
-          <RegisterButton onClick={() => navigate("/register")}>
-            회원가입
-          </RegisterButton>
-        </ButtonGroup>
-      )}
-    </Wrapper>
+    </>
   );
 }
 
@@ -185,7 +233,7 @@ const Wrapper = styled.header`
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 0 4.38rem;
+  padding:  0  2.25rem 0 2.25rem;
   background: white;
   z-index: 5;
   border-bottom: 1px solid var(--5, #e9e9e9);
@@ -196,6 +244,12 @@ const Logo = styled.img`
   height: 2.76788rem;
   cursor: pointer;
 `;
+const Box = styled.div`
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+`;
+
 
 const ButtonGroup = styled.div`
   display: inline-flex;
@@ -212,15 +266,10 @@ const LoginButton = styled.button`
   border-radius: 0.625rem;
   border: 2px solid var(--5, #e9e9e9);
   background: #fff;
-
   color: var(--80, #0e0e0e);
-  text-align: center;
   font-family: Pretendard;
   font-size: 1.25rem;
-  font-style: normal;
   font-weight: 700;
-  line-height: 130%;
-
   cursor: pointer;
 `;
 
@@ -233,45 +282,31 @@ const RegisterButton = styled.button`
   border-radius: 0.625rem;
   border: 2px solid var(--70, #313131);
   background: var(--70, #313131);
-
   color: #fff;
-  text-align: center;
   font-family: Pretendard;
   font-size: 1.25rem;
-  font-style: normal;
   font-weight: 700;
-  line-height: 130%;
-
   cursor: pointer;
 `;
 
 const NavButton = styled.div`
   ${typo("h4")};
   color: ${({ $active }) => ($active ? color("black.80") : color("black.30"))};
-
   cursor: pointer;
   white-space: nowrap;
   transition: color 0.25s ease;
 `;
 
-const LogoutWrapper = styled.div`
-  display: flex;
-  gap: 0.65rem;
-`;
-
-const LogoutText = styled.div`
-  display: flex;
-  align-items: center;
-  gap: 0.75rem;
+const AlarmIcon = styled.img`
+  width: 2.5rem;
+  height: 2.5rem;
   cursor: pointer;
-  ${typo("h3")};
-  color: ${color("black.30")};
-  border-radius: 0.25rem;
-  width: 13.25rem;
-  box-sizing: border-box;
-  transition: all 0.2s ease;
-
-  &:hover {
-    color: ${color("black.70")};
-  }
 `;
+
+const OpenBox=styled.div`
+  padding-right: 5.25rem;
+  display: flex;
+  gap: 2.12rem;
+  flex-direction: row;
+  align-items: center;
+`
