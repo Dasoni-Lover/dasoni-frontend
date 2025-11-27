@@ -7,8 +7,8 @@ export const fetchNotifications = async () => {
   return res.data;
 };
 
-// 알림 삭제 (닫기)
-export const deleteNotification = async (notificationId) => {
+// 알림 닫기
+export const closeNotification = async (notificationId) => {
   const res = await client.patch(`/api/notifications/${notificationId}/close`);
   return res.data;
 };
