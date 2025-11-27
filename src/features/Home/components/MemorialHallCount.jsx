@@ -5,6 +5,7 @@ import { color, typo } from "../../../styles/tokens";
 import { useNavigate } from "react-router-dom";
 import Button from "../../../components/Button";
 import Icon from "../assets/icon-search2.svg";
+import deleteicon from "../../../assets/icon-delete.svg";
 
 export const MemorialHallCount = ({ count = 0, tab = 0, onSearch }) => {
   const nav = useNavigate();
@@ -37,9 +38,21 @@ export const MemorialHallCount = ({ count = 0, tab = 0, onSearch }) => {
             value={keyword}
             onChange={(e) => setKeyword(e.target.value)}
           />
-          <SearchButton type="button" onClick={handleSearch}>
-            <img src={Icon} alt="search" />
-          </SearchButton>
+          <ButtonWrapper>
+  <ResetButton
+    onClick={() => {
+      setKeyword("");
+      onSearch("");
+    }}
+  >
+    <Reset src={deleteicon} />
+  </ResetButton>
+
+  <SearchButton type="button" onClick={handleSearch}>
+    <img src={Icon} alt="search" />
+  </SearchButton>
+</ButtonWrapper>
+
         </InputWrapper>
 
         <Button
@@ -79,7 +92,7 @@ const Text = styled.div`
 
 const InputWrapper = styled.div`
   display: flex;
-  width: 17.3125rem;
+  width: 21.3125rem;
   height: 3.25rem;
   padding: 0.5rem 1rem;
   align-items: center;
@@ -87,11 +100,11 @@ const InputWrapper = styled.div`
   border: 2px solid var(--5, #E9E9E9);
   background: #fff;
   box-sizing: border-box;
-  gap: 0.625rem;
+  gap: 1rem;
 `;
 
 const StyledInput = styled.input`
-  width: 12.4375rem;
+  width: 13.5626rem;
   height: 100%;
   border: none;
   background: transparent;
@@ -102,6 +115,12 @@ const StyledInput = styled.input`
     color: ${color("black.10")};
   }
 `;
+
+const ButtonWrapper=styled.div`
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+`
 
 const SearchButton = styled.button`
   border: none;
@@ -114,9 +133,22 @@ const SearchButton = styled.button`
   cursor: pointer;
 
   img {
-    width: 100%;
-    height: 100%;
     object-fit: contain;
     display: block;
   }
 `;
+
+const ResetButton=styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.625rem;
+  box-sizing: border-box;
+  cursor: pointer;
+`
+
+const Reset=styled.img`
+width: 2rem;
+height: 2rem;
+aspect-ratio: 1/1;
+`

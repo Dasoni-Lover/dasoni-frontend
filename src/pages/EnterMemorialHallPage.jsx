@@ -5,6 +5,7 @@ import { SearchTab } from "../features/EnterMemorialHall/components/SearchTab";
 import { EnterModal } from "../features/EnterMemorialHall/components/EnterModal";
 import { color, typo } from "../styles/tokens";
 import { searchHalls } from "../api/search-hall";
+import { NoneList } from "../features/Home/components/NoneList";
 
 export const EnterMemorialHallPage = () => {
   const [modalVisible, setModalVisible] = useState(false);
@@ -44,13 +45,23 @@ export const EnterMemorialHallPage = () => {
     <Wrapper>
       <Text>추모관 입장하기</Text>
       <SearchTab onSearchResult={setSearchResults} />
-      <Content>
-        {loadingInitial ? (
-          <LoadingText>로딩중...</LoadingText>
-        ) : (
-          <CardListEnter halls={searchResults} onOpenModal={handleOpenModal} />
-        )}
-      </Content>
+  <Content>
+    {loadingInitial ? (
+      <LoadingText>로딩중...</LoadingText>
+    ) : searchResults.length === 0 ? (
+      <NoneList
+  tab={1}
+  bgColor="#fff"
+  borderColor="#e9e9e9"
+  buttonColor="white"
+  openTexts={["입력하신 정보와 일치하는 추모관이 없어요.", "성함 혹은 생일, 기일을 확인하거나, 직접 추모관을 개설해보시는 건 어떨까요?"]}
+/>
+
+    ) : (
+      <CardListEnter halls={searchResults} onOpenModal={handleOpenModal} />
+    )}
+  </Content>
+
 
       {modalVisible && (
         <EnterModal hall={selectedHall} onClose={handleCloseModal} />
