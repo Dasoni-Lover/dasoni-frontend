@@ -128,6 +128,20 @@ export default function Header({ showAuthButtons }) {
     setIsAlarmOpen(false);
   };
 
+  // ⭐ 부모(Header)의 상태 변화 시 LogoutBox 자동 닫기
+useEffect(() => {
+  if (isAlarmOpen) {
+    setIsLogoutBoxOpen(false);
+  }
+}, [isAlarmOpen]);
+
+// ⭐ 라우트 변경 시 닫기
+useEffect(() => {
+  setIsLogoutBoxOpen(false);
+  setIsAlarmOpen(false);
+}, [location.pathname]);
+
+
   return (
     <>
       <Wrapper>
@@ -181,6 +195,7 @@ export default function Header({ showAuthButtons }) {
       {/* MiniProfile 아래에 LogoutBox 표시 */}
       {isLogoutBoxOpen && (
         <LogoutBox
+        name={profileInfo.name}
         profileImg={profileInfo.myProfile}
           onLogout={async () => {
             try {

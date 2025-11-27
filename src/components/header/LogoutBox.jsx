@@ -1,46 +1,47 @@
-// src/components/header/LogoutBox.jsx
-import React, { useRef } from "react";
+import React, { useRef, useEffect } from "react";
 import styled from "styled-components";
 import { color, typo } from "../../styles/tokens";
 import logout from "../../assets/icon-logout.svg";
 import edit from "../../assets/edit-btn.svg";
 import { getPresignedUrlForImage, uploadFileToS3 } from "../../api/files";
-import { updateMyHallProfile } from "../../api/my-hall";   // ⭐ 추가할 API 경로로 수정해줘!
+import { updateMyHallProfile } from "../../api/my-hall";
 
-export default function LogoutBox({ onLogout, onClose, profileImg }) {
+export default function LogoutBox({ onLogout, onClose, profileImg, name }) {
   const fileInputRef = useRef(null);
+  const boxRef = useRef(null);   // ⭐ 바깥 클릭 감지 영역
 
-  // Edit 버튼 클릭 (파일 선택창 열기)
+  // ⭐ 바깥 클릭 시 닫기 기능
+  useEffect(() => {
+    const handleClickOutside = (e) => {
+      if (boxRef.current && !boxRef.current.contains(e.target)) {
+        onClose();
+      }
+    };
+
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, [onClose]);
+
   const handleEditClick = () => {
-    if (fileInputRef.current) {
-      fileInputRef.current.click();
-    }
+    if (fileInputRef.current) fileInputRef.current.click();
   };
 
-  // 실제 파일 선택 후 처리: S3 업로드 → 내 추모관 프로필 API 호출
   const handleFileChange = async (e) => {
     const file = e.target.files?.[0];
     if (!file) return;
 
     try {
-      // 1. presigned-url발급
       const { uploadUrl, fileUrl, contentType } = await getPresignedUrlForImage(file);
-
-      // 2. S3 업로드
       await uploadFileToS3(uploadUrl, file, contentType);
-
-      // 3. 내 추모관 프로필 수정 PATCH 호출
       await updateMyHallProfile(fileUrl);
 
-      // 4. 헤더의 프로필 이미지 업데이트
       window.dispatchEvent(
         new CustomEvent("myProfileUpdated", {
-          detail: { profileUrl: fileUrl }
+          detail: { profileUrl: fileUrl },
         })
       );
 
       alert("프로필 이미지가 변경되었습니다.");
-
     } catch (error) {
       console.error("프로필 이미지 변경 실패:", error);
       alert("이미지 변경 중 오류가 발생했습니다.");
@@ -52,9 +53,10 @@ export default function LogoutBox({ onLogout, onClose, profileImg }) {
     onClose();
   };
 
+  
+
   return (
-    <Container>
-      {/* 숨겨진 파일 인풋 */}
+    <Container ref={boxRef}>
       <input
         type="file"
         accept="image/*"
@@ -65,13 +67,13 @@ export default function LogoutBox({ onLogout, onClose, profileImg }) {
 
       <Text>계정</Text>
 
-      <Box>
+      <Box onClick={handleEditClick}>
         <PhotoBox>
           <Photo src={profileImg} />
-          <Name>박영진</Name>
+          <Name>{name}</Name>
         </PhotoBox>
 
-        <Editcontainer onClick={handleEditClick}>
+        <Editcontainer>
           <Edit src={edit} />
         </Editcontainer>
       </Box>
@@ -85,6 +87,7 @@ export default function LogoutBox({ onLogout, onClose, profileImg }) {
     </Container>
   );
 }
+
 
 
 
@@ -115,7 +118,7 @@ const Text = styled.div`
   padding-bottom: 1rem;
 `;
 const Box = styled.div`
-  position: relative;   /* ⭐ 추가: Editcontainer 기준점 */
+  position: relative;   /* Editcontainer 기준점 */
   width: 100%;
   box-sizing: border-box;
   height: 8.4375rem;
@@ -125,12 +128,13 @@ const Box = styled.div`
   align-items: center;
   background: #FFF;
   box-shadow: 0 0 2px 0 rgba(0, 0, 0, 0.11);
+  cursor: pointer;
 `;
 
 const Editcontainer = styled.div`
   position: absolute;
-  top: 3rem;          /* ⭐ 수정 */
-  right: 7.53rem;     /* ⭐ 수정 */
+  top: 3rem;         
+  right: 7.53rem;     
 
   display: flex;
   padding: 0.375rem;
@@ -143,7 +147,7 @@ const PhotoBox=styled.div`
     display: flex;
     flex-direction: column;
     justify-content: center;
-    align-items: flex-start;
+    align-items: center;
     gap: 1rem;
 `
 const Photo=styled.img`
