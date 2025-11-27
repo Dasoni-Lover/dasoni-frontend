@@ -115,14 +115,14 @@ export default function Header({ showAuthButtons }) {
     }
   };
 
-  // ⭐ Alarm 아이콘 토글
+  // Alarm 아이콘 토글
   const handleAlarmClick = () => {
     setIsAlarmOpen((prev) => !prev);
     setIsLogoutBoxOpen(false);
   };
   
 
-  // ⭐ MiniProfile 클릭 → LogoutBox 토글
+  // MiniProfile 클릭 → LogoutBox 토글
   const handleProfileClick = () => {
     if (!isLoggedIn) return;
     setIsLogoutBoxOpen((prev) => !prev);
@@ -131,7 +131,7 @@ export default function Header({ showAuthButtons }) {
 
   
 
-  // ⭐ 부모(Header)의 상태 변화 시 LogoutBox 자동 닫기
+  // 부모(Header)의 상태 변화 시 LogoutBox 자동 닫기
 useEffect(() => {
   if (isAlarmOpen) {
     setIsLogoutBoxOpen(false);
@@ -140,7 +140,7 @@ useEffect(() => {
 
 
 
-// ⭐ 라우트 변경 시 닫기
+// 라우트 변경 시 닫기
 useEffect(() => {
   setIsLogoutBoxOpen(false);
   setIsAlarmOpen(false);
@@ -172,11 +172,12 @@ useEffect(() => {
               <AlarmIcon
                 src={isAlarmOpen ? alarmclick : alarm}
                 onClick={handleAlarmClick}
+                data-ignore-close="true" 
               />
 
               {isAlarmOpen && <AlarmPanel onClose={() => setIsAlarmOpen(false)}/>}
 
-              <div onClick={handleProfileClick}>
+              <div onClick={handleProfileClick} data-ignore-close="true" >
                 <MiniProfile
                   name={isLoggedIn ? profileInfo.name : "로그인 해주세요"}
                   profileImg={profileInfo.myProfile}

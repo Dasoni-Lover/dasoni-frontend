@@ -13,6 +13,10 @@ export default function LogoutBox({ onLogout, onClose, profileImg, name }) {
   // ⭐ 바깥 클릭 시 닫기 기능
   useEffect(() => {
     const handleClickOutside = (e) => {
+      if (e.target && e.target.closest && e.target.closest('[data-ignore-close]')) {
+        return;
+      }
+
       if (boxRef.current && !boxRef.current.contains(e.target)) {
         onClose();
       }

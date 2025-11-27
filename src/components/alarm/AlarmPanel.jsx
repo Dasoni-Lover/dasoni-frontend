@@ -10,6 +10,10 @@ const AlarmPanel = ({ onClose }) => {
   // ⭐ 바깥 클릭 감지
   useEffect(() => {
     const handleClickOutside = (e) => {
+      if (e.target && e.target.closest && e.target.closest('[data-ignore-close]')) {
+        return;
+      }
+
       if (panelRef.current && !panelRef.current.contains(e.target)) {
         onClose();
       }
