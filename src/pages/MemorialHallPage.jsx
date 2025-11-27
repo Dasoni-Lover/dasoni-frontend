@@ -201,19 +201,35 @@ export default function MemorialHallPage() {
     let result = [...photos];
     if (filter.isHideAI) result = result.filter((p) => !p.isAI);
 
+    // ✅ 백엔드에서 내려주는 ts(ms) 기반 정렬
+    // - sortOption 이 "업로드순"이면 isBydate = false 로 요청 → ts = 업로드 시각
+    // - sortOption 이 "사진순"이면 isBydate = true 로 요청 → ts = 촬영 시각
+    //   => 여기서는 그냥 ts만 기준으로 정렬하면 됨
+    const getTs = (photo) => {
+      if (typeof photo.ts === "number") return photo.ts;
+
+      // 혹시 모를 예외 상황(옛 데이터)에 대비한 안전장치
+      if (photo.uploadDate) return new Date(photo.uploadDate).getTime();
+      if (photo.takenDate) return new Date(photo.takenDate).getTime();
+      return 0;
+    };
+
     switch (filter.sortOption) {
       case "최신 업로드순":
-        result.sort((a, b) => new Date(b.uploadDate) - new Date(a.uploadDate));
-        break;
-      case "오래된 업로드순":
-        result.sort((a, b) => new Date(a.uploadDate) - new Date(b.uploadDate));
-        break;
       case "최신 사진순":
-        result.sort((a, b) => new Date(b.takenDate) - new Date(a.takenDate));
+        result.sort((a, b) => getTs(b) - getTs(a));
         break;
+
+      case "오래된 업로드순":
       case "오래된 사진순":
-        result.sort((a, b) => new Date(a.takenDate) - new Date(b.takenDate));
+        result.sort((a, b) => getTs(a) - getTs(b));
         break;
+<<<<<<< HEAD
+
+      default:
+        break;
+=======
+>>>>>>> develop
     }
     return result;
   }, [photos, filter]);
@@ -326,7 +342,9 @@ export default function MemorialHallPage() {
 
   // ===================== 9) 네비게이션 =====================
   const goWritePage = () =>
-    nav("/write", { state: { hallId: Number(effectiveHallId) } });
+    nav("/write", {
+      state: { hallId: Number(effectiveHallId), fromMyHall: isMe },
+    });
   const goAIGeneratePage = () =>
     nav("/generate", { state: { hallId: Number(effectiveHallId) } });
 
@@ -421,11 +439,19 @@ export default function MemorialHallPage() {
 
           {showFloatingAddPost && (
             <FixedAddPostContainer>
-              <AITextGuide>
-                <img src={IconAITextGuide} />
-                AI 이미지를 생성해 글을 작성해 보세요
-              </AITextGuide>
-              <FixedAddPostButton onClick={() => setIsAddPostModalOpen(true)}>
+              {/* 나의 추모관이 아닐 때만 AI 가이드 문구 노출 */}
+              {!isMe && (
+                <AITextGuide>
+                  <img src={IconAITextGuide} />
+                  AI 이미지를 생성해 글을 작성해 보세요
+                </AITextGuide>
+              )}
+
+              <FixedAddPostButton
+                // 나의 추모관이면: 바로 글쓰기 페이지로 이동
+                // 그 외(role !== "me") : 기존처럼 AddPostModal 열기
+                onClick={isMe ? goWritePage : () => setIsAddPostModalOpen(true)}
+              >
                 <img src={AddPostButtonImg} alt="추가 버튼" />
               </FixedAddPostButton>
             </FixedAddPostContainer>

@@ -25,6 +25,7 @@ export default function PostOptionForm({
   initialScope = "public",
   photoFile,
   isAI = false,
+  hideScope = false, // ✅ 추가
 }) {
   const [scope, setScope] = useState(initialScope);
   const [date, setDate] = useState(initialDate);
@@ -122,7 +123,10 @@ export default function PostOptionForm({
   };
 
   return (
-    <Column $justify={"space-between"}>
+    <Column
+      $justify={"space-between"}
+      style={hideScope ? { height: "18.5rem" } : undefined}
+    >
       <Column>
         <Column $gap={"0.75rem"}>
           <Row>
@@ -139,67 +143,70 @@ export default function PostOptionForm({
         </Column>
 
         {/* 공유 범위 */}
-        <Column>
-          <Label style={{ marginTop: "2.75rem" }}>공유 범위</Label>
+        {/* ✅ 공유 범위: 나의 추모관 글쓰기에서는 숨김 */}
+        {!hideScope && (
+          <Column>
+            <Label style={{ marginTop: "2.75rem" }}>공유 범위</Label>
 
-          <RadioCard role="radiogroup" aria-label="공유 범위">
-            {/* 공개 */}
-            <RadioOption
-              role="radio"
-              tabIndex={0}
-              aria-checked={scope === "public"}
-              onClick={() => setScope("public")}
-              onKeyDown={(e) => {
-                if (e.key === "Enter" || e.key === " ") {
-                  e.preventDefault();
-                  setScope("public");
-                }
-                if (e.key === "ArrowRight" || e.key === "ArrowDown") {
-                  setScope("private");
-                }
-              }}
-            >
-              <RadioIcon
-                src={scope === "public" ? IconRadioFilled : IconRadioBlank}
-                alt={scope === "public" ? "선택됨" : "선택 안 됨"}
-                aria-hidden
-              />
-              <Column $gap={"0.25rem"}>
-                <RadioMainText>공유앨범</RadioMainText>
-                <RadioSubText>
-                  추모관에 입장한 사람들이 게시물을 볼 수 있어요
-                </RadioSubText>
-              </Column>
-            </RadioOption>
+            <RadioCard role="radiogroup" aria-label="공유 범위">
+              {/* 공개 */}
+              <RadioOption
+                role="radio"
+                tabIndex={0}
+                aria-checked={scope === "public"}
+                onClick={() => setScope("public")}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter" || e.key === " ") {
+                    e.preventDefault();
+                    setScope("public");
+                  }
+                  if (e.key === "ArrowRight" || e.key === "ArrowDown") {
+                    setScope("private");
+                  }
+                }}
+              >
+                <RadioIcon
+                  src={scope === "public" ? IconRadioFilled : IconRadioBlank}
+                  alt={scope === "public" ? "선택됨" : "선택 안 됨"}
+                  aria-hidden
+                />
+                <Column $gap={"0.25rem"}>
+                  <RadioMainText>공유앨범</RadioMainText>
+                  <RadioSubText>
+                    추모관에 입장한 사람들이 게시물을 볼 수 있어요
+                  </RadioSubText>
+                </Column>
+              </RadioOption>
 
-            {/* 비공개 */}
-            <RadioOption
-              role="radio"
-              tabIndex={0}
-              aria-checked={scope === "private"}
-              onClick={() => setScope("private")}
-              onKeyDown={(e) => {
-                if (e.key === "Enter" || e.key === " ") {
-                  e.preventDefault();
-                  setScope("private");
-                }
-                if (e.key === "ArrowLeft" || e.key === "ArrowUp") {
-                  setScope("public");
-                }
-              }}
-            >
-              <RadioIcon
-                src={scope === "private" ? IconRadioFilled : IconRadioBlank}
-                alt={scope === "private" ? "선택됨" : "선택 안 됨"}
-                aria-hidden
-              />
-              <Column $gap={"0.25rem"}>
-                <RadioMainText>나와의 앨범</RadioMainText>
-                <RadioSubText>나만 게시물을 볼 수 있어요</RadioSubText>
-              </Column>
-            </RadioOption>
-          </RadioCard>
-        </Column>
+              {/* 비공개 */}
+              <RadioOption
+                role="radio"
+                tabIndex={0}
+                aria-checked={scope === "private"}
+                onClick={() => setScope("private")}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter" || e.key === " ") {
+                    e.preventDefault();
+                    setScope("private");
+                  }
+                  if (e.key === "ArrowLeft" || e.key === "ArrowUp") {
+                    setScope("public");
+                  }
+                }}
+              >
+                <RadioIcon
+                  src={scope === "private" ? IconRadioFilled : IconRadioBlank}
+                  alt={scope === "private" ? "선택됨" : "선택 안 됨"}
+                  aria-hidden
+                />
+                <Column $gap={"0.25rem"}>
+                  <RadioMainText>나와의 앨범</RadioMainText>
+                  <RadioSubText>나만 게시물을 볼 수 있어요</RadioSubText>
+                </Column>
+              </RadioOption>
+            </RadioCard>
+          </Column>
+        )}
       </Column>
 
       <Column $gap={"1.25rem"}>

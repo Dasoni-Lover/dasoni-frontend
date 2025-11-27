@@ -1,9 +1,8 @@
-import React, { useEffect, useState } from "react";
+import React from "react";
 import styled, { css } from "styled-components";
 import { useNavigate } from "react-router-dom";
 import { color, typo } from "../../../styles/tokens";
 import profileimg from "../../../assets/icon-profile-default.svg";
-import { fetchManagedHalls } from "../../../api/user";
 import Button from "../../../components/Button";
 import { MediumPhotoBox } from "../../../components/photobox/MediumPhotoBox";
 
@@ -15,37 +14,17 @@ const tagTextByStatus = {
 
 export const CardListItemEnter = ({ hall, onOpenModal, hoverable = true }) => {
   const navigate = useNavigate();
-  const [managedHallIds, setManagedHallIds] = useState([]);
-
-  // ⭐ 내가 관리하는 추모관 목록 가져오기
-  useEffect(() => {
-    const loadManagedHalls = async () => {
-      try {
-        const data = await fetchManagedHalls();
-        const ids = data.halls.map((h) => h.hallId);
-        setManagedHallIds(ids);
-      } catch (err) {
-        console.error("관리 추모관 목록 로드 실패:", err);
-      }
-    };
-    loadManagedHalls();
-  }, []);
 
   // ⭐ 버튼 클릭 시 동작
   const handleButtonClick = () => {
     if (!hall) return;
 
     switch (hall.status) {
-      case "ENTERING": {
-        const isManager = managedHallIds.includes(hall.hallId);
-
-        if (isManager) {
-          navigate("/memorial", { state: { hallId: hall.hallId } });
-        } else {
+      case "ENTERING":
+        {
           navigate("/memorial", { state: { hallId: hall.hallId } });
         }
         break;
-      }
 
       case "WAITING":
         return; // 비활성화라서 실행 안 되지만 혹시 모르므로

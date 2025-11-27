@@ -252,6 +252,7 @@ export default function RegisterPage() {
                 </DropdownContainer>
               </InputBox>
 
+              {/* 생일 */}
               <InputBox>
                 <PointText question="생일" bold={true} width="8.75rem" />
                 <DatePicker
@@ -259,10 +260,11 @@ export default function RegisterPage() {
                   onChange={setDate}
                   borderColor="#A8A8A8"
                   width="15.6rem"
+                  maxDate={new Date()} // ✅ 오늘 이후 날짜 선택 불가
                 />
               </InputBox>
 
-              {/* ✅ 아이디 + 중복확인 + 메시지 영역 */}
+              {/* 아이디 + 중복확인 + 메시지 영역 */}
               <Column style={{ width: "100%" }}>
                 <InputBox>
                   <PointText question="아이디" bold={true} width="8.75rem" />
@@ -464,6 +466,7 @@ const ProfileImg = styled.img`
   aspect-ratio: 1/1;
   fill: #f2f2f2;
   cursor: pointer;
+  object-fit: cover;
 `;
 
 const CheckedMessage = styled.div`

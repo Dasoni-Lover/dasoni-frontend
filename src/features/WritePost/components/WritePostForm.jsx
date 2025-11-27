@@ -13,6 +13,7 @@ export default function WritePostForm({
   initialData,
   initialImageUrl,
   isAI = false,
+  isMyHallWrite = false,
 }) {
   const location = useLocation();
   const generatedImage = location.state?.generatedImage || null; // ✅ data URL (prefix 포함)
@@ -93,6 +94,7 @@ export default function WritePostForm({
         initialScope={initialScope}
         photoFile={photoFile} // ✅ 업로드용 파일 전달
         isAI={isAI}
+        hideScope={isMyHallWrite} // ✅ 나의 추모관이면 공유 범위 숨기기
       />
     </Row>
   );
