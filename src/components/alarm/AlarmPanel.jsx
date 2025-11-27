@@ -7,7 +7,7 @@ import { AlarmList } from "./AlarmList";
 const AlarmPanel = ({ onClose }) => {
   const panelRef = useRef(null);
 
-  // ⭐ 바깥 클릭 감지
+  //바깥 클릭 감지
   useEffect(() => {
     const handleClickOutside = (e) => {
       if (e.target && e.target.closest && e.target.closest('[data-ignore-close]')) {

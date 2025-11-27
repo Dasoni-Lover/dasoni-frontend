@@ -96,7 +96,7 @@ export default function LogoutBox({ onLogout, onClose, profileImg, name }) {
 
 
 const Container = styled.div`
-  position: absolute;
+  position: fixed;
   top: 5.38rem;
   right: 7.5rem;
 
