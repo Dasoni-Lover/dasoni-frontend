@@ -1,6 +1,8 @@
-import React, { useState} from "react";
+// src/pages/LeaveLetterBoxPage.jsx
+import React, { useState, useEffect } from "react";
 import styled from "styled-components";
 import { useLocation } from "react-router-dom";
+
 import { color, typo } from "../styles/tokens";
 import BarNavigate from "../components/BarNavigate";
 import { LetterList } from "../features/Letters/components/LetterList";
@@ -10,66 +12,75 @@ import Calendar from "../components/Calendar";
 import calendaricon from "../assets/calendar-icon.svg";
 import clickcalendaricon from "../assets/click-calendar-icon.svg";
 
+// API
+import {
+  fetchLettersList,
+  fetchLetterDetail,
+  fetchLettersCalendar,
+} from "../api/letters";
+
 export const LeaveLetterBoxPage = () => {
   const location = useLocation();
   const hallId = location.state?.hallId;
 
-  const [letters, setLetters] = useState([]);
+  const [letters, setLetters] = useState([]); // 목록
+  const [letterDates, setLetterDates] = useState([]); // 달력 데이터
+  const [selectedLetter, setSelectedLetter] = useState(null); // 상세 내용
   const [modalOpen, setModalOpen] = useState(false);
-  const [selectedLetter, setSelectedLetter] = useState(null);
-  const [hallName, setHallName] = useState("");
   const [calendarOpen, setCalendarOpen] = useState(false);
-  const [letterDates, setLetterDates] = useState([]);
 
- 
-//   // 추모관 정보 불러오기
-//     useEffect(() => {
-//       const fetchHallName = async () => {
-//         if (!hallId) return;
-//         try {
-//           const info = await getHallInfo(hallId);
-//           const name = info?.data?.name || info?.name || "";
-//           setHallName(name);
-//           console.log("불러온 추모관 정보:", info);
-//         } catch (err) {
-//           console.error("추모관 이름 불러오기 실패:", err);
-//         }
-//       };
-//       fetchHallName();
-//     }, [hallId]);
-  
-//     // 편지 목록 불러오기
-//     const fetchLetters = async () => {
-//       if (!hallId) return;
-//       try {
-//         const list = await fetchLettersList(hallId);
-//         setLetters(list);
-  
-//         const dates = list.map((l) => new Date(l.completedAt).getDate());
-//         setLetterDates(dates);
-//         console.log("불러온 편지 목록:", list);
-//       } catch (err) {
-//         console.error("편지 목록 불러오기 실패:", err);
-//       }
-//     };
-  
-//     useEffect(() => {
-//       fetchLetters();
-//     }, [hallId]);
-  
-//     const handleItemClick = async (letterId) => {
-//       if (!hallId) return;
-//       try {
-//         const detail = await fetchLetterDetail(hallId, letterId);
-//         setSelectedLetter(detail);
-//         setModalOpen(true);
-//         console.log("선택한 편지 상세:", detail);
-//       } catch (err) {
-//         console.error("편지 상세 불러오기 실패:", err);
-//       }
-//     };
+  // ===============================
+  //   1) 편지 목록 조회
+  // ===============================
+  useEffect(() => {
+    if (!hallId) return;
 
-  const toggleCalendar = () => setCalendarOpen(!calendarOpen);
+    const loadLetters = async () => {
+      try {
+        const data = await fetchLettersList(hallId);
+        setLetters(data);
+      } catch (err) {
+        console.error("편지 목록 조회 실패:", err);
+      }
+    };
+
+    loadLetters();
+  }, [hallId]);
+
+  // ===============================
+  //   2) 달력 조회
+  // ===============================
+  useEffect(() => {
+    if (!hallId || !calendarOpen) return;
+
+    const now = new Date();
+    const year = now.getFullYear();
+    const month = now.getMonth() + 1;
+
+    const loadCalendar = async () => {
+      try {
+        const days = await fetchLettersCalendar(hallId, year, month);
+        setLetterDates(days);
+      } catch (err) {
+        console.error("달력 조회 실패:", err);
+      }
+    };
+
+    loadCalendar();
+  }, [hallId, calendarOpen]);
+
+  // ===============================
+  //   3) 개별 상세 조회 + 모달 열기
+  // ===============================
+  const openLetterDetail = async (letterId) => {
+    try {
+      const data = await fetchLetterDetail(hallId, letterId);
+      setSelectedLetter(data);
+      setModalOpen(true);
+    } catch (err) {
+      console.error("편지 상세 조회 실패:", err);
+    }
+  };
 
   return (
     <Wrapper>
@@ -82,7 +93,8 @@ export const LeaveLetterBoxPage = () => {
 
       <TitleAndCalendar>
         <Title>총 {letters.length}개의 보낸 편지가 있어요</Title>
-        <CalendarWrapper onClick={toggleCalendar}>
+
+        <CalendarWrapper onClick={() => setCalendarOpen(!calendarOpen)}>
           <CalendarBorder active={calendarOpen}>
             <CalendarIcon
               src={calendarOpen ? clickcalendaricon : calendaricon}
@@ -93,7 +105,7 @@ export const LeaveLetterBoxPage = () => {
 
       <ContentWrapper>
         <LetterArea calendarOpen={calendarOpen}>
-          <LetterList letters={letters}/>
+          <LetterList letters={letters} onClickLetter={openLetterDetail} />
         </LetterArea>
 
         {calendarOpen && (
@@ -111,11 +123,11 @@ export const LeaveLetterBoxPage = () => {
         data={selectedLetter}
         onCancel={() => setModalOpen(false)}
       />
-        {/*서랍 디자인 전*/}
     </Wrapper>
   );
 };
 
+/* ======================= styled ======================= */
 const Wrapper = styled.div`
   display: flex;
   flex-direction: column;
@@ -142,28 +154,6 @@ const Title = styled.div`
   color: ${color("black.70")};
 `;
 
-const ContentWrapper = styled.div`
-  display: flex;
-  width: 100%;
-  gap: 0rem;
-  position: relative;
-`;
-
-const LetterArea = styled.div`
-  width: ${({ calendarOpen }) => (calendarOpen ? "29.125rem" : "68.5rem")};
-  transition: width 0.4s ease;
-`;
-
-const CalendarArea = styled.div`
-  width: 30rem;
-  position: relative;
-`;
-
-const CalendarIcon = styled.img`
-  width: 1.5rem;
-  height: 1.66669rem;
-`;
-
 const CalendarWrapper = styled.div`
   width: 100%;
   display: flex;
@@ -183,11 +173,31 @@ const CalendarBorder = styled.div`
   border: ${({ active }) => (active ? "1px solid #FFCC8C" : "1px solid #DDD")};
   background: ${({ active }) => (active ? "#FFF4E6" : "#FFF")};
   box-sizing: border-box;
-  aspect-ratio: 1/1;
+`;
+
+const CalendarIcon = styled.img`
+  width: 1.5rem;
+  height: 1.66669rem;
+`;
+
+const ContentWrapper = styled.div`
+  display: flex;
+  width: 100%;
+  position: relative;
+`;
+
+const LetterArea = styled.div`
+  width: ${({ calendarOpen }) => (calendarOpen ? "29.125rem" : "68.5rem")};
+  transition: width 0.4s ease;
+`;
+
+const CalendarArea = styled.div`
+  width: 30rem;
+  position: relative;
 `;
 
 const Divider = styled.div`
-  width: 0.0625rem;
+  width: 1px;
   height: 42.5rem;
   background-color: #ddd;
   margin: 0 0.5rem 0 2rem;

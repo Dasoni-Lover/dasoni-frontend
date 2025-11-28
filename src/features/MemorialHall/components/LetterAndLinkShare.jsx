@@ -24,7 +24,7 @@ const LetterAndLinkShare = ({ onLinkShareClick, page, hallId }) => {
     } else if (page === "me") {
       navigate("/leave-letterbox", { state: { hallId } });
     } else {
-      navigate("/sent-letterbox")
+      navigate("/sent-letterbox", { state: { hallId } });
     }
   };
 
