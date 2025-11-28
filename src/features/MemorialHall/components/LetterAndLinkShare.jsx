@@ -19,10 +19,12 @@ const LetterAndLinkShare = ({ onLinkShareClick, page, hallId }) => {
   const navigate = useNavigate();
 
   const handleLetterClick = () => {
-    if (page === "default" || page === "manager") {
-      navigate("/sent-letter", { state: { hallId } });
-    } else if (page === "my") {
+    if (page === "admin") {
+      navigate("/sent-letterbox", { state: { hallId } });
+    } else if (page === "me") {
       navigate("/leave-letter", { state: { hallId } });
+    } else {
+      navigate("/sent-letterbox")
     }
   };
 
