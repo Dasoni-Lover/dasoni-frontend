@@ -4,7 +4,13 @@ import styled from 'styled-components';
 import { color, typo } from '../../../styles/tokens';
 import deleteicon from "../assets/delete-icon.svg";
 
-export const LetterListItem = ({ letter, onClick, isNarrow }) => {
+export const LetterListItem = ({
+  letter,
+  onClick,
+  onDelete,
+  isNarrow,
+  showDelete = false   // 🔥 디폴트 false
+}) => {
   return (
     <Container onClick={onClick}>
       <Left isNarrow={isNarrow}>
@@ -14,7 +20,17 @@ export const LetterListItem = ({ letter, onClick, isNarrow }) => {
         </Wrapper>
         <Content>{letter.excerpt}</Content>
       </Left>
-      <Delete src={deleteicon}/>
+
+      {/* 삭제 버튼 클릭 */}
+      <Delete
+        src={deleteicon}
+        $visible={showDelete}
+        onClick={(e) => {
+          if (!showDelete) return; // 🔥 showDelete false면 클릭 무시
+          e.stopPropagation(); // 상세보기 막기
+          onDelete(letter.letterId);
+        }}
+      />
     </Container>
   );
 };
@@ -45,9 +61,13 @@ const Left = styled.div`
   transition: width 0.3s ease;
 `;
 
-const Delete=styled.img`
+const Delete = styled.img`
   width: 0.875rem;
   height: 0.875rem;
+
+  /* 🔥 영역 유지 + 보일 때만 표시 */
+  opacity: ${({ $visible }) => ($visible ? 1 : 0)};
+  pointer-events: ${({ $visible }) => ($visible ? "auto" : "none")};
 `;
 
 const Wrapper = styled.div`

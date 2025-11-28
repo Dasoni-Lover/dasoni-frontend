@@ -9,6 +9,8 @@ import { LetterList } from "../features/Letters/components/LetterList";
 import LetterModal from "../features/Letters/components/LetterModal";
 import Calendar from "../components/Calendar";
 import SideCategoryBox from "../features/Letters/components/SideCategoryBox";
+import ConfirmModal from "../components/ConfirmModal";
+import { deleteLetter } from "../api/letters";
 
 import calendaricon from "../assets/calendar-icon.svg";
 import clickcalendaricon from "../assets/click-calendar-icon.svg";
@@ -31,6 +33,10 @@ export const LeaveLetterBoxPage = () => {
   const [selectedLetter, setSelectedLetter] = useState(null);
   const [modalOpen, setModalOpen] = useState(false);
   const [calendarOpen, setCalendarOpen] = useState(false);
+  const [deleteTarget, setDeleteTarget] = useState(null);
+const [deleteModalOpen, setDeleteModalOpen] = useState(false);
+
+  
 
   // 1) 편지 목록 조회
   useEffect(() => {
@@ -86,6 +92,28 @@ export const LeaveLetterBoxPage = () => {
     });
   };
 
+  const handleDeleteClick = (letterId) => {
+    setDeleteTarget(letterId);
+    setDeleteModalOpen(true);
+  };
+
+  const handleConfirmDelete = async () => {
+  try {
+    await deleteLetter(hallId, deleteTarget);
+
+    // 리스트 다시 불러오기
+    const updated = await fetchLettersList(hallId);
+    setLetters(updated);
+  } catch (err) {
+    console.error("삭제 실패:", err);
+  } finally {
+    setDeleteModalOpen(false);
+    setDeleteTarget(null);
+  }
+};
+
+
+
   return (
     <Wrapper>
       <NavWrapper>
@@ -113,7 +141,7 @@ export const LeaveLetterBoxPage = () => {
 
       <ContentWrapper>
         <LetterArea calendarOpen={calendarOpen}>
-          <LetterList letters={letters} onClickLetter={openLetterDetail} isNarrow={calendarOpen}/>
+          <LetterList letters={letters} onClickLetter={openLetterDetail} isNarrow={calendarOpen} onDelete={handleDeleteClick} showDelete={true}/>
         </LetterArea>
 
         {calendarOpen && (
@@ -131,6 +159,16 @@ export const LeaveLetterBoxPage = () => {
         data={selectedLetter}
         onCancel={() => setModalOpen(false)}
       />
+      <ConfirmModal
+        isOpen={deleteModalOpen}
+        title="보낸 편지를 삭제할까요?"
+        description="삭제된 편지는 다시 불러올 수 없어요."
+        confirmText="삭제하기"
+        cancelText="취소"
+        onConfirm={handleConfirmDelete}
+        onCancel={() => setDeleteModalOpen(false)}
+      />
+
 
       <SideCategoryBox hallId={hallId} page={page} />
     </Wrapper>

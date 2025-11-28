@@ -50,6 +50,12 @@ export const fetchLettersCalendar = async (hallId, year, month) => {
   return res.data?.days || []; // [{ date, letterId }]
 };
 
+// 보낸 편지 삭제
+export const deleteLetter = async (hallId, letterId) => {
+  return client.post(`/api/halls/${hallId}/letters/${letterId}/delete`);
+};
+
+
 
 
 //임시보관함
