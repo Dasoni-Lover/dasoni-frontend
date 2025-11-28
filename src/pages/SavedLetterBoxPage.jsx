@@ -15,6 +15,8 @@ import {
   fetchTempLetterDetail,
 } from "../api/letters";
 
+import { getHallInfo } from "../api/memorial";
+
 import calendaricon from "../assets/calendar-icon.svg";
 import clickcalendaricon from "../assets/click-calendar-icon.svg";
 
@@ -30,10 +32,32 @@ export const SavedLetterBoxPage = () => {
   const [calendarOpen, setCalendarOpen] = useState(false);
   const [letterDates, setLetterDates] = useState([]);
 
+  // ⭐ 추모관 이름
+  const [hallName, setHallName] = useState("");
+
   const toggleCalendar = () => setCalendarOpen(!calendarOpen);
 
   // -------------------------
-  // 📌 임시보관함 리스트 불러오기
+  // 📌 me가 아닐 경우 → 추모관 정보 조회
+  // -------------------------
+  useEffect(() => {
+    if (page !== "me" && hallId) {
+      loadHallInfo();
+    }
+  }, [page, hallId]);
+
+  const loadHallInfo = async () => {
+    try {
+      const res = await getHallInfo(hallId);
+      setHallName(res?.data?.name || "추모관");
+    } catch (err) {
+      console.error("❌ 추모관 정보 불러오기 실패:", err);
+      setHallName("추모관");
+    }
+  };
+
+  // -------------------------
+  // 📌 임시보관함 리스트
   // -------------------------
   useEffect(() => {
     if (!hallId) return;
@@ -50,7 +74,7 @@ export const SavedLetterBoxPage = () => {
   };
 
   // -------------------------
-  // 📌 리스트에서 카드 클릭 → 상세 조회 후 모달 열기
+  // 📌 상세 조회
   // -------------------------
   const handleSelectLetter = async (letterId) => {
     try {
@@ -62,10 +86,18 @@ export const SavedLetterBoxPage = () => {
     }
   };
 
+  // -------------------------
+  // ⭐ BarNavigate 경로 설정
+  // -------------------------
+  const paths =
+    page === "me"
+      ? ["나의 추모관", "보낸 편지함", "임시보관함"]
+      : ["홈", `故 ${hallName}의 추모관`, "임시보관함"];
+
   return (
     <Wrapper>
       <NavWrapper>
-        <BarNavigate paths={["나의 추모관", "보낸 편지함", "임시보관함"]} />
+        <BarNavigate paths={paths} />
       </NavWrapper>
 
       <TitleAndCalendar>
