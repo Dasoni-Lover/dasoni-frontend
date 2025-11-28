@@ -1,8 +1,9 @@
+// src/features/Letters/components/LetterList.jsx
 import React from 'react';
 import styled from 'styled-components';
 import { LetterListItem } from './LetterListItem';
 
-export const LetterList = ({ letters, onItemClick }) => {
+export const LetterList = ({ letters, onItemClick, isNarrow }) => {
   return (
     <Wrapper>
       {letters.map(letter => (
@@ -10,6 +11,7 @@ export const LetterList = ({ letters, onItemClick }) => {
           key={letter.letterId}
           letter={letter}
           onClick={() => onItemClick(letter.letterId)}
+          isNarrow={isNarrow}
         />
       ))}
     </Wrapper>

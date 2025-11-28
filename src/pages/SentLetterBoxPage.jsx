@@ -107,7 +107,7 @@ export const SentLetterBoxPage = () => {
 
       <ContentWrapper>
         <LetterArea calendarOpen={calendarOpen}>
-          <LetterList letters={letters} onItemClick={handleItemClick} />
+          <LetterList letters={letters} onItemClick={handleItemClick} isNarrow={calendarOpen} />
         </LetterArea>
 
         {calendarOpen && (

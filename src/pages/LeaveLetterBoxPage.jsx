@@ -113,7 +113,7 @@ export const LeaveLetterBoxPage = () => {
 
       <ContentWrapper>
         <LetterArea calendarOpen={calendarOpen}>
-          <LetterList letters={letters} onClickLetter={openLetterDetail} />
+          <LetterList letters={letters} onClickLetter={openLetterDetail} isNarrow={calendarOpen}/>
         </LetterArea>
 
         {calendarOpen && (
