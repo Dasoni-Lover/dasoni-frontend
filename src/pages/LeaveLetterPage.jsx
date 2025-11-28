@@ -7,10 +7,12 @@ import { SentLetter } from "../features/Letters/components/SentLetter";
 import Button from "../components/Button";
 import ConfirmModal from "../components/ConfirmModal";
 import { sendLetter } from "../api/letters";
+import SideCategoryBox from "../features/Letters/components/SideCategoryBox";
 
 export const LeaveLetterPage = () => {
   const location = useLocation();
   const hallId = location.state?.hallId; 
+  const page = location.state?.page;
   const navigate = useNavigate();
 
   const [letterText, setLetterText] = useState("");
@@ -115,7 +117,7 @@ export const LeaveLetterPage = () => {
         onCancel={handleCloseModal}
       />
 
-      {/* 서랍 디자인 전 */}
+      <SideCategoryBox hallId={hallId} page={page} />
     </Wrapper>
   );
 };

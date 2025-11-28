@@ -10,10 +10,12 @@ import ConfirmModal from "../components/ConfirmModal";
 import { sendLetter, getLetterStatus } from "../api/letters";
 import { SideDrawer } from "../features/Letters/components/SideDrawer";
 import { getHallInfo } from "../api/memorial"; // ✅ 추모관 정보 가져오기
+import SideCategoryBox from "../features/Letters/components/SideCategoryBox";
 
 export const SentLetterPage = () => {
   const location = useLocation();
   const hallId = location.state?.hallId; // ✅ MemorialHallPage → LetterAndLinkShare → 여기로 전달된 hallId
+  const page = location.state?.page;
   const navigate = useNavigate();
 
   const [letterText, setLetterText] = useState("");
@@ -169,7 +171,7 @@ export const SentLetterPage = () => {
         onCancel={handleCloseModal}
       />
 
-      <SideDrawer hallId={hallId} />
+      <SideCategoryBox hallId={hallId} page={page} />
     </Wrapper>
   );
 };

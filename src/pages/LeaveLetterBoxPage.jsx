@@ -13,12 +13,7 @@ import SideCategoryBox from "../features/Letters/components/SideCategoryBox";
 import calendaricon from "../assets/calendar-icon.svg";
 import clickcalendaricon from "../assets/click-calendar-icon.svg";
 
-// API
-import {
-  fetchLettersList,
-  fetchLetterDetail,
-  fetchLettersCalendar,
-} from "../api/letters";
+import {fetchLettersList,fetchLetterDetail,fetchLettersCalendar,} from "../api/letters";
 
 export const LeaveLetterBoxPage = () => {
   const location = useLocation();

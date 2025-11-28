@@ -2,9 +2,9 @@ import React from "react";
 import styled from "styled-components";
 import { typo, color } from "../../../styles/tokens";
 
-export default function SideCategoryBoxItem({ text, bgcolor, border }) {
+export default function SideCategoryBoxItem({ text, bgcolor, border, onClick }) {
   return (
-    <Container bgcolor={bgcolor} border={border}>
+    <Container bgcolor={bgcolor} border={border} onClick={onClick}>
       <Text>{text}</Text>
     </Container>
   );
@@ -21,12 +21,14 @@ const Container = styled.div`
   background: ${({ bgcolor }) => bgcolor || "#fff"};
   border-top: ${({ border }) => border || "1px solid #ddd"};
   border-bottom: ${({ border }) => border || "1px solid #ddd"};
-  
   border-radius: 0.25rem;
 
   cursor: pointer;
   box-sizing: border-box;
 
+  &:hover {
+    background: #f7f7f7;
+  }
 `;
 
 const Text = styled.div`
