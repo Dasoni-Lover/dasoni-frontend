@@ -12,10 +12,12 @@ import Calendar from "../components/Calendar";
 
 import calendaricon from "../assets/calendar-icon.svg";
 import clickcalendaricon from "../assets/click-calendar-icon.svg";
+import SideCategoryBox from "../features/Letters/components/SideCategoryBox";
 
 export const SentLetterBoxPage = () => {
   const location = useLocation();
   const hallId = location.state?.hallId;
+  const page = location.state?.page;
 
   const [letters, setLetters] = useState([]);
   const [modalOpen, setModalOpen] = useState(false);
@@ -117,7 +119,7 @@ export const SentLetterBoxPage = () => {
       />
 
       {/* hallId를 SideDrawer에 전달 */}
-      <SideDrawer hallId={hallId} />
+      <SideCategoryBox hallId={hallId} page={page}/>
     </Wrapper>
   );
 };

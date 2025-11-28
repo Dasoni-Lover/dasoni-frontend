@@ -8,6 +8,7 @@ import BarNavigate from "../components/BarNavigate";
 import { LetterList } from "../features/Letters/components/LetterList";
 import LetterModal from "../features/Letters/components/LetterModal";
 import Calendar from "../components/Calendar";
+import SideCategoryBox from "../features/Letters/components/SideCategoryBox";
 
 import calendaricon from "../assets/calendar-icon.svg";
 import clickcalendaricon from "../assets/click-calendar-icon.svg";
@@ -22,6 +23,7 @@ import {
 export const LeaveLetterBoxPage = () => {
   const location = useLocation();
   const hallId = location.state?.hallId;
+  const page = location.state?.page;
 
   const [letters, setLetters] = useState([]); // 목록
   const [letterDates, setLetterDates] = useState([]); // 달력 데이터
@@ -123,6 +125,8 @@ export const LeaveLetterBoxPage = () => {
         data={selectedLetter}
         onCancel={() => setModalOpen(false)}
       />
+
+      <SideCategoryBox hallId={hallId} page={page}/>
     </Wrapper>
   );
 };
