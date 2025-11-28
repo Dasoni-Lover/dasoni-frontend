@@ -51,7 +51,7 @@ export default function SideCategoryBox({ hallId, page }) {
   //   고인 정보 수정 클릭
   // ===========================
   const handleClickEditInfo = () => {
-    navigate("/edit-hall-info", {
+    navigate("/edit-hallinfo", {
       state: { hallId, page },
     });
   };

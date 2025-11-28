@@ -49,3 +49,48 @@ export const fetchLettersCalendar = async (hallId, year, month) => {
   );
   return res.data?.days || []; // [{ date, letterId }]
 };
+
+
+
+//임시보관함
+
+// 임시보관함 목록 조회
+export const fetchTempLettersList = async (hallId) => {
+  try {
+    const res = await client.get(
+      `/api/halls/${hallId}/letters/temp/list`
+    );
+
+    const letters = res.data?.letters || [];
+
+    // 기존 리스트 조회처럼 date → createdAt 으로 통일
+    return letters
+      .map((l) => ({
+        ...l,
+        createdAt: l.date,
+      }))
+      .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+  } catch (err) {
+    console.error("❌ 임시보관함 목록 조회 실패:", {
+      status: err.response?.status,
+      data: err.response?.data,
+    });
+    throw err;
+  }
+};
+
+// 임시보관함 편지 상세 조회
+export const fetchTempLetterDetail = async (hallId, letterId) => {
+  try {
+    const res = await client.get(
+      `/api/halls/${hallId}/letters/temp/${letterId}`
+    );
+    return res.data; // { toName, fromName, content }
+  } catch (err) {
+    console.error("❌ 임시보관함 편지 상세 조회 실패:", {
+      status: err.response?.status,
+      data: err.response?.data,
+    });
+    throw err;
+  }
+};

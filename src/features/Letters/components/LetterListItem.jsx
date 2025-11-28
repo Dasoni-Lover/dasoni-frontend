@@ -28,6 +28,7 @@ const Container = styled.div`
   border-radius: 0.625rem;
   border: 1px solid var(--5, #E9E9E9);
   background: var(--0, #FFF);
+  box-shadow: -4px -4px 10px 0 rgba(0, 0, 0, 0.03), 4px 4px 10px 0 rgba(0, 0, 0, 0.03);
 `;
 
 const Wrapper = styled.div`

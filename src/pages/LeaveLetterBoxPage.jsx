@@ -1,7 +1,7 @@
 // src/pages/LeaveLetterBoxPage.jsx
 import React, { useState, useEffect } from "react";
 import styled from "styled-components";
-import { useLocation } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 
 import { color, typo } from "../styles/tokens";
 import BarNavigate from "../components/BarNavigate";
@@ -13,22 +13,26 @@ import SideCategoryBox from "../features/Letters/components/SideCategoryBox";
 import calendaricon from "../assets/calendar-icon.svg";
 import clickcalendaricon from "../assets/click-calendar-icon.svg";
 
-import {fetchLettersList,fetchLetterDetail,fetchLettersCalendar,} from "../api/letters";
+import {
+  fetchLettersList,
+  fetchLetterDetail,
+  fetchLettersCalendar,
+} from "../api/letters";
 
 export const LeaveLetterBoxPage = () => {
   const location = useLocation();
+  const navigate = useNavigate();
+
   const hallId = location.state?.hallId;
   const page = location.state?.page;
 
-  const [letters, setLetters] = useState([]); // 목록
-  const [letterDates, setLetterDates] = useState([]); // 달력 데이터
-  const [selectedLetter, setSelectedLetter] = useState(null); // 상세 내용
+  const [letters, setLetters] = useState([]);
+  const [letterDates, setLetterDates] = useState([]);
+  const [selectedLetter, setSelectedLetter] = useState(null);
   const [modalOpen, setModalOpen] = useState(false);
   const [calendarOpen, setCalendarOpen] = useState(false);
 
-  // ===============================
-  //   1) 편지 목록 조회
-  // ===============================
+  // 1) 편지 목록 조회
   useEffect(() => {
     if (!hallId) return;
 
@@ -44,9 +48,7 @@ export const LeaveLetterBoxPage = () => {
     loadLetters();
   }, [hallId]);
 
-  // ===============================
-  //   2) 달력 조회
-  // ===============================
+  // 2) 달력 데이터 조회
   useEffect(() => {
     if (!hallId || !calendarOpen) return;
 
@@ -66,9 +68,7 @@ export const LeaveLetterBoxPage = () => {
     loadCalendar();
   }, [hallId, calendarOpen]);
 
-  // ===============================
-  //   3) 개별 상세 조회 + 모달 열기
-  // ===============================
+  // 3) 상세 조회 + 모달
   const openLetterDetail = async (letterId) => {
     try {
       const data = await fetchLetterDetail(hallId, letterId);
@@ -77,6 +77,13 @@ export const LeaveLetterBoxPage = () => {
     } catch (err) {
       console.error("편지 상세 조회 실패:", err);
     }
+  };
+
+  // ⭐ 임시보관함 클릭 → 이동
+  const goSavedLetterBox = () => {
+    navigate("/saved-letterbox", {
+      state: { hallId, page },
+    });
   };
 
   return (
@@ -91,13 +98,17 @@ export const LeaveLetterBoxPage = () => {
       <TitleAndCalendar>
         <Title>총 {letters.length}개의 보낸 편지가 있어요</Title>
 
-        <CalendarWrapper onClick={() => setCalendarOpen(!calendarOpen)}>
-          <CalendarBorder active={calendarOpen}>
-            <CalendarIcon
-              src={calendarOpen ? clickcalendaricon : calendaricon}
-            />
-          </CalendarBorder>
-        </CalendarWrapper>
+        <Box>
+          <SavedButton onClick={goSavedLetterBox}>임시보관함</SavedButton>
+
+          <CalendarWrapper onClick={() => setCalendarOpen(!calendarOpen)}>
+            <CalendarBorder active={calendarOpen}>
+              <CalendarIcon
+                src={calendarOpen ? clickcalendaricon : calendaricon}
+              />
+            </CalendarBorder>
+          </CalendarWrapper>
+        </Box>
       </TitleAndCalendar>
 
       <ContentWrapper>
@@ -121,12 +132,13 @@ export const LeaveLetterBoxPage = () => {
         onCancel={() => setModalOpen(false)}
       />
 
-      <SideCategoryBox hallId={hallId} page={page}/>
+      <SideCategoryBox hallId={hallId} page={page} />
     </Wrapper>
   );
 };
 
-/* ======================= styled ======================= */
+/* styled-components는 동일 — 생략 */
+
 const Wrapper = styled.div`
   display: flex;
   flex-direction: column;
@@ -153,8 +165,34 @@ const Title = styled.div`
   color: ${color("black.70")};
 `;
 
-const CalendarWrapper = styled.div`
+const Box=styled.div`
   width: 100%;
+  display: flex;
+  flex-direction: row;
+  align-items: flex-end;
+  justify-content: flex-end;
+  gap: 0.62rem;
+`
+
+const SavedButton=styled.div`
+  display: flex;
+  width: 7.5rem;
+  height: 2.5rem;
+  padding: 0.4375rem 0.5rem;
+  justify-content: center;
+  align-items: center;
+  gap: 0.625rem;
+  border-radius: 0.25rem;
+  border: 1px solid var(--10, #DDD);
+  background: #FFF;
+  ${typo("body")};
+  color: ${color("black.70")};
+  box-sizing: border-box;
+  cursor: pointer;
+`
+
+const CalendarWrapper = styled.div`
+
   display: flex;
   justify-content: flex-end;
   margin-top: 1rem;

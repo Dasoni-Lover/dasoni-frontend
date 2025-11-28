@@ -1,21 +1,24 @@
+// src/pages/SentLetterBoxPage.jsx
 import React, { useState, useEffect } from "react";
 import styled from "styled-components";
-import { useLocation } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
+
 import { color, typo } from "../styles/tokens";
 import BarNavigate from "../components/BarNavigate";
 import { LetterList } from "../features/Letters/components/LetterList";
 import LetterModal from "../features/Letters/components/LetterModal";
-import { SideDrawer } from "../features/Letters/components/SideDrawer";
 import { fetchLettersList, fetchLetterDetail } from "../api/letters";
 import { getHallInfo } from "../api/memorial";
 import Calendar from "../components/Calendar";
+import SideCategoryBox from "../features/Letters/components/SideCategoryBox";
 
 import calendaricon from "../assets/calendar-icon.svg";
 import clickcalendaricon from "../assets/click-calendar-icon.svg";
-import SideCategoryBox from "../features/Letters/components/SideCategoryBox";
 
 export const SentLetterBoxPage = () => {
   const location = useLocation();
+  const navigate = useNavigate();
+
   const hallId = location.state?.hallId;
   const page = location.state?.page;
 
@@ -26,7 +29,6 @@ export const SentLetterBoxPage = () => {
   const [calendarOpen, setCalendarOpen] = useState(false);
   const [letterDates, setLetterDates] = useState([]);
 
-  // 추모관 정보 불러오기
   useEffect(() => {
     const fetchHallName = async () => {
       if (!hallId) return;
@@ -34,7 +36,6 @@ export const SentLetterBoxPage = () => {
         const info = await getHallInfo(hallId);
         const name = info?.data?.name || info?.name || "";
         setHallName(name);
-        console.log("불러온 추모관 정보:", info);
       } catch (err) {
         console.error("추모관 이름 불러오기 실패:", err);
       }
@@ -42,7 +43,7 @@ export const SentLetterBoxPage = () => {
     fetchHallName();
   }, [hallId]);
 
-  // 편지 목록 불러오기
+  // 편지 목록
   const fetchLetters = async () => {
     if (!hallId) return;
     try {
@@ -51,9 +52,8 @@ export const SentLetterBoxPage = () => {
 
       const dates = list.map((l) => new Date(l.completedAt).getDate());
       setLetterDates(dates);
-      console.log("불러온 편지 목록:", list);
     } catch (err) {
-      console.error("편지 목록 불러오기 실패:", err);
+      console.error("편지 목록 실패:", err);
     }
   };
 
@@ -67,15 +67,18 @@ export const SentLetterBoxPage = () => {
       const detail = await fetchLetterDetail(hallId, letterId);
       setSelectedLetter(detail);
       setModalOpen(true);
-      console.log("선택한 편지 상세:", detail);
     } catch (err) {
-      console.error("편지 상세 불러오기 실패:", err);
+      console.error("편지 상세 실패:", err);
     }
   };
 
   const hallTitle = hallName ? `故 ${hallName}의 추모관` : "故 추모관";
 
-  const toggleCalendar = () => setCalendarOpen(!calendarOpen);
+  const goSavedLetterBox = () => {
+    navigate("/saved-letterbox", {
+      state: { hallId, page },
+    });
+  };
 
   return (
     <Wrapper>
@@ -88,13 +91,18 @@ export const SentLetterBoxPage = () => {
 
       <TitleAndCalendar>
         <Title>총 {letters.length}개의 보낸 편지가 있어요</Title>
-        <CalendarWrapper onClick={toggleCalendar}>
-          <CalendarBorder active={calendarOpen}>
-            <CalendarIcon
-              src={calendarOpen ? clickcalendaricon : calendaricon}
-            />
-          </CalendarBorder>
-        </CalendarWrapper>
+
+        <Box>
+          <SavedButton onClick={goSavedLetterBox}>임시보관함</SavedButton>
+
+          <CalendarWrapper onClick={() => setCalendarOpen(!calendarOpen)}>
+            <CalendarBorder active={calendarOpen}>
+              <CalendarIcon
+                src={calendarOpen ? clickcalendaricon : calendaricon}
+              />
+            </CalendarBorder>
+          </CalendarWrapper>
+        </Box>
       </TitleAndCalendar>
 
       <ContentWrapper>
@@ -118,13 +126,12 @@ export const SentLetterBoxPage = () => {
         onCancel={() => setModalOpen(false)}
       />
 
-      {/* hallId를 SideDrawer에 전달 */}
-      <SideCategoryBox hallId={hallId} page={page}/>
+      <SideCategoryBox hallId={hallId} page={page} />
     </Wrapper>
   );
 };
 
-// --- styled components ---
+
 const Wrapper = styled.div`
   display: flex;
   flex-direction: column;
@@ -151,6 +158,32 @@ const Title = styled.div`
   color: ${color("black.70")};
 `;
 
+const Box=styled.div`
+  width: 100%;
+  display: flex;
+  flex-direction: row;
+  align-items: flex-end;
+  justify-content: flex-end;
+  gap: 0.62rem;
+`
+
+const SavedButton=styled.div`
+  display: flex;
+  width: 7.5rem;
+  height: 2.5rem;
+  padding: 0.4375rem 0.5rem;
+  justify-content: center;
+  align-items: center;
+  gap: 0.625rem;
+  border-radius: 0.25rem;
+  border: 1px solid var(--10, #DDD);
+  background: #FFF;
+  ${typo("body")};
+  color: ${color("black.70")};
+  box-sizing: border-box;
+  cursor: pointer;
+`
+
 const ContentWrapper = styled.div`
   display: flex;
   width: 100%;
@@ -174,7 +207,7 @@ const CalendarIcon = styled.img`
 `;
 
 const CalendarWrapper = styled.div`
-  width: 100%;
+
   display: flex;
   justify-content: flex-end;
   margin-top: 1rem;
