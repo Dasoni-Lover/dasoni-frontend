@@ -60,7 +60,7 @@ export const LeaveLetterPage = () => {
 
   const handleModalConfirm = () => {
     setIsModalOpen(false);
-    navigate("/leave-letterbox", { state: { hallId } });
+    navigate("/leave-letterbox", { state: { hallId, page } });
   };
 
   return (
