@@ -29,11 +29,14 @@ export const ProfileEditPage = () => {
   const [place, setPlace] = useState("");
   const [phone, setPhone] = useState("");
 
-  // 🔄 검색 허용 여부 (secret = true → 비공개 / false → 공개)
+  // 공개 여부 (secret: true = 비공개, false = 공개)
   const [secret, setSecret] = useState(null);
 
-  // 기존 이미지 URL (preview용)
+  // ✅ 서버에서 받은 원본 URL (그대로 다시 서버에 보내기 위함)
+  const [originalProfileUrl, setOriginalProfileUrl] = useState(null);
+  // ✅ 화면에서 보여줄 프리뷰 URL (blob:... 포함)
   const [profileImageUrl, setProfileImageUrl] = useState(null);
+
   // 새로 업로드할 File 객체
   const [profileFile, setProfileFile] = useState(null);
 
@@ -55,7 +58,7 @@ export const ProfileEditPage = () => {
     return `${num.slice(0, 3)}-${num.slice(3, 7)}-${num.slice(7, 11)}`;
   };
 
-  // 기존 데이터 불러오기
+  // ✅ 기존 데이터 불러오기
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -65,11 +68,14 @@ export const ProfileEditPage = () => {
         setName(data?.name || "");
         setPlace(data?.place || "");
         setPhone(data?.phone || "");
-        setProfileImageUrl(data?.profile || null);
+
+        const serverProfile = data?.profile || null;
+        setOriginalProfileUrl(serverProfile); // 서버에서 받은 전체 URL 그대로 보관
+        setProfileImageUrl(serverProfile); // 화면에는 이걸 프리뷰로 사용
+
         setBirthDate(data?.birthday || null);
         setDeathDate(data?.deadday || null);
 
-        // 🔄 백엔드의 secret 필드 받아오기 (true: 비공개 / false: 공개)
         setSecret(typeof data?.secret === "boolean" ? data.secret : null);
       } catch (e) {
         console.error("추모관 정보 불러오기 실패:", e);
@@ -78,37 +84,38 @@ export const ProfileEditPage = () => {
     if (hallId) fetchData();
   }, [hallId]);
 
-  // File 선택 시 처리 (미리보기 + 상태 저장)
+  // ✅ File 선택 시 처리 (미리보기 + 상태 저장)
   const handleFileSelect = (file) => {
     if (!file) return;
     setProfileFile(file);
-    setProfileImageUrl(URL.createObjectURL(file)); // preview
+    setProfileImageUrl(URL.createObjectURL(file)); // 화면에만 쓰는 blob URL
   };
 
-  // 저장
+  // ✅ 저장
   const handleSave = async () => {
-    let uploadedProfileUrl = profileImageUrl;
+    // 기본값: 서버에 이미 저장되어 있던 원본 URL을 그대로 보냄
+    let profileToSend = originalProfileUrl;
 
     try {
-      // 파일이 선택되었으면 S3 업로드
+      // 1) 새 파일이 있는 경우 → 업로드 후 presigned fileUrl 사용
       if (profileFile) {
         const { uploadUrl, fileUrl, contentType } =
           await getPresignedUrlForImage(profileFile);
         await uploadFileToS3(uploadUrl, profileFile, contentType);
-        uploadedProfileUrl = fileUrl; // 실제 S3 URL
+        profileToSend = fileUrl; // 이제부터 서버에는 이 URL이 저장됨
       }
 
       const body = {
-        profile: uploadedProfileUrl || null,
+        profile: profileToSend || null, // 항상 뭔가를 보내되, 없으면 null
         name: name || null,
         birthday: birthDate ? toDotFormat4(birthDate) : null,
         deadday: deathDate ? toDotFormat4(deathDate) : null,
         place: place || null,
         phone: phone || null,
-        // 🔥 secret 필드 적용
-        // 선택 안 했으면 기존값 유지하도록 null 그대로 전달
         secret: typeof secret === "boolean" ? secret : null,
       };
+
+      console.log("[ProfileEdit] update body:", body);
 
       await updateHallProfile(hallId, body);
       alert("추모관 정보가 수정되었습니다.");
@@ -195,7 +202,7 @@ export const ProfileEditPage = () => {
               />
             </InputWrapper>
 
-            {/* 🔥 secret 라디오 UI */}
+            {/* secret 라디오 UI */}
             <InputWrapper>
               <Text>추모관 검색 허용 여부</Text>
               <RadioGroup>
@@ -250,8 +257,7 @@ export const ProfileEditPage = () => {
   );
 };
 
-/* -------- styled-components 그대로 유지하되 isSearchOpen 관련 제거 -------- */
-
+/* 스타일은 네가 준 것 그대로 */
 const Wrapper = styled.div`
   height: 100vh;
   display: flex;
