@@ -7,7 +7,7 @@ import BarNavigate from "../components/BarNavigate";
 import { SentLetter } from "../features/Letters/components/SentLetter";
 import Button from "../components/Button";
 import ConfirmModal from "../components/ConfirmModal";
-import { sendLetter } from "../api/letters"; // ← getLetterStatus 제거됨
+import { sendLetter } from "../api/letters";
 import { getHallInfo } from "../api/memorial";
 import SideCategoryBox from "../features/Letters/components/SideCategoryBox";
 
@@ -20,27 +20,21 @@ export const SentLetterPage = () => {
   const [letterText, setLetterText] = useState("");
   const [toName, setToName] = useState("");
   const [fromName, setFromName] = useState("");
-  const [isModalOpen, setIsModalOpen] = useState(false);
-  const [modalType, setModalType] = useState(""); // "cancel" | "submit"
+  const [isWanted] = useState(true); // 영상편지 요청
 
-  // 🟢 작성 가능 여부 관련 state 삭제됨
-  // const [canWrite, setCanWrite] = useState({ isOpen: false, isSet: true });
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [modalType, setModalType] = useState(""); // "temp" | "submit"
 
   const [hallName, setHallName] = useState("");
 
   useEffect(() => {
-    console.log("SentLetterPage hallId:", hallId);
-
     if (!hallId) {
       alert("유효하지 않은 추모관입니다.");
       navigate(-1);
       return;
     }
 
-    // 🟢 작성 가능 여부 요청 삭제
-    // fetchStatus() 제거
-
-    // 🟢 추모관 이름만 조회
+    // 추모관 이름 조회
     const fetchHallName = async () => {
       try {
         const info = await getHallInfo(hallId);
@@ -63,14 +57,33 @@ export const SentLetterPage = () => {
     setModalType(type);
     setIsModalOpen(true);
   };
+
   const handleCloseModal = () => setIsModalOpen(false);
 
-  const handleSendLetter = async () => {
-    if (!hallId) {
-      alert("유효하지 않은 추모관입니다.");
-      return;
-    }
+  // -------------------------------
+  // ⭐ 임시보관하기
+  // -------------------------------
+  const handleTempSave = async () => {
+    try {
+      await sendLetter(hallId, {
+        toName,
+        fromName,
+        content: letterText,
+        isCompleted: false, // 임시보관
+        isWanted: isWanted,
+      });
 
+      handleOpenModal("temp");
+    } catch (err) {
+      console.error("임시보관 실패:", err.response?.data || err);
+      alert(err.response?.data?.message || "임시보관 실패");
+    }
+  };
+
+  // -------------------------------
+  // ⭐ 전달하기 (isCompleted: true)
+  // -------------------------------
+  const handleSendLetter = async () => {
     if (!isActive) {
       alert("편지를 올바르게 작성해 주세요.");
       return;
@@ -82,19 +95,33 @@ export const SentLetterPage = () => {
         fromName,
         content: letterText,
         isCompleted: true,
+        isWanted: isWanted,
       });
+
       handleOpenModal("submit");
     } catch (err) {
-      console.error("편지 보내기 실패:", err.response?.data || err);
-      alert(err.response?.data?.message || "편지 보내기 실패");
+      const msg = err.response?.data?.message;
+
+      if (msg === "이미 편지를 보냈어요") {
+        alert("오늘 이미 편지를 보냈어요.");
+      } else {
+        alert(msg || "편지 보내기 실패");
+      }
     }
   };
 
+  // -------------------------------
+  // ⭐ 모달에서 확인 → 리스트로 이동
+  // -------------------------------
   const handleModalConfirm = () => {
     setIsModalOpen(false);
 
     navigate("/sent-letterbox", {
-      state: { hallId, page },
+      state: {
+        hallId,
+        page,
+        activeMenu: "sent", // ⭐ 메뉴 활성화 값 전달
+      },
     });
   };
 
@@ -109,9 +136,8 @@ export const SentLetterPage = () => {
       <TextWrapper>
         <Title>나의 소중한 마음을 담아 편지를 써 보세요</Title>
         <Content>
-          고인께 전하고 싶은 말과 함께 편지에 마음을 담으면, 다소니가 전달해
-          드릴게요 <br />
-          생일, 기일, 명절 등 기념일에 편지에 대한 답장이 올 거예요.
+          고인께 전하고 싶은 말과 함께 편지에 마음을 담으면, 다소니가 전달해 드릴게요 <br />
+          생일, 기일, 명절 등 기념일에 답장이 올 거예요.
         </Content>
       </TextWrapper>
 
@@ -126,11 +152,12 @@ export const SentLetterPage = () => {
 
       <ButtonWrapper>
         <Button
-          text="취소"
+          text="임시 보관하기"
           size="M"
           color="white"
-          onClick={() => handleOpenModal("cancel")}
+          onClick={handleTempSave}
         />
+
         <Button
           text="전달하기"
           size="M"
@@ -141,22 +168,25 @@ export const SentLetterPage = () => {
 
       <ConfirmModal
         isOpen={isModalOpen}
-        title={modalType === "cancel" ? "작성을 그만둘까요?" : "편지를 전달했어요"}
+        title={
+          modalType === "temp" ? "편지를 임시 보관했어요" : "편지를 전달했어요"
+        }
         description={
-          modalType === "cancel"
-            ? "작성한 내용은 저장되지 않고 사라져요"
+          modalType === "temp"
+            ? "임시보관함에서 확인할 수 있어요"
             : "조금만 기다리면 답장이 올 거예요"
         }
-        confirmText={modalType === "cancel" ? "그만 두기" : "확인"}
-        cancelText={modalType === "cancel" ? "취소" : null}
+        confirmText="확인"
         onConfirm={handleModalConfirm}
         onCancel={handleCloseModal}
       />
 
-      <SideCategoryBox hallId={hallId} page={page} />
+      <SideCategoryBox hallId={hallId} page={page} activeMenu="sent" />
     </Wrapper>
   );
 };
+
+// ----------------- styled -----------------
 
 const Wrapper = styled.div`
   display: flex;
