@@ -103,3 +103,21 @@ export const fetchTempLetterDetail = async (hallId, letterId) => {
     throw err;
   }
 };
+
+// 임시보관함 편지 삭제
+export const deleteTempLetter = async (hallId, letterId) => {
+  try {
+    const res = await client.delete(
+      `/api/halls/${hallId}/letters/temp/${letterId}/delete`
+    );
+
+    console.log("🗑️ 임시보관함 편지 삭제 완료:", res.data);
+    return res.data;
+  } catch (err) {
+    console.error("❌ 임시보관함 편지 삭제 실패:", {
+      status: err.response?.status,
+      data: err.response?.data,
+    });
+    throw err;
+  }
+};

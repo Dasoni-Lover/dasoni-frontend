@@ -8,7 +8,12 @@ import BarNavigate from "../components/BarNavigate";
 import { LetterList } from "../features/Letters/components/LetterList";
 import SideCategoryBox from "../features/Letters/components/SideCategoryBox";
 
-import { fetchTempLettersList, fetchTempLetterDetail } from "../api/letters";
+import { 
+  fetchTempLettersList, 
+  fetchTempLetterDetail,
+  deleteTempLetter 
+} from "../api/letters";
+
 import { getHallInfo } from "../api/memorial";
 
 export const SavedLetterBoxPage = () => {
@@ -24,9 +29,7 @@ export const SavedLetterBoxPage = () => {
   // 📌 추모관 정보 조회
   // -------------------------
   useEffect(() => {
-    if (page !== "me" && hallId) {
-      loadHallInfo();
-    }
+    if (page !== "me" && hallId) loadHallInfo();
   }, [page, hallId]);
 
   const loadHallInfo = async () => {
@@ -40,11 +43,10 @@ export const SavedLetterBoxPage = () => {
   };
 
   // -------------------------
-  // 📌 임시보관함 리스트
+  // 📌 임시보관함 리스트 로드
   // -------------------------
   useEffect(() => {
-    if (!hallId) return;
-    loadTempLetters();
+    if (hallId) loadTempLetters();
   }, [hallId]);
 
   const loadTempLetters = async () => {
@@ -59,27 +61,36 @@ export const SavedLetterBoxPage = () => {
   // -------------------------
   // 📌 편지 클릭 → LeaveLetterPage 이동
   // -------------------------
-// src/pages/SavedLetterBoxPage.jsx
-const handleSelectLetter = async (letterId) => {
-  try {
-    const detail = await fetchTempLetterDetail(hallId, letterId);
+  const handleSelectLetter = async (letterId) => {
+    try {
+      const detail = await fetchTempLetterDetail(hallId, letterId);
+      navigate("/leave-letter", {
+        state: {
+          hallId,
+          page,
+          letterData: {
+            toName: detail.toName,
+            fromName: detail.fromName,
+            content: detail.content,
+          },
+        },
+      });
+    } catch (err) {
+      console.error("❌ 상세 조회 실패:", err);
+    }
+  };
 
-    navigate("/leave-letter", { 
-      state: { 
-        hallId, 
-        page, 
-        letterData: {
-          toName: detail.toName,
-          fromName: detail.fromName,
-          content: detail.content,
-        }
-      } 
-    });
-  } catch (err) {
-    console.error("❌ 상세 조회 실패:", err);
-  }
-};
-
+  // -------------------------
+  // ⭐ 임시 저장 편지 삭제 기능
+  // -------------------------
+  const handleDeleteLetter = async (letterId) => {
+    try {
+      await deleteTempLetter(hallId, letterId);
+      await loadTempLetters(); // 삭제 후 리스트 업데이트
+    } catch (err) {
+      console.error("❌ 임시편지 삭제 실패:", err);
+    }
+  };
 
   // -------------------------
   // ⭐ BarNavigate 경로
@@ -98,7 +109,12 @@ const handleSelectLetter = async (letterId) => {
       <Title>총 {letters.length}개의 임시 저장된 편지가 있어요</Title>
 
       <LetterListWrapper>
-        <LetterList letters={letters} onItemClick={handleSelectLetter} />
+        <LetterList
+          letters={letters}
+          onItemClick={handleSelectLetter}
+          onDelete={handleDeleteLetter}    // ⭐ 여기 연결
+          showDelete={true}
+        />
       </LetterListWrapper>
 
       <SideCategoryBox hallId={hallId} page={page} />
