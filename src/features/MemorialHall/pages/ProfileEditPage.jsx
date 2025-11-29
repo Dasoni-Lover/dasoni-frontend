@@ -29,8 +29,8 @@ export const ProfileEditPage = () => {
   const [place, setPlace] = useState("");
   const [phone, setPhone] = useState("");
 
-  // 검색 허용 여부 (추가)
-  const [isSearchOpen, setIsSearchOpen] = useState(null); // true / false
+  // 🔄 검색 허용 여부 (secret = true → 비공개 / false → 공개)
+  const [secret, setSecret] = useState(null);
 
   // 기존 이미지 URL (preview용)
   const [profileImageUrl, setProfileImageUrl] = useState(null);
@@ -68,7 +68,9 @@ export const ProfileEditPage = () => {
         setProfileImageUrl(data?.profile || null);
         setBirthDate(data?.birthday || null);
         setDeathDate(data?.deadday || null);
-        setIsSearchOpen(typeof data?.open === "boolean" ? data.open : null); // ✅ 기존 open 값
+
+        // 🔄 백엔드의 secret 필드 받아오기 (true: 비공개 / false: 공개)
+        setSecret(typeof data?.secret === "boolean" ? data.secret : null);
       } catch (e) {
         console.error("추모관 정보 불러오기 실패:", e);
       }
@@ -103,8 +105,9 @@ export const ProfileEditPage = () => {
         deadday: deathDate ? toDotFormat4(deathDate) : null,
         place: place || null,
         phone: phone || null,
-        // ✅ 검색 허용 여부 전달 (선택 안 했으면 기존 값 유지하고 싶다면 백엔드 정책에 맞춰 조정)
-        open: typeof isSearchOpen === "boolean" ? isSearchOpen : null,
+        // 🔥 secret 필드 적용
+        // 선택 안 했으면 기존값 유지하도록 null 그대로 전달
+        secret: typeof secret === "boolean" ? secret : null,
       };
 
       await updateHallProfile(hallId, body);
@@ -116,9 +119,7 @@ export const ProfileEditPage = () => {
     }
   };
 
-  const handleSelectSearchOpen = (value) => {
-    setIsSearchOpen(value);
-  };
+  const handleSelectSecret = (value) => setSecret(value);
 
   return (
     <Wrapper>
@@ -172,7 +173,7 @@ export const ProfileEditPage = () => {
               <Text>고인의 프로필 사진</Text>
               <EditSmallPhotoBox
                 src={profileImageUrl || defaultprofile}
-                onFileSelect={handleFileSelect} // File 객체 그대로 전달
+                onFileSelect={handleFileSelect}
               />
             </InputWrapper>
 
@@ -194,22 +195,15 @@ export const ProfileEditPage = () => {
               />
             </InputWrapper>
 
-            {/* ✅ 추모관 검색 허용 여부 라디오 */}
+            {/* 🔥 secret 라디오 UI */}
             <InputWrapper>
               <Text>추모관 검색 허용 여부</Text>
               <RadioGroup>
-                {/* 검색 허용 */}
-                <RadioBox
-                  role="button"
-                  tabIndex={0}
-                  onClick={() => handleSelectSearchOpen(true)}
-                >
+                {/* 공개(검색 허용) → secret: false */}
+                <RadioBox onClick={() => handleSelectSecret(false)}>
                   <Row $gap={"1rem"} $align={"start"}>
                     <RadioIcon
-                      src={
-                        isSearchOpen === true ? IconRadioFilled : IconRadioBlank
-                      }
-                      alt="검색 허용"
+                      src={secret === false ? IconRadioFilled : IconRadioBlank}
                     />
                     <Column $gap={"0.125rem"}>
                       <RadioText>검색 허용하기</RadioText>
@@ -221,20 +215,11 @@ export const ProfileEditPage = () => {
                   </Row>
                 </RadioBox>
 
-                {/* 검색 허용하지 않음 */}
-                <RadioBox
-                  role="button"
-                  tabIndex={0}
-                  onClick={() => handleSelectSearchOpen(false)}
-                >
+                {/* 비공개(검색 불가) → secret: true */}
+                <RadioBox onClick={() => handleSelectSecret(true)}>
                   <Row $gap={"1rem"} $align={"start"}>
                     <RadioIcon
-                      src={
-                        isSearchOpen === false
-                          ? IconRadioFilled
-                          : IconRadioBlank
-                      }
-                      alt="검색 허용하지 않기"
+                      src={secret === true ? IconRadioFilled : IconRadioBlank}
                     />
                     <Column $gap={"0.125rem"}>
                       <RadioText>검색 허용하지 않기</RadioText>
@@ -264,6 +249,8 @@ export const ProfileEditPage = () => {
     </Wrapper>
   );
 };
+
+/* -------- styled-components 그대로 유지하되 isSearchOpen 관련 제거 -------- */
 
 const Wrapper = styled.div`
   height: 100vh;
@@ -311,7 +298,7 @@ const Box = styled.div`
 const InputWrapper = styled.div`
   width: 100%;
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   gap: 1rem;
 `;
 
@@ -353,7 +340,6 @@ const Border = styled.div`
   box-shadow: 0 0 5px rgba(0, 0, 0, 0.04);
 `;
 
-// ✅ 라디오 관련 스타일
 const RadioGroup = styled.div`
   flex: 1;
   display: flex;
