@@ -1,18 +1,22 @@
-import React, { useState } from 'react';
-import styled from 'styled-components';
+import React, { useState } from "react";
+import styled from "styled-components";
 import { color, typo } from "../../../styles/tokens";
-import Button from '../../../components/Button';
+import Button from "../../../components/Button";
 
-export const CheckReturnModal = () => {
+export const CheckReturnModal = ({ onClose, onConfirm }) => {
   const [selectedOption, setSelectedOption] = useState("yes");
 
+  // 바깥 클릭 → 닫기
+  const handleBackdropClick = (e) => {
+    if (e.target === e.currentTarget) onClose();
+  };
+
   return (
-    <Wrapper>
+    <Wrapper onClick={handleBackdropClick}>
       <Box>
         <Text>고인의 목소리로 답장을 받아보시겠어요?</Text>
 
         <RadioWrapper>
-          {/* 라디오 1 - 예 */}
           <RadioItem onClick={() => setSelectedOption("yes")}>
             <HiddenRadio
               type="radio"
@@ -23,7 +27,6 @@ export const CheckReturnModal = () => {
             <RadioLabel>예, 받고 싶어요</RadioLabel>
           </RadioItem>
 
-          {/* 라디오 2 - 아니오 */}
           <RadioItem onClick={() => setSelectedOption("no")}>
             <HiddenRadio
               type="radio"
@@ -36,8 +39,8 @@ export const CheckReturnModal = () => {
         </RadioWrapper>
 
         <ButtonWrapper>
-          <Button text="확인" />
-          <Button text="취소" color="white" />
+          <Button text="확인" onClick={() => onConfirm(selectedOption)} />
+          <Button text="취소" color="white" onClick={onClose} />
         </ButtonWrapper>
       </Box>
     </Wrapper>
@@ -67,7 +70,6 @@ const Box = styled.div`
   gap: 2.75rem;
   border-radius: 1.25rem;
   background: #FFF;
-  box-sizing: border-box;
 `;
 
 const Text = styled.div`
@@ -80,7 +82,6 @@ const RadioWrapper = styled.div`
   display: flex;
   width: 24.625rem;
   flex-direction: column;
-  align-items: flex-start;
   gap: 0.75rem;
 `;
 
@@ -101,7 +102,7 @@ const CustomRadio = styled.div`
   border-radius: 50%;
   border: 2px solid #FFBC67;
   background-color: ${({ checked }) => (checked ? "#FFBC67" : "transparent")};
-  transition: 0.2 ease;
+  transition: 0.2s ease;
 `;
 
 const RadioLabel = styled.div`
@@ -112,7 +113,6 @@ const RadioLabel = styled.div`
 const ButtonWrapper = styled.div`
   display: flex;
   flex-direction: column;
-  align-items: flex-start;
   gap: 1.25rem;
   width: 24.5rem;
 `;

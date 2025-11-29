@@ -19,13 +19,14 @@ export const sendLetter = async (hallId, body) => {
 // 편지 작성 가능 여부 체크
 export const getLetterStatus = async (hallId) => {
   const res = await client.get(`/api/halls/${hallId}/letters`);
-  const data = res.data; // { open: true/false, set: true/false }
+  const data = res.data || {}; // { open: true/false, set: true/false }
 
   return {
-    isOpen: data.open,
-    isSet: data.set,
+    isOpen: data.open ?? false,
+    isSet: data.set ?? false,
   };
 };
+
 
 // 보낸 편지 리스트 조회
 export const fetchLettersList = async (hallId) => {

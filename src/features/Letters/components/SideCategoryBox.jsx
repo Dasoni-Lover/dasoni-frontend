@@ -1,86 +1,108 @@
+// src/components/SideCategoryBox.jsx
 import React, { useState } from "react";
 import styled from "styled-components";
 import { useNavigate, useLocation } from "react-router-dom";
 import SideCategoryBoxItem from "./SideCategoryBoxItem";
+import { CheckReturnModal } from "./CheckReturnModal";
+import { getLetterStatus } from "../../../api/letters";
 
 export default function SideCategoryBox({ hallId, page }) {
   const navigate = useNavigate();
   const location = useLocation();
 
-  // 초기 activeMenu를 페이지 이동 시 전달된 값으로 설정
   const [activeMenu, setActiveMenu] = useState(
     location.state?.activeMenu || "sent"
   );
 
-  // ===========================
-  //   보낸 편지함 클릭
-  // ===========================
-  const handleClickSentLetters = () => {
-    setActiveMenu("sent");
+  const [showModal, setShowModal] = useState(false);
 
-    const nextPath = page === "me" ? "/leave-letterbox" : "/sent-letterbox";
-
-    navigate(nextPath, {
-      state: { hallId, page, activeMenu: "sent" },
-    });
-  };
+  const closeModal = () => setShowModal(false);
 
   // ===========================
-  //   편지 쓰기 클릭
+  // 편지 쓰기 클릭 → 모달 열기
   // ===========================
   const handleClickWriteLetter = () => {
     setActiveMenu("write");
-
-    const nextPath = page === "me" ? "/leave-letter" : "/sent-letter";
-
-    navigate(nextPath, {
-      state: { hallId, page, activeMenu: "write" },
-    });
+    setShowModal(true);
   };
 
   // ===========================
-  //   받은 편지함 클릭 (admin/follower)
+  // 모달 내 "확인" 클릭 후 이동 처리
   // ===========================
-  const handleClickReceivedLetters = () => {
-    setActiveMenu("received");
+  const handleModalConfirm = async (selectedOption) => {
+    setShowModal(false);
 
-    navigate("/received-letterbox", {
-      state: { hallId, page, activeMenu: "received" },
-    });
-  };
+    // CASE 1: "아니오" 선택 → 무조건 sent-letter 이동
+    if (selectedOption === "no") {
+      navigate("/sent-letter", {
+        state: { hallId, page, activeMenu: "write" },
+      });
+      return;
+    }
 
-  // ===========================
-  //   고인 정보 수정 클릭
-  // ===========================
-  const handleClickEditInfo = () => {
-    setActiveMenu("edit");
+    // CASE 2: "예" 선택 → API 호출
+    try {
+      const { isOpen, isSet } = await getLetterStatus(hallId);
 
-    navigate("/edit-hallinfo", {
-      state: { hallId, page, activeMenu: "edit" },
-    });
+      // ---- 분기 조건 ----
+      if (isOpen === true && isSet === true) {
+        navigate("/sent-letter", {
+          state: { hallId, page, activeMenu: "write" },
+        });
+      } else if (isOpen === true && isSet === false) {
+        if (page === "follower") {
+          navigate("/edit-hallinfo", {
+            state: { hallId, page, activeMenu: "edit" },
+          });
+        } else {
+          navigate("/sent-letter", {
+            state: { hallId, page, activeMenu: "write" },
+          });
+        }
+      } else if (isOpen === false) {
+        if (page === "admin") {
+          navigate("/edit-hallinfo", {
+            state: { hallId, page, activeMenu: "edit" },
+          });
+        } else {
+          navigate("/sent-letter", {
+            state: { hallId, page, activeMenu: "write" },
+          });
+        }
+      }
+    } catch (error) {
+      console.error("편지 작성 가능 여부 조회 실패:", error);
+    }
   };
 
   return (
     <Container>
-      {/* 보낸 편지함 */}
       <SideCategoryBoxItem
         text="보낸 편지함"
         bgcolor={activeMenu === "sent" ? "#FFF4E6" : undefined}
         border={activeMenu === "sent" ? "1px solid #FFBC67" : undefined}
-        onClick={handleClickSentLetters}
+        onClick={() => {
+          setActiveMenu("sent");
+          navigate("/sent-letterbox", {
+            state: { hallId, page, activeMenu: "sent" },
+          });
+        }}
       />
 
-      {/* admin / follower만 받은 편지함 노출 */}
       {(page === "admin" || page === "follower") && (
         <SideCategoryBoxItem
           text="받은 편지함"
           bgcolor={activeMenu === "received" ? "#FFF4E6" : undefined}
           border={activeMenu === "received" ? "1px solid #FFBC67" : undefined}
-          onClick={handleClickReceivedLetters}
+          onClick={() => {
+            setActiveMenu("received");
+            navigate("/received-letterbox", {
+              state: { hallId, page, activeMenu: "received" },
+            });
+          }}
         />
       )}
 
-      {/* 편지 쓰기 */}
       <SideCategoryBoxItem
         text="편지 쓰기"
         bgcolor={activeMenu === "write" ? "#FFF4E6" : undefined}
@@ -88,13 +110,24 @@ export default function SideCategoryBox({ hallId, page }) {
         onClick={handleClickWriteLetter}
       />
 
-      {/* 고인 정보 수정 */}
       {(page === "admin" || page === "follower") && (
         <SideCategoryBoxItem
           text="고인 정보 수정"
           bgcolor={activeMenu === "edit" ? "#FFF4E6" : undefined}
           border={activeMenu === "edit" ? "1px solid #FFBC67" : undefined}
-          onClick={handleClickEditInfo}
+          onClick={() => {
+            setActiveMenu("edit");
+            navigate("/edit-hallinfo", {
+              state: { hallId, page, activeMenu: "edit" },
+            });
+          }}
+        />
+      )}
+
+      {showModal && (
+        <CheckReturnModal
+          onClose={closeModal}
+          onConfirm={handleModalConfirm}
         />
       )}
     </Container>
@@ -109,6 +142,5 @@ const Container = styled.div`
   width: 15rem;
   display: flex;
   flex-direction: column;
-  align-items: flex-start;
   gap: 0.625rem;
 `;
