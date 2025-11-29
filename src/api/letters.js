@@ -27,7 +27,7 @@ export const getLetterStatus = async (hallId) => {
   };
 };
 
-// 편지 리스트 조회
+// 보낸 편지 리스트 조회
 export const fetchLettersList = async (hallId) => {
   const res = await client.get(`/api/halls/${hallId}/letters/list`);
   const lettersData = res.data?.letters || [];
@@ -54,6 +54,35 @@ export const fetchLettersCalendar = async (hallId, year, month) => {
 export const deleteLetter = async (hallId, letterId) => {
   return client.post(`/api/halls/${hallId}/letters/${letterId}/delete`);
 };
+
+// 받은 편지함 조회 (Reply List)
+export const fetchReceivedReplies = async (hallId) => {
+  try {
+    const res = await client.get(`/api/halls/${hallId}/letters/reply/list`);
+
+    console.log("📨 받은 편지함 조회:", res.data);
+
+    const { count, replies } = res.data || {};
+
+    return {
+      count: count ?? 0,
+      replies: replies?.map((r) => ({
+        replyId: r.replyId,
+        userName: r.userName,
+        subjectName: r.subjectName,   // 고인 이름
+        createdAt: r.createdAt,
+        isChecked: r.isChecked,
+      })) || [],
+    };
+  } catch (err) {
+    console.error("❌ 받은 편지함 조회 실패:", {
+      status: err.response?.status,
+      data: err.response?.data,
+    });
+    throw err;
+  }
+};
+
 
 
 

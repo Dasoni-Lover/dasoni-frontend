@@ -84,7 +84,7 @@ export const SentLetterBoxPage = () => {
     <Wrapper>
       <NavWrapper>
         <BarNavigate
-          paths={["내가 입장한 추모관", hallTitle, "보낸 편지함"]}
+          paths={["홈", hallTitle, "보낸 편지함"]}
           title="보낸 편지함"
         />
       </NavWrapper>
