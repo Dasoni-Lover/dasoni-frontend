@@ -4,7 +4,10 @@ import { useLocation, useNavigate } from 'react-router-dom';
 
 import BarNavigate from '../components/BarNavigate';
 import { color, typo } from '../styles/tokens';
-import letterIcon from "../features/Letters/assets/receive-letter-icon.svg";
+
+import letterIcon1 from "../features/Letters/assets/read-letter-icon.svg";
+import letterIcon2 from "../features/Letters/assets/notread-letter-icon.svg";  // ⭐ 추가
+
 import SideCategoryBox from "../features/Letters/components/SideCategoryBox";
 
 import { fetchReceivedReplies } from "../api/letters";
@@ -19,9 +22,13 @@ const RecievedLetterBoxPage = () => {
 
   const [replyCount, setReplyCount] = useState(0);
   const [replies, setReplies] = useState([]);
-  const [hallName, setHallName] = useState(""); // 🔥 고인 이름
+  const [hallName, setHallName] = useState("");
 
-  // 🔥 추모관 정보 불러오기(고인 이름, etc)
+  // ⭐ 읽은 / 안읽은 편지 개수 상태 추가
+  const [readCount, setReadCount] = useState(0);
+  const [unreadCount, setUnreadCount] = useState(0);
+
+  // 🔥 추모관 정보 불러오기
   useEffect(() => {
     const loadHallInfo = async () => {
       try {
@@ -35,13 +42,22 @@ const RecievedLetterBoxPage = () => {
     if (hallId) loadHallInfo();
   }, [hallId]);
 
-  // 🔥 받은 편지 목록 불러오기
+  // 받은 편지 목록 불러오기
   useEffect(() => {
     const loadReplies = async () => {
       try {
         const data = await fetchReceivedReplies(hallId);
+
         setReplyCount(data.count);
         setReplies(data.replies);
+
+        // 읽은/안읽은 개수 자동 계산
+        const unread = data.replies.filter((r) => !r.isChecked).length;
+        const read = data.replies.filter((r) => r.isChecked).length;
+
+        setUnreadCount(unread);
+        setReadCount(read);
+
       } catch (err) {
         console.error("받은 편지함 조회 실패:", err);
       }
@@ -75,12 +91,31 @@ const RecievedLetterBoxPage = () => {
         </Text>
       </TextWrapper>
 
+      {/* 읽은/안읽은 편지 수 표시 */}
+      <StateBox>
+        <StateContainer>
+          <StateContent>읽지 않은 편지</StateContent>
+          <StateCount>{unreadCount}</StateCount>
+        </StateContainer>
+        <Line>|</Line>
+        <StateContainer>
+          <StateContent>읽은 편지</StateContent>
+          <StateCount>{readCount}</StateCount>
+        </StateContainer>
+      </StateBox>
+
       <ContentWrapper>
         {replies.map((item) => (
           <Box key={item.replyId} onClick={() => handleClickReply(item.replyId)}>
+            
+            {/* NEW 뱃지 */}
             {!item.isChecked && <NewBadge>NEW</NewBadge>}
 
-            <LetterIcon src={letterIcon} />
+            {/* 읽음 여부에 따른 아이콘 변경 */}
+            <LetterIcon
+              src={item.isChecked ? letterIcon1 : letterIcon2}
+            />
+
             <Date>{item.createdAt}</Date>
             <Sender>{item.userName}님이 보낸 편지</Sender>
           </Box>
@@ -94,8 +129,6 @@ const RecievedLetterBoxPage = () => {
 
 export default RecievedLetterBoxPage;
 
-
-/* -------------------- 스타일 -------------------- */
 
 const Wrapper = styled.div`
   width: 68.5rem;
@@ -116,7 +149,7 @@ const TextWrapper = styled.div`
   display: inline-flex;
   flex-direction: column;
   gap: 0.625rem;
-  margin-bottom: 5rem;
+  margin-bottom: 3.25rem;
 `;
 
 const Count = styled.div`
@@ -131,6 +164,38 @@ const Text = styled.div`
 
 const BoldText = styled.span`
   font-weight: 800;
+`;
+
+const StateBox = styled.div`
+  display: inline-flex;
+  align-items: center;
+  gap: 1.25rem;
+  margin-bottom: 3.25rem;
+`;
+
+const StateContainer = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+`;
+
+const StateContent = styled.div`
+  ${typo("h3")};
+  color: ${color("black.80")};
+`;
+
+const StateCount = styled.div`
+  ${typo("h3")};
+  color: red;
+  display: flex;
+  padding: 0 0.4375rem;
+  justify-content: center;
+  align-items: center;
+`;
+
+const Line = styled.div`
+  ${typo("h3")};
+  color: ${color("black.50")};
 `;
 
 const ContentWrapper = styled.div`
