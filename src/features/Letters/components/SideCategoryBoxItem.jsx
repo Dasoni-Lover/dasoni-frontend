@@ -26,9 +26,6 @@ const Container = styled.div`
   cursor: pointer;
   box-sizing: border-box;
 
-  &:hover {
-    background: #f7f7f7;
-  }
 `;
 
 const Text = styled.div`
