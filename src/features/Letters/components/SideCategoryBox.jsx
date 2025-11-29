@@ -143,4 +143,12 @@ const Container = styled.div`
   display: flex;
   flex-direction: column;
   gap: 0.625rem;
+
+  /* ===============================
+     화면 폭이 좁아질 때 반응형 처리
+     =============================== */
+  @media (max-width: 1200px) {
+    display: none;
+  }
+
 `;
