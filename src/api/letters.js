@@ -60,22 +60,23 @@ export const deleteLetter = async (hallId, letterId) => {
 
 //임시보관함
 
-// 임시보관함 목록 조회
 export const fetchTempLettersList = async (hallId) => {
   try {
-    const res = await client.get(
-      `/api/halls/${hallId}/letters/temp/list`
-    );
+    const res = await client.get(`/api/halls/${hallId}/letters/temp/list`);
+
+    console.log("📌 임시보관함 응답:", res.data);
 
     const letters = res.data?.letters || [];
 
-    // 기존 리스트 조회처럼 date → createdAt 으로 통일
-    return letters
-      .map((l) => ({
+    return letters.map((l) => {
+      console.log("🔍 each letter:", l);
+      return {
         ...l,
+        letterId: l.letterId,   // ⭐ 여기 수정!
         createdAt: l.date,
-      }))
-      .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+        excerpt: l.content?.slice(0, 20) || "",  // 리스트 미리보기용(선택)
+      };
+    });
   } catch (err) {
     console.error("❌ 임시보관함 목록 조회 실패:", {
       status: err.response?.status,
@@ -84,6 +85,8 @@ export const fetchTempLettersList = async (hallId) => {
     throw err;
   }
 };
+
+
 
 // 임시보관함 편지 상세 조회
 export const fetchTempLetterDetail = async (hallId, letterId) => {

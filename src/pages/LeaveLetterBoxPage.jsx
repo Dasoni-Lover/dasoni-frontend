@@ -141,7 +141,7 @@ const [deleteModalOpen, setDeleteModalOpen] = useState(false);
 
       <ContentWrapper>
         <LetterArea calendarOpen={calendarOpen}>
-          <LetterList letters={letters} onClickLetter={openLetterDetail} isNarrow={calendarOpen} onDelete={handleDeleteClick} showDelete={true}/>
+          <LetterList letters={letters} onItemClick={openLetterDetail} isNarrow={calendarOpen} onDelete={handleDeleteClick} showDelete={true}/>
         </LetterArea>
 
         {calendarOpen && (
