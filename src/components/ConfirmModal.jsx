@@ -7,6 +7,7 @@ export default function ConfirmModal({
   isOpen,
   title,
   description,
+  image,
   subImage = null,
   subText = null,
   confirmText = "확인",
@@ -19,7 +20,9 @@ export default function ConfirmModal({
   return (
     <Overlay onClick={onCancel}>
       <ModalContainer onClick={(e) => e.stopPropagation()}>
-        <Title $hasDescription={!!description}>{title}</Title>
+        <Title $hasDescription={description} $hasImage={image}>
+          {title}
+        </Title>
 
         {description && (
           <Description $hasSub={!!(subImage || subText)}>
@@ -33,6 +36,8 @@ export default function ConfirmModal({
             {subText && <InfoText>{subText}</InfoText>}
           </InfoBox>
         )}
+
+        {image && <img src={image} />}
 
         <ButtonGroup>
           <Button text={confirmText} size="L" onClick={onConfirm} />
@@ -76,8 +81,11 @@ const Title = styled.h2`
   ${typo("h2")};
   color: ${color("black.80")};
   text-align: center;
-  margin-bottom: ${({ $hasDescription }) =>
-    $hasDescription ? "0.7rem" : "5.25rem"};
+
+  margin-bottom: ${({ $hasDescription, $hasImage }) => {
+    if ($hasImage) return "0"; // ⭐ image 있으면 margin 제거
+    return $hasDescription ? "0.7rem" : "5.25rem";
+  }};
 `;
 
 const Description = styled.p`

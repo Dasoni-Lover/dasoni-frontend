@@ -14,7 +14,9 @@ import { getPresignedUrlForImage, uploadFileToS3 } from "../../../api/files";
 import defaultprofile from "../../../assets/default-profile-icon.svg";
 import IconRadioFilled from "../../../assets/icon-radio-filled.svg";
 import IconRadioBlank from "../../../assets/icon-radio-blank.svg";
+import IconCheck from "../../../assets/icon-check.svg";
 import { Column, Row } from "../../../styles/flex";
+import ConfirmModal from "../../../components/ConfirmModal";
 
 export const ProfileEditPage = () => {
   const nav = useNavigate();
@@ -39,6 +41,9 @@ export const ProfileEditPage = () => {
 
   // 새로 업로드할 File 객체
   const [profileFile, setProfileFile] = useState(null);
+
+  // ✅ 수정완료 모달
+  const [isConfirmOpen, setIsConfirmOpen] = useState(false);
 
   // YYYY.MM.DD 포맷 변환
   const toDotFormat4 = (date) => {
@@ -118,8 +123,9 @@ export const ProfileEditPage = () => {
       console.log("[ProfileEdit] update body:", body);
 
       await updateHallProfile(hallId, body);
-      alert("추모관 정보가 수정되었습니다.");
-      nav(-1);
+
+      // ✅ alert 대신 ConfirmModal 오픈
+      setIsConfirmOpen(true);
     } catch (e) {
       console.error("프로필 수정 실패:", e);
       alert("수정에 실패했습니다.");
@@ -253,6 +259,19 @@ export const ProfileEditPage = () => {
           </ButtonWrapper>
         </Container>
       </ContentBox>
+
+      {/* ✅ 수정 완료 모달 */}
+      <ConfirmModal
+        isOpen={isConfirmOpen}
+        title="변경사항을 성공적으로 저장했어요"
+        image={IconCheck}
+        confirmText="확인"
+        onConfirm={() => {
+          setIsConfirmOpen(false);
+          nav(-1);
+        }}
+        onCancel={() => setIsConfirmOpen(false)}
+      />
     </Wrapper>
   );
 };

@@ -1,10 +1,6 @@
 // src/api/voice.js
 import client from "./client";
-import {
-  getFileContentType,
-  getPresignedUrlForImage,
-  uploadFileToS3,
-} from "./files";
+import { getPresignedUrlForImage, uploadFileToS3 } from "./files";
 
 /**
  * 음성 파일 업로드
