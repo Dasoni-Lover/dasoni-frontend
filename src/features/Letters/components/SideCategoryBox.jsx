@@ -15,17 +15,33 @@ export default function SideCategoryBox({ hallId, page }) {
   );
 
   const [showModal, setShowModal] = useState(false);
-
   const closeModal = () => setShowModal(false);
 
+  // ==========================
+  // 편지 쓰기 클릭
+  // ==========================
   const handleClickWriteLetter = () => {
     setActiveMenu("write");
+
+    // ✔ page가 "me"일 경우 → 모달 없이 즉시 이동
+    if (page === "me") {
+      navigate("/sent-letter", {
+        state: { hallId, page, activeMenu: "write" },
+      });
+      return;
+    }
+
+    // ✔ admin / follower → 기존 모달 열림
     setShowModal(true);
   };
 
+  // ==========================
+  // 모달 내 확인 처리
+  // ==========================
   const handleModalConfirm = async (selectedOption) => {
     setShowModal(false);
 
+    // CASE 1: "아니오" → 무조건 sent-letter 이동
     if (selectedOption === "no") {
       navigate("/sent-letter", {
         state: { hallId, page, activeMenu: "write" },
@@ -33,6 +49,7 @@ export default function SideCategoryBox({ hallId, page }) {
       return;
     }
 
+    // CASE 2: "예" → API 조회
     try {
       const { isOpen, isSet } = await getLetterStatus(hallId);
 
