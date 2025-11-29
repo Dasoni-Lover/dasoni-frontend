@@ -13,7 +13,7 @@ import { getPresignedUrlForImage, uploadFileToS3 } from "../api/files"; // ✅ �
 
 export default function OpenMemorialHallPage() {
   const [step, setStep] = useState(1);
-  const MAX_STEP = 4;
+  const MAX_STEP = 5;
 
   const [isStepValid, setIsStepValid] = useState(false);
   const isLastStep = step === MAX_STEP;
@@ -34,6 +34,7 @@ export default function OpenMemorialHallPage() {
     relation: "",
     natures: [],
     review: "",
+    secret: null,
   });
 
   const [createdHallId, setCreatedHallId] = useState(null);
@@ -107,6 +108,8 @@ export default function OpenMemorialHallPage() {
           place: formData.place || "",
           phone: formData.phone || "",
           docs: docsUrl,
+          secret:
+            typeof formData.secret === "boolean" ? formData.secret : false,
         };
 
         console.log("🔍 create payload", payload);

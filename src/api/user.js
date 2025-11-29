@@ -32,3 +32,11 @@ export const fetchManagedHalls = async () => {
   const res = await client.get("/api/halls/home/manage");
   return res.data;
 };
+
+// 내 프로필 이미지 변경
+export const updateMyProfileImage = async (profileUrl) => {
+  const res = await client.patch("/api/users/profile", {
+    profile: profileUrl,
+  });
+  return res.data;
+};
