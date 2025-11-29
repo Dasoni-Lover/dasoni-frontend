@@ -7,17 +7,17 @@ import IconRadioFilled from "../../../assets/icon-radio-filled.svg";
 import IconRadioBlank from "../../../assets/icon-radio-blank.svg";
 
 export default function OpenStep5({ onValidChange, formData, setFormData }) {
-  const { isSearchOpen } = formData;
+  const { secret } = formData;
 
   useEffect(() => {
-    const isValid = typeof isSearchOpen === "boolean";
+    const isValid = typeof secret === "boolean";
     onValidChange?.(isValid);
-  }, [isSearchOpen, onValidChange]);
+  }, [secret, onValidChange]);
 
   const handleSelect = (value) => {
     setFormData((prev) => ({
       ...prev,
-      isSearchOpen: value,
+      secret: value, // true = 비공개 / false = 공개
     }));
   };
 
@@ -26,16 +26,16 @@ export default function OpenStep5({ onValidChange, formData, setFormData }) {
       <StepTitle>추모관 검색을 허용할까요?</StepTitle>
 
       <Column $gap={"1.25rem"}>
-        {/* 검색 허용 */}
+        {/* 공개 (검색 허용) */}
         <GreyBox
           role="button"
           tabIndex={0}
-          $active={isSearchOpen === true}
-          onClick={() => handleSelect(true)}
+          $active={secret === false}
+          onClick={() => handleSelect(false)}
         >
           <Row $gap={"1rem"}>
             <RadioIcon
-              src={isSearchOpen === true ? IconRadioFilled : IconRadioBlank}
+              src={secret === false ? IconRadioFilled : IconRadioBlank}
               alt="radio"
             />
 
@@ -48,16 +48,16 @@ export default function OpenStep5({ onValidChange, formData, setFormData }) {
           </Row>
         </GreyBox>
 
-        {/* 검색 허용하지 않음 */}
+        {/* 비공개 (검색 불가) */}
         <GreyBox
           role="button"
           tabIndex={0}
-          $active={isSearchOpen === false}
-          onClick={() => handleSelect(false)}
+          $active={secret === true}
+          onClick={() => handleSelect(true)}
         >
           <Row $gap={"1rem"}>
             <RadioIcon
-              src={isSearchOpen === false ? IconRadioFilled : IconRadioBlank}
+              src={secret === true ? IconRadioFilled : IconRadioBlank}
               alt="radio"
             />
 
@@ -88,7 +88,7 @@ const GreyBox = styled.div`
   align-items: flex-start;
   gap: 0.625rem;
   border-radius: 0.625rem;
-  background: var(--Lightgrey, #f8f8f8);
+  background: #f8f8f8;
   cursor: pointer;
 `;
 

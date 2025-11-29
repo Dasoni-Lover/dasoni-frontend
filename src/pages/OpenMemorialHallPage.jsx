@@ -34,8 +34,7 @@ export default function OpenMemorialHallPage() {
     relation: "",
     natures: [],
     review: "",
-    // ✅ Step5: 추모관 검색 허용 여부 (true: 허용, false: 미허용, null: 미선택)
-    isSearchOpen: null,
+    secret: null,
   });
 
   const [createdHallId, setCreatedHallId] = useState(null);
@@ -109,6 +108,8 @@ export default function OpenMemorialHallPage() {
           place: formData.place || "",
           phone: formData.phone || "",
           docs: docsUrl,
+          secret:
+            typeof formData.secret === "boolean" ? formData.secret : false,
         };
 
         console.log("🔍 create payload", payload);
