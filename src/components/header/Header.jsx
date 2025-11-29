@@ -86,7 +86,8 @@ export default function Header({ showAuthButtons }) {
     };
 
     window.addEventListener("myProfileUpdated", handleProfileUpdated);
-    return () => window.removeEventListener("myProfileUpdated", handleProfileUpdated);
+    return () =>
+      window.removeEventListener("myProfileUpdated", handleProfileUpdated);
   }, []);
 
   const menuItems = [
@@ -120,7 +121,6 @@ export default function Header({ showAuthButtons }) {
     setIsAlarmOpen((prev) => !prev);
     setIsLogoutBoxOpen(false);
   };
-  
 
   // MiniProfile 클릭 → LogoutBox 토글
   const handleProfileClick = () => {
@@ -129,23 +129,18 @@ export default function Header({ showAuthButtons }) {
     setIsAlarmOpen(false);
   };
 
-  
-
   // 부모(Header)의 상태 변화 시 LogoutBox 자동 닫기
-useEffect(() => {
-  if (isAlarmOpen) {
+  useEffect(() => {
+    if (isAlarmOpen) {
+      setIsLogoutBoxOpen(false);
+    }
+  }, [isAlarmOpen]);
+
+  // 라우트 변경 시 닫기
+  useEffect(() => {
     setIsLogoutBoxOpen(false);
-  }
-}, [isAlarmOpen]);
-
-
-
-// 라우트 변경 시 닫기
-useEffect(() => {
-  setIsLogoutBoxOpen(false);
-  setIsAlarmOpen(false);
-}, [location.pathname]);
-
+    setIsAlarmOpen(false);
+  }, [location.pathname]);
 
   return (
     <>
@@ -155,29 +150,31 @@ useEffect(() => {
         {!showAuthButtons && (
           <>
             <Box>
-            <Row $gap={"4.3rem"}>
-              {menuItems.map((item) => (
-                <NavButton
-                  key={item.path}
-                  onClick={() => handleMenuClick(item)}
-                  $active={getIsActive(item)}
-                >
-                  {item.label}
-                </NavButton>
-              ))}
-            </Row>
+              <Row $gap={"4.3rem"}>
+                {menuItems.map((item) => (
+                  <NavButton
+                    key={item.path}
+                    onClick={() => handleMenuClick(item)}
+                    $active={getIsActive(item)}
+                  >
+                    {item.label}
+                  </NavButton>
+                ))}
+              </Row>
             </Box>
 
             <OpenBox>
               <AlarmIcon
                 src={isAlarmOpen ? alarmclick : alarm}
                 onClick={handleAlarmClick}
-                data-ignore-close="true" 
+                data-ignore-close="true"
               />
 
-              {isAlarmOpen && <AlarmPanel onClose={() => setIsAlarmOpen(false)}/>}
+              {isAlarmOpen && (
+                <AlarmPanel onClose={() => setIsAlarmOpen(false)} />
+              )}
 
-              <div onClick={handleProfileClick} data-ignore-close="true" >
+              <div onClick={handleProfileClick} data-ignore-close="true">
                 <MiniProfile
                   name={isLoggedIn ? profileInfo.name : "로그인 해주세요"}
                   profileImg={profileInfo.myProfile}
@@ -201,8 +198,8 @@ useEffect(() => {
       {/* MiniProfile 아래에 LogoutBox 표시 */}
       {isLogoutBoxOpen && (
         <LogoutBox
-        name={profileInfo.name}
-        profileImg={profileInfo.myProfile}
+          name={profileInfo.name}
+          profileImg={profileInfo.myProfile}
           onLogout={async () => {
             try {
               await logoutUser();
@@ -215,9 +212,7 @@ useEffect(() => {
               alert("로그아웃 되었습니다.");
             }
           }}
-          onClose={() => setIsLogoutBoxOpen(false)
-            
-          } 
+          onClose={() => setIsLogoutBoxOpen(false)}
         />
       )}
     </>
@@ -233,7 +228,7 @@ const Wrapper = styled.header`
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding:  0  2.25rem 0 2.25rem;
+  padding: 0 2.25rem 0 2.25rem;
   background: white;
   z-index: 5;
   border-bottom: 1px solid var(--5, #e9e9e9);
@@ -245,11 +240,8 @@ const Logo = styled.img`
   cursor: pointer;
 `;
 const Box = styled.div`
-  position: absolute;
-  left: 50%;
-  transform: translateX(-50%);
+  margin: 0 2rem;
 `;
-
 
 const ButtonGroup = styled.div`
   display: inline-flex;
@@ -303,10 +295,10 @@ const AlarmIcon = styled.img`
   cursor: pointer;
 `;
 
-const OpenBox=styled.div`
+const OpenBox = styled.div`
   padding-right: 5.25rem;
   display: flex;
   gap: 2.12rem;
   flex-direction: row;
   align-items: center;
-`
+`;
