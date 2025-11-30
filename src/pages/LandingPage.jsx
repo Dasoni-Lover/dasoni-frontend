@@ -1,7 +1,7 @@
 import React from "react";
 import styled from "styled-components";
 
-export default function FirstPage() {
+export default function LandingPage() {
   return (
     <div>
       <Container>
