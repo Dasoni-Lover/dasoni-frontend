@@ -92,16 +92,17 @@ const [deleteModalOpen, setDeleteModalOpen] = useState(false);
     });
   };
 
-  const handleDeleteClick = (letterId) => {
-    setDeleteTarget(letterId);
-    setDeleteModalOpen(true);
-  };
+// 삭제 핸들러
+const handleDeleteClick = (letterId) => {
+  setDeleteTarget(letterId);
+  setDeleteModalOpen(true);
+};
 
-  const handleConfirmDelete = async () => {
+const handleConfirmDelete = async () => {
   try {
-    await deleteLetter(hallId, deleteTarget);
+    await deleteLetter(hallId, deleteTarget); // DELETE 요청
 
-    // 리스트 다시 불러오기
+    // 삭제 후 목록 새로 불러오기
     const updated = await fetchLettersList(hallId);
     setLetters(updated);
   } catch (err) {
@@ -111,6 +112,7 @@ const [deleteModalOpen, setDeleteModalOpen] = useState(false);
     setDeleteTarget(null);
   }
 };
+
 
 
 
@@ -141,7 +143,14 @@ const [deleteModalOpen, setDeleteModalOpen] = useState(false);
 
       <ContentWrapper>
         <LetterArea calendarOpen={calendarOpen}>
-          <LetterList letters={letters} onItemClick={openLetterDetail} isNarrow={calendarOpen} onDelete={handleDeleteClick} showDelete={true}/>
+          <LetterList
+            letters={letters}
+            onItemClick={openLetterDetail}
+            onDelete={handleDeleteClick} // ✅ 삭제 클릭 함수 전달
+            isNarrow={calendarOpen}
+            showDelete={true}            // ✅ 삭제 버튼 항상 보이도록
+          />
+
         </LetterArea>
 
         {calendarOpen && (

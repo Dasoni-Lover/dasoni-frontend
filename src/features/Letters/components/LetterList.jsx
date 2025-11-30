@@ -20,7 +20,6 @@ export const LetterList = ({ letters, onItemClick, onDelete, isNarrow, showDelet
   );
 };
 
-
 const Wrapper = styled.div`
   display: flex;
   flex-direction: column;
