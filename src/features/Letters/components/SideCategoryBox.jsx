@@ -73,7 +73,7 @@ export default function SideCategoryBox({ hallId, page }) {
             state: { hallId, page, activeMenu: "edit" },
           });
         } else {
-          navigate("/sent-letter", {
+          navigate("/edit-hallinfo", {
             state: { hallId, page, activeMenu: "write" },
           });
         }
