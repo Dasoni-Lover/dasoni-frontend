@@ -48,7 +48,6 @@ export const LeaveLetterPage = () => {
                 fromName,
                 content: letterText,
                 isCompleted: true,
-                isWanted: true,
             });
 
             handleOpenModal("submit");
@@ -67,7 +66,6 @@ export const LeaveLetterPage = () => {
                 fromName,
                 content: letterText,
                 isCompleted: false,
-                isWanted: true,
             });
 
             handleOpenModal("temp");
@@ -109,8 +107,15 @@ export const LeaveLetterPage = () => {
                 </Content>
             </TextWrapper>
             <HoverBox>
-                <DescriptionHover>무슨 이야기를 적어야 할지 고민되시나요?</DescriptionHover>
-                {/* ⭐ 임시저장버튼 위치 */}
+                <DescriptionHover>
+                    <HoverToolTip>
+                        <UnorderedList>
+                            <li>박영진님의 기일을 챙기는 방식에 대해 적어보세요</li>
+                            <li>미처 사과하지 못했거나 풀고 싶은 마음에 대해 적어보세요</li>
+                        </UnorderedList>
+                    </HoverToolTip>
+                    <DescriptionText>무슨 이야기를 적어야 할지 고민되시나요?</DescriptionText>
+                </DescriptionHover>
                 <SavedButton onClick={goSavedLetterBox}>임시보관함</SavedButton>
             </HoverBox>
 
@@ -197,8 +202,10 @@ const HoverBox = styled.div`
     margin-bottom: 1rem;
 `;
 
+// 툴팁 컨테이너 스타일 (마우스 오버 시 툴팁이 나타나야 하므로 position: relative)
 const DescriptionHover = styled.div`
     display: flex;
+    position: relative; /* 툴팁 위치 지정을 위한 기준점 */
     width: 17.5rem;
     height: 2.5rem;
     padding: 0 0.5625rem;
@@ -208,7 +215,62 @@ const DescriptionHover = styled.div`
     border-radius: 0.25rem;
     border: 1px solid #F8E4CA;
     background: linear-gradient(90deg, #FFF1F2 9%, #FFF6EB 76%, #FFEFE5 100%);
+    cursor: default;
+    
+    &:hover > div:first-child {
+        opacity: 1;
+        visibility: visible;
+    }
 `;
+
+// 툴팁 텍스트를 감싸는 내부 엘리먼트 (기존 텍스트 내용)
+const DescriptionText = styled.div`
+    ${typo("body")}; 
+    color: ${color("black.70")};
+`;
+
+const UnorderedList = styled.ul`
+    list-style-type: disc; /* 동그라미 불릿 적용 */
+    padding-left: 1.5rem; /* 불릿을 표시하기 위한 들여쓰기 */
+    margin: 0;
+    
+    & li {
+        ${typo("bodym")};
+        color: ${color("black.70")};
+        white-space: nowrap;
+        margin-bottom: 0.62rem; 
+    }
+    
+    & li:last-child {
+        margin-bottom: 0; /* 마지막 아이템에서는 하단 간격 제거 */
+    }
+`;
+
+
+const HoverToolTip = styled.div`
+    position: absolute;
+    bottom: calc(100% + 0.62rem);
+    left: 0; 
+    z-index: 10;
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.3s, visibility 0.3s;
+    pointer-events: none; 
+        width: 25.125rem;
+    height: 5rem;
+
+    display: inline-flex;
+    height: 5rem;
+    padding: 0 0.5625rem; 
+    flex-direction: column;
+    justify-content: center;
+    align-items: flex-start;
+    gap: 0; 
+    border-radius: 0.25rem;
+    border: 1px solid #F8E4CA;
+    background: linear-gradient(90deg, #FFF1F2 9%, #FFF6EB 76%, #FFEFE5 100%);
+`;
+
 
 const SavedButton = styled.div`
     display: flex;

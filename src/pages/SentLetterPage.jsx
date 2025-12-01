@@ -21,10 +21,10 @@ export const SentLetterPage = () => {
     const [letterText, setLetterText] = useState("");
     const [toName, setToName] = useState("");
     const [fromName, setFromName] = useState("");
-    const [isWanted] = useState(true); // 영상편지 요청
+    const [isWanted] = useState(true);
 
     const [isModalOpen, setIsModalOpen] = useState(false);
-    const [modalType, setModalType] = useState(""); // "temp" | "submit"
+    const [modalType, setModalType] = useState("");
 
     const [hallName, setHallName] = useState("");
 
@@ -35,7 +35,6 @@ export const SentLetterPage = () => {
             return;
         }
 
-        // 추모관 이름 조회
         const fetchHallName = async () => {
             try {
                 const info = await getHallInfo(hallId);
@@ -61,16 +60,13 @@ export const SentLetterPage = () => {
 
     const handleCloseModal = () => setIsModalOpen(false);
 
-    // -------------------------------
-    // ⭐ 임시보관하기
-    // -------------------------------
     const handleTempSave = async () => {
         try {
             await sendLetter(hallId, {
                 toName,
                 fromName,
                 content: letterText,
-                isCompleted: false, // 임시보관
+                isCompleted: false,
                 isWanted: isWanted,
             });
 
@@ -81,9 +77,6 @@ export const SentLetterPage = () => {
         }
     };
 
-    // -------------------------------
-    // ⭐ 전달하기 (isCompleted: true)
-    // -------------------------------
     const handleSendLetter = async () => {
         if (!isActive) {
             alert("편지를 올바르게 작성해 주세요.");
@@ -111,9 +104,6 @@ export const SentLetterPage = () => {
         }
     };
 
-    // -------------------------------
-    // ⭐ 모달에서 확인 → 리스트로 이동
-    // -------------------------------
     const handleModalConfirm = () => {
         setIsModalOpen(false);
 
@@ -121,12 +111,11 @@ export const SentLetterPage = () => {
             state: {
                 hallId,
                 page,
-                activeMenu: "sent", // ⭐ 메뉴 활성화 값 전달
+                activeMenu: "sent",
             },
         });
     };
     
-    // ⭐ 추가: 임시보관함 클릭 → 이동
     const goSavedLetterBox = () => {
         navigate("/saved-letterbox", {
             state: { hallId, page },
@@ -150,12 +139,18 @@ export const SentLetterPage = () => {
                 </Content>
             </TextWrapper>
 
-            {/* ⭐ HoverBox 추가 시작 */}
             <HoverBox>
-                <DescriptionHover>무슨 이야기를 적어야 할지 고민되시나요?</DescriptionHover>
+                <DescriptionHover>
+                    <HoverToolTip>
+                        <UnorderedList>
+                            <li>{hallName}님의 기일을 챙기는 방식에 대해 적어보세요</li>
+                            <li>미처 사과하지 못했거나 풀고 싶은 마음에 대해 적어보세요</li>
+                        </UnorderedList>
+                    </HoverToolTip>
+                    <DescriptionText>무슨 이야기를 적어야 할지 고민되시나요?</DescriptionText>
+                </DescriptionHover>
                 <SavedButton onClick={goSavedLetterBox}>임시보관함</SavedButton>
             </HoverBox>
-            {/* ⭐ HoverBox 추가 끝 */}
 
             <SentLetter
                 to={toName}
@@ -225,7 +220,7 @@ const NavWrapper = styled.div`
 const TextWrapper = styled.div`
     width: 100%;
     margin-top: 4.5rem;
-    margin-bottom: 0.34rem; /* HoverBox와의 간격 조정을 위해 4.12rem에서 0.34rem으로 조정 */
+    margin-bottom: 0.34rem; 
     display: flex;
     flex-direction: column;
     align-items: flex-start;
@@ -254,13 +249,14 @@ const HoverBox = styled.div`
     flex-direction: row;
     justify-content: flex-end;
     align-items: center;
-   width: 56.25rem;
+    width: 56.25rem;
     gap: 0.62rem;
     margin-bottom: 1rem;
 `;
 
 const DescriptionHover = styled.div`
     display: flex;
+    position: relative;
     width: 17.5rem;
     height: 2.5rem;
     padding: 0 0.5625rem;
@@ -270,7 +266,59 @@ const DescriptionHover = styled.div`
     border-radius: 0.25rem;
     border: 1px solid #F8E4CA;
     background: linear-gradient(90deg, #FFF1F2 9%, #FFF6EB 76%, #FFEFE5 100%);
+    cursor: default;
+    
+    &:hover > div:first-child {
+        opacity: 1;
+        visibility: visible;
+    }
 `;
+
+const DescriptionText = styled.div`
+    ${typo("body")}; 
+    color: ${color("black.70")};
+`;
+
+const UnorderedList = styled.ul`
+    list-style-type: disc;
+    padding-left: 1.5rem;
+    margin: 0;
+    
+    & li {
+        ${typo("bodym")};
+        color: ${color("black.70")};
+        white-space: nowrap;
+        margin-bottom: 0.62rem;
+    }
+    
+    & li:last-child {
+        margin-bottom: 0;
+    }
+`;
+
+const HoverToolTip = styled.div`
+    position: absolute;
+    bottom: calc(100% + 0.62rem);
+    left: 0;
+    z-index: 10;
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.3s, visibility 0.3s;
+    pointer-events: none; 
+    width: 25.125rem;
+    height: 5rem;
+
+    display: inline-flex;
+    padding: 0.5rem 0.5625rem; 
+    flex-direction: column;
+    justify-content: center;
+    align-items: flex-start;
+    gap: 0; 
+    border-radius: 0.25rem;
+    border: 1px solid #F8E4CA;
+    background: linear-gradient(90deg, #FFF1F2 9%, #FFF6EB 76%, #FFEFE5 100%);
+`;
+
 
 const SavedButton = styled.div`
     display: flex;
