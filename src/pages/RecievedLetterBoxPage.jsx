@@ -6,9 +6,10 @@ import BarNavigate from '../components/BarNavigate';
 import { color, typo } from '../styles/tokens';
 
 import letterIcon1 from "../features/Letters/assets/read-letter-icon.svg";
-import letterIcon2 from "../features/Letters/assets/notread-letter-icon.svg";  // ⭐ 추가
+import letterIcon2 from "../features/Letters/assets/notread-letter-icon.svg"; 
 
 import SideCategoryBox from "../features/Letters/components/SideCategoryBox";
+import TapeModal from '../features/Letters/components/TapeModal';
 
 import { fetchReceivedReplies } from "../api/letters";
 import { getHallInfo } from "../api/memorial";
@@ -23,6 +24,8 @@ const RecievedLetterBoxPage = () => {
   const [replyCount, setReplyCount] = useState(0);
   const [replies, setReplies] = useState([]);
   const [hallName, setHallName] = useState("");
+  const [isModalOpen, setIsModalOpen] = useState(false);
+
 
   // ⭐ 읽은 / 안읽은 편지 개수 상태 추가
   const [readCount, setReadCount] = useState(0);
@@ -73,6 +76,12 @@ const RecievedLetterBoxPage = () => {
     });
   };
 
+  const handleIconClick = (e) => {
+  e.stopPropagation(); // 부모 Box 클릭 방지
+  setIsModalOpen(true);
+};
+
+
   return (
     <Wrapper>
       <NavWrapper>
@@ -114,15 +123,20 @@ const RecievedLetterBoxPage = () => {
             {/* 읽음 여부에 따른 아이콘 변경 */}
             <LetterIcon
               src={item.isChecked ? letterIcon1 : letterIcon2}
+              onClick={handleIconClick}
             />
-
             <Date>{item.createdAt}</Date>
-            <Sender>{item.userName}님이 보낸 편지</Sender>
           </Box>
         ))}
+        {/* <LetterIcon
+              src={letterIcon1}
+              onClick={handleIconClick}
+            /> 테스트용 */}
       </ContentWrapper>
 
       <SideCategoryBox hallId={hallId} page={page} />
+      {isModalOpen && <TapeModal onCancel={() => setIsModalOpen(false)} />}
+
     </Wrapper>
   );
 };
@@ -227,10 +241,6 @@ const Date = styled.div`
   margin-top: 0.25rem;
 `;
 
-const Sender = styled.div`
-  ${typo("bodys")};
-  color: ${color("black.40")};
-`;
 
 const NewBadge = styled.div`
   position: absolute;
