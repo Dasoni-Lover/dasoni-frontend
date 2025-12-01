@@ -12,224 +12,279 @@ import { getHallInfo } from "../api/memorial";
 import SideCategoryBox from "../features/Letters/components/SideCategoryBox";
 
 export const SentLetterPage = () => {
-  const location = useLocation();
-  const hallId = location.state?.hallId;
-  const page = location.state?.page;
-  const selectedOption = location.state?.selectedOption
-  const navigate = useNavigate();
+    const location = useLocation();
+    const hallId = location.state?.hallId;
+    const page = location.state?.page;
+    const selectedOption = location.state?.selectedOption
+    const navigate = useNavigate();
 
-  const [letterText, setLetterText] = useState("");
-  const [toName, setToName] = useState("");
-  const [fromName, setFromName] = useState("");
-  const [isWanted] = useState(true); // 영상편지 요청
+    const [letterText, setLetterText] = useState("");
+    const [toName, setToName] = useState("");
+    const [fromName, setFromName] = useState("");
+    const [isWanted] = useState(true); // 영상편지 요청
 
-  const [isModalOpen, setIsModalOpen] = useState(false);
-  const [modalType, setModalType] = useState(""); // "temp" | "submit"
+    const [isModalOpen, setIsModalOpen] = useState(false);
+    const [modalType, setModalType] = useState(""); // "temp" | "submit"
 
-  const [hallName, setHallName] = useState("");
+    const [hallName, setHallName] = useState("");
 
-  useEffect(() => {
-    if (!hallId) {
-      alert("유효하지 않은 추모관입니다.");
-      navigate(-1);
-      return;
-    }
+    useEffect(() => {
+        if (!hallId) {
+            alert("유효하지 않은 추모관입니다.");
+            navigate(-1);
+            return;
+        }
 
-    // 추모관 이름 조회
-    const fetchHallName = async () => {
-      try {
-        const info = await getHallInfo(hallId);
-        const name = info?.data?.name || info?.name || "";
-        setHallName(name);
-      } catch (err) {
-        console.error("추모관 이름 조회 실패:", err);
-      }
+        // 추모관 이름 조회
+        const fetchHallName = async () => {
+            try {
+                const info = await getHallInfo(hallId);
+                const name = info?.data?.name || info?.name || "";
+                setHallName(name);
+            } catch (err) {
+                console.error("추모관 이름 조회 실패:", err);
+            }
+        };
+
+        fetchHallName();
+    }, [hallId, navigate]);
+
+    const isActive =
+        letterText.trim().length >= 50 &&
+        toName.trim().length > 0 &&
+        fromName.trim().length > 0;
+
+    const handleOpenModal = (type) => {
+        setModalType(type);
+        setIsModalOpen(true);
     };
 
-    fetchHallName();
-  }, [hallId, navigate]);
+    const handleCloseModal = () => setIsModalOpen(false);
 
-  const isActive =
-    letterText.trim().length >= 50 &&
-    toName.trim().length > 0 &&
-    fromName.trim().length > 0;
+    // -------------------------------
+    // ⭐ 임시보관하기
+    // -------------------------------
+    const handleTempSave = async () => {
+        try {
+            await sendLetter(hallId, {
+                toName,
+                fromName,
+                content: letterText,
+                isCompleted: false, // 임시보관
+                isWanted: isWanted,
+            });
 
-  const handleOpenModal = (type) => {
-    setModalType(type);
-    setIsModalOpen(true);
-  };
+            handleOpenModal("temp");
+        } catch (err) {
+            console.error("임시보관 실패:", err.response?.data || err);
+            alert(err.response?.data?.message || "임시보관 실패");
+        }
+    };
 
-  const handleCloseModal = () => setIsModalOpen(false);
+    // -------------------------------
+    // ⭐ 전달하기 (isCompleted: true)
+    // -------------------------------
+    const handleSendLetter = async () => {
+        if (!isActive) {
+            alert("편지를 올바르게 작성해 주세요.");
+            return;
+        }
 
-  // -------------------------------
-  // ⭐ 임시보관하기
-  // -------------------------------
-  const handleTempSave = async () => {
-    try {
-      await sendLetter(hallId, {
-        toName,
-        fromName,
-        content: letterText,
-        isCompleted: false, // 임시보관
-        isWanted: isWanted,
-      });
+        try {
+            await sendLetter(hallId, {
+                toName,
+                fromName,
+                content: letterText,
+                isCompleted: true,
+                isWanted: isWanted,
+            });
 
-      handleOpenModal("temp");
-    } catch (err) {
-      console.error("임시보관 실패:", err.response?.data || err);
-      alert(err.response?.data?.message || "임시보관 실패");
-    }
-  };
+            handleOpenModal("submit");
+        } catch (err) {
+            const msg = err.response?.data?.message;
 
-  // -------------------------------
-  // ⭐ 전달하기 (isCompleted: true)
-  // -------------------------------
-  const handleSendLetter = async () => {
-    if (!isActive) {
-      alert("편지를 올바르게 작성해 주세요.");
-      return;
-    }
+            if (msg === "이미 편지를 보냈어요") {
+                alert("오늘 이미 편지를 보냈어요.");
+            } else {
+                alert(msg || "편지 보내기 실패");
+            }
+        }
+    };
 
-    try {
-      await sendLetter(hallId, {
-        toName,
-        fromName,
-        content: letterText,
-        isCompleted: true,
-        isWanted: isWanted,
-      });
+    // -------------------------------
+    // ⭐ 모달에서 확인 → 리스트로 이동
+    // -------------------------------
+    const handleModalConfirm = () => {
+        setIsModalOpen(false);
 
-      handleOpenModal("submit");
-    } catch (err) {
-      const msg = err.response?.data?.message;
-
-      if (msg === "이미 편지를 보냈어요") {
-        alert("오늘 이미 편지를 보냈어요.");
-      } else {
-        alert(msg || "편지 보내기 실패");
-      }
-    }
-  };
-
-  // -------------------------------
-  // ⭐ 모달에서 확인 → 리스트로 이동
-  // -------------------------------
-  const handleModalConfirm = () => {
-    setIsModalOpen(false);
-
-    navigate("/sent-letterbox", {
-      state: {
-        hallId,
-        page,
-        activeMenu: "sent", // ⭐ 메뉴 활성화 값 전달
-      },
-    });
-  };
-
-  const hallTitle = hallName ? `故 ${hallName}의 추모관` : "故 추모관";
-
-  return (
-    <Wrapper>
-      <NavWrapper>
-        <BarNavigate paths={["홈", hallTitle, "편지쓰기"]} />
-      </NavWrapper>
-
-      <TextWrapper>
-        <Title>나의 소중한 마음을 담아 편지를 써 보세요</Title>
-        <Content>
-          고인께 전하고 싶은 말과 함께 편지에 마음을 담으면, 다소니가 전달해 드릴게요 <br />
-          생일, 기일, 명절 등 기념일에 답장이 올 거예요.
-        </Content>
-      </TextWrapper>
-
-      <SentLetter
-        to={toName}
-        from={fromName}
-        value={letterText}
-        onToChange={setToName}
-        onFromChange={setFromName}
-        onValueChange={setLetterText}
-      />
-
-      <ButtonWrapper>
-        <Button
-          text="임시 보관하기"
-          size="M"
-          color="white"
-          onClick={handleTempSave}
-        />
-
-        <Button
-          text="전달하기"
-          size="M"
-          active={isActive}
-          onClick={handleSendLetter}
-        />
-      </ButtonWrapper>
-
-<ConfirmModal
-  isOpen={isModalOpen}
-  title={
-    modalType === "temp" ? "편지를 임시 보관했어요" : "편지를 전달했어요"
-  }
-  description={
-    modalType === "temp"
-      ? "임시보관함에서 확인할 수 있어요"
-      : selectedOption === "no"
-      ? "소중한 마음을 전해드릴게요"
-      : "조금만 기다리면 답장이 올 거예요"
-  }
-  confirmText="확인"
-  onConfirm={handleModalConfirm}
-  onCancel={handleCloseModal}
-/>
+        navigate("/sent-letterbox", {
+            state: {
+                hallId,
+                page,
+                activeMenu: "sent", // ⭐ 메뉴 활성화 값 전달
+            },
+        });
+    };
+    
+    // ⭐ 추가: 임시보관함 클릭 → 이동
+    const goSavedLetterBox = () => {
+        navigate("/saved-letterbox", {
+            state: { hallId, page },
+        });
+    };
 
 
-      <SideCategoryBox hallId={hallId} page={page} activeMenu="sent" />
-    </Wrapper>
-  );
+    const hallTitle = hallName ? `故 ${hallName}의 추모관` : "故 추모관";
+
+    return (
+        <Wrapper>
+            <NavWrapper>
+                <BarNavigate paths={["홈", hallTitle, "편지쓰기"]} />
+            </NavWrapper>
+
+            <TextWrapper>
+                <Title>나의 소중한 마음을 담아 편지를 써 보세요</Title>
+                <Content>
+                    고인께 전하고 싶은 말과 함께 편지에 마음을 담으면, 다소니가 전달해 드릴게요 <br />
+                    생일, 기일, 명절 등 기념일에 답장이 올 거예요.
+                </Content>
+            </TextWrapper>
+
+            {/* ⭐ HoverBox 추가 시작 */}
+            <HoverBox>
+                <DescriptionHover>무슨 이야기를 적어야 할지 고민되시나요?</DescriptionHover>
+                <SavedButton onClick={goSavedLetterBox}>임시보관함</SavedButton>
+            </HoverBox>
+            {/* ⭐ HoverBox 추가 끝 */}
+
+            <SentLetter
+                to={toName}
+                from={fromName}
+                value={letterText}
+                onToChange={setToName}
+                onFromChange={setFromName}
+                onValueChange={setLetterText}
+            />
+
+            <ButtonWrapper>
+                <Button
+                    text="임시 보관하기"
+                    size="M"
+                    color="white"
+                    onClick={handleTempSave}
+                />
+
+                <Button
+                    text="전달하기"
+                    size="M"
+                    active={isActive}
+                    onClick={handleSendLetter}
+                />
+            </ButtonWrapper>
+
+            <ConfirmModal
+                isOpen={isModalOpen}
+                title={
+                    modalType === "temp" ? "편지를 임시 보관했어요" : "편지를 전달했어요"
+                }
+                description={
+                    modalType === "temp"
+                        ? "임시보관함에서 확인할 수 있어요"
+                        : selectedOption === "no"
+                            ? "소중한 마음을 전해드릴게요"
+                            : "조금만 기다리면 답장이 올 거예요"
+                }
+                confirmText="확인"
+                onConfirm={handleModalConfirm}
+                onCancel={handleCloseModal}
+            />
+
+
+            <SideCategoryBox hallId={hallId} page={page} activeMenu="sent" />
+        </Wrapper>
+    );
 };
 
 // ----------------- styled -----------------
 
 const Wrapper = styled.div`
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  width: 68.5rem;
-  margin-top: 1.81rem;
-  position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 68.5rem;
+    margin-top: 1.81rem;
+    position: relative;
 `;
 
 const NavWrapper = styled.div`
-  width: 100%;
-  display: flex;
-  justify-content: flex-start;
+    width: 100%;
+    display: flex;
+    justify-content: flex-start;
 `;
 
 const TextWrapper = styled.div`
-  width: 100%;
-  margin-top: 4.5rem;
-  margin-bottom: 4.12rem;
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-  gap: 0.62rem;
+    width: 100%;
+    margin-top: 4.5rem;
+    margin-bottom: 0.34rem; /* HoverBox와의 간격 조정을 위해 4.12rem에서 0.34rem으로 조정 */
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.62rem;
 `;
 
 const Title = styled.div`
-  ${typo("h3")};
-  color: ${color("black.70")};
+    ${typo("h3")};
+    color: ${color("black.70")};
 `;
 
 const Content = styled.div`
-  ${typo("bodym")};
-  color: ${color("black.50")};
+    ${typo("bodym")};
+    color: ${color("black.50")};
 `;
 
 const ButtonWrapper = styled.div`
-  margin-top: 4.62rem;
-  display: flex;
-  justify-content: center;
-  gap: 1rem;
+    margin-top: 4.62rem;
+    display: flex;
+    justify-content: center;
+    gap: 1rem;
+`;
+
+const HoverBox = styled.div`
+    display: flex;
+    flex-direction: row;
+    justify-content: flex-end;
+    align-items: center;
+   width: 56.25rem;
+    gap: 0.62rem;
+    margin-bottom: 1rem;
+`;
+
+const DescriptionHover = styled.div`
+    display: flex;
+    width: 17.5rem;
+    height: 2.5rem;
+    padding: 0 0.5625rem;
+    justify-content: center;
+    align-items: center;
+    gap: 0.625rem;
+    border-radius: 0.25rem;
+    border: 1px solid #F8E4CA;
+    background: linear-gradient(90deg, #FFF1F2 9%, #FFF6EB 76%, #FFEFE5 100%);
+`;
+
+const SavedButton = styled.div`
+    display: flex;
+    width: 7.5rem;
+    height: 2.5rem;
+    padding: 0.4375rem 0.5rem;
+    justify-content: center;
+    align-items: center;
+    gap: 0.625rem;
+    border-radius: 0.25rem;
+    border: 1px solid var(--10, #DDD);
+    background: #FFF;
+    ${typo("body")};
+    color: ${color("black.70")};
+    box-sizing: border-box;
+    cursor: pointer;
 `;

@@ -16,19 +16,20 @@ export default function SideCategoryBox({ hallId, page }) {
     );
 
     const [showModal, setShowModal] = useState(false);
-    const [showEditBlockedModal, setShowEditBlockedModal] = useState(false); // ⭐ 추가: 고인 정보 수정 불가 모달 상태
+    const [showEditBlockedModal, setShowEditBlockedModal] = useState(false); // 고인 정보 수정 불가 모달 상태
     const closeModal = () => setShowModal(false);
-    const closeEditBlockedModal = () => setShowEditBlockedModal(false); // ⭐ 추가: 고인 정보 수정 불가 모달 닫기
+    const closeEditBlockedModal = () => setShowEditBlockedModal(false); // 고인 정보 수정 불가 모달 닫기
 
     // ==========================
-    // 편지 쓰기 클릭
+    // 편지 쓰기 클릭 (경로 수정)
     // ==========================
     const handleClickWriteLetter = () => {
         setActiveMenu("write");
 
         // ✔ page가 "me"일 경우 → 모달 없이 즉시 이동
         if (page === "me") {
-            navigate("/sent-letter", {
+            // ⭐ 수정: me 페이지일 때 leave-letter로 이동
+            navigate("/leave-letter", {
                 state: { hallId, page, activeMenu: "write" },
             });
             return;
@@ -87,7 +88,7 @@ export default function SideCategoryBox({ hallId, page }) {
     };
     
     // ==========================
-    // ⭐ 고인 정보 수정 클릭 (로직 수정)
+    // 고인 정보 수정 클릭
     // ==========================
     const handleClickEditHallInfo = async () => {
         setActiveMenu("edit");
@@ -109,7 +110,6 @@ export default function SideCategoryBox({ hallId, page }) {
         } catch (error) {
             console.error("고인 정보 수정 가능 여부 조회 실패:", error);
             // 에러 발생 시에도 일단 페이지 이동을 시킬지, 에러 메시지를 띄울지 결정 필요
-            // 여기서는 일단 이동을 막고 에러 메시지를 띄우는 것으로 가정합니다.
             alert("정보 조회 중 오류가 발생했습니다.");
         }
     };
@@ -124,7 +124,9 @@ export default function SideCategoryBox({ hallId, page }) {
                     border={activeMenu === "sent" ? "1px solid #FFBC67" : undefined}
                     onClick={() => {
                         setActiveMenu("sent");
-                        navigate("/sent-letterbox", {
+                        // ⭐ 수정: page === "me" 일 때 경로 분기
+                        const targetPath = page === "me" ? "/leave-letterbox" : "/sent-letterbox";
+                        navigate(targetPath, {
                             state: { hallId, page, activeMenu: "sent" },
                         });
                     }}
@@ -156,7 +158,7 @@ export default function SideCategoryBox({ hallId, page }) {
                         text="고인 정보 수정"
                         bgcolor={activeMenu === "edit" ? "#FFF4E6" : undefined}
                         border={activeMenu === "edit" ? "1px solid #FFBC67" : undefined}
-                        onClick={handleClickEditHallInfo} // ⭐ 수정된 핸들러 연결
+                        onClick={handleClickEditHallInfo}
                     />
                 )}
             </Container>
@@ -168,7 +170,7 @@ export default function SideCategoryBox({ hallId, page }) {
                 />
             )}
             
-            {/* ⭐ 추가: 고인 정보 수정 불가 모달 */}
+            {/* 고인 정보 수정 불가 모달 */}
             {showEditBlockedModal && (
                 <ConfirmModal
                     isOpen={showEditBlockedModal}
