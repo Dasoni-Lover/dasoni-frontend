@@ -15,6 +15,7 @@ export const SentLetterPage = () => {
   const location = useLocation();
   const hallId = location.state?.hallId;
   const page = location.state?.page;
+  const selectedOption = location.state?.selectedOption
   const navigate = useNavigate();
 
   const [letterText, setLetterText] = useState("");
@@ -166,20 +167,23 @@ export const SentLetterPage = () => {
         />
       </ButtonWrapper>
 
-      <ConfirmModal
-        isOpen={isModalOpen}
-        title={
-          modalType === "temp" ? "편지를 임시 보관했어요" : "편지를 전달했어요"
-        }
-        description={
-          modalType === "temp"
-            ? "임시보관함에서 확인할 수 있어요"
-            : "조금만 기다리면 답장이 올 거예요"
-        }
-        confirmText="확인"
-        onConfirm={handleModalConfirm}
-        onCancel={handleCloseModal}
-      />
+<ConfirmModal
+  isOpen={isModalOpen}
+  title={
+    modalType === "temp" ? "편지를 임시 보관했어요" : "편지를 전달했어요"
+  }
+  description={
+    modalType === "temp"
+      ? "임시보관함에서 확인할 수 있어요"
+      : selectedOption === "no"
+      ? "소중한 마음을 전해드릴게요"
+      : "조금만 기다리면 답장이 올 거예요"
+  }
+  confirmText="확인"
+  onConfirm={handleModalConfirm}
+  onCancel={handleCloseModal}
+/>
+
 
       <SideCategoryBox hallId={hallId} page={page} activeMenu="sent" />
     </Wrapper>

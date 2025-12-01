@@ -44,7 +44,7 @@ export default function SideCategoryBox({ hallId, page }) {
     // CASE 1: "아니오" → 무조건 sent-letter 이동
     if (selectedOption === "no") {
       navigate("/sent-letter", {
-        state: { hallId, page, activeMenu: "write" },
+        state: { hallId, page, activeMenu: "write" ,selectedOption},
       });
       return;
     }
@@ -55,26 +55,26 @@ export default function SideCategoryBox({ hallId, page }) {
 
       if (isOpen === true && isSet === true) {
         navigate("/sent-letter", {
-          state: { hallId, page, activeMenu: "write" },
+          state: { hallId, page, activeMenu: "write" ,selectedOption},
         });
       } else if (isOpen === true && isSet === false) {
         if (page === "follower") {
           navigate("/edit-hallinfo", {
-            state: { hallId, page, activeMenu: "edit" },
+            state: { hallId, page, activeMenu: "edit" ,selectedOption},
           });
         } else {
           navigate("/sent-letter", {
-            state: { hallId, page, activeMenu: "write" },
+            state: { hallId, page, activeMenu: "write" ,selectedOption},
           });
         }
       } else if (isOpen === false) {
         if (page === "admin") {
           navigate("/edit-hallinfo", {
-            state: { hallId, page, activeMenu: "edit" },
+            state: { hallId, page, activeMenu: "edit" ,selectedOption},
           });
         } else {
           navigate("/edit-hallinfo", {
-            state: { hallId, page, activeMenu: "write" },
+            state: { hallId, page, activeMenu: "write" ,selectedOption},
           });
         }
       }
