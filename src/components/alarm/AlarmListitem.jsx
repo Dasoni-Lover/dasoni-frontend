@@ -10,7 +10,7 @@ export const AlarmListitem = ({ tagText, title, content, onDelete, onClick, hall
       <Left onClick={onClick}>
         <Box>
           <Tag text={tagText} />
-          <Title>故 {title}</Title>
+          <Title>{title}</Title>
         </Box>
         <Content>{content}</Content>
       </Left>
