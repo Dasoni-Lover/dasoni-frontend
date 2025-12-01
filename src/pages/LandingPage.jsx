@@ -9,6 +9,7 @@ import ImgRainbow from "../features/Landing/assets/img-rainbow.svg";
 import ImgBlueHouse from "../features/Landing/assets/img-blue-house.svg";
 import ImgOrangeHouse from "../features/Landing/assets/img-orange-house.svg";
 import ImgPostBox from "../features/Landing/assets/img-post-box.svg";
+import FeatureInfo from "../features/Landing/components/FeatureInfo";
 
 export default function LandingPage() {
   const [bgMode, setBgMode] = useState("default");
@@ -51,6 +52,29 @@ export default function LandingPage() {
             onMouseLeave={() => setBgMode("default")}
           />
         </HoverSection>
+
+        <ShareAlbumSection>
+          <FeatureInfo
+            title="공유앨범"
+            main="고인과의 추억이 담긴 사진을 앨범에 올려주세요"
+            sub="추모관에 방문한 추모객들과 함께 따뜻했던 추억을 나눌 수 있어요"
+          />
+        </ShareAlbumSection>
+        <AIGenerationSection>
+          <FeatureInfo
+            highlight={true}
+            title="AI 사진 생성"
+            main="함께한 순간의 사진이 남아있지 않아 아쉬우신가요?"
+            sub={`혹은 함께하지 못해 상상만 했던 순간이 있나요? \n 기억 속의 장면을 AI로 직접 만들어 보세요.`}
+          />
+        </AIGenerationSection>
+        <LinkShareSection>
+          <FeatureInfo
+            title="링크 공유"
+            main="추모관 링크를 공유해 주세요"
+            sub={`지인들과 함께 추모할 수 있어요 \n그리움은 나눌수록 따뜻한 위로가 됩니다`}
+          />
+        </LinkShareSection>
       </Container>
       <Footer />
     </>
@@ -136,7 +160,7 @@ const HoverSection = styled.div`
   display: flex;
   justify-content: center;
   margin-top: 5rem;
-  margin-bottom: 9rem;
+  margin-bottom: 30rem;
 `;
 
 const HoverGuideText = styled.div`
@@ -184,4 +208,21 @@ const PostBoxImg = styled.img`
   ${HoverBase};
   top: 3.4375rem;
   left: 11.875rem;
+`;
+
+const ShareAlbumSection = styled.div`
+  height: 57rem;
+  align-self: stretch;
+`;
+
+const AIGenerationSection = styled.div`
+  height: 120.3125rem;
+  align-self: stretch;
+  background: #fff7ee;
+`;
+
+const LinkShareSection = styled.div`
+  height: 51.875rem;
+  align-self: stretch;
+  background: #fff;
 `;
