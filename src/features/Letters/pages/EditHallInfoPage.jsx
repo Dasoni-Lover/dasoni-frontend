@@ -6,6 +6,7 @@ import deleteicon from "../../../assets/delete-icon.svg";
 
 import SideCategoryBox from "../components/SideCategoryBox";
 import BarNavigate from '../../../components/BarNavigate';
+import Button from "../../../components/Button";
 
 import { getHallInfo } from "../../../api/memorial";
 
@@ -49,7 +50,8 @@ export default function EditHallInfoPage() {
         </Wrapper>
       </NavWrapper>
       <Content>
-        edithallinfo
+        <Form>form</Form>
+        <Button text="다음" size="M" width="13.75rem"/>
       </Content>
       <SideCategoryBox hallId={hallId} page={page} />
     </Container>
@@ -126,4 +128,14 @@ const Text=styled.div`
 `
 
 
-const Content = styled.div``;
+const Content = styled.div`
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: flex-start;
+  width: 100%;
+`;
+
+const Form=styled.div`
+  width: 53.9375rem;
+`
