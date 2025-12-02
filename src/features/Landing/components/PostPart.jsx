@@ -50,7 +50,7 @@ export default function PostPart() {
         <Row
           $align={"center"}
           $justify={"space-between"}
-          style={{ paddingRight: "7rem", marginTop: "10rem" }}
+          style={{ paddingRight: "10rem", marginTop: "10rem" }}
         >
           <LetterInfoText>
             실제 故ㅇㅇㅇ씨의 음성으로 재현한 테스트 편지입니다.
