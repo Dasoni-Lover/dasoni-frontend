@@ -8,7 +8,8 @@ import Header from "../components/header/Header";
 export default function GlobalStyle({ children }) {
   const location = useLocation();
 
-  // 페이지별 컨텐츠 최대 너비 유지
+  const isLandingPage = location.pathname === "/";
+
   const CONTENT_MAX_WIDTH_BY_PATH = {
     "/": 600,
     "/login": 502,
@@ -21,30 +22,30 @@ export default function GlobalStyle({ children }) {
   const isLoginPage = location.pathname === "/login";
   const isRegisterPage = location.pathname === "/register";
 
-  // 로그인/회원가입/랜딩에서는 헤더 인증 버튼 보여주기
-  const showAuthButtons =
-    location.pathname === "/" ||
-    location.pathname === "/login" ||
-    location.pathname === "/register";
+  const showAuthButtons = isLandingPage || isLoginPage || isRegisterPage;
 
   return (
     <>
       <FontGlobalStyle />
       <Wrapper>
         <Header showAuthButtons={showAuthButtons} />
-        {/* /login일 때만 배경 FFBC67 */}
-        <MainContent $isLogin={isLoginPage} $isRegister={isRegisterPage}>
-          <ContentWrapper $contentMaxWidth={contentMaxWidth}>
-            {children}
-          </ContentWrapper>
 
-          {location.pathname !== "/login" &&
-            location.pathname !== "/register" && (
+        {/* ⭐ LandingPage('/')일 때는 MainContent를 적용하지 않는다 */}
+        {isLandingPage ? (
+          <>{children}</>
+        ) : (
+          <MainContent $isLogin={isLoginPage} $isRegister={isRegisterPage}>
+            <ContentWrapper $contentMaxWidth={contentMaxWidth}>
+              {children}
+            </ContentWrapper>
+
+            {!isLoginPage && !isRegisterPage && (
               <FooterWrapper>
                 <Footer />
               </FooterWrapper>
             )}
-        </MainContent>
+          </MainContent>
+        )}
       </Wrapper>
     </>
   );

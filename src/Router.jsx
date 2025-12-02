@@ -3,7 +3,7 @@ import App from "./App";
 import { authGuard } from "./utils/authGuard";
 
 /* 온보딩 관련 */
-import FirstPage from "./pages/FirstPage";
+import LandingPage from "./pages/LandingPage";
 import LogInPage from "./pages/LogInPage";
 import RegisterPage from "./pages/RegisterPage";
 
@@ -39,7 +39,7 @@ const router = createBrowserRouter([
     element: <App />,
     children: [
       /* 온보딩 관련 (로그인 필요 없음) */
-      { index: true, element: <FirstPage /> },
+      { index: true, element: <LandingPage /> },
       { path: "/login", element: <LogInPage /> },
       { path: "/register", element: <RegisterPage /> },
 
