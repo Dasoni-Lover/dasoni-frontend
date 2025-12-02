@@ -11,7 +11,7 @@ import linksharehover from "../assets/linkshare-hover.svg";
 /**
  *  LetterAndLinkShare
  * @param {Function} onLinkShareClick - 링크 공유 버튼 클릭 시 실행할 함수
- * @param {"default" | "my" | "manager"} page - 네비게이션 동작을 결정하는 모드
+ * @param {"follower" | "me" | "admin"} page - 네비게이션 동작을 결정하는 모드
  */
 const LetterAndLinkShare = ({ onLinkShareClick, page, hallId }) => {
   const [isLetterHover, setIsLetterHover] = useState(false);
@@ -19,10 +19,15 @@ const LetterAndLinkShare = ({ onLinkShareClick, page, hallId }) => {
   const navigate = useNavigate();
 
   const handleLetterClick = () => {
-    if (page === "default" || page === "manager") {
-      navigate("/sent-letter", { state: { hallId } });
-    } else if (page === "my") {
-      navigate("/leave-letter", { state: { hallId } });
+      console.log("📌 현재 page:", page);
+  console.log("📌 현재 hallId:", hallId);
+
+    if (page === "admin") {
+      navigate("/sent-letterbox", { state: { hallId, page  } });
+    } else if (page === "me") {
+      navigate("/leave-letterbox", { state: { hallId, page  } });
+    } else if (page === "follower") {
+      navigate("/sent-letterbox", { state: { hallId, page  } });
     }
   };
 

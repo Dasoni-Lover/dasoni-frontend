@@ -1,0 +1,157 @@
+// src/components/CheckReturnModal.jsx
+import React, { useState } from "react";
+import ReactDOM from "react-dom";
+import styled from "styled-components";
+import { color, typo } from "../../../styles/tokens";
+import Button from "../../../components/Button";
+
+export const CheckReturnModal = ({ onClose, onConfirm }) => {
+  const [selectedOption, setSelectedOption] = useState("yes");
+
+  const handleBackdropClick = (e) => {
+    if (e.target === e.currentTarget) onClose();
+  };
+
+  const modalContent = (
+    <Wrapper onClick={handleBackdropClick}>
+      <Box>
+        <Text>고인의 목소리로 답장을 받아보시겠어요?</Text>
+
+        <RadioWrapper>
+          <RadioItem onClick={() => setSelectedOption("yes")}>
+            <HiddenRadio
+              type="radio"
+              checked={selectedOption === "yes"}
+              onChange={() => setSelectedOption("yes")}
+            />
+            <CustomRadio checked={selectedOption === "yes"} />
+            <Description>
+                <RadioLabel>네, 답장을 받을게요</RadioLabel>
+                <RadioLabe2>고인 정보 설정 후 이용할 수 있어요</RadioLabe2>
+            </Description>
+          </RadioItem>
+
+          <RadioItem onClick={() => setSelectedOption("no")}>
+            <HiddenRadio
+              type="radio"
+              checked={selectedOption === "no"}
+              onChange={() => setSelectedOption("no")}
+            />
+            <CustomRadio checked={selectedOption === "no"} />
+            <Description>
+                <RadioLabel>괜찮아요, 편지만 보낼게요</RadioLabel>
+                <RadioLabe2>답장을 받지 않아도 ‘보낸 편지함’에 소중히 보관돼요</RadioLabe2>
+            </Description>
+          </RadioItem>
+        </RadioWrapper>
+
+        <ButtonWrapper>
+          <Button text="확인" onClick={() => onConfirm(selectedOption)} />
+          <Button text="취소" color="white" onClick={onClose} />
+        </ButtonWrapper>
+      </Box>
+    </Wrapper>
+  );
+
+  // Portal로 body 최상단에 렌더
+  return ReactDOM.createPortal(modalContent, document.body);
+};
+
+/* ---------- 스타일 ---------- */
+const Wrapper = styled.div`
+  width: 100vw;
+  height: 100vh;
+  background-color: rgba(0, 0, 0, 0.40);
+  backdrop-filter: blur(5.4px);
+  position: fixed;
+  top: 0;
+  left: 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 200000;
+`;
+
+const Box = styled.div`
+  display: inline-flex;
+  padding: 5.25rem 4.75rem 2.75rem 4.75rem;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 2.75rem;
+  border-radius: 1.25rem;
+  background: #FFF;
+`;
+
+const Text = styled.div`
+  ${typo("h2")};
+  color: ${color("black.80")};
+  text-align: center;
+`;
+
+const RadioWrapper = styled.div`
+  display: flex;
+  width: 24.625rem;
+  flex-direction: column;
+  gap: 0.75rem;
+`;
+
+const RadioItem = styled.div`
+display: flex;
+padding: 0.75rem;
+align-items: flex-start;
+gap: 1rem;
+align-self: stretch;
+  cursor: pointer;
+`;
+
+const HiddenRadio = styled.input`
+  display: none;
+`;
+
+const CustomRadio = styled.div`
+  width: 1.5rem;
+  height: 1.5rem;
+  border-radius: 50%;
+  border: 2px solid #000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: 0.2s ease;
+
+  /* 내부 작은 원 */
+  &::after {
+    content: "";
+    width: 0.875rem;
+    height: 0.875rem;
+    background-color: #000;
+    border-radius: 50%;
+    opacity: ${({ checked }) => (checked ? 1 : 0)};
+    transition: 0.2s ease;
+  }
+`;
+
+const Description=styled.div`
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.25rem;
+    flex: 1 0 0;
+`
+
+const RadioLabel = styled.div`
+  ${typo("bodym")};
+  color: ${color("black.70")};
+`;
+
+const RadioLabe2 = styled.div`
+  ${typo("bodym")};
+  color: ${color("black.30")};
+`;
+
+const ButtonWrapper = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+  width: 24.5rem;
+`;
