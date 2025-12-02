@@ -1,10 +1,6 @@
 // src/api/voice.js
 import client from "./client";
-import {
-  getFileContentType,
-  getPresignedUrlForImage,
-  uploadFileToS3,
-} from "./files";
+import { getPresignedUrlForImage, uploadFileToS3 } from "./files";
 
 /**
  * 음성 파일 업로드
@@ -43,35 +39,28 @@ export const getVoiceFile = async (hallId) => {
   const res = await client.get(`/api/halls/${hallId}/voice`);
   return res.data; // { url: "..." }
 };
-
 /**
  * 음성 파일 재업로드(갱신)
- *  1. presigned-url 요청
- *  2. S3 업로드
- *  3. 백엔드에 s3Key 기반으로 PATCH
- *   - PATCH /api/halls/{hall_id}/voice/update
- *   - body: { type: "AUDIO", filename, s3Key }
+ *  - PATCH /api/halls/{hall_id}/voice/update
+ *  - body: { url: "..." }
  */
 export const updateVoiceFile = async (hallId, file) => {
   if (!hallId) throw new Error("추모관 ID가 없습니다.");
   if (!file) throw new Error("파일이 없습니다.");
 
-  // 1️⃣ presigned URL + s3Key 받기
-  const { uploadUrl, fileUrl, contentType, s3Key } =
-    await getPresignedUrlForImage(file);
+  // 1️⃣ presigned URL + fileUrl 받기
+  const { uploadUrl, fileUrl, contentType } = await getPresignedUrlForImage(
+    file
+  );
 
   // 2️⃣ S3 업로드
   await uploadFileToS3(uploadUrl, file, contentType);
 
-  // 3️⃣ 백엔드에 s3Key 기반으로 PATCH
+  // 3️⃣ 백엔드에 fileUrl 등록 (업로드와 동일한 방식)
   await client.patch(`/api/halls/${hallId}/voice/update`, {
-    type: "AUDIO",
-    filename: file.name,
-    s3Key,
+    url: fileUrl,
   });
 
-  // UI 쪽에서는 server URL이 굳이 필요 없지만,
-  // 혹시 쓸 수도 있으니 fileUrl을 리턴해 둠
   return fileUrl;
 };
 

@@ -12,6 +12,11 @@ import { useNavigate, useLocation } from "react-router-dom";
 import { updateHallProfile, getHallInfo } from "../../../api/memorial";
 import { getPresignedUrlForImage, uploadFileToS3 } from "../../../api/files";
 import defaultprofile from "../../../assets/default-profile-icon.svg";
+import IconRadioFilled from "../../../assets/icon-radio-filled.svg";
+import IconRadioBlank from "../../../assets/icon-radio-blank.svg";
+import IconCheck from "../../../assets/icon-check.svg";
+import { Column, Row } from "../../../styles/flex";
+import ConfirmModal from "../../../components/ConfirmModal";
 
 export const ProfileEditPage = () => {
   const nav = useNavigate();
@@ -26,10 +31,19 @@ export const ProfileEditPage = () => {
   const [place, setPlace] = useState("");
   const [phone, setPhone] = useState("");
 
-  // 기존 이미지 URL (preview용)
+  // 공개 여부 (secret: true = 비공개, false = 공개)
+  const [secret, setSecret] = useState(null);
+
+  // ✅ 서버에서 받은 원본 URL (그대로 다시 서버에 보내기 위함)
+  const [originalProfileUrl, setOriginalProfileUrl] = useState(null);
+  // ✅ 화면에서 보여줄 프리뷰 URL (blob:... 포함)
   const [profileImageUrl, setProfileImageUrl] = useState(null);
+
   // 새로 업로드할 File 객체
   const [profileFile, setProfileFile] = useState(null);
+
+  // ✅ 수정완료 모달
+  const [isConfirmOpen, setIsConfirmOpen] = useState(false);
 
   // YYYY.MM.DD 포맷 변환
   const toDotFormat4 = (date) => {
@@ -49,7 +63,7 @@ export const ProfileEditPage = () => {
     return `${num.slice(0, 3)}-${num.slice(3, 7)}-${num.slice(7, 11)}`;
   };
 
-  // 기존 데이터 불러오기
+  // ✅ 기존 데이터 불러오기
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -59,9 +73,15 @@ export const ProfileEditPage = () => {
         setName(data?.name || "");
         setPlace(data?.place || "");
         setPhone(data?.phone || "");
-        setProfileImageUrl(data?.profile || null);
+
+        const serverProfile = data?.profile || null;
+        setOriginalProfileUrl(serverProfile); // 서버에서 받은 전체 URL 그대로 보관
+        setProfileImageUrl(serverProfile); // 화면에는 이걸 프리뷰로 사용
+
         setBirthDate(data?.birthday || null);
         setDeathDate(data?.deadday || null);
+
+        setSecret(typeof data?.secret === "boolean" ? data.secret : null);
       } catch (e) {
         console.error("추모관 정보 불러오기 실패:", e);
       }
@@ -69,43 +89,50 @@ export const ProfileEditPage = () => {
     if (hallId) fetchData();
   }, [hallId]);
 
-  // File 선택 시 처리 (미리보기 + 상태 저장)
+  // ✅ File 선택 시 처리 (미리보기 + 상태 저장)
   const handleFileSelect = (file) => {
     if (!file) return;
     setProfileFile(file);
-    setProfileImageUrl(URL.createObjectURL(file)); // preview
+    setProfileImageUrl(URL.createObjectURL(file)); // 화면에만 쓰는 blob URL
   };
 
-  // 저장
+  // ✅ 저장
   const handleSave = async () => {
-    let uploadedProfileUrl = profileImageUrl;
+    // 기본값: 서버에 이미 저장되어 있던 원본 URL을 그대로 보냄
+    let profileToSend = originalProfileUrl;
 
     try {
-      // 파일이 선택되었으면 S3 업로드
+      // 1) 새 파일이 있는 경우 → 업로드 후 presigned fileUrl 사용
       if (profileFile) {
         const { uploadUrl, fileUrl, contentType } =
           await getPresignedUrlForImage(profileFile);
         await uploadFileToS3(uploadUrl, profileFile, contentType);
-        uploadedProfileUrl = fileUrl; // 실제 S3 URL
+        profileToSend = fileUrl; // 이제부터 서버에는 이 URL이 저장됨
       }
 
       const body = {
-        profile: uploadedProfileUrl || null,
+        profile: profileToSend || null, // 항상 뭔가를 보내되, 없으면 null
         name: name || null,
         birthday: birthDate ? toDotFormat4(birthDate) : null,
         deadday: deathDate ? toDotFormat4(deathDate) : null,
         place: place || null,
         phone: phone || null,
+        secret: typeof secret === "boolean" ? secret : null,
       };
 
+      console.log("[ProfileEdit] update body:", body);
+
       await updateHallProfile(hallId, body);
-      alert("추모관 정보가 수정되었습니다.");
-      nav(-1);
+
+      // ✅ alert 대신 ConfirmModal 오픈
+      setIsConfirmOpen(true);
     } catch (e) {
       console.error("프로필 수정 실패:", e);
       alert("수정에 실패했습니다.");
     }
   };
+
+  const handleSelectSecret = (value) => setSecret(value);
 
   return (
     <Wrapper>
@@ -131,7 +158,7 @@ export const ProfileEditPage = () => {
 
             <InputWrapper>
               <PointTextWrapper>
-                <PointText question="고인의 생일을 알려주세요" />
+                <PointText question="고인의 생일" />
               </PointTextWrapper>
               <DateWrapper>
                 <DatePicker
@@ -144,7 +171,7 @@ export const ProfileEditPage = () => {
 
             <InputWrapper>
               <PointTextWrapper>
-                <PointText question="고인의 기일을 알려주세요" />
+                <PointText question="고인의 기일" />
               </PointTextWrapper>
               <DateWrapper>
                 <DatePicker
@@ -156,15 +183,15 @@ export const ProfileEditPage = () => {
             </InputWrapper>
 
             <InputWrapper>
-              <Text>고인의 프로필 사진을 업로드해 주세요</Text>
+              <Text>고인의 프로필 사진</Text>
               <EditSmallPhotoBox
                 src={profileImageUrl || defaultprofile}
-                onFileSelect={handleFileSelect} // File 객체 그대로 전달
+                onFileSelect={handleFileSelect}
               />
             </InputWrapper>
 
             <InputWrapper>
-              <Text>고인을 모신 곳을 알려주세요</Text>
+              <Text>고인을 모신 곳</Text>
               <InputField
                 value={place}
                 onChange={(e) => setPlace(e.target.value)}
@@ -173,12 +200,49 @@ export const ProfileEditPage = () => {
             </InputWrapper>
 
             <InputWrapper>
-              <Text>개설자의 연락처를 알려주세요</Text>
+              <Text>개설자 연락처</Text>
               <InputField
                 value={phone}
                 onChange={(e) => setPhone(formatPhone(e.target.value))}
                 placeholder="ex) 010-0000-0000"
               />
+            </InputWrapper>
+
+            {/* secret 라디오 UI */}
+            <InputWrapper>
+              <Text>추모관 검색 허용 여부</Text>
+              <RadioGroup>
+                {/* 공개(검색 허용) → secret: false */}
+                <RadioBox onClick={() => handleSelectSecret(false)}>
+                  <Row $gap={"1rem"} $align={"start"}>
+                    <RadioIcon
+                      src={secret === false ? IconRadioFilled : IconRadioBlank}
+                    />
+                    <Column $gap={"0.125rem"}>
+                      <RadioText>검색 허용하기</RadioText>
+                      <RadioInfo>
+                        다른 이용자가 고인의 이름으로 추모관을 검색해 방문할 수
+                        있어요.
+                      </RadioInfo>
+                    </Column>
+                  </Row>
+                </RadioBox>
+
+                {/* 비공개(검색 불가) → secret: true */}
+                <RadioBox onClick={() => handleSelectSecret(true)}>
+                  <Row $gap={"1rem"} $align={"start"}>
+                    <RadioIcon
+                      src={secret === true ? IconRadioFilled : IconRadioBlank}
+                    />
+                    <Column $gap={"0.125rem"}>
+                      <RadioText>검색 허용하지 않기</RadioText>
+                      <RadioInfo>
+                        초대 링크를 받은 사람만 추모관에 들어올 수 있어요.
+                      </RadioInfo>
+                    </Column>
+                  </Row>
+                </RadioBox>
+              </RadioGroup>
             </InputWrapper>
           </Box>
 
@@ -195,10 +259,24 @@ export const ProfileEditPage = () => {
           </ButtonWrapper>
         </Container>
       </ContentBox>
+
+      {/* ✅ 수정 완료 모달 */}
+      <ConfirmModal
+        isOpen={isConfirmOpen}
+        title="변경사항을 성공적으로 저장했어요"
+        image={IconCheck}
+        confirmText="확인"
+        onConfirm={() => {
+          setIsConfirmOpen(false);
+          nav(-1);
+        }}
+        onCancel={() => setIsConfirmOpen(false)}
+      />
     </Wrapper>
   );
 };
 
+/* 스타일은 네가 준 것 그대로 */
 const Wrapper = styled.div`
   height: 100vh;
   display: flex;
@@ -245,7 +323,7 @@ const Box = styled.div`
 const InputWrapper = styled.div`
   width: 100%;
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   gap: 1rem;
 `;
 
@@ -285,4 +363,30 @@ const Border = styled.div`
   border: 2px solid #e9e9e9;
   background: #fff;
   box-shadow: 0 0 5px rgba(0, 0, 0, 0.04);
+`;
+
+const RadioGroup = styled.div`
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  padding: 1.5rem;
+  border-radius: 0.5rem;
+  background: ${color("lightgrey")};
+  gap: 1.5rem;
+`;
+
+const RadioBox = styled.div`
+  cursor: pointer;
+`;
+
+const RadioIcon = styled.img``;
+
+const RadioText = styled.div`
+  ${typo("bodym")};
+  color: ${color("black.70")};
+`;
+
+const RadioInfo = styled.div`
+  ${typo("bodym")};
+  color: ${color("black.30")};
 `;

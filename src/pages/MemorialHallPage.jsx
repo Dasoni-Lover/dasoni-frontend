@@ -283,10 +283,6 @@ export default function MemorialHallPage() {
       await uploadFileToS3(uploadUrl, file, contentType);
       await updateMyHallProfile(fileUrl);
 
-      window.dispatchEvent(
-        new CustomEvent("myProfileUpdated", { detail: { profileUrl: fileUrl } })
-      );
-
       if (effectiveHallId) {
         const res = await getHallInfo(Number(effectiveHallId));
         setHallInfo(res?.data || null);
