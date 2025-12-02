@@ -3,11 +3,11 @@ import styled from "styled-components";
 import { color, typo } from "../../../styles/tokens";
 import letterbg from "../assets/letter-bg.svg";
 
-export const Letter = ({ data }) => {
+export const Letter = ({ data, width = "56.25rem", height = "32rem" }) => {
   if (!data) return null;
 
   return (
-    <Container>
+    <Container width={width} height={height}>
       <Row1>
         <To>TO. {data.toName}</To>
       </Row1>
@@ -26,8 +26,8 @@ export const Letter = ({ data }) => {
 };
 
 const Container = styled.div`
-  width: 56.25rem;
-  height: 32rem;
+  width: ${({ width }) => width};
+  height: ${({ height }) => height};
   border-radius: 0.625rem;
   padding: 0.81rem 1.38rem;
   background-image: url(${letterbg});

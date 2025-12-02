@@ -19,15 +19,16 @@ export const sendLetter = async (hallId, body) => {
 // 편지 작성 가능 여부 체크
 export const getLetterStatus = async (hallId) => {
   const res = await client.get(`/api/halls/${hallId}/letters`);
-  const data = res.data; // { open: true/false, set: true/false }
+  const data = res.data || {}; // { open: true/false, set: true/false }
 
   return {
-    isOpen: data.open,
-    isSet: data.set,
+    isOpen: data.open ?? false,
+    isSet: data.set ?? false,
   };
 };
 
-// 편지 리스트 조회
+
+// 보낸 편지 리스트 조회
 export const fetchLettersList = async (hallId) => {
   const res = await client.get(`/api/halls/${hallId}/letters/list`);
   const lettersData = res.data?.letters || [];
@@ -48,4 +49,105 @@ export const fetchLettersCalendar = async (hallId, year, month) => {
     `/api/halls/${hallId}/letters/calendar?year=${year}&month=${month}`
   );
   return res.data?.days || []; // [{ date, letterId }]
+};
+
+// 보낸 편지 삭제
+export const deleteLetter = async (hallId, letterId) => {
+  return client.post(`/api/halls/${hallId}/letters/${letterId}/delete`);
+};
+
+// 받은 편지함 조회 (Reply List)
+export const fetchReceivedReplies = async (hallId) => {
+  try {
+    const res = await client.get(`/api/halls/${hallId}/letters/reply/list`);
+
+    console.log("📨 받은 편지함 조회:", res.data);
+
+    const { count, replies } = res.data || {};
+
+    return {
+      count: count ?? 0,
+      replies: replies?.map((r) => ({
+        replyId: r.replyId,
+        userName: r.userName,
+        subjectName: r.subjectName,   // 고인 이름
+        createdAt: r.createdAt,
+        isChecked: r.isChecked,
+      })) || [],
+    };
+  } catch (err) {
+    console.error("❌ 받은 편지함 조회 실패:", {
+      status: err.response?.status,
+      data: err.response?.data,
+    });
+    throw err;
+  }
+};
+
+
+
+
+
+//임시보관함
+
+export const fetchTempLettersList = async (hallId) => {
+  try {
+    const res = await client.get(`/api/halls/${hallId}/letters/temp/list`);
+
+    console.log("📌 임시보관함 응답:", res.data);
+
+    const letters = res.data?.letters || [];
+
+    return letters.map((l) => {
+      console.log("🔍 each letter:", l);
+      return {
+        ...l,
+        letterId: l.letterId,   // ⭐ 여기 수정!
+        createdAt: l.date,
+        excerpt: l.content?.slice(0, 20) || "",  // 리스트 미리보기용(선택)
+      };
+    });
+  } catch (err) {
+    console.error("❌ 임시보관함 목록 조회 실패:", {
+      status: err.response?.status,
+      data: err.response?.data,
+    });
+    throw err;
+  }
+};
+
+
+
+// 임시보관함 편지 상세 조회
+export const fetchTempLetterDetail = async (hallId, letterId) => {
+  try {
+    const res = await client.get(
+      `/api/halls/${hallId}/letters/temp/${letterId}`
+    );
+    return res.data; // { toName, fromName, content }
+  } catch (err) {
+    console.error("❌ 임시보관함 편지 상세 조회 실패:", {
+      status: err.response?.status,
+      data: err.response?.data,
+    });
+    throw err;
+  }
+};
+
+// 임시보관함 편지 삭제
+export const deleteTempLetter = async (hallId, letterId) => {
+  try {
+    const res = await client.delete(
+      `/api/halls/${hallId}/letters/temp/${letterId}/delete`
+    );
+
+    console.log("🗑️ 임시보관함 편지 삭제 완료:", res.data);
+    return res.data;
+  } catch (err) {
+    console.error("❌ 임시보관함 편지 삭제 실패:", {
+      status: err.response?.status,
+      data: err.response?.data,
+    });
+    throw err;
+  }
 };

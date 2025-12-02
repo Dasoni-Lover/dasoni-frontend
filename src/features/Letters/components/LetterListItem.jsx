@@ -1,16 +1,35 @@
+// src/features/Letters/components/LetterListItem.jsx
 import React from 'react';
 import styled from 'styled-components';
 import { color, typo } from '../../../styles/tokens';
 import deleteicon from "../assets/delete-icon.svg";
 
-export const LetterListItem = ({ letter, onClick }) => {
+export const LetterListItem = ({
+  letter,
+  onClick,
+  onDelete,
+  isNarrow,
+  showDelete = false
+}) => {
   return (
     <Container onClick={onClick}>
-      <Wrapper>
-        <To>TO. {letter.toName}</To>
-        <Date>&nbsp;· {letter.completedAt}</Date>
-      </Wrapper>
-      <Content>{letter.excerpt}</Content>
+      <Left $isNarrow={isNarrow}>
+        <Wrapper>
+          <To>TO. {letter.toName}</To>
+          <Date>&nbsp;· {letter.completedAt}</Date>
+        </Wrapper>
+        <Content>{letter.excerpt}</Content>
+      </Left>
+
+      <Delete
+        src={deleteicon}
+        $visible={showDelete}
+        onClick={(e) => {
+          if (!showDelete) return;
+          e.stopPropagation();
+          onDelete(letter.letterId);
+        }}
+      />
     </Container>
   );
 };
@@ -20,20 +39,36 @@ const Container = styled.div`
   display: flex;
   width: 100%;
   padding: 1.25rem 1.375rem;
-  flex-direction: column;
-  justify-content: center;
-  align-items: flex-start;
-  gap: 0.75rem;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
   box-sizing: border-box;
   border-radius: 0.625rem;
-  border: 1px solid var(--5, #E9E9E9);
-  background: var(--0, #FFF);
+  border: 1px solid #E9E9E9;
+  background: #FFF;
+  box-shadow: -4px -4px 10px rgba(0,0,0,0.03),
+               4px 4px 10px rgba(0,0,0,0.03);
+`;
+
+const Left = styled.div`
+  width: ${({ $isNarrow }) => ($isNarrow ? "17rem" : "56.375rem")};
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.75rem;
+  transition: width 0.3s ease;
+`;
+
+const Delete = styled.img`
+  width: 0.875rem;
+  height: 0.875rem;
+  opacity: ${({ $visible }) => ($visible ? 1 : 0)};
+  pointer-events: ${({ $visible }) => ($visible ? "auto" : "none")};
 `;
 
 const Wrapper = styled.div`
   display: flex;
   flex-direction: row;
-  justify-content: flex-start;
   align-items: center;
 `;
 

@@ -81,6 +81,7 @@ export const SentLetter = ({
 const Container = styled.div`
   width: 56.25rem;
   height: 32rem;
+  box-sizing: border-box;
   border-radius: 0.625rem;
   padding: 0.81rem 1.38rem;
 

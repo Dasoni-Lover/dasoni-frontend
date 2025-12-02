@@ -31,6 +31,7 @@ import { SavedLetterPage } from "./pages/SavedLetterPage";
 import { LeaveLetterBoxPage } from "./pages/LeaveLetterBoxPage";
 import { SavedLetterBoxPage } from "./pages/SavedLetterBoxPage";
 import RecievedLetterBoxPage from "./pages/RecievedLetterBoxPage";
+import EditHallInfoPage from "./features/Letters/pages/EditHallInfoPage";
 
 const router = createBrowserRouter([
   {
@@ -96,6 +97,11 @@ const router = createBrowserRouter([
       {
         path: "/received-letterbox",
         element: <RecievedLetterBoxPage />,
+        loader: authGuard,
+      },
+      {
+        path: "/edit-hallinfo",
+        element: <EditHallInfoPage />,
         loader: authGuard,
       },
     ],
