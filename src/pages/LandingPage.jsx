@@ -4,14 +4,16 @@ import styled, { css } from "styled-components";
 import Footer from "../components/Footer";
 import Button from "../components/Button";
 import { Column } from "../styles/flex";
-
 import ImgFrame from "../features/Landing/assets/img-frame-flower.svg";
 import ImgRainbow from "../features/Landing/assets/img-rainbow.svg";
 import ImgBlueHouse from "../features/Landing/assets/img-blue-house.svg";
 import ImgOrangeHouse from "../features/Landing/assets/img-orange-house.svg";
 import ImgPostBox from "../features/Landing/assets/img-post-box.svg";
+import ImgRequest1 from "../features/Landing/assets/img-request-example-1.svg";
+import ImgResponse1 from "../features/Landing/assets/img-response-example-1.svg";
 import FeatureInfo from "../features/Landing/components/FeatureInfo";
 import ShareAlbumCarousel from "../features/Landing/components/ShareAlbumCarousel"; // ✅ 추가
+import { color, typo } from "../styles/tokens";
 
 export default function LandingPage() {
   const [bgMode, setBgMode] = useState("default");
@@ -76,6 +78,22 @@ export default function LandingPage() {
             main="함께한 순간의 사진이 남아있지 않아 아쉬우신가요?"
             sub={`혹은 함께하지 못해 상상만 했던 순간이 있나요? \n 기억 속의 장면을 AI로 직접 만들어 보세요.`}
           />
+          <ExampleWrapper>
+            <RequestImg src={ImgRequest1} />
+            <ResponseBox>
+              {/* ⬇️ 여기만 수정 */}
+              <ResponseImgWrapper>
+                <ResponseImg src={ImgResponse1} />
+              </ResponseImgWrapper>
+            </ResponseBox>
+
+            <RequestImg src={ImgRequest1} />
+            <ResponseBox>
+              <ResponseImgWrapper>
+                <ResponseImg src={ImgResponse1} />
+              </ResponseImgWrapper>
+            </ResponseBox>
+          </ExampleWrapper>
         </AIGenerationSection>
 
         <LinkShareSection>
@@ -240,11 +258,69 @@ const ShareAlbumInner = styled.div`
 const AIGenerationSection = styled.div`
   height: 120.3125rem;
   align-self: stretch;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
   background: #fff7ee;
+`;
+
+const ExampleWrapper = styled.div`
+  display: flex;
+  flex-direction: column;
+  width: 88.25rem;
+  padding-top: 5rem;
+`;
+
+const RequestImg = styled.img`
+  width: 44.75rem;
+  height: 23.3125rem;
+  align-self: end;
+`;
+const ResponseBox = styled.div`
+  width: 20rem;
+  padding: 1.65rem 1.65rem 1.65rem 8.25rem;
+  border-radius: 1.875rem;
+  border: 1px solid var(--5, #e9e9e9);
+  background: var(--main, #ffbc67);
+`;
+
+// 🆕 이미지 + 오버레이 래퍼
+const ResponseImgWrapper = styled.div`
+  position: relative;
+  width: 100%;
+  height: 20rem;
+  overflow: hidden;
+  border-radius: 1.25rem; /* 필요 없으면 제거해도 됨 */
+
+  &::after {
+    content: "마우스를 올려보세요";
+    position: absolute;
+    inset: 0;
+    background-color: rgba(255, 255, 255, 0.8); /* 흰색 80% */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: ${color("black.70")};
+    ${typo("h3")}
+    opacity: 1;
+    transition: opacity 0.4s ease-in-out;
+    pointer-events: none;
+  }
+
+  &:hover::after {
+    opacity: 0;
+  }
+`;
+
+const ResponseImg = styled.img`
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
 `;
 
 const LinkShareSection = styled.div`
   height: 51.875rem;
-  align-self: stretch;
+  display: flex;
   background: #fff;
 `;
