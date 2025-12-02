@@ -74,56 +74,68 @@ export default function LandingPage() {
   );
 }
 
+/* --------- styled-components --------- */
+
 const Container = styled.div`
   position: relative;
-  overflow: hidden; /* 배경 레이어 잘림 방지 */
+  overflow: hidden; /* 배경 레이어 튀어나오는 것 방지 */
 
   display: flex;
   flex-direction: column;
   align-items: center;
 
   margin-top: 6.25rem;
+
+  /* 높이는 내용만큼 + 최소 1뷰포트 */
+  width: 100%;
+  min-height: 100vh;
+
   background: transparent;
 `;
 
-/*  배경 레이어 - opacity로 페이드 전환 */
+/*  배경 레이어 - opacity로 페이드 전환 + 1920x6195 기준 그라디언트 */
 const BackgroundLayer = styled.div`
   position: absolute;
   inset: 0;
   z-index: -1;
   pointer-events: none;
 
+  /* 1920 x 6195 기준 사이즈로 그라데이션 지정 */
+  background-repeat: no-repeat;
+  background-size: 1920px 6195px;
+  background-position: top center;
+
   ${({ $variant }) =>
     $variant === "orange" &&
     css`
-      background: radial-gradient(
+      background-image: radial-gradient(
           279.82% 89.28% at 52.53% 69.51%,
           #fff 56.83%,
           #ffc085 89.65%
         ),
-        #d9d9d9;
+        linear-gradient(#d9d9d9, #d9d9d9);
     `}
 
   ${({ $variant }) =>
     $variant === "blue" &&
     css`
-      background: radial-gradient(
+      background-image: radial-gradient(
           279.82% 89.28% at 52.53% 69.51%,
           #fff 67.81%,
           #a877c4 100%
         ),
-        #d9d9d9;
+        linear-gradient(#d9d9d9, #d9d9d9);
     `}
 
   ${({ $variant }) =>
     $variant === "post" &&
     css`
-      background: radial-gradient(
+      background-image: radial-gradient(
           279.82% 89.28% at 52.53% 69.51%,
           #fff 69.43%,
           #f4938c 87.92%
         ),
-        #d9d9d9;
+        linear-gradient(#d9d9d9, #d9d9d9);
     `}
 
   opacity: ${({ $active }) => ($active ? 1 : 0)};
