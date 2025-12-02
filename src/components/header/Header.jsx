@@ -230,7 +230,7 @@ const Wrapper = styled.header`
   align-items: center;
   padding: 0 2.25rem 0 2.25rem;
   background: white;
-  z-index: 5;
+  z-index: 10;
   border-bottom: 1px solid var(--5, #e9e9e9);
 `;
 
