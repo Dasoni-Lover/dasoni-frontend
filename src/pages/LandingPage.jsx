@@ -83,7 +83,6 @@ const Container = styled.div`
   align-items: center;
 
   margin-top: 6.25rem;
-  height: 324rem;
   background: transparent;
 `;
 

@@ -13,7 +13,7 @@ export default function FeatureInfo({
     <Wrapper $align={align}>
       <Title $highlight={highlight}>{title}</Title>
       <MainText>{main}</MainText>
-      <SubText>{sub}</SubText>
+      <SubText $align={align}>{sub}</SubText>
     </Wrapper>
   );
 }
@@ -54,7 +54,7 @@ const MainText = styled.div`
 
 const SubText = styled.div`
   color: var(--50, #7a7a7a);
-  text-align: center;
+  text-align: ${({ $align }) => ($align === "left" ? "left" : "center")};
   font-family: Pretendard;
   font-size: 1.5rem;
   font-style: normal;
