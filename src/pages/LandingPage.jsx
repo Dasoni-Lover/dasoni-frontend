@@ -87,7 +87,6 @@ const Container = styled.div`
   margin-top: 6.25rem;
 
   /* 높이는 내용만큼 + 최소 1뷰포트 */
-  width: 100%;
   min-height: 100vh;
 
   background: transparent;
@@ -100,9 +99,9 @@ const BackgroundLayer = styled.div`
   z-index: -1;
   pointer-events: none;
 
-  /* 1920 x 6195 기준 사이즈로 그라데이션 지정 */
+  /* 100vw x 6195 기준 사이즈로 그라데이션 지정 */
   background-repeat: no-repeat;
-  background-size: 1920px 6195px;
+  background-size: 100vw 6195px;
   background-position: top center;
 
   ${({ $variant }) =>
