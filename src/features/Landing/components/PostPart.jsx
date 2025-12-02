@@ -92,8 +92,8 @@ const ExampleWrapper = styled.div`
 
   --carousel-width: 100%;
   /* 이동 거리 계산용 값(실제 카드 크기가 아니라 애니메이션 거리용으로만 사용됨) */
-  --carousel-item-width: 56rem;
-  --carousel-item-height: 32rem;
+  --carousel-item-width: 100%;
+  --carousel-item-height: 43rem;
   --carousel-item-gap: 2.5rem;
 
   position: relative;
@@ -142,14 +142,12 @@ const LetterItem = styled.article`
 const LetterImg = styled.img`
   display: block;
   width: auto;
-  height: auto; /* 👉 SVG 원본 크기 유지 */
 `;
 
 const ResponseLetterSection = styled.div`
   width: 100%;
   padding-top: 5rem;
   padding-left: 14rem;
-  width: 100%;
   display: flex;
   flex-direction: column;
   margin-bottom: 15rem;

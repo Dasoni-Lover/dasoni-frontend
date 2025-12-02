@@ -203,18 +203,18 @@ const RainbowImg = styled.img`
 
 const BlueHouseImg = styled.img`
   ${HoverBase};
-  top: -2.1875rem;
-  right: 5.9375rem;
+  top: -2.5rem;
+  right: 7.8rem;
 `;
 
 const OrangeHouseImg = styled.img`
   ${HoverBase};
   top: -1.5625rem;
-  left: 2.8125rem;
+  left: 3rem;
 `;
 
 const PostBoxImg = styled.img`
   ${HoverBase};
-  top: 3.4375rem;
-  left: 11.875rem;
+  top: 7rem;
+  left: 15.3rem;
 `;
