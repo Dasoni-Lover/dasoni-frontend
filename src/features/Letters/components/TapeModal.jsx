@@ -10,7 +10,7 @@ import tape from "../assets/tape.svg";
 import play from "../../MemorialHall/assets/icon-play.svg";
 import foldedletter from "../assets/folded-letter.svg";
 
-export default function TapeModal({ onCancel }) {
+export default function TapeModal({ onCancel, data }) {
   const [isOpened, setIsOpened] = useState(false); // 접힘/펼침 상태
 
   const handleOverlayClick = (e) => {
@@ -45,19 +45,20 @@ export default function TapeModal({ onCancel }) {
           )}
 
           {/* 펼쳐진 상태 Letter 표시 */}
-          {isOpened && (
-            <OpenedLetterWrapper>
-              <Letter
-                data={{
-                  toName: "다예1",
-                  content: "안녕",
-                  completedAt: "2025-12-01",
-                  fromName: "다예2",
-                }}
-                width="40.75rem"
-              />
-            </OpenedLetterWrapper>
-          )}
+        {isOpened && data && (
+          <OpenedLetterWrapper>
+            <Letter
+              data={{
+                toName: data.subjectName,
+                content: data.content || "(내용 없음)",
+                completedAt: data.createdAt,
+                fromName: data.userName,
+              }}
+              width="40.75rem"
+            />
+          </OpenedLetterWrapper>
+        )}
+
         </LetterWrapper>
 
         <Bar>
@@ -74,7 +75,6 @@ export default function TapeModal({ onCancel }) {
   );
 }
 
-/* ----------------- 스타일 ------------------ */
 
 const Overlay = styled.div`
   position: fixed;

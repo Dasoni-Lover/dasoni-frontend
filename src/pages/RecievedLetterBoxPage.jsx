@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import styled from 'styled-components';
-import { useLocation, useNavigate } from 'react-router-dom';
+import { useLocation} from 'react-router-dom';
 
 import BarNavigate from '../components/BarNavigate';
 import { color, typo } from '../styles/tokens';
@@ -16,7 +16,6 @@ import { getHallInfo } from "../api/memorial";
 
 const RecievedLetterBoxPage = () => {
   const location = useLocation();
-  const navigate = useNavigate();
 
   const hallId = location.state?.hallId;
   const page = location.state?.page;
@@ -25,13 +24,14 @@ const RecievedLetterBoxPage = () => {
   const [replies, setReplies] = useState([]);
   const [hallName, setHallName] = useState("");
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [selectedReply, setSelectedReply] = useState(null);
 
 
-  // ⭐ 읽은 / 안읽은 편지 개수 상태 추가
+  // 읽은 / 안읽은 편지 개수 상태 추가
   const [readCount, setReadCount] = useState(0);
   const [unreadCount, setUnreadCount] = useState(0);
 
-  // 🔥 추모관 정보 불러오기
+  // 추모관 정보 불러오기
   useEffect(() => {
     const loadHallInfo = async () => {
       try {
@@ -69,15 +69,10 @@ const RecievedLetterBoxPage = () => {
     if (hallId) loadReplies();
   }, [hallId]);
 
-  // 상세 페이지 이동
-  const handleClickReply = (replyId) => {
-    navigate(`/letters/reply/${replyId}`, {
-      state: { hallId, page, replyId },
-    });
-  };
 
-  const handleIconClick = (e) => {
-  e.stopPropagation(); // 부모 Box 클릭 방지
+
+const handleIconClick = (item) => {  // item 전달!
+  setSelectedReply(item); 
   setIsModalOpen(true);
 };
 
@@ -115,15 +110,11 @@ const RecievedLetterBoxPage = () => {
 
       <ContentWrapper>
         {replies.map((item) => (
-          <Box key={item.replyId} onClick={() => handleClickReply(item.replyId)}>
-            
-            {/* NEW 뱃지 */}
-            {!item.isChecked && <NewBadge>NEW</NewBadge>}
+          <Box key={item.replyId} onClick={() => handleIconClick(item)}>
 
             {/* 읽음 여부에 따른 아이콘 변경 */}
             <LetterIcon
               src={item.isChecked ? letterIcon1 : letterIcon2}
-              onClick={handleIconClick}
             />
             <Date>{item.createdAt}</Date>
           </Box>
@@ -135,7 +126,13 @@ const RecievedLetterBoxPage = () => {
       </ContentWrapper>
 
       <SideCategoryBox hallId={hallId} page={page} />
-      {isModalOpen && <TapeModal onCancel={() => setIsModalOpen(false)} />}
+      {isModalOpen && (
+        <TapeModal 
+          onCancel={() => setIsModalOpen(false)}
+          data={selectedReply}
+        />
+      )}
+
 
     </Wrapper>
   );
