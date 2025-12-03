@@ -85,6 +85,7 @@ export default function OpenStep2({ onValidChange, formData, setFormData }) {
             placeholder="YYYY/M/D"
             // 🔹 생일: 기일보다 빠른 날짜 & 오늘 이전(오늘 포함)까지만
             maxDate={birthMaxDate}
+            calendarIcon="yellow"
           />
         </FieldRight>
       </FormRow>
@@ -106,6 +107,7 @@ export default function OpenStep2({ onValidChange, formData, setFormData }) {
             minDate={deathMinDate || undefined}
             // 🔹 기일: 오늘까지만 선택 가능 (미래 불가)
             maxDate={deathMaxDate}
+            calendarIcon="yellow"
           />
         </FieldRight>
       </FormRow>

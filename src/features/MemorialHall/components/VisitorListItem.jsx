@@ -25,8 +25,9 @@ export default function VisitorListItem({
   const idWrapperRef = useRef(null);
 
   useEffect(() => {
-    if (idWrapperRef.current)
+    if (idWrapperRef.current) {
       setContentWidth(`${idWrapperRef.current.offsetWidth}px`);
+    }
   }, []);
 
   useEffect(() => setIsOpen(openAll), [openAll]);
@@ -35,7 +36,7 @@ export default function VisitorListItem({
     try {
       console.log("=== handleRequest 호출 ===");
       console.log("요청 대상 item:", item);
-      console.log("수락 여부 isAccept:", isAccept); // 🔥 여기에 수락(true)/거절(false) 찍힘
+      console.log("수락 여부 isAccept:", isAccept);
 
       const res = await respondRequest(hallId, item.requestId, isAccept);
       console.log("응답 결과:", res);
@@ -65,14 +66,16 @@ export default function VisitorListItem({
     }
   };
 
+  const toggleOpen = () => {
+    setIsOpen((prev) => !prev);
+  };
+
   return (
     <Container>
       <TopRow>
-        <Wrapper>
-          <Open
-            src={isOpen ? downicon : righticon}
-            onClick={() => setIsOpen(!isOpen)}
-          />
+        <Wrapper onClick={toggleOpen}>
+          <Open src={righticon} $isOpen={isOpen} />
+
           <IdWrapper ref={idWrapperRef}>
             <Id>{index}</Id>
             <Name>{item.name}</Name>
@@ -108,11 +111,10 @@ export default function VisitorListItem({
         </ButtonWrapper>
       </TopRow>
 
-      {isOpen && (
-        <ContentWrapper style={{ width: contentWidth }}>
-          <VisitorListItemContent item={item} />
-        </ContentWrapper>
-      )}
+      {/* ⭐ 항상 렌더해두고 max-height / opacity / transform으로 애니메이션 */}
+      <ContentWrapper $isOpen={isOpen} style={{ width: contentWidth }}>
+        <VisitorListItemContent item={item} />
+      </ContentWrapper>
 
       <ConfirmModal
         isOpen={isModalOpen}
@@ -151,12 +153,15 @@ const Wrapper = styled.div`
   padding: 0.5rem 0.625rem;
   align-items: center;
   gap: 1.875rem;
+  cursor: pointer;
 `;
 
 const Open = styled.img`
-  cursor: pointer;
   padding: 0.375rem;
   height: 1.5rem;
+
+  transform: ${({ $isOpen }) => ($isOpen ? "rotate(90deg)" : "rotate(0deg)")};
+  transition: transform 0.25s ease;
 `;
 
 const IdWrapper = styled.div`
@@ -188,9 +193,17 @@ const ButtonWrapper = styled.div`
   height: 2.25rem;
 `;
 
+// 슬라이드 애니메이션 들어가는 부분
 const ContentWrapper = styled.div`
   margin-left: 4.76rem;
-  margin-top: 1.88rem;
-  transition: all 0.3s ease;
+  margin-top: ${({ $isOpen }) => ($isOpen ? "1.88rem" : "0")};
   overflow: hidden;
+
+  max-height: ${({ $isOpen }) => ($isOpen ? "500px" : "0")};
+  opacity: ${({ $isOpen }) => ($isOpen ? 1 : 0)};
+  transform: ${({ $isOpen }) =>
+    $isOpen ? "translateY(0)" : "translateY(-4px)"};
+
+  transition: max-height 0.3s ease, opacity 0.3s ease, transform 0.3s ease,
+    margin-top 0.3s ease;
 `;

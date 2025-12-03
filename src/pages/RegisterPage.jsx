@@ -202,8 +202,10 @@ export default function RegisterPage() {
 
   return (
     <Wrapper>
-      <HouseImg src={ImgRainbowHouse} />
+      {/* ✅ HouseImg를 OutBox 안으로 이동 */}
       <OutBox>
+        <HouseImg src={ImgRainbowHouse} />
+
         <Box>
           <TextWrapper>
             <Title>회원가입</Title>
@@ -229,7 +231,7 @@ export default function RegisterPage() {
                   <DropdownButton
                     type="button"
                     onClick={() => setIsOpen((prev) => !prev)}
-                    $isPlaceholder={selectedGender === "성별을 선택해 주세요"} // 🔥 추가
+                    $isPlaceholder={selectedGender === "성별을 선택해 주세요"}
                   >
                     <span>{selectedGender}</span>
                     <Icon
@@ -258,9 +260,10 @@ export default function RegisterPage() {
                 <DatePicker
                   selected={date}
                   onChange={setDate}
-                  borderColor="#A8A8A8"
+                  borderColor="#DDD"
                   width="15.6rem"
                   maxDate={new Date()} // ✅ 오늘 이후 날짜 선택 불가
+                  font="bodym"
                 />
               </InputBox>
 
@@ -370,6 +373,7 @@ export default function RegisterPage() {
           </ClickBox>
         </Box>
       </OutBox>
+
       <ConfirmModal
         isOpen={isSuccess}
         title="성공적으로 회원가입을 마쳤어요"
@@ -383,8 +387,6 @@ export default function RegisterPage() {
   );
 }
 
-/* ------------------- 스타일 ------------------- */
-
 const Wrapper = styled.div`
   position: relative;
   display: flex;
@@ -392,21 +394,10 @@ const Wrapper = styled.div`
   justify-content: center;
   align-items: center;
   width: 100%;
-  margin: auto 0;
-
-  @media (max-width: 1200px) {
-    align-items: flex-start;
-  }
-`;
-
-const HouseImg = styled.img`
-  position: absolute;
-  z-index: 1;
-  left: -50%;
-  top: 10%;
 `;
 
 const OutBox = styled.div`
+  position: relative; /*  HouseImg 기준 컨테이너 */
   display: inline-flex;
   padding: 2.5rem 7.5rem 5rem 3.125rem;
   justify-content: center;
@@ -414,9 +405,22 @@ const OutBox = styled.div`
   border-radius: 1rem;
   border: 1px solid ${color("black.10")};
   background: #fff;
+  margin: 4rem 0;
+  overflow: visible; /* 이미지가 조금 튀어나와도 보이게 */
+  left: 20rem;
+`;
+
+const HouseImg = styled.img`
+  position: absolute;
+  z-index: 1; /* 카드(Box) 뒤에 깔리게 */
+  left: -60%;
+  top: 15%;
 `;
 
 const Box = styled.div`
+  position: relative; /* z-index 기준 */
+  z-index: 2; /* HouseImg 위 레이어 */
+
   display: flex;
   width: 51.5rem;
   flex-direction: column;
@@ -463,7 +467,7 @@ const ProfileWrapper = styled.div`
 const ProfileImg = styled.img`
   height: 12.5rem;
   align-self: stretch;
-  aspect-ratio: 1/1;
+  aspect-ratio: 1 / 1;
   fill: #f2f2f2;
   cursor: pointer;
   object-fit: cover;
@@ -527,16 +531,15 @@ const DropdownButton = styled.button`
   align-items: center;
   justify-content: space-between;
   width: 100%;
-  height: 3rem;
+  height: 3.25rem;
   padding: 0 1rem;
   background: white;
   border: 1px solid ${color("black.10")};
-  border-radius: 6px;
-  color: ${color("black.10")};
-  font-size: 1rem;
-  cursor: pointer;
+  border-radius: 0.25rem;
   color: ${({ $isPlaceholder }) =>
     $isPlaceholder ? color("black.10") : color("black.70")};
+  font-size: 1rem;
+  cursor: pointer;
 `;
 
 const Icon = styled.img`

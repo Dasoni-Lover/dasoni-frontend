@@ -6,11 +6,7 @@ export const CardListEnter = ({ halls = [], onOpenModal }) => {
   return (
     <Wrapper>
       {halls.map((hall, index) => (
-        <CardListItemEnter
-          key={index}
-          hall={hall}
-          onOpenModal={onOpenModal}
-        />
+        <CardListItemEnter key={index} hall={hall} onOpenModal={onOpenModal} />
       ))}
     </Wrapper>
   );
@@ -23,5 +19,5 @@ const Wrapper = styled.div`
   justify-content: center;
   align-items: start;
   width: 100%;
-  margin-bottom: 18.3125rem;
+  margin-bottom: 10rem;
 `;

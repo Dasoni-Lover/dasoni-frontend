@@ -10,7 +10,11 @@ const AlarmPanel = ({ onClose }) => {
   //바깥 클릭 감지
   useEffect(() => {
     const handleClickOutside = (e) => {
-      if (e.target && e.target.closest && e.target.closest('[data-ignore-close]')) {
+      if (
+        e.target &&
+        e.target.closest &&
+        e.target.closest("[data-ignore-close]")
+      ) {
         return;
       }
 
@@ -27,7 +31,13 @@ const AlarmPanel = ({ onClose }) => {
     <Panel ref={panelRef}>
       <Header>
         <Title>알림</Title>
-        <Button text="닫기" width="6.25rem" color="white" size="S" onClick={onClose}/>
+        <Button
+          text="닫기"
+          width="6.25rem"
+          color="white"
+          size="S"
+          onClick={onClose}
+        />
       </Header>
       <Wrapper>
         <AlarmList />
@@ -38,16 +48,15 @@ const AlarmPanel = ({ onClose }) => {
 
 export default AlarmPanel;
 
-
 const Panel = styled.div`
   position: fixed;
   top: 5.06rem;
-  right: 16.75rem; 
+  right: 13.75rem;
   width: 27.4375rem;
   max-height: 33.25rem;
   border-radius: 1.875rem;
-  border: 1px solid var(--outline, #F2E8DF);
-  background: var(--0, #FFF);
+  border: 1px solid var(--outline, #f2e8df);
+  background: var(--0, #fff);
   box-shadow: -4px 18px 41.4px 0 rgba(0, 0, 0, 0.11);
   padding-top: 1.875rem;
   z-index: 9;
@@ -80,4 +89,3 @@ const Wrapper = styled.div`
   overflow: hidden; /* 내부 스크롤만 사용 */
   border-radius: 0 0 1.875rem 1.875rem;
 `;
-

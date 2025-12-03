@@ -165,6 +165,7 @@ export const ProfileEditPage = () => {
                   selected={birthDate}
                   onChange={setBirthDate}
                   placeholder="YYYY/M/D"
+                  calendarIcon="yellow"
                 />
               </DateWrapper>
             </InputWrapper>
@@ -178,6 +179,7 @@ export const ProfileEditPage = () => {
                   selected={deathDate}
                   onChange={setDeathDate}
                   placeholder="YYYY/M/D"
+                  calendarIcon="yellow"
                 />
               </DateWrapper>
             </InputWrapper>
@@ -259,7 +261,6 @@ export const ProfileEditPage = () => {
           </ButtonWrapper>
         </Container>
       </ContentBox>
-
       {/* ✅ 수정 완료 모달 */}
       <ConfirmModal
         isOpen={isConfirmOpen}
@@ -278,7 +279,6 @@ export const ProfileEditPage = () => {
 
 /* 스타일은 네가 준 것 그대로 */
 const Wrapper = styled.div`
-  height: 100vh;
   display: flex;
   flex-direction: column;
   justify-content: flex-start;
@@ -318,6 +318,7 @@ const Box = styled.div`
   border-radius: 20px;
   background: #fff;
   box-shadow: 0 2px 8.2px 0 rgba(0, 0, 0, 0.15);
+  margin-bottom: 5rem;
 `;
 
 const InputWrapper = styled.div`
@@ -343,7 +344,6 @@ const DateWrapper = styled.div`
 
 const Text = styled.div`
   display: flex;
-  height: 20px;
   width: 50%;
   align-items: center;
   ${typo("bodym2")};

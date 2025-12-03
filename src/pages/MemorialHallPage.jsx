@@ -563,7 +563,7 @@ const BarWrapper = styled.div`
   display: flex;
 
   > * {
-    width: 1320px;
+    width: 82.5rem;
   }
 
   @media (max-width: 1200px) {
@@ -578,7 +578,7 @@ const Title = styled.div`
 `;
 
 const ModifyButton = styled.div`
-  width: 1320px;
+  width: 82.5rem;
   display: flex;
   justify-content: flex-end;
   align-items: center;
@@ -608,7 +608,7 @@ const ModifyText = styled.div`
 `;
 
 const Content = styled.div`
-  width: 1320px;
+  width: 82.5rem;
   transition: all 0.3s ease;
 
   @media (max-width: 1200px) {
@@ -622,7 +622,7 @@ const ProfileBox = styled.div`
 
 const FixedShareButton = styled.div`
   position: absolute;
-  right: -10%;
+  right: -7%;
   top: 13rem;
 
   @media (max-width: 1200px) {
@@ -632,7 +632,7 @@ const FixedShareButton = styled.div`
 
 const FixedAddPostContainer = styled.div`
   position: fixed;
-  right: 10vh;
+  right: 5vh;
   bottom: 10vh;
   z-index: 1000;
   display: flex;

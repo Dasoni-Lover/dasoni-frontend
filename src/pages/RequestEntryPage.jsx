@@ -47,11 +47,10 @@ export default function RequestEntryPage() {
       }
 
       const relationMap = {
-        "친구예요": "친구",
-        "가족이에요": "가족",
-        "연인이에요": "연인",
+        친구예요: "친구",
+        가족이에요: "가족",
+        연인이에요: "연인",
       };
-
 
       const payload = {
         relation: relationMap[formData.relation] || formData.relation,
@@ -62,10 +61,7 @@ export default function RequestEntryPage() {
 
       // natures 개수 체크 (옵션)
       if (payload.natures.length !== 3) {
-        console.warn(
-          "natures는 정확히 3개여야 합니다. 현재:",
-          payload.natures
-        );
+        console.warn("natures는 정확히 3개여야 합니다. 현재:", payload.natures);
         // 필요하면 아래처럼 막을 수 있음
         // return alert("고인을 표현하는 단어 3개를 선택해 주세요.");
       }
@@ -87,7 +83,7 @@ export default function RequestEntryPage() {
   };
 
   return (
-    <div>
+    <div style={{ width: "74rem" }}>
       <BarWrapper>
         <Column>
           <Title>입장 요청 보내기</Title>
@@ -97,8 +93,6 @@ export default function RequestEntryPage() {
             </Subtitle>
             <CancelProcessButton onClick={() => setIsCanceled(true)} />
           </Row>
-
-          {hall && <HallInfo>현재 선택된 추모관: {hall.name}</HallInfo>}
         </Column>
       </BarWrapper>
 

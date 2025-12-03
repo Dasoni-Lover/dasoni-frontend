@@ -1,11 +1,11 @@
-import React, { useState } from "react";
+// src/features/EnterMemorialHall/components/SearchTab.jsx
+import React, { useState, useEffect } from "react";
 import styled from "styled-components";
 import { color, typo } from "../../../styles/tokens";
 import { InputField } from "../../../components/InputField";
 import Button from "../../../components/Button";
 import DatePicker from "../../../components/DatePicker";
 import { searchHalls } from "../../../api/search-hall";
-import YellowCalendar from "../../../assets/calendar-icon-yellow.svg"
 
 export const SearchTab = ({ onSearchResult }) => {
   const [name, setName] = useState("");
@@ -30,6 +30,13 @@ export const SearchTab = ({ onSearchResult }) => {
     const d = padZero(date.getDate());
     return `${y}.${m}.${d}`;
   };
+
+  // ✅ 생일이 변경되었을 때, 선택된 기일이 생일보다 이전이면 초기화
+  useEffect(() => {
+    if (birthdate && deaddate && deaddate < birthdate) {
+      setDeadDate(null);
+    }
+  }, [birthdate, deaddate]);
 
   const handleSearch = async () => {
     setLoading(true);
@@ -86,7 +93,9 @@ export const SearchTab = ({ onSearchResult }) => {
             width="15.625rem"
             height="3.25rem"
             showClear={true}
-            calendarIcon={YellowCalendar}
+            calendarIcon="yellow"
+            // ✅ 오늘 이후 선택 불가
+            maxDate={new Date()}
           />
         </Box2>
 
@@ -95,11 +104,15 @@ export const SearchTab = ({ onSearchResult }) => {
           <DatePicker
             selected={deaddate}
             onChange={setDeadDate}
-            placeholder={todayPlaceholder} // ← 오늘 날짜 적용!
+            placeholder={todayPlaceholder}
             width="15.625rem"
             height="3.25rem"
             showClear={true}
-            calendarIcon={YellowCalendar}
+            calendarIcon="yellow"
+            // ✅ 오늘 이후 선택 불가
+            maxDate={new Date()}
+            // ✅ 생일 이후 날짜만 선택 가능
+            minDate={birthdate || undefined}
           />
         </Box2>
       </Container>

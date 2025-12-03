@@ -8,7 +8,7 @@ export const NoPost = ({ text = "작성한 게시물이 없어요" }) => {
 
 const Wrapper = styled.div`
   display: flex;
-  padding: 1.25rem 0; /* 20px → rem 단위 */
+  padding: 15rem 0; /* 20px → rem 단위 */
   justify-content: center;
   align-items: center;
   align-content: center;

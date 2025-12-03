@@ -69,7 +69,7 @@ export default function WritePostForm({
     : "";
 
   return (
-    <Row $gap={"5.5rem"}>
+    <Row $justify="space-between">
       <Column style={{ height: "33rem" }} $justify={"space-between"}>
         <InputImgCard
           label="사진"

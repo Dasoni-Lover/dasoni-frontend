@@ -95,7 +95,7 @@ export default function VoiceRecord({ file, onReupload, onDelete }) {
 
 const Wrapper = styled.div`
   display: flex;
-  padding: 1.875rem 2.5rem;
+  padding: 1.875rem;
   gap: 2rem;
   align-items: center;
   align-self: stretch;

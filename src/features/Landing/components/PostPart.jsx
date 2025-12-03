@@ -50,7 +50,7 @@ export default function PostPart() {
         <Row
           $align={"center"}
           $justify={"space-between"}
-          style={{ paddingRight: "10rem", marginTop: "10rem" }}
+          style={{ paddingRight: "16rem", marginTop: "10rem" }}
         >
           <LetterInfoText>
             실제 故ㅇㅇㅇ씨의 음성으로 재현한 테스트 편지입니다.
@@ -92,8 +92,8 @@ const ExampleWrapper = styled.div`
 
   --carousel-width: 100%;
   /* 이동 거리 계산용 값(실제 카드 크기가 아니라 애니메이션 거리용으로만 사용됨) */
-  --carousel-item-width: 56rem;
-  --carousel-item-height: 32rem;
+  --carousel-item-width: 100%;
+  --carousel-item-height: 38rem;
   --carousel-item-gap: 2.5rem;
 
   position: relative;
@@ -142,14 +142,13 @@ const LetterItem = styled.article`
 const LetterImg = styled.img`
   display: block;
   width: auto;
-  height: auto; /* 👉 SVG 원본 크기 유지 */
+  height: 38rem;
 `;
 
 const ResponseLetterSection = styled.div`
   width: 100%;
   padding-top: 5rem;
-  padding-left: 14rem;
-  width: 100%;
+  padding-left: 20rem;
   display: flex;
   flex-direction: column;
   margin-bottom: 15rem;

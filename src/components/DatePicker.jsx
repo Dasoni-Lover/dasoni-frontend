@@ -6,6 +6,7 @@ import { ko } from "date-fns/locale";
 import "react-datepicker/dist/react-datepicker.css";
 
 import DefaultIconCalendar from "../assets/calendar-icon-black.svg";
+import YellowCalendar from "../assets/calendar-icon-yellow.svg";
 import DefaultClearIcon from "../assets/input-false-icon.svg";
 import { color, typo } from "../styles/tokens";
 
@@ -25,6 +26,7 @@ const DateInput = forwardRef(
       calendarIcon,
       showClear,
       clearIcon,
+      font,
     },
     ref
   ) => {
@@ -41,7 +43,7 @@ const DateInput = forwardRef(
         </CalendarButton>
 
         {/* 가운데: 날짜 텍스트 */}
-        <InputArea>
+        <InputArea $font={font}>
           <input readOnly value={value || ""} placeholder={placeholder} />
         </InputArea>
 
@@ -54,7 +56,7 @@ const DateInput = forwardRef(
               onClear();
             }}
           >
-            <img src={clearIcon} alt="clear" />
+            <img src={clearIcon} style={{ width: "1.7rem" }} alt="clear" />
           </ClearButton>
         )}
       </DateField>
@@ -66,7 +68,7 @@ const DateInput = forwardRef(
 function DatePicker({
   selected,
   onChange,
-  placeholder = "YYYY/M/D",
+  placeholder = "YYYY/MM/DD",
   dateFormat = "yyyy/M/d",
   borderColor,
   width = "100%",
@@ -74,13 +76,26 @@ function DatePicker({
   showMonthDropdown = true,
   showYearDropdown = true,
 
-  /* showClear 디폴트 → false 로 변경 */
+  // 기본값 font: bodym2
+  font = "bodym2",
+
+  // 기본 아이콘: 검정 아이콘
   calendarIcon = DefaultIconCalendar,
   showClear = false,
   clearIcon = DefaultClearIcon,
 
   ...props
 }) {
+  // calendarIcon이 문자열이면 내부에서 매핑
+  // - "yellow" → YellowCalendar
+  // - 그 외 문자열 / 직접 import한 svg → 그대로 사용
+  const resolvedCalendarIcon =
+    typeof calendarIcon === "string"
+      ? calendarIcon === "yellow"
+        ? YellowCalendar
+        : DefaultIconCalendar
+      : calendarIcon;
+
   return (
     <DatePickerWrapper $width={width}>
       <ReactDatePicker
@@ -95,9 +110,10 @@ function DatePicker({
             $height={height}
             value={selected ? formatDate(selected) : ""}
             onClear={() => onChange(null)}
-            calendarIcon={calendarIcon}
+            calendarIcon={resolvedCalendarIcon}
             showClear={showClear}
             clearIcon={clearIcon}
+            font={font}
           />
         }
         popperPlacement="bottom-start"
@@ -144,8 +160,8 @@ const DateField = styled.div`
   border-radius: 4px;
   border: 1px solid ${({ $borderColor }) => $borderColor || color("black.10")};
   background: ${color("white")};
-  display: grid;
-  grid-template-columns: 2.7rem 1fr 2rem;
+  display: flex;
+  gap: 0.75rem;
   align-items: center;
   padding: 0.62rem 0.94rem;
   box-sizing: border-box;
@@ -171,7 +187,9 @@ const InputArea = styled.div`
     width: 100%;
     border: 0;
     background: transparent;
-    ${typo("bodym")};
+
+    ${({ $font }) => typo($font || "bodym2")};
+
     color: ${color("black.70")};
     outline: none;
     cursor: pointer;
@@ -182,21 +200,12 @@ const InputArea = styled.div`
   }
 `;
 
-const ClearButton = styled.button`
+const ClearButton = styled.div`
   width: 1.7rem;
   height: 1.7rem;
   border: none;
   background: transparent;
-  display: grid;
+  display: flex;
   place-items: center;
   cursor: pointer;
 `;
-
-{
-  /* <DatePicker
-  selected={date}
-  onChange={setDate}
-  calendarIcon={YellowCalendar}
-  showClear={false}
-/> */
-}

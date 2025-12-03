@@ -191,6 +191,7 @@ const Container = styled.div`
   display: flex;
   flex-direction: column;
   gap: 1.75rem;
+  margin-bottom: 5rem;
 `;
 
 const UploadBox = styled.div`

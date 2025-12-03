@@ -95,9 +95,7 @@ export const HomePage = () => {
 
         {/* 🔹 검색결과 0개면 아래처럼 아무 카드도 없지만 NoneList는 안 뜸 */}
         {isSearchEmpty && (
-          <div style={{ marginTop: "1rem", color: color("black.20") }}>
-    
-          </div>
+          <div style={{ marginTop: "1rem", color: color("black.20") }}></div>
         )}
       </Content>
     </Wrapper>
@@ -113,8 +111,7 @@ const Wrapper = styled.div`
 const Text = styled.div`
   ${typo("h1")};
   color: ${color("black.100")};
-  margin-bottom: 6rem;
-  margin-top: 4.37rem;
+  margin: 2.5rem 0;
 `;
 
 const Content = styled.div`

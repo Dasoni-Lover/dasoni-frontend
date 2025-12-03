@@ -16,7 +16,7 @@ export default function GlobalStyle({ children }) {
     "/register": 918,
   };
 
-  const getContentMaxWidth = (path) => CONTENT_MAX_WIDTH_BY_PATH[path] || 1096;
+  const getContentMaxWidth = (path) => CONTENT_MAX_WIDTH_BY_PATH[path] || 82.5;
   const contentMaxWidth = getContentMaxWidth(location.pathname);
 
   const isLoginPage = location.pathname === "/login";
@@ -71,7 +71,6 @@ const MainContent = styled.div`
   flex: 1;
   display: flex;
   flex-direction: column;
-  justify-content: space-between;
   background: ${({ $isLogin, $isRegister }) =>
     $isRegister
       ? "radial-gradient(650.38% 156.37% at 0% 3.41%, #FFC085 9.49%, #FFE2C7 29.81%, #FFF 82.69%)"
@@ -86,7 +85,7 @@ const ContentWrapper = styled.div`
   flex-direction: column;
   align-items: center;
   width: 100%;
-  max-width: ${({ $contentMaxWidth }) => `${$contentMaxWidth}px`};
+  max-width: ${({ $contentMaxWidth }) => `${$contentMaxWidth}rem`};
   margin: 0 auto;
 
   margin-top: 6.25rem;
@@ -94,4 +93,5 @@ const ContentWrapper = styled.div`
 
 const FooterWrapper = styled.footer`
   position: relative;
+  margin-top: auto; /* ⭐ 컨텐츠가 적을 땐 바닥으로, 많으면 아래로 밀리게 */
 `;

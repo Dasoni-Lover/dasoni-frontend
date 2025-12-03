@@ -53,8 +53,8 @@ const Img = styled.img`
 
 const EditIcon = styled.img`
   position: absolute;
-  width: 56px;
-  height: 56px;
+  width: 3.25rem;
+  height: 3.25rem;
   right: 2rem;
   bottom: 2rem;
   cursor: pointer;

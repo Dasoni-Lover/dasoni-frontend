@@ -87,7 +87,6 @@ const Container = styled.div`
   margin-top: 6.25rem;
 
   /* 높이는 내용만큼 + 최소 1뷰포트 */
-  width: 100%;
   min-height: 100vh;
 
   background: transparent;
@@ -100,20 +99,20 @@ const BackgroundLayer = styled.div`
   z-index: -1;
   pointer-events: none;
 
-  /* 1920 x 6195 기준 사이즈로 그라데이션 지정 */
+  /* 100vw x 6195 기준 사이즈로 그라데이션 지정 */
   background-repeat: no-repeat;
-  background-size: 1920px 6195px;
+  background-size: 100vw 6195px;
   background-position: top center;
 
   ${({ $variant }) =>
     $variant === "orange" &&
     css`
-      background-image: radial-gradient(
+      background: radial-gradient(
           279.82% 89.28% at 52.53% 69.51%,
           #fff 56.83%,
           #ffc085 89.65%
         ),
-        linear-gradient(#d9d9d9, #d9d9d9);
+        #d9d9d9;
     `}
 
   ${({ $variant }) =>
@@ -121,7 +120,7 @@ const BackgroundLayer = styled.div`
     css`
       background-image: radial-gradient(
           279.82% 89.28% at 52.53% 69.51%,
-          #fff 67.81%,
+          #fff 70%,
           #a877c4 100%
         ),
         linear-gradient(#d9d9d9, #d9d9d9);
@@ -132,7 +131,7 @@ const BackgroundLayer = styled.div`
     css`
       background-image: radial-gradient(
           279.82% 89.28% at 52.53% 69.51%,
-          #fff 69.43%,
+          #fff 70%,
           #f4938c 87.92%
         ),
         linear-gradient(#d9d9d9, #d9d9d9);
@@ -204,18 +203,18 @@ const RainbowImg = styled.img`
 
 const BlueHouseImg = styled.img`
   ${HoverBase};
-  top: -2.1875rem;
-  right: 5.9375rem;
+  top: -2.5rem;
+  right: 7.8rem;
 `;
 
 const OrangeHouseImg = styled.img`
   ${HoverBase};
   top: -1.5625rem;
-  left: 2.8125rem;
+  left: 3rem;
 `;
 
 const PostBoxImg = styled.img`
   ${HoverBase};
-  top: 3.4375rem;
-  left: 11.875rem;
+  top: 7rem;
+  left: 15.3rem;
 `;

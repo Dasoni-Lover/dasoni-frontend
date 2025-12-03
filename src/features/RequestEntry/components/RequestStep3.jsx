@@ -20,7 +20,7 @@ export default function RequestStep3({ onValidChange, value, onChange }) {
       <StepTitle>고인을 한줄로 소개해 주세요</StepTitle>
 
       <IntroTextArea
-        placeholder="고인은 어떤 사람이었나요?"
+        placeholder={`사용자에게 고인은 어떤 사람이었나요?\n예) 늘 유쾌한 농담으로 모두를 웃게 만들던 사람\n예) 마지막까지 열정을 잃지 않던 멋진 선배님`}
         value={intro}
         onChange={(e) => setIntro(e.target.value)}
       />

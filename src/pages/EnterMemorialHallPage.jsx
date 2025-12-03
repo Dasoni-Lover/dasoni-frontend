@@ -45,23 +45,24 @@ export const EnterMemorialHallPage = () => {
     <Wrapper>
       <Text>추모관 입장하기</Text>
       <SearchTab onSearchResult={setSearchResults} />
-  <Content>
-    {loadingInitial ? (
-      <LoadingText>로딩중...</LoadingText>
-    ) : searchResults.length === 0 ? (
-      <NoneList
-  tab={1}
-  bgColor="#fff"
-  borderColor="#e9e9e9"
-  buttonColor="white"
-  openTexts={["입력하신 정보와 일치하는 추모관이 없어요.", "성함 혹은 생일, 기일을 확인하거나, 직접 추모관을 개설해보시는 건 어떨까요?"]}
-/>
-
-    ) : (
-      <CardListEnter halls={searchResults} onOpenModal={handleOpenModal} />
-    )}
-  </Content>
-
+      <Content>
+        {loadingInitial ? (
+          <LoadingText>로딩중...</LoadingText>
+        ) : searchResults.length === 0 ? (
+          <NoneList
+            tab={1}
+            bgColor="#fff"
+            borderColor="#e9e9e9"
+            buttonColor="white"
+            openTexts={[
+              "입력하신 정보와 일치하는 추모관이 없어요.",
+              "성함 혹은 생일, 기일을 확인하거나, 직접 추모관을 개설해보시는 건 어떨까요?",
+            ]}
+          />
+        ) : (
+          <CardListEnter halls={searchResults} onOpenModal={handleOpenModal} />
+        )}
+      </Content>
 
       {modalVisible && (
         <EnterModal hall={selectedHall} onClose={handleCloseModal} />
@@ -81,8 +82,7 @@ const Wrapper = styled.div`
 const Text = styled.div`
   ${typo("h1")};
   color: ${color("black.100")};
-  margin-bottom: 4rem;
-  margin-top: 4.37rem;
+  margin: 2.5rem 0;
 `;
 
 const Content = styled.div`
