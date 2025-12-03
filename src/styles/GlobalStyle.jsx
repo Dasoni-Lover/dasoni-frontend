@@ -16,7 +16,7 @@ export default function GlobalStyle({ children }) {
     "/register": 918,
   };
 
-  const getContentMaxWidth = (path) => CONTENT_MAX_WIDTH_BY_PATH[path] || 1096;
+  const getContentMaxWidth = (path) => CONTENT_MAX_WIDTH_BY_PATH[path] || 82.5;
   const contentMaxWidth = getContentMaxWidth(location.pathname);
 
   const isLoginPage = location.pathname === "/login";
@@ -86,7 +86,7 @@ const ContentWrapper = styled.div`
   flex-direction: column;
   align-items: center;
   width: 100%;
-  max-width: ${({ $contentMaxWidth }) => `${$contentMaxWidth}px`};
+  max-width: ${({ $contentMaxWidth }) => `${$contentMaxWidth}rem`};
   margin: 0 auto;
 
   margin-top: 6.25rem;
