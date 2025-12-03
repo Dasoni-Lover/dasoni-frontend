@@ -54,7 +54,7 @@ const DateInput = forwardRef(
               onClear();
             }}
           >
-            <img src={clearIcon} alt="clear" />
+            <img src={clearIcon} style={{ width: "1.7rem" }} alt="clear" />
           </ClearButton>
         )}
       </DateField>
@@ -66,7 +66,7 @@ const DateInput = forwardRef(
 function DatePicker({
   selected,
   onChange,
-  placeholder = "YYYY/M/D",
+  placeholder = "YYYY/MM/DD",
   dateFormat = "yyyy/M/d",
   borderColor,
   width = "100%",
@@ -144,8 +144,8 @@ const DateField = styled.div`
   border-radius: 4px;
   border: 1px solid ${({ $borderColor }) => $borderColor || color("black.10")};
   background: ${color("white")};
-  display: grid;
-  grid-template-columns: 2.7rem 1fr 2rem;
+  display: flex;
+  gap: 0.75rem;
   align-items: center;
   padding: 0.62rem 0.94rem;
   box-sizing: border-box;
@@ -171,7 +171,7 @@ const InputArea = styled.div`
     width: 100%;
     border: 0;
     background: transparent;
-    ${typo("bodym")};
+    ${typo("bodym2")};
     color: ${color("black.70")};
     outline: none;
     cursor: pointer;
@@ -182,12 +182,12 @@ const InputArea = styled.div`
   }
 `;
 
-const ClearButton = styled.button`
+const ClearButton = styled.div`
   width: 1.7rem;
   height: 1.7rem;
   border: none;
   background: transparent;
-  display: grid;
+  display: flex;
   place-items: center;
   cursor: pointer;
 `;

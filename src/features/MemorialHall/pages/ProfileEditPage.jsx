@@ -17,6 +17,8 @@ import IconRadioBlank from "../../../assets/icon-radio-blank.svg";
 import IconCheck from "../../../assets/icon-check.svg";
 import { Column, Row } from "../../../styles/flex";
 import ConfirmModal from "../../../components/ConfirmModal";
+import Footer from "../../../components/Footer";
+import YellowCalendar from "../../../assets/calendar-icon-yellow.svg";
 
 export const ProfileEditPage = () => {
   const nav = useNavigate();
@@ -165,6 +167,7 @@ export const ProfileEditPage = () => {
                   selected={birthDate}
                   onChange={setBirthDate}
                   placeholder="YYYY/M/D"
+                  calendarIcon={YellowCalendar}
                 />
               </DateWrapper>
             </InputWrapper>
@@ -178,6 +181,7 @@ export const ProfileEditPage = () => {
                   selected={deathDate}
                   onChange={setDeathDate}
                   placeholder="YYYY/M/D"
+                  calendarIcon={YellowCalendar}
                 />
               </DateWrapper>
             </InputWrapper>
@@ -259,7 +263,6 @@ export const ProfileEditPage = () => {
           </ButtonWrapper>
         </Container>
       </ContentBox>
-
       {/* ✅ 수정 완료 모달 */}
       <ConfirmModal
         isOpen={isConfirmOpen}
@@ -318,6 +321,7 @@ const Box = styled.div`
   border-radius: 20px;
   background: #fff;
   box-shadow: 0 2px 8.2px 0 rgba(0, 0, 0, 0.15);
+  margin-bottom: 5rem;
 `;
 
 const InputWrapper = styled.div`

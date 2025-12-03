@@ -38,10 +38,10 @@ export default function LogInPage() {
       const data = await loginUser(body); // { access_token, refresh_token }
       console.log("login response:", data);
 
-      // ✅ 토큰 저장 헬퍼 사용
+      // 토큰 저장 헬퍼 사용
       setAuthTokens(data);
 
-      // ✅ 헤더 즉시 갱신 트리거
+      // 헤더 즉시 갱신 트리거
       window.dispatchEvent(new Event("authChanged"));
 
       alert("로그인에 성공했습니다.");
@@ -56,9 +56,12 @@ export default function LogInPage() {
 
   return (
     <Wrapper>
-      <LetterImg src={ImgLetter} />
-      <HouseImg src={ImgRainbowHouse} />
       <OutBox>
+        {/* 박스 기준으로 절대 위치 + 카드 뒤 레이어 */}
+        <LetterImg src={ImgLetter} />
+        <HouseImg src={ImgRainbowHouse} />
+
+        {/* 실제 카드 박스 */}
         <Box>
           <TextWrapper>
             <Title>기억이 머무는 다솜 마을에 오신 걸 환영해요</Title>
@@ -112,7 +115,6 @@ export default function LogInPage() {
 }
 
 const Wrapper = styled.div`
-  position: relative;
   display: flex;
   flex-direction: column;
   justify-content: center;
@@ -125,38 +127,58 @@ const Wrapper = styled.div`
   }
 `;
 
+/**
+ * OutBox는 "포지셔닝 컨테이너"
+ * - position: relative 로 두고
+ * - 자식인 이미지들을 absolute로 배치
+ * - 카드(Box)는 그 위에 z-index로 올림
+ */
+const OutBox = styled.div`
+  position: relative;
+  display: inline-flex;
+  justify-content: center;
+  align-items: center;
+`;
+
+/**
+ * ✉️ 편지 이미지 — OutBox 기준 absolute
+ * z-index: 0 → 카드(Box)보다 아래
+ */
 const LetterImg = styled.img`
   position: absolute;
-  z-index: 1;
-  right: -20%;
+  z-index: 0;
+  right: -25%;
   bottom: 20%;
 `;
 
+/**
+ * 🏠 무지개 집 이미지 — OutBox 기준 absolute
+ */
 const HouseImg = styled.img`
   position: absolute;
-  z-index: 1;
-  left: -50%;
+  z-index: 0;
+  left: -70%;
   top: 10%;
 `;
 
-const OutBox = styled.div`
-  z-index: 2;
-  display: inline-flex;
-  padding: 2.1875rem 2.875rem;
-  justify-content: center;
-  align-items: center;
-  gap: 0.625rem;
-  border-radius: 1rem;
-  border: 1px solid #f4f4f4;
-  background: rgba(255, 255, 255, 0.78);
-`;
-
+/**
+ * 📦 실제 흰색 카드
+ * - 배경/테두리/패딩 모두 여기로 이동
+ * - z-index: 1 로 이미지 위에 놓임
+ */
 const Box = styled.div`
+  position: relative;
+  z-index: 1;
   display: flex;
   width: 25.5rem;
   flex-direction: column;
   align-items: center;
   gap: 3.125rem;
+
+  padding: 2.1875rem 2.875rem;
+  border-radius: 1rem;
+  border: 1px solid #f4f4f4;
+  background: rgba(255, 255, 255, 0.78);
 `;
 
 const TextWrapper = styled.div`

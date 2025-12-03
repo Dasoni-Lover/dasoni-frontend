@@ -21,6 +21,9 @@ export default function GlobalStyle({ children }) {
 
   const isLoginPage = location.pathname === "/login";
   const isRegisterPage = location.pathname === "/register";
+  const isProfileEditPage = location.pathname.startsWith(
+    "/memorial/edit-profile"
+  );
 
   const showAuthButtons = isLandingPage || isLoginPage || isRegisterPage;
 
@@ -39,7 +42,7 @@ export default function GlobalStyle({ children }) {
               {children}
             </ContentWrapper>
 
-            {!isLoginPage && !isRegisterPage && (
+            {!isLoginPage && !isRegisterPage && !isProfileEditPage && (
               <FooterWrapper>
                 <Footer />
               </FooterWrapper>
