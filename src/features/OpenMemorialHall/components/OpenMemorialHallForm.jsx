@@ -79,6 +79,7 @@ const WhiteBox = styled.div`
   align-items: flex-start;
   flex-shrink: 0;
 
+  margin-bottom: 5rem;
   border-radius: 1.25rem;
   background: #fff;
   box-shadow: 0 2px 8.2px 0 rgba(0, 0, 0, 0.15);

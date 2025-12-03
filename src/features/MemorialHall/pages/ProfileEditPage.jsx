@@ -17,8 +17,6 @@ import IconRadioBlank from "../../../assets/icon-radio-blank.svg";
 import IconCheck from "../../../assets/icon-check.svg";
 import { Column, Row } from "../../../styles/flex";
 import ConfirmModal from "../../../components/ConfirmModal";
-import Footer from "../../../components/Footer";
-import YellowCalendar from "../../../assets/calendar-icon-yellow.svg";
 
 export const ProfileEditPage = () => {
   const nav = useNavigate();
@@ -167,7 +165,7 @@ export const ProfileEditPage = () => {
                   selected={birthDate}
                   onChange={setBirthDate}
                   placeholder="YYYY/M/D"
-                  calendarIcon={YellowCalendar}
+                  calendarIcon="yellow"
                 />
               </DateWrapper>
             </InputWrapper>
@@ -181,7 +179,7 @@ export const ProfileEditPage = () => {
                   selected={deathDate}
                   onChange={setDeathDate}
                   placeholder="YYYY/M/D"
-                  calendarIcon={YellowCalendar}
+                  calendarIcon="yellow"
                 />
               </DateWrapper>
             </InputWrapper>
@@ -281,7 +279,6 @@ export const ProfileEditPage = () => {
 
 /* 스타일은 네가 준 것 그대로 */
 const Wrapper = styled.div`
-  height: 100vh;
   display: flex;
   flex-direction: column;
   justify-content: flex-start;
@@ -347,7 +344,6 @@ const DateWrapper = styled.div`
 
 const Text = styled.div`
   display: flex;
-  height: 20px;
   width: 50%;
   align-items: center;
   ${typo("bodym2")};

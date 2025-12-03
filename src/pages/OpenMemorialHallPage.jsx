@@ -163,7 +163,7 @@ export default function OpenMemorialHallPage() {
   };
 
   return (
-    <div>
+    <div style={{ width: "74rem" }}>
       <BarWrapper>
         <Column>
           <Title>추모관 개설</Title>

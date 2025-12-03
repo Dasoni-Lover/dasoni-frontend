@@ -156,9 +156,9 @@ export default function MyRecord({ hallId }) {
 
 const Wrapper = styled.div`
   width: 100%;
-  height: 36.8rem;
   display: flex;
   flex-direction: column;
+  margin-bottom: 10rem;
 `;
 
 const ButtonWrapper = styled.div`

@@ -263,6 +263,7 @@ export default function RegisterPage() {
                   borderColor="#DDD"
                   width="15.6rem"
                   maxDate={new Date()} // ✅ 오늘 이후 날짜 선택 불가
+                  font="bodym"
                 />
               </InputBox>
 

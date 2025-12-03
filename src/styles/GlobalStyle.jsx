@@ -21,9 +21,6 @@ export default function GlobalStyle({ children }) {
 
   const isLoginPage = location.pathname === "/login";
   const isRegisterPage = location.pathname === "/register";
-  const isProfileEditPage = location.pathname.startsWith(
-    "/memorial/edit-profile"
-  );
 
   const showAuthButtons = isLandingPage || isLoginPage || isRegisterPage;
 
@@ -42,7 +39,7 @@ export default function GlobalStyle({ children }) {
               {children}
             </ContentWrapper>
 
-            {!isLoginPage && !isRegisterPage && !isProfileEditPage && (
+            {!isLoginPage && !isRegisterPage && (
               <FooterWrapper>
                 <Footer />
               </FooterWrapper>
@@ -74,7 +71,6 @@ const MainContent = styled.div`
   flex: 1;
   display: flex;
   flex-direction: column;
-  justify-content: space-between;
   background: ${({ $isLogin, $isRegister }) =>
     $isRegister
       ? "radial-gradient(650.38% 156.37% at 0% 3.41%, #FFC085 9.49%, #FFE2C7 29.81%, #FFF 82.69%)"
@@ -97,4 +93,5 @@ const ContentWrapper = styled.div`
 
 const FooterWrapper = styled.footer`
   position: relative;
+  margin-top: auto; /* ⭐ 컨텐츠가 적을 땐 바닥으로, 많으면 아래로 밀리게 */
 `;
