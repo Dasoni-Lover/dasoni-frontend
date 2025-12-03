@@ -107,12 +107,12 @@ const BackgroundLayer = styled.div`
   ${({ $variant }) =>
     $variant === "orange" &&
     css`
-      background-image: radial-gradient(
+      background: radial-gradient(
           279.82% 89.28% at 52.53% 69.51%,
           #fff 56.83%,
           #ffc085 89.65%
         ),
-        linear-gradient(#d9d9d9, #d9d9d9);
+        #d9d9d9;
     `}
 
   ${({ $variant }) =>
@@ -120,7 +120,7 @@ const BackgroundLayer = styled.div`
     css`
       background-image: radial-gradient(
           279.82% 89.28% at 52.53% 69.51%,
-          #fff 67.81%,
+          #fff 70%,
           #a877c4 100%
         ),
         linear-gradient(#d9d9d9, #d9d9d9);
@@ -131,7 +131,7 @@ const BackgroundLayer = styled.div`
     css`
       background-image: radial-gradient(
           279.82% 89.28% at 52.53% 69.51%,
-          #fff 69.43%,
+          #fff 70%,
           #f4938c 87.92%
         ),
         linear-gradient(#d9d9d9, #d9d9d9);

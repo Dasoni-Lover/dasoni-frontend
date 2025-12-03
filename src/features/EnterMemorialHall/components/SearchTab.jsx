@@ -5,7 +5,7 @@ import { InputField } from "../../../components/InputField";
 import Button from "../../../components/Button";
 import DatePicker from "../../../components/DatePicker";
 import { searchHalls } from "../../../api/search-hall";
-import YellowCalendar from "../../../assets/calendar-icon-yellow.svg"
+import YellowCalendar from "../../../assets/calendar-icon-yellow.svg";
 
 export const SearchTab = ({ onSearchResult }) => {
   const [name, setName] = useState("");
@@ -95,7 +95,7 @@ export const SearchTab = ({ onSearchResult }) => {
           <DatePicker
             selected={deaddate}
             onChange={setDeadDate}
-            placeholder={todayPlaceholder} // ← 오늘 날짜 적용!
+            placeholder="YYYY/MM/DD"
             width="15.625rem"
             height="3.25rem"
             showClear={true}

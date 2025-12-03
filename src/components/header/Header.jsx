@@ -162,7 +162,7 @@ export default function Header({ showAuthButtons }) {
                 ))}
               </Row>
             </Box>
-
+            <div style={{ width: "6.8rem" }} />
             <OpenBox>
               <AlarmIcon
                 src={isAlarmOpen ? alarmclick : alarm}
@@ -296,9 +296,14 @@ const AlarmIcon = styled.img`
 `;
 
 const OpenBox = styled.div`
-  padding-right: 5.25rem;
+  position: absolute;
+  right: 5.25rem;
   display: flex;
   gap: 2.12rem;
   flex-direction: row;
   align-items: center;
+
+  @media (max-width: 800px) {
+    display: none;
+  }
 `;
