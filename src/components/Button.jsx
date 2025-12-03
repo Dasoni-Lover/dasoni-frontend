@@ -77,4 +77,5 @@ const ButtonWrapper = styled.div`
 
 const Icon = styled.img`
   margin-right: 0.5rem;
+  width: 2rem;
 `;

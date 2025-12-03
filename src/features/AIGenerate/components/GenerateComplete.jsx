@@ -125,7 +125,7 @@ export default function GenerateComplete({
   const displayImage = badgedImage || generatedImage;
 
   return (
-    <Row>
+    <div>
       <Column>
         <Row $justify={"end"} style={{ marginBottom: "3.38rem" }}>
           <CancelProcessButton
@@ -134,7 +134,7 @@ export default function GenerateComplete({
           />
         </Row>
 
-        <Row $gap={"2.8rem"} style={{ marginBottom: "13rem" }}>
+        <Row $justify="space-around" style={{ marginBottom: "13rem" }}>
           <GeneratedImg src={displayImage} alt="생성된 이미지" />
           <Column style={{ width: "24.5rem" }} $justify={"space-between"}>
             <InformText></InformText>
@@ -171,7 +171,7 @@ export default function GenerateComplete({
         onConfirm={goHome}
         onCancel={() => setIsCanceled(false)}
       />
-    </Row>
+    </div>
   );
 }
 
