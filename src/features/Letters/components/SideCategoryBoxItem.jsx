@@ -18,7 +18,7 @@ const Container = styled.div`
   gap: 0.625rem;
   align-self: stretch;
 
-  background: ${({ bgcolor }) => bgcolor || "#fff"};
+  background: ${({ bgcolor }) => bgcolor || ""};
   border-top: ${({ border }) => border || "1px solid #ddd"};
   border-bottom: ${({ border }) => border || "1px solid #ddd"};
   border-radius: 0.25rem;

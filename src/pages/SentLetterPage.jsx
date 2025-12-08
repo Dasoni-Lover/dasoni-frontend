@@ -126,6 +126,7 @@ export const SentLetterPage = () => {
     const hallTitle = hallName ? `故 ${hallName}의 추모관` : "故 추모관";
 
     return (
+        <Background>
         <Wrapper>
             <NavWrapper>
                 <BarNavigate paths={["홈", hallTitle, "편지쓰기"]} />
@@ -197,10 +198,18 @@ export const SentLetterPage = () => {
 
             <SideCategoryBox hallId={hallId} page={page} activeMenu="sent" />
         </Wrapper>
+        </Background>
     );
 };
 
-// ----------------- styled -----------------
+const Background=styled.div`
+  width: 100vw;
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  background: linear-gradient(90deg, #FFF1F2 9.13%, #FFF6EB 76.44%, #FFEFE5 100%);
+`
 
 const Wrapper = styled.div`
     display: flex;

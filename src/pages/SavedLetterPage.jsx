@@ -62,6 +62,7 @@ export const SavedLetterPage = () => {
   };
 
   return (
+    <Background>
     <Wrapper>
       <NavWrapper>
         <BarNavigate paths={["나의 추모관", "임시보관함","편지쓰기"]} />
@@ -117,8 +118,18 @@ export const SavedLetterPage = () => {
 
       {/* 서랍 디자인 전 */}
     </Wrapper>
+    </Background>
   );
 };
+
+const Background=styled.div`
+  width: 100vw;
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  background: linear-gradient(90deg, #FFF1F2 9.13%, #FFF6EB 76.44%, #FFEFE5 100%);
+`
 
 const Wrapper = styled.div`
   display: flex;

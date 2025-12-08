@@ -105,6 +105,7 @@ export const SavedLetterBoxPage = () => {
       : ["홈", `故 ${hallName}의 추모관`, "임시보관함"];
 
   return (
+    <Background>
     <Wrapper>
       <NavWrapper>
         <BarNavigate paths={paths} />
@@ -124,12 +125,20 @@ export const SavedLetterBoxPage = () => {
 
       <SideCategoryBox hallId={hallId} page={page} />
     </Wrapper>
+    </Background>
   );
 };
 
-// ======================
-// Styled-components
-// ======================
+
+const Background=styled.div`
+  width: 100vw;
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  background: linear-gradient(90deg, #FFF1F2 9.13%, #FFF6EB 76.44%, #FFEFE5 100%);
+`
+
 const Wrapper = styled.div`
   display: flex;
   flex-direction: column;

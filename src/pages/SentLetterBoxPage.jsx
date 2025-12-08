@@ -81,6 +81,7 @@ export const SentLetterBoxPage = () => {
   };
 
   return (
+    <Background>
     <Wrapper>
       <NavWrapper>
         <BarNavigate
@@ -128,9 +129,17 @@ export const SentLetterBoxPage = () => {
 
       <SideCategoryBox hallId={hallId} page={page} />
     </Wrapper>
+    </Background>
   );
 };
-
+const Background=styled.div`
+  width: 100vw;
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  background: linear-gradient(90deg, #FFF1F2 9.13%, #FFF6EB 76.44%, #FFEFE5 100%);
+`
 
 const Wrapper = styled.div`
   display: flex;
@@ -139,6 +148,7 @@ const Wrapper = styled.div`
   align-items: center;
   margin-top: 1.81rem;
   position: relative;
+  
 `;
 
 const NavWrapper = styled.div`
