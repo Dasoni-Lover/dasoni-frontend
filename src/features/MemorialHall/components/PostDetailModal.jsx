@@ -6,6 +6,7 @@ import IconChevron from "../../../assets/icon-chevron.svg";
 import ConfirmModal from "../../../components/ConfirmModal";
 import { deletePhoto } from "../../../api/memorial";
 import { useNavigate } from "react-router-dom";
+import defaultprofile from "../../../assets/profile-img-default.svg"
 
 export default function PostDetailModal({
   isOpen,
@@ -100,7 +101,7 @@ export default function PostDetailModal({
         <ModalInner>
           <HeaderRow>
             <AuthorInfo>
-              <Avatar $src={profileImage} />
+              <Avatar $src={profileImage || defaultprofile} />
               <AuthorName>{authorName}</AuthorName>
             </AuthorInfo>
 

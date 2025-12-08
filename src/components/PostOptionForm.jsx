@@ -40,10 +40,8 @@ export default function PostOptionForm({
 
   const handleSubmit = async () => {
     try {
-      if (!content || content.trim().length === 0) {
-        alert("글 내용을 작성해 주세요.");
-        return;
-      }
+      // 글 내용은 선택사항으로 변경
+      const safeContent = content?.trim() || "";
 
       if (!date) {
         alert("사진 속 날짜를 선택해 주세요.");
@@ -61,7 +59,7 @@ export default function PostOptionForm({
         }
 
         const payload = {
-          content: content.trim(),
+          content: safeContent,
           occurredAt,
           isPrivate: isPrivateValue,
         };
@@ -102,7 +100,7 @@ export default function PostOptionForm({
       // 3) 업로드된 파일 URL로 게시글 등록
       const payload = {
         url: fileUrl,
-        content: content.trim(),
+        content: safeContent,
         occurredAt,
         isPrivate: scope === "private",
         isAI: isAI,
@@ -134,11 +132,12 @@ export default function PostOptionForm({
             <img src={IconEssential} alt="필수" />
           </Row>
 
-          {/* ✨ 초기값을 가진 DatePicker */}
           <DatePicker
             selected={date}
             onChange={setDate}
             placeholder="YYYY/M/D"
+            maxDate={new Date()} 
+            direction="row-reverse" 
           />
         </Column>
 

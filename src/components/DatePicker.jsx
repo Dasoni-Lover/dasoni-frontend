@@ -27,6 +27,7 @@ const DateInput = forwardRef(
       showClear,
       clearIcon,
       font,
+      $direction, // <- 전달받는 방향 prop
     },
     ref
   ) => {
@@ -36,6 +37,7 @@ const DateInput = forwardRef(
         ref={ref}
         $borderColor={borderColor}
         $height={$height}
+        $direction={$direction}
       >
         {/* 왼쪽: 달력 아이콘 */}
         <CalendarButton type="button">
@@ -84,6 +86,9 @@ function DatePicker({
   showClear = false,
   clearIcon = DefaultClearIcon,
 
+  // 내부 요소 flex 방향: "row" 또는 "row-reverse"
+  direction = "row",
+
   ...props
 }) {
   // calendarIcon이 문자열이면 내부에서 매핑
@@ -114,6 +119,7 @@ function DatePicker({
             showClear={showClear}
             clearIcon={clearIcon}
             font={font}
+            $direction={direction} // <- 전달
           />
         }
         popperPlacement="bottom-start"
@@ -167,6 +173,9 @@ const DateField = styled.div`
   box-sizing: border-box;
   cursor: pointer;
   position: relative;
+
+  /* 전달된 방향을 사용 (기본 row) */
+  flex-direction: ${({ $direction }) => $direction || "row"};
 `;
 
 const CalendarButton = styled.div`
