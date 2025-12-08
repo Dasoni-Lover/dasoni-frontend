@@ -1,5 +1,5 @@
 import React from "react";
-import styled, { css } from "styled-components";
+import styled from "styled-components";
 import { useNavigate } from "react-router-dom";
 import { color, typo } from "../../../styles/tokens";
 import profileimg from "../../../assets/icon-profile-default.svg";
@@ -111,21 +111,6 @@ const Wrapper = styled.div`
   box-shadow: 0 0 16px 0 rgba(0, 0, 0, 0.08);
   transition: all 0.2s ease;
 
-  ${({ status }) =>
-    status === "WAITING" &&
-    css`
-      &:hover {
-        transform: none;
-      }
-    `}
-
-  ${({ hoverable }) =>
-    hoverable &&
-    css`
-      &:hover {
-        transform: translateY(-8px);
-      }
-    `}
 `;
 
 const Box = styled.div`

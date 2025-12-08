@@ -8,6 +8,7 @@ import { Row } from "../../styles/flex";
 import { color, typo } from "../../styles/tokens";
 import { clearAuthTokens, getAccessToken, logoutUser } from "../../api/auth";
 import { getProfileInfo } from "../../api/user";
+import { fetchNotifications } from "../../api/notification";
 import MiniProfile from "./MiniProflie";
 import AlarmPanel from "../alarm/AlarmPanel";
 import alarm from "../../assets/bell-icon-gray.svg";
@@ -18,6 +19,21 @@ import LogoutBox from "./LogoutBox";
 export default function Header({ showAuthButtons }) {
   const navigate = useNavigate();
   const location = useLocation();
+
+  const [notifications, setNotifications] = useState([]);
+
+  const loadNotifications = async () => {
+    try {
+      const data = await fetchNotifications();
+      setNotifications(data.notifications || []);
+    } catch (err) {
+      console.error("알림 불러오기 실패:", err);
+    }
+  };
+
+  useEffect(() => {
+      loadNotifications();
+    }, []);
 
   const [profileInfo, setProfileInfo] = useState({
     name: "로그인",
@@ -165,26 +181,31 @@ export default function Header({ showAuthButtons }) {
             </Box>
             <div style={{ width: "6.8rem" }} />
             <OpenBox>
-              <AlarmIcon
-                src={isAlarmOpen ? alarmclick : alarm}
-                onClick={handleAlarmClick}
-                data-ignore-close="true"
-              />
+  <AlarmWrapper>
+    <AlarmIcon
+      src={isAlarmOpen ? alarmclick : alarm}
+      onClick={handleAlarmClick}
+      data-ignore-close="true"
+    />
+    {/* 알림 개수가 0보다 클 때만 빨간 뱃지 표시 */}
+    {notifications.length > 0 && <AlarmBadge></AlarmBadge>}
 
-              {isAlarmOpen && 
-              ReactDOM.createPortal(
-                <AlarmPanel onClose={() => setIsAlarmOpen(false)} />,
-                document.getElementById("portal-root")
-              )}
+    {isAlarmOpen &&
+      ReactDOM.createPortal(
+        <AlarmPanel onClose={() => setIsAlarmOpen(false)} />,
+        document.getElementById("portal-root")
+      )}
+  </AlarmWrapper>
 
-              <div onClick={handleProfileClick} data-ignore-close="true">
-                <MiniProfile
-                  name={isLoggedIn ? profileInfo.name : "로그인 해주세요"}
-                  profileImg={profileInfo.myProfile}
-                  isLogin={isLoggedIn}
-                />
-              </div>
-            </OpenBox>
+  <div onClick={handleProfileClick} data-ignore-close="true">
+    <MiniProfile
+      name={isLoggedIn ? profileInfo.name : "로그인 해주세요"}
+      profileImg={profileInfo.myProfile}
+      isLogin={isLoggedIn}
+    />
+  </div>
+</OpenBox>
+
           </>
         )}
 
@@ -311,4 +332,23 @@ const OpenBox = styled.div`
   @media (max-width: 800px) {
     display: none;
   }
+`;
+const AlarmWrapper = styled.div`
+  position: relative;
+`;
+
+const AlarmBadge = styled.div`
+  position: absolute;
+  top: 0.21rem;   // 위쪽 안쪽에서 0.21rem
+  right: 0.21rem; // 오른쪽 안쪽에서 0.21rem
+  width: 0.625rem;
+  height: 0.625rem;
+  background-color: #D74D4D;
+  border-radius: 50%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  color: white;
+  font-size: 0.625rem;
+  font-weight: 700;
 `;

@@ -75,9 +75,6 @@ const Wrapper = styled.div`
   box-shadow: 0 0 16px 0 rgba(0, 0, 0, 0.08);
   transition: all 0.2s ease;
 
-  &:hover {
-    transform: translateY(-4px);
-  }
 `;
 
 const Box = styled.div`
