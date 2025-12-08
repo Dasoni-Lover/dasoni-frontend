@@ -4,32 +4,28 @@ import { useLocation } from 'react-router-dom';
 
 import BarNavigate from '../components/BarNavigate';
 import { color, typo } from '../styles/tokens';
-
-import letterIcon1 from "../features/Letters/assets/read-letter-icon.svg";
-import letterIcon2 from "../features/Letters/assets/notread-letter-icon.svg"; 
-
 import SideCategoryBox from "../features/Letters/components/SideCategoryBox";
 import TapeModal from '../features/Letters/components/TapeModal';
 
-import { fetchReceivedReplies } from "../api/letters";
+import { fetchReceivedReplies, fetchReceivedReplyDetail } from "../api/letters";
 import { getHallInfo } from "../api/memorial";
+
+import letterIcon1 from "../features/Letters/assets/read-letter-icon.svg";
+import letterIcon2 from "../features/Letters/assets/notread-letter-icon.svg";
 
 const RecievedLetterBoxPage = () => {
   const location = useLocation();
-
   const hallId = location.state?.hallId;
   const page = location.state?.page;
 
-  const [replyCount, setReplyCount] = useState(0);
   const [replies, setReplies] = useState([]);
   const [hallName, setHallName] = useState("");
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedReply, setSelectedReply] = useState(null);
-
   const [readCount, setReadCount] = useState(0);
   const [unreadCount, setUnreadCount] = useState(0);
 
-  // 추모관 정보 불러오기
+  // 추모관 정보
   useEffect(() => {
     if (!hallId) return;
     const loadHallInfo = async () => {
@@ -43,22 +39,15 @@ const RecievedLetterBoxPage = () => {
     loadHallInfo();
   }, [hallId]);
 
-  // 받은 편지 목록 불러오기
+  // 받은 편지 목록
   useEffect(() => {
     if (!hallId) return;
     const loadReplies = async () => {
       try {
         const data = await fetchReceivedReplies(hallId);
-
-        setReplyCount(data.totalCount);
         setReplies(data.replies);
-
-        const unread = data.replies.filter((r) => !r.isChecked).length;
-        const read = data.replies.filter((r) => r.isChecked).length;
-
-        setUnreadCount(unread);
-        setReadCount(read);
-
+        setUnreadCount(data.unreadCount);
+        setReadCount(data.readCount);
       } catch (err) {
         console.error("받은 편지함 조회 실패:", err);
       }
@@ -66,27 +55,25 @@ const RecievedLetterBoxPage = () => {
     loadReplies();
   }, [hallId]);
 
-  const handleIconClick = (item) => {
-    setSelectedReply(item); 
-    setIsModalOpen(true);
+  // 편지 클릭 시 상세 조회 후 모달 열기
+  const handleIconClick = async (reply) => {
+    try {
+      const detail = await fetchReceivedReplyDetail(hallId, reply.replyId);
+      setSelectedReply(detail);
+      setIsModalOpen(true);
+    } catch (err) {
+      console.error("편지 상세 조회 실패:", err);
+    }
   };
 
   return (
     <Wrapper>
       <NavWrapper>
-        <BarNavigate
-          paths={["홈", `故 ${hallName}의 추모관`, "받은 편지함"]}
-        />
+        <BarNavigate paths={["홈", `故 ${hallName}의 추모관`, "받은 편지함"]} />
       </NavWrapper>
 
       <TextWrapper>
-        <Count>총 {replyCount}개의 받은 편지가 있어요</Count>
-        <Text>
-          잠시 그리움에 머무르되, 이곳에 머물러 있지 말고 고인과 함께했던 기억을 품은 채 오늘의 삶으로 천천히 돌아가 주세요
-          <br />사랑은 사라지지 않고 여전히 당신 안에서, 따뜻한 온기로 오래도록 남아있을 거예요
-          <br />
-          <BoldText>*음성 편지는 생전 고인의 정보를 바탕으로 만든 가상의 AI 창작물이에요</BoldText>
-        </Text>
+        <Count>총 {readCount + unreadCount}개의 받은 편지가 있어요</Count>
       </TextWrapper>
 
       <StateBox>
@@ -104,18 +91,16 @@ const RecievedLetterBoxPage = () => {
       <ContentWrapper>
         {replies.map((item) => (
           <Box key={item.replyId} onClick={() => handleIconClick(item)}>
-            <LetterIcon
-              src={item.isChecked ? letterIcon1 : letterIcon2}
-            />
-            {!item.isChecked && <NewBadge>NEW</NewBadge>}
+            <LetterIcon src={item.isChecked ? letterIcon1 : letterIcon2} />
             <Date>{item.createdAt}</Date>
           </Box>
         ))}
+
       </ContentWrapper>
 
       <SideCategoryBox hallId={hallId} page={page} />
 
-      {isModalOpen && (
+      {isModalOpen && selectedReply && (
         <TapeModal 
           onCancel={() => setIsModalOpen(false)}
           data={selectedReply}
@@ -127,7 +112,6 @@ const RecievedLetterBoxPage = () => {
 
 export default RecievedLetterBoxPage;
 
-// Styled Components
 const Wrapper = styled.div`
   width: 68.5rem;
   display: flex;

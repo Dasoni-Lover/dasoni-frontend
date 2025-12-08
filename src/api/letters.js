@@ -56,13 +56,10 @@ export const deleteLetter = async (hallId, letterId) => {
   return client.post(`/api/halls/${hallId}/letters/${letterId}/delete`);
 };
 
-// 받은 편지함 조회 (Reply List)
+// 받은 편지함 전체 조회
 export const fetchReceivedReplies = async (hallId) => {
   try {
     const res = await client.get(`/api/halls/${hallId}/letters/reply/list`);
-
-    console.log("📨 받은 편지함 조회:", res.data);
-
     const { totalCount, unreadCount, readCount, replies } = res.data || {};
 
     return {
@@ -72,14 +69,11 @@ export const fetchReceivedReplies = async (hallId) => {
       replies: replies?.map((r) => ({
         replyId: r.replyId,
         createdAt: r.createdAt,
-        isChecked: r.isChecked, // true: 읽음, false: 안 읽음
+        isChecked: r.isChecked,
       })) || [],
     };
   } catch (err) {
-    console.error("❌ 받은 편지함 조회 실패:", {
-      status: err.response?.status,
-      data: err.response?.data,
-    });
+    console.error("❌ 받은 편지함 조회 실패:", err.response?.data || err);
     throw err;
   }
 };
@@ -87,12 +81,7 @@ export const fetchReceivedReplies = async (hallId) => {
 // 받은 편지 상세 조회
 export const fetchReceivedReplyDetail = async (hallId, replyId) => {
   try {
-    const res = await client.get(
-      `/api/halls/${hallId}/letters/reply/${replyId}`
-    );
-
-    console.log("📨 받은 편지 상세 조회:", res.data);
-
+    const res = await client.get(`/api/halls/${hallId}/letters/reply/${replyId}`);
     return {
       toName: res.data?.toName || "",
       fromName: res.data?.fromName || "",
@@ -101,14 +90,10 @@ export const fetchReceivedReplyDetail = async (hallId, replyId) => {
       createdAt: res.data?.date || "",
     };
   } catch (err) {
-    console.error("❌ 받은 편지 상세 조회 실패:", {
-      status: err.response?.status,
-      data: err.response?.data,
-    });
+    console.error("❌ 받은 편지 상세 조회 실패:", err.response?.data || err);
     throw err;
   }
 };
-
 
 
 
