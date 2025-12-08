@@ -35,7 +35,7 @@ const ProfileContainer = styled.div`
 const ProfileImage = styled.img`
   width: 3.125rem;
   height: 3.125rem;
-  border-radius: 3px;
+  border-radius: 0.1875rem;
   object-fit: cover;
 `;
 

@@ -1,5 +1,6 @@
 // src/components/header/Header.jsx
 import React, { useEffect, useState } from "react";
+import ReactDOM from "react-dom";
 import styled from "styled-components";
 import { useLocation, useNavigate } from "react-router-dom";
 import logo from "../../assets/logo.svg";
@@ -170,8 +171,10 @@ export default function Header({ showAuthButtons }) {
                 data-ignore-close="true"
               />
 
-              {isAlarmOpen && (
-                <AlarmPanel onClose={() => setIsAlarmOpen(false)} />
+              {isAlarmOpen && 
+              ReactDOM.createPortal(
+                <AlarmPanel onClose={() => setIsAlarmOpen(false)} />,
+                document.getElementById("portal-root")
               )}
 
               <div onClick={handleProfileClick} data-ignore-close="true">
@@ -196,7 +199,8 @@ export default function Header({ showAuthButtons }) {
       </Wrapper>
 
       {/* MiniProfile 아래에 LogoutBox 표시 */}
-      {isLogoutBoxOpen && (
+      {isLogoutBoxOpen &&
+        ReactDOM.createPortal(
         <LogoutBox
           name={profileInfo.name}
           profileImg={profileInfo.myProfile}
@@ -213,7 +217,8 @@ export default function Header({ showAuthButtons }) {
             }
           }}
           onClose={() => setIsLogoutBoxOpen(false)}
-        />
+        />,
+        document.getElementById("portal-root")
       )}
     </>
   );

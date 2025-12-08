@@ -1,3 +1,4 @@
+// AlarmPanel.jsx
 import React, { useRef, useEffect } from "react";
 import styled from "styled-components";
 import Button from "../Button";
@@ -7,7 +8,6 @@ import { AlarmList } from "./AlarmList";
 const AlarmPanel = ({ onClose }) => {
   const panelRef = useRef(null);
 
-  //바깥 클릭 감지
   useEffect(() => {
     const handleClickOutside = (e) => {
       if (
@@ -53,23 +53,21 @@ const Panel = styled.div`
   top: 5.06rem;
   right: 13.75rem;
   width: 27.4375rem;
-  max-height: 33.25rem;
   border-radius: 1.875rem;
   border: 1px solid var(--outline, #f2e8df);
-  background: var(--0, #fff);
+  background: white;
   box-shadow: -4px 18px 41.4px 0 rgba(0, 0, 0, 0.11);
   padding-top: 1.875rem;
   z-index: 9;
-  transition: all 0.3s ease;
-
   display: flex;
   flex-direction: column;
   align-items: flex-start;
+  z-index: 30001;
 `;
 
 const Header = styled.div`
   display: flex;
-  width: 27.4375rem;
+  width: 100%;
   padding: 0 2.5rem;
   justify-content: space-between;
   align-items: center;
@@ -82,10 +80,11 @@ const Title = styled.div`
   color: ${color("black.70")};
 `;
 
+// ✅ 여기서 높이 제어
 const Wrapper = styled.div`
   width: 100%;
-  flex: 1; /* 남는 공간 꽉 채움 */
   box-sizing: border-box;
-  overflow: hidden; /* 내부 스크롤만 사용 */
   border-radius: 0 0 1.875rem 1.875rem;
+  overflow: hidden;
+  background: #fff4e6;
 `;
