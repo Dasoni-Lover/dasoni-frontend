@@ -59,12 +59,15 @@ export const SavedLetterBoxPage = () => {
   };
 
   // -------------------------
-  // 📌 편지 클릭 → LeaveLetterPage 이동
+  // 📌 편지 클릭 → 페이지 분기 이동
   // -------------------------
   const handleSelectLetter = async (letterId) => {
     try {
       const detail = await fetchTempLetterDetail(hallId, letterId);
-      navigate("/leave-letter", {
+
+      const targetPath = page === "me" ? "/leave-letter" : "/sent-letter";
+
+      navigate(targetPath, {
         state: {
           hallId,
           page,
@@ -79,6 +82,7 @@ export const SavedLetterBoxPage = () => {
       console.error("❌ 상세 조회 실패:", err);
     }
   };
+
 
   // -------------------------
   // ⭐ 임시 저장 편지 삭제 기능
@@ -114,6 +118,7 @@ export const SavedLetterBoxPage = () => {
           onItemClick={handleSelectLetter}
           onDelete={handleDeleteLetter}    // ⭐ 여기 연결
           showDelete={true}
+          page={page}
         />
       </LetterListWrapper>
 

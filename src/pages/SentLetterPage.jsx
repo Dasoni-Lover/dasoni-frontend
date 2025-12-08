@@ -49,7 +49,7 @@ export const SentLetterPage = () => {
     }, [hallId, navigate]);
 
     const isActive =
-        letterText.trim().length >= 50 &&
+        letterText.trim().length >0 &&
         toName.trim().length > 0 &&
         fromName.trim().length > 0;
 
@@ -143,8 +143,8 @@ export const SentLetterPage = () => {
                 <DescriptionHover>
                     <HoverToolTip>
                         <UnorderedList>
-                            <li>{hallName}님의 기일을 챙기는 방식에 대해 적어보세요</li>
-                            <li>미처 사과하지 못했거나 풀고 싶은 마음에 대해 적어보세요</li>
+                            <li>{hallName}님과 함께한 소중한 추억에 대해 적어보세요</li>
+                            <li>{hallName}님에게 들려주고 싶은 나의 근황에 대해 적어보세요</li>
                         </UnorderedList>
                     </HoverToolTip>
                     <DescriptionText>무슨 이야기를 적어야 할지 고민되시나요?</DescriptionText>

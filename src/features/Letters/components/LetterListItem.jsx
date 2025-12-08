@@ -4,12 +4,13 @@ import styled from 'styled-components';
 import { color, typo } from '../../../styles/tokens';
 import deleteicon from "../assets/delete-icon.svg";
 
+
 export const LetterListItem = ({
   letter,
   onClick,
   onDelete,
   isNarrow,
-  showDelete = false
+  showDelete = false,
 }) => {
   return (
     <Container onClick={onClick}>
@@ -21,18 +22,21 @@ export const LetterListItem = ({
         <Content>{letter.excerpt}</Content>
       </Left>
 
-      <Delete
-        src={deleteicon}
+      {/* ✅ 클릭 영역 확장 wrapper */}
+      <DeleteButton
         $visible={showDelete}
         onClick={(e) => {
           if (!showDelete) return;
           e.stopPropagation();
           onDelete(letter.letterId);
         }}
-      />
+      >
+        <DeleteIcon src={deleteicon} />
+      </DeleteButton>
     </Container>
   );
 };
+
 
 const Container = styled.div`
   cursor: pointer;
@@ -59,12 +63,23 @@ const Left = styled.div`
   transition: width 0.3s ease;
 `;
 
-const Delete = styled.img`
-  width: 0.875rem;
-  height: 0.875rem;
+const DeleteButton = styled.div`
+  width: 2rem;
+  height: 2rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+
   opacity: ${({ $visible }) => ($visible ? 1 : 0)};
   pointer-events: ${({ $visible }) => ($visible ? "auto" : "none")};
 `;
+
+const DeleteIcon = styled.img`
+  width: 1rem;
+  height: 1rem;
+`;
+
 
 const Wrapper = styled.div`
   display: flex;

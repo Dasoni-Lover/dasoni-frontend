@@ -21,7 +21,7 @@ export const SavedLetterPage = () => {
 
 
   const isActive =
-    letterText.trim().length >= 50 &&
+    letterText.trim().length > 0 &&
     toName.trim().length > 0 &&
     fromName.trim().length > 0;
 
