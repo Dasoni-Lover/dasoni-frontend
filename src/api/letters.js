@@ -63,16 +63,16 @@ export const fetchReceivedReplies = async (hallId) => {
 
     console.log("📨 받은 편지함 조회:", res.data);
 
-    const { count, replies } = res.data || {};
+    const { totalCount, unreadCount, readCount, replies } = res.data || {};
 
     return {
-      count: count ?? 0,
+      totalCount: totalCount ?? 0,
+      unreadCount: unreadCount ?? 0,
+      readCount: readCount ?? 0,
       replies: replies?.map((r) => ({
         replyId: r.replyId,
-        userName: r.userName,
-        subjectName: r.subjectName,   // 고인 이름
         createdAt: r.createdAt,
-        isChecked: r.isChecked,
+        isChecked: r.isChecked, // true: 읽음, false: 안 읽음
       })) || [],
     };
   } catch (err) {
@@ -84,6 +84,30 @@ export const fetchReceivedReplies = async (hallId) => {
   }
 };
 
+// 받은 편지 상세 조회
+export const fetchReceivedReplyDetail = async (hallId, replyId) => {
+  try {
+    const res = await client.get(
+      `/api/halls/${hallId}/letters/reply/${replyId}`
+    );
+
+    console.log("📨 받은 편지 상세 조회:", res.data);
+
+    return {
+      toName: res.data?.toName || "",
+      fromName: res.data?.fromName || "",
+      content: res.data?.content || "",
+      audioUrl: res.data?.audioUrl || null,
+      createdAt: res.data?.date || "",
+    };
+  } catch (err) {
+    console.error("❌ 받은 편지 상세 조회 실패:", {
+      status: err.response?.status,
+      data: err.response?.data,
+    });
+    throw err;
+  }
+};
 
 
 

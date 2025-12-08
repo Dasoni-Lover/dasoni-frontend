@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import styled from 'styled-components';
-import { useLocation} from 'react-router-dom';
+import { useLocation } from 'react-router-dom';
 
 import BarNavigate from '../components/BarNavigate';
 import { color, typo } from '../styles/tokens';
@@ -26,13 +26,12 @@ const RecievedLetterBoxPage = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedReply, setSelectedReply] = useState(null);
 
-
-  // 읽은 / 안읽은 편지 개수 상태 추가
   const [readCount, setReadCount] = useState(0);
   const [unreadCount, setUnreadCount] = useState(0);
 
   // 추모관 정보 불러오기
   useEffect(() => {
+    if (!hallId) return;
     const loadHallInfo = async () => {
       try {
         const data = await getHallInfo(hallId);
@@ -41,20 +40,19 @@ const RecievedLetterBoxPage = () => {
         console.error("추모관 정보 조회 실패:", err);
       }
     };
-
-    if (hallId) loadHallInfo();
+    loadHallInfo();
   }, [hallId]);
 
   // 받은 편지 목록 불러오기
   useEffect(() => {
+    if (!hallId) return;
     const loadReplies = async () => {
       try {
         const data = await fetchReceivedReplies(hallId);
 
-        setReplyCount(data.count);
+        setReplyCount(data.totalCount);
         setReplies(data.replies);
 
-        // 읽은/안읽은 개수 자동 계산
         const unread = data.replies.filter((r) => !r.isChecked).length;
         const read = data.replies.filter((r) => r.isChecked).length;
 
@@ -65,17 +63,13 @@ const RecievedLetterBoxPage = () => {
         console.error("받은 편지함 조회 실패:", err);
       }
     };
-
-    if (hallId) loadReplies();
+    loadReplies();
   }, [hallId]);
 
-
-
-const handleIconClick = (item) => {  // item 전달!
-  setSelectedReply(item); 
-  setIsModalOpen(true);
-};
-
+  const handleIconClick = (item) => {
+    setSelectedReply(item); 
+    setIsModalOpen(true);
+  };
 
   return (
     <Wrapper>
@@ -95,7 +89,6 @@ const handleIconClick = (item) => {  // item 전달!
         </Text>
       </TextWrapper>
 
-      {/* 읽은/안읽은 편지 수 표시 */}
       <StateBox>
         <StateContainer>
           <StateContent>읽지 않은 편지</StateContent>
@@ -111,36 +104,30 @@ const handleIconClick = (item) => {  // item 전달!
       <ContentWrapper>
         {replies.map((item) => (
           <Box key={item.replyId} onClick={() => handleIconClick(item)}>
-
-            {/* 읽음 여부에 따른 아이콘 변경 */}
             <LetterIcon
               src={item.isChecked ? letterIcon1 : letterIcon2}
             />
+            {!item.isChecked && <NewBadge>NEW</NewBadge>}
             <Date>{item.createdAt}</Date>
           </Box>
         ))}
-        {/* <LetterIcon
-              src={letterIcon1}
-              onClick={handleIconClick}
-            /> 테스트용 */}
       </ContentWrapper>
 
       <SideCategoryBox hallId={hallId} page={page} />
+
       {isModalOpen && (
         <TapeModal 
           onCancel={() => setIsModalOpen(false)}
           data={selectedReply}
         />
       )}
-
-
     </Wrapper>
   );
 };
 
 export default RecievedLetterBoxPage;
 
-
+// Styled Components
 const Wrapper = styled.div`
   width: 68.5rem;
   display: flex;
@@ -237,7 +224,6 @@ const Date = styled.div`
   color: ${color("black.50")};
   margin-top: 0.25rem;
 `;
-
 
 const NewBadge = styled.div`
   position: absolute;
