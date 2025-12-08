@@ -13,14 +13,11 @@ export const SearchTab = ({ onSearchResult }) => {
   const [deaddate, setDeadDate] = useState(null);
   const [loading, setLoading] = useState(false);
 
+  // ✅ 이름이 비어있는지 체크
+  const isNameEmpty = !name.trim();
+
   // 한 자리 수 → 2자리 문자열
   const padZero = (num) => String(num).padStart(2, "0");
-
-  // today placeholder 생성
-  const today = new Date();
-  const todayPlaceholder = `${today.getFullYear()}/${padZero(
-    today.getMonth() + 1
-  )}/${padZero(today.getDate())}`;
 
   // Date → "YYYY.MM.DD"
   const formatDate = (date) => {
@@ -31,7 +28,7 @@ export const SearchTab = ({ onSearchResult }) => {
     return `${y}.${m}.${d}`;
   };
 
-  // ✅ 생일이 변경되었을 때, 선택된 기일이 생일보다 이전이면 초기화
+  // 생일 > 기일 방지
   useEffect(() => {
     if (birthdate && deaddate && deaddate < birthdate) {
       setDeadDate(null);
@@ -39,6 +36,9 @@ export const SearchTab = ({ onSearchResult }) => {
   }, [birthdate, deaddate]);
 
   const handleSearch = async () => {
+    // ✅ 안전 장치 (혹시 강제로 호출될 경우 대비)
+    if (isNameEmpty || loading) return;
+
     setLoading(true);
     try {
       const body = {
@@ -78,7 +78,8 @@ export const SearchTab = ({ onSearchResult }) => {
             icon="search"
             style={{ padding: "0.46rem" }}
             onClick={handleSearch}
-            disabled={loading}
+            // ✅ 이름이 없거나 로딩 중이면 비활성화
+            disabled={loading || isNameEmpty}
           />
         </ButtonBox>
       </Box>
@@ -94,7 +95,6 @@ export const SearchTab = ({ onSearchResult }) => {
             height="3.25rem"
             showClear={true}
             calendarIcon="yellow"
-            // ✅ 오늘 이후 선택 불가
             maxDate={new Date()}
           />
         </Box2>
@@ -104,14 +104,12 @@ export const SearchTab = ({ onSearchResult }) => {
           <DatePicker
             selected={deaddate}
             onChange={setDeadDate}
-            placeholder={todayPlaceholder}
+            placeholder="YYYY/MM/DD"
             width="15.625rem"
             height="3.25rem"
             showClear={true}
             calendarIcon="yellow"
-            // ✅ 오늘 이후 선택 불가
             maxDate={new Date()}
-            // ✅ 생일 이후 날짜만 선택 가능
             minDate={birthdate || undefined}
           />
         </Box2>
@@ -120,6 +118,7 @@ export const SearchTab = ({ onSearchResult }) => {
   );
 };
 
+// styled-components는 그대로 유지
 const Wrapper = styled.div`
   display: flex;
   flex-direction: column;

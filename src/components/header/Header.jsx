@@ -92,8 +92,8 @@ export default function Header({ showAuthButtons }) {
 
   const menuItems = [
     { label: "홈", path: "/home" },
-    { label: "입장하기", path: "/enter" },
-    { label: "개설하기", path: "/open" },
+    { label: "추모관 검색하기", path: "/enter" },
+    { label: "추모관 개설하기", path: "/open" },
     { label: "나의 추모관", path: "/memorial" },
   ];
 

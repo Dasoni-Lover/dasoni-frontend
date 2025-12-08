@@ -15,7 +15,6 @@ const tagTextByStatus = {
 export const CardListItemEnter = ({ hall, onOpenModal, hoverable = true }) => {
   const navigate = useNavigate();
 
-  // ⭐ 버튼 클릭 시 동작
   const handleButtonClick = () => {
     if (!hall) return;
 
@@ -38,13 +37,28 @@ export const CardListItemEnter = ({ hall, onOpenModal, hoverable = true }) => {
     }
   };
 
+    // 앞자리 0 제거 함수 추가
+  const formatDate = (dateStr) => {
+    if (!dateStr) return "";
+
+    const parts = dateStr.split(".");
+    if (parts.length !== 3) return dateStr;
+
+    const [y, m, d] = parts;
+    const month = String(Number(m)); // "09" -> "9"
+    const day = String(Number(d));   // "09" -> "9"
+
+    return `${y}.${month}.${day}.`;
+  };
+
+
   const profile = hall?.profile || profileimg;
   const name = hall?.name || "이름 미상";
-  const birthday = hall?.birthday || "-";
-  const deadday = hall?.deadDay || "-";
+  const birthday = formatDate(hall?.birthday)|| "";
+  const deadday = formatDate(hall?.deadDay)|| "";
   const adminName = hall?.adminName || "-";
 
-  // ⭐ status 기반 버튼 설정
+  // status 기반 버튼 설정
   const buttonText = tagTextByStatus[hall.status];
   const buttonActive = hall.status !== "WAITING"; // WAITING만 비활성화
 

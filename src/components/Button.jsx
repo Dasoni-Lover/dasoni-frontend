@@ -3,6 +3,7 @@ import styled from "styled-components";
 import { color, typo } from "../styles/tokens";
 import IconFolder from "../assets/icon-folder.svg";
 import IconAdd from "../assets/icon-add.svg";
+import IconAdd2 from "../features/Home/assets/icon-add2.svg"
 import IconSearch from "../assets/icon-search.svg";
 import IconRestart from "../assets/icon-restart.svg";
 import IconDownload from "../assets/icon-download-black.svg";
@@ -13,6 +14,7 @@ export default function Button({
   color: variant = "main",
   active = true,
   width = "100%",
+  height = null,
   icon = false,
   ...rest
 }) {
@@ -23,6 +25,7 @@ export default function Button({
     search: IconSearch,
     restart: IconRestart,
     download: IconDownload,
+    add2: IconAdd2,
   };
 
   const iconSrc =
@@ -38,6 +41,7 @@ export default function Button({
       $color={variant}
       $active={active}
       $width={width}
+      $height={height}
       {...rest}
     >
       {iconSrc && <Icon src={iconSrc} alt="icon" />}
@@ -58,6 +62,7 @@ const ButtonWrapper = styled.div`
 
   box-sizing: border-box;
   width: ${({ $width }) => $width};
+  height: ${({ $height }) => ($height ? $height : "auto")};
   padding: ${({ $size }) =>
     $size === "S" ? "5px 13px" : "0.8125rem 1.875rem"};
   border-radius: 0.5rem;
