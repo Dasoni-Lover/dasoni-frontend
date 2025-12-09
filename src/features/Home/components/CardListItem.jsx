@@ -3,7 +3,7 @@ import React from "react";
 import styled from "styled-components";
 import { useNavigate } from "react-router-dom";
 import { color, typo } from "../../../styles/tokens";
-import profileimg from "../../../assets/icon-profile-default.svg";
+import profileimg from "../../../assets/icon-profile-default.png";
 import {MediumPhotoBox} from "../../../components/photobox/MediumPhotoBox"
 import Button from "../../../components/Button";
 
