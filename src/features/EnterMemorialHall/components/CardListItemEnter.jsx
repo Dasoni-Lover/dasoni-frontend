@@ -167,4 +167,7 @@ const ButtonWrapper = styled.div`
   display: flex;
   width: 100%;
   margin-top: 1.25rem;
+  :hover{
+    background-color: #F8E4CA;
+  }
 `;
