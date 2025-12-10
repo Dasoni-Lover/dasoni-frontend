@@ -27,7 +27,6 @@ export const getLetterStatus = async (hallId) => {
   };
 };
 
-
 // 보낸 편지 리스트 조회
 export const fetchLettersList = async (hallId) => {
   const res = await client.get(`/api/halls/${hallId}/letters/list`);
@@ -67,13 +66,14 @@ export const fetchReceivedReplies = async (hallId) => {
 
     return {
       count: count ?? 0,
-      replies: replies?.map((r) => ({
-        replyId: r.replyId,
-        userName: r.userName,
-        subjectName: r.subjectName,   // 고인 이름
-        createdAt: r.createdAt,
-        isChecked: r.isChecked,
-      })) || [],
+      replies:
+        replies?.map((r) => ({
+          replyId: r.replyId,
+          userName: r.userName,
+          subjectName: r.subjectName, // 고인 이름
+          createdAt: r.createdAt,
+          isChecked: r.isChecked,
+        })) || [],
     };
   } catch (err) {
     console.error("❌ 받은 편지함 조회 실패:", {
@@ -83,10 +83,6 @@ export const fetchReceivedReplies = async (hallId) => {
     throw err;
   }
 };
-
-
-
-
 
 //임시보관함
 
@@ -102,9 +98,9 @@ export const fetchTempLettersList = async (hallId) => {
       console.log("🔍 each letter:", l);
       return {
         ...l,
-        letterId: l.letterId,   // ⭐ 여기 수정!
+        letterId: l.letterId, // ⭐ 여기 수정!
         createdAt: l.date,
-        excerpt: l.content?.slice(0, 20) || "",  // 리스트 미리보기용(선택)
+        excerpt: l.content?.slice(0, 20) || "", // 리스트 미리보기용(선택)
       };
     });
   } catch (err) {
@@ -115,8 +111,6 @@ export const fetchTempLettersList = async (hallId) => {
     throw err;
   }
 };
-
-
 
 // 임시보관함 편지 상세 조회
 export const fetchTempLetterDetail = async (hallId, letterId) => {
@@ -150,4 +144,13 @@ export const deleteTempLetter = async (hallId, letterId) => {
     });
     throw err;
   }
+};
+
+// 초기 고인 정보 설정 생성
+export const createLetterSettings = async (hallId, payload) => {
+  const res = await client.post(
+    `/api/halls/${hallId}/letters/settings/create`,
+    payload
+  );
+  return res.data;
 };

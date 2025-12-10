@@ -11,6 +11,8 @@ import CancelProcessButton from "../../../components/CancelProcessButton";
 import { Row, Column } from "../../../styles/flex";
 
 import { getHallInfo } from "../../../api/memorial";
+import { createLetterSettings } from "../../../api/letters";
+import { uploadVoiceFile } from "../../../api/voice";
 import SetTheDeadForm from "../components/SetTheDeadForm";
 import ConfirmModal from "../../../components/ConfirmModal";
 
@@ -19,18 +21,18 @@ export default function SetTheDeadPage() {
   const navigate = useNavigate();
 
   const hallId = location.state?.hallId;
-  const page = location.state?.page; // "admin" | "follower" (현재 구조상 me는 안 옴)
+  const page = location.state?.page; // "admin" | "follower" | "me" (실제 호출은 admin/follower)
 
-  // 👇 역할 플래그
+  // ✅ 역할 플래그 (관리자 여부)
   const isManager = page === "admin";
 
   const [hallName, setHallName] = useState("");
   const [step, setStep] = useState(1);
-  // ✅ 관리자면 6단계, 방문자면 5단계
-  const MAX_STEP = isManager ? 6 : 5;
+  const MAX_STEP = isManager ? 6 : 5; // ✅ 관리자 6단계, 방문자 5단계
 
   const [isStepValid, setIsStepValid] = useState(false);
   const [isCanceled, setIsCanceled] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   // 전체 폼 데이터
   const [formData, setFormData] = useState({
@@ -57,25 +59,59 @@ export default function SetTheDeadPage() {
   }, [hallId]);
 
   const hallTitle = hallName ? `故 ${hallName}의 추모관` : "故 추모관";
-
   const isLastStep = step === MAX_STEP;
 
-  const handleNext = () => {
-    if (!isStepValid) return;
+  // ✅ 다음 버튼
+  const handleNext = async () => {
+    if (!isStepValid || isSubmitting) return;
 
+    // 마지막 단계가 아니면 단순 step 증가
     if (step < MAX_STEP) {
       setStep((prev) => prev + 1);
       return;
     }
 
-    // ✅ 마지막 단계(관리자는 6, 방문자는 5)에서 저장 처리
-    console.log("🔍 최종 고인 정보 formData:", formData);
-    // TODO: 저장 API 연결
+    // ✅ 마지막 단계 → API 호출
+    if (!hallId) {
+      alert("추모관 정보가 없습니다.");
+      return;
+    }
+
+    try {
+      setIsSubmitting(true);
+
+      // 1) 관리자 + 음성 파일 있을 때만 S3 업로드
+      let voiceUrl = null;
+      if (isManager && formData.voiceFile) {
+        voiceUrl = await uploadVoiceFile(hallId, formData.voiceFile);
+      }
+
+      // 2) payload 매핑
+      const payload = {
+        detail: formData.relation, // 관계(사랑하는 사이 등)
+        explain: formData.about, // 고인에 대한 설명
+        isPolite: formData.tone === "존댓말", // true: 존댓말, false: 반말
+        calledName: formData.nickname, // 애칭/호칭
+        speakHabit: formData.frequentWords, // 자주 쓰던 말
+        voiceUrl: voiceUrl, // 관리자면 url, 아니면 null
+      };
+
+      await createLetterSettings(hallId, payload);
+
+      // 3) 완료 후 이동 (원하는 경로로 변경 가능)
+      navigate("/sent-letterbox", {
+        state: { hallId, page, activeMenu: "sent" },
+      });
+    } catch (e) {
+      console.error("고인 정보 설정 저장 실패:", e);
+      alert("고인 정보 저장에 실패했습니다. 잠시 후 다시 시도해 주세요.");
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   const handlePrevOrCancel = () => {
     if (step === 1) {
-      // 첫 단계에서 '취소' 클릭 → 편지 리스트로 이동 (또는 홈)
       navigate("/home");
       return;
     }
@@ -112,8 +148,8 @@ export default function SetTheDeadPage() {
         <Row $justify={"space-between"} $align={"flex-start"}>
           <SetTheDeadForm
             step={step}
-            maxStep={MAX_STEP} // 🔹 총 단계 수 전달
-            isManager={isManager} // 🔹 관리자 여부 전달
+            maxStep={MAX_STEP}
+            isManager={isManager}
             onStepValidChange={setIsStepValid}
             formData={formData}
             setFormData={setFormData}
@@ -125,7 +161,7 @@ export default function SetTheDeadPage() {
               width="14rem"
               text={isLastStep ? "완료" : "다음"}
               onClick={handleNext}
-              active={isStepValid}
+              active={isStepValid && !isSubmitting}
             />
             {step !== 1 && (
               <Button
