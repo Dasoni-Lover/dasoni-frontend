@@ -100,7 +100,7 @@ const router = createBrowserRouter([
         loader: authGuard,
       },
       {
-        path: "/edit-hallinfo",
+        path: "/set-the-dead",
         element: <SetTheDeadPage />,
         loader: authGuard,
       },
