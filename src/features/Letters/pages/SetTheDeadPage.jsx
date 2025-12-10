@@ -11,39 +11,46 @@ import CancelProcessButton from "../../../components/CancelProcessButton";
 import { Row, Column } from "../../../styles/flex";
 
 import { getHallInfo } from "../../../api/memorial";
-import { createLetterSettings } from "../../../api/letters";
+import { createLetterSettings, getLetterSettings } from "../../../api/letters";
 import { uploadVoiceFile } from "../../../api/voice";
 import SetTheDeadForm from "../components/SetTheDeadForm";
 import ConfirmModal from "../../../components/ConfirmModal";
+
+import EditTheDeadForm from "../components/EditTheDeadForm";
 
 export default function SetTheDeadPage() {
   const location = useLocation();
   const navigate = useNavigate();
 
   const hallId = location.state?.hallId;
-  const page = location.state?.page; // "admin" | "follower" | "me" (실제 호출은 admin/follower)
+  const page = location.state?.page; // "admin" | "follower" | "me"
 
-  // ✅ 역할 플래그 (관리자 여부)
   const isManager = page === "admin";
-
   const [hallName, setHallName] = useState("");
   const [step, setStep] = useState(1);
-  const MAX_STEP = isManager ? 6 : 5; // ✅ 관리자 6단계, 방문자 5단계
+  const MAX_STEP = isManager ? 6 : 5;
 
   const [isStepValid, setIsStepValid] = useState(false);
   const [isCanceled, setIsCanceled] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  // 전체 폼 데이터
+  // ✅ 기존 폼 데이터
   const [formData, setFormData] = useState({
     relation: "",
     nickname: "",
     frequentWords: "",
-    tone: "", // "존댓말" | "반말"
+    tone: "",
     about: "",
     voiceFile: null,
   });
 
+  // ✅ 고인정보 설정 여부 확인용 상태
+  const [existingSettings, setExistingSettings] = useState(null);
+  const [isSettingsLoaded, setIsSettingsLoaded] = useState(false);
+
+  const isEditing = isSettingsLoaded && !!existingSettings;
+
+  // 추모관 이름
   useEffect(() => {
     const fetchHallName = async () => {
       if (!hallId) return;
@@ -58,20 +65,59 @@ export default function SetTheDeadPage() {
     fetchHallName();
   }, [hallId]);
 
-  const hallTitle = hallName ? `故 ${hallName}의 추모관` : "故 추모관";
-  const isLastStep = step === MAX_STEP;
+  // ✅ 고인정보 설정 조회
+  useEffect(() => {
+    const fetchSettings = async () => {
+      if (!hallId) return;
+      try {
+        const data = await getLetterSettings(hallId);
 
-  // ✅ 다음 버튼
-  const handleNext = async () => {
-    if (!isStepValid || isSubmitting) return;
+        // ✅ 응답 전체가 null 값인지 검사
+        const hasAnyValue =
+          data &&
+          (data.detail != null ||
+            data.explanation != null ||
+            data.isPolite != null ||
+            data.calledName != null ||
+            data.speakHabit != null ||
+            data.voiceUrl != null);
 
-    // 마지막 단계가 아니면 단순 step 증가
-    if (step < MAX_STEP) {
-      setStep((prev) => prev + 1);
-      return;
-    }
+        if (hasAnyValue) {
+          // ⭐ 실제 값이 하나라도 있으면 "수정 모드"
+          setExistingSettings(data);
 
-    // ✅ 마지막 단계 → API 호출
+          setFormData((prev) => ({
+            ...prev,
+            relation: data.detail || "",
+            about: data.explanation || "",
+            tone:
+              data.isPolite == null ? "" : data.isPolite ? "존댓말" : "반말",
+            nickname: data.calledName || "",
+            frequentWords: data.speakHabit || "",
+            voiceFile: null,
+          }));
+        } else {
+          // ⭐ 모두 null이면 "처음 작성"으로 간주
+          setExistingSettings(null);
+          setFormData({
+            relation: "",
+            nickname: "",
+            frequentWords: "",
+            tone: "",
+            about: "",
+            voiceFile: null,
+          });
+        }
+      } catch (err) {
+        console.error("고인 정보 설정 조회 실패:", err);
+      } finally {
+        setIsSettingsLoaded(true);
+      }
+    };
+
+    fetchSettings();
+  }, [hallId]);
+  const submitSettings = async () => {
     if (!hallId) {
       alert("추모관 정보가 없습니다.");
       return;
@@ -80,25 +126,24 @@ export default function SetTheDeadPage() {
     try {
       setIsSubmitting(true);
 
-      // 1) 관리자 + 음성 파일 있을 때만 S3 업로드
-      let voiceUrl = null;
+      // 기존 voiceUrl 유지 (새 파일 업로드 시에만 교체)
+      let voiceUrl = existingSettings?.voiceUrl || null;
+
       if (isManager && formData.voiceFile) {
         voiceUrl = await uploadVoiceFile(hallId, formData.voiceFile);
       }
 
-      // 2) payload 매핑
       const payload = {
-        detail: formData.relation, // 관계(사랑하는 사이 등)
-        explain: formData.about, // 고인에 대한 설명
-        isPolite: formData.tone === "존댓말", // true: 존댓말, false: 반말
-        calledName: formData.nickname, // 애칭/호칭
-        speakHabit: formData.frequentWords, // 자주 쓰던 말
-        voiceUrl: voiceUrl, // 관리자면 url, 아니면 null
+        detail: formData.relation,
+        explain: formData.about,
+        isPolite: formData.tone === "존댓말",
+        calledName: formData.nickname,
+        speakHabit: formData.frequentWords,
+        voiceUrl: voiceUrl,
       };
 
       await createLetterSettings(hallId, payload);
 
-      // 3) 완료 후 이동 (원하는 경로로 변경 가능)
       navigate("/sent-letterbox", {
         state: { hallId, page, activeMenu: "sent" },
       });
@@ -108,6 +153,21 @@ export default function SetTheDeadPage() {
     } finally {
       setIsSubmitting(false);
     }
+  };
+
+  const hallTitle = hallName ? `故 ${hallName}의 추모관` : "故 추모관";
+  const isLastStep = step === MAX_STEP;
+
+  const handleNext = async () => {
+    if (!isStepValid || isSubmitting) return;
+
+    if (step < MAX_STEP) {
+      setStep((prev) => prev + 1);
+      return;
+    }
+
+    // 마지막 단계 → 저장
+    await submitSettings();
   };
 
   const handlePrevOrCancel = () => {
@@ -124,59 +184,94 @@ export default function SetTheDeadPage() {
 
   return (
     <Container>
-      {/* 왼쪽 사이드 카테고리 */}
       <SideCategoryBox hallId={hallId} page={page} />
 
-      {/* 오른쪽 메인 영역 */}
       <MainWrapper>
         <NavWrapper>
           <BarNavigate paths={["홈", hallTitle, "고인 정보 설정"]} />
-          <Row
-            $justify={"space-between"}
-            $align={"center"}
-            style={{ marginTop: "4.5rem" }}
-          >
-            <Title>고인 정보 설정</Title>
-            <CancelProcessButton
-              title="작성 그만두기"
-              onClick={handleCancelProcess}
-            />
-          </Row>
+
+          {/* 새로 작성일 때만 상단 "작성 그만두기" 버튼 노출 */}
+          {!isEditing && (
+            <Row
+              $justify={"space-between"}
+              $align={"center"}
+              style={{ marginTop: "4.5rem" }}
+            >
+              <Title>고인 정보 설정</Title>
+              <CancelProcessButton
+                title="작성 그만두기"
+                onClick={handleCancelProcess}
+              />
+            </Row>
+          )}
         </NavWrapper>
 
-        {/* 본문: 폼 + 버튼 영역 */}
-        <Row $justify={"space-between"} $align={"flex-start"}>
-          <SetTheDeadForm
-            step={step}
-            maxStep={MAX_STEP}
-            isManager={isManager}
-            onStepValidChange={setIsStepValid}
-            formData={formData}
-            setFormData={setFormData}
-          />
-
-          <Column $gap={"1rem"}>
-            <Button
-              size="M"
-              width="14rem"
-              text={isLastStep ? "완료" : "다음"}
-              onClick={handleNext}
-              active={isStepValid && !isSubmitting}
+        {/* ✅ 이미 설정된 경우: 수정 폼 */}
+        {isEditing ? (
+          <Row $justify={"space-between"} $align={"flex-start"}>
+            <EditTheDeadForm
+              formData={formData}
+              setFormData={setFormData}
+              isManager={isManager}
+              voiceUrl={existingSettings?.voiceUrl}
             />
-            {step !== 1 && (
+
+            <Column $gap={"1rem"}>
+              <Button
+                size="M"
+                width="14rem"
+                text="저장하기"
+                onClick={submitSettings}
+                active={!isSubmitting}
+              />
               <Button
                 size="M"
                 width="14rem"
                 color="white"
-                text="뒤로"
-                onClick={handlePrevOrCancel}
+                text="취소"
+                onClick={() =>
+                  navigate("/sent-letterbox", {
+                    state: { hallId, page, activeMenu: "sent" },
+                  })
+                }
               />
-            )}
-          </Column>
-        </Row>
+            </Column>
+          </Row>
+        ) : (
+          // ✅ 설정이 없을 때만 단계형 폼 + 버튼
+          <Row $justify={"space-between"} $align={"flex-start"}>
+            <SetTheDeadForm
+              step={step}
+              maxStep={MAX_STEP}
+              isManager={isManager}
+              onStepValidChange={setIsStepValid}
+              formData={formData}
+              setFormData={setFormData}
+            />
+
+            <Column $gap={"1rem"}>
+              <Button
+                size="M"
+                width="14rem"
+                text={isLastStep ? "완료" : "다음"}
+                onClick={handleNext}
+                active={isStepValid && !isSubmitting}
+              />
+              {step !== 1 && (
+                <Button
+                  size="M"
+                  width="14rem"
+                  color="white"
+                  text="뒤로"
+                  onClick={handlePrevOrCancel}
+                />
+              )}
+            </Column>
+          </Row>
+        )}
       </MainWrapper>
 
-      {/*  그만두기 클릭 시 */}
+      {/* 그만두기 모달 그대로 유지 */}
       <ConfirmModal
         isOpen={isCanceled}
         title="작성을 그만둘까요?"
@@ -215,4 +310,17 @@ const NavWrapper = styled.div`
 const Title = styled.div`
   ${typo("h3")};
   color: ${color("black.100")};
+`;
+
+/* ✅ 이미 설정된 경우 보여줄 박스 */
+const AlreadySetBox = styled.div`
+  padding: 3.25rem;
+  border-radius: 1.25rem;
+  background: #fff;
+  box-shadow: 0 2px 8.2px 0 rgba(0, 0, 0, 0.15);
+`;
+
+const AlreadySetText = styled.div`
+  ${typo("h3")};
+  color: ${color("black.70")};
 `;

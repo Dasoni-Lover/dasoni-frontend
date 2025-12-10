@@ -154,3 +154,17 @@ export const createLetterSettings = async (hallId, payload) => {
   );
   return res.data;
 };
+
+//고인 정보 설정 조회
+export const getLetterSettings = async (hallId) => {
+  try {
+    const res = await client.get(`/api/halls/${hallId}/letters/settings`);
+    return res.data; // 설정 있으면 위 명세 예시 형태
+  } catch (e) {
+    // 설정이 아예 없는 경우 404로 내려올 수 있으니 안전하게 null 반환
+    if (e.response && e.response.status === 404) {
+      return null;
+    }
+    throw e;
+  }
+};

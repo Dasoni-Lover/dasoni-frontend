@@ -5,7 +5,7 @@ import playicon from "../assets/icon-play.svg";
 import pauseicon from "../assets/icon-pause.svg"; // 아직 미생성
 import { color, typo } from "../../../styles/tokens";
 
-export default function VoiceRecord({ file, onReupload, onDelete }) {
+export default function VoiceRecord({ file, url, onReupload, onDelete }) {
   const audioRef = useRef(null);
   const [isPlaying, setIsPlaying] = useState(false);
   const [currentTime, setCurrentTime] = useState(0);
@@ -13,12 +13,22 @@ export default function VoiceRecord({ file, onReupload, onDelete }) {
   const [fileUrl, setFileUrl] = useState("");
 
   useEffect(() => {
+    // ✅ file이 있으면 objectURL 생성
     if (file) {
-      const url = URL.createObjectURL(file);
-      setFileUrl(url);
-      return () => URL.revokeObjectURL(url);
+      const objectUrl = URL.createObjectURL(file);
+      setFileUrl(objectUrl);
+      return () => URL.revokeObjectURL(objectUrl);
     }
-  }, [file]);
+
+    // ✅ file은 없고 url만 있으면 그대로 사용
+    if (!file && url) {
+      setFileUrl(url);
+      return;
+    }
+
+    // 둘 다 없으면 초기화
+    setFileUrl("");
+  }, [file, url]);
 
   const handlePlayPause = () => {
     if (!audioRef.current) return;
