@@ -44,28 +44,36 @@ export const AlarmList = () => {
       console.error("알림 닫기 실패:", err);
     }
 
-    // 🔹 kind별 경로 분류
-    let path = "";
+    let path = "/";
+    let state = {};
+
     switch (item.kind) {
       case "입장 요청":
       case "입장 승인":
-        path = `/memorial?h=${item.hallId}`;
+        path = "/memorial";
+        state = { hallId: item.hallId };
         break;
+
       case "편지 도착":
-        path = `/received-letterbox?h=${item.hallId}`;
+        path = "/received-letterbox";
+        state = { hallId: item.hallId };
         break;
+
       case "생일 알림":
       case "기일 알림":
       case "설날 알림":
       case "추석 알림":
-        path = `/sent-letterbox?h=${item.hallId}`;
+        path = "/sent-letterbox";
+        state = { hallId: item.hallId };
         break;
+
       default:
         path = "/";
+        state = {};
         break;
     }
 
-    navigate(path);
+    navigate(path, { state });
   };
 
   useEffect(() => {
@@ -106,20 +114,22 @@ export const AlarmList = () => {
   );
 };
 
-// 스크롤되는 영역
+/* ========== styles ========== */
+
 const Container = styled.div`
   width: 100%;
   overflow-y: auto;
 
   &::-webkit-scrollbar {
     width: 0.375rem;
-    background: transparent; 
+    background: transparent;
   }
 
   &::-webkit-scrollbar-thumb {
     border-radius: 1.25rem;
-    background: var(--50, #7A7A7A); 
+    background: var(--50, #7a7a7a);
   }
+
   border-radius: 0 0 1.875rem 1.875rem;
 `;
 
