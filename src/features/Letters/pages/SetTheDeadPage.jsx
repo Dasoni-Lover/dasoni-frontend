@@ -11,7 +11,12 @@ import CancelProcessButton from "../../../components/CancelProcessButton";
 import { Row, Column } from "../../../styles/flex";
 
 import { getHallInfo } from "../../../api/memorial";
-import { createLetterSettings, getLetterSettings } from "../../../api/letters";
+import {
+  createLetterSettings,
+  getLetterSettings,
+  updateLetterSettings,
+} from "../../../api/letters";
+import IconCheck from "../../../assets/icon-check.svg";
 import { uploadVoiceFile } from "../../../api/voice";
 import SetTheDeadForm from "../components/SetTheDeadForm";
 import ConfirmModal from "../../../components/ConfirmModal";
@@ -33,6 +38,7 @@ export default function SetTheDeadPage() {
   const [isStepValid, setIsStepValid] = useState(false);
   const [isCanceled, setIsCanceled] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isConfirmOpen, setIsConfirmOpen] = useState(false);
 
   // ✅ 기존 폼 데이터
   const [formData, setFormData] = useState({
@@ -49,6 +55,13 @@ export default function SetTheDeadPage() {
   const [isSettingsLoaded, setIsSettingsLoaded] = useState(false);
 
   const isEditing = isSettingsLoaded && !!existingSettings;
+
+  // ✅ 공통 이동 함수: 항상 hallId / page / activeMenu 포함해서 이동
+  const goSentLetterBox = () => {
+    navigate("/sent-letterbox", {
+      state: { hallId, page, activeMenu: "sent" },
+    });
+  };
 
   // 추모관 이름
   useEffect(() => {
@@ -117,6 +130,7 @@ export default function SetTheDeadPage() {
 
     fetchSettings();
   }, [hallId]);
+
   const submitSettings = async () => {
     if (!hallId) {
       alert("추모관 정보가 없습니다.");
@@ -126,11 +140,19 @@ export default function SetTheDeadPage() {
     try {
       setIsSubmitting(true);
 
-      // 기존 voiceUrl 유지 (새 파일 업로드 시에만 교체)
-      let voiceUrl = existingSettings?.voiceUrl || null;
+      // 🔹 역할별 voiceUrl 처리
+      let voiceUrl = null;
 
-      if (isManager && formData.voiceFile) {
-        voiceUrl = await uploadVoiceFile(hallId, formData.voiceFile);
+      if (isManager) {
+        // 관리자라면: 새로 업로드한 파일이 있으면 업로드, 없으면 기존 값 유지
+        if (formData.voiceFile) {
+          voiceUrl = await uploadVoiceFile(hallId, formData.voiceFile);
+        } else {
+          voiceUrl = existingSettings?.voiceUrl || null;
+        }
+      } else {
+        // 방문자/친구(me, follower)는 voiceUrl을 보내지 않거나 null로 보냄
+        voiceUrl = null;
       }
 
       const payload = {
@@ -142,11 +164,15 @@ export default function SetTheDeadPage() {
         voiceUrl: voiceUrl,
       };
 
-      await createLetterSettings(hallId, payload);
+      // 🔹 최초 생성 vs 수정 분기
+      if (isEditing) {
+        await updateLetterSettings(hallId, payload);
+      } else {
+        await createLetterSettings(hallId, payload);
+      }
 
-      navigate("/sent-letterbox", {
-        state: { hallId, page, activeMenu: "sent" },
-      });
+      // 🔹 저장 완료 모달 띄우기
+      setIsConfirmOpen(true);
     } catch (e) {
       console.error("고인 정보 설정 저장 실패:", e);
       alert("고인 정보 저장에 실패했습니다. 잠시 후 다시 시도해 주세요.");
@@ -172,7 +198,8 @@ export default function SetTheDeadPage() {
 
   const handlePrevOrCancel = () => {
     if (step === 1) {
-      navigate("/home");
+      // ⬅️ 첫 단계에서 "뒤로" → 현재 추모관 정보·역할을 들고 보낸 편지함으로
+      goSentLetterBox();
       return;
     }
     setStep((prev) => prev - 1);
@@ -229,11 +256,7 @@ export default function SetTheDeadPage() {
                 width="14rem"
                 color="white"
                 text="취소"
-                onClick={() =>
-                  navigate("/sent-letterbox", {
-                    state: { hallId, page, activeMenu: "sent" },
-                  })
-                }
+                onClick={goSentLetterBox}
               />
             </Column>
           </Row>
@@ -271,17 +294,34 @@ export default function SetTheDeadPage() {
         )}
       </MainWrapper>
 
-      {/* 그만두기 모달 그대로 유지 */}
+      {/* 작성 그만두기 모달 */}
       <ConfirmModal
         isOpen={isCanceled}
         title="작성을 그만둘까요?"
         description="작성한 내용은 저장되지 않고 사라져요"
         confirmText="그만두기"
         cancelText="취소"
-        onConfirm={() => navigate("/home")}
+        onConfirm={goSentLetterBox}
         onCancel={() => {
           setIsCanceled(false);
         }}
+      />
+
+      {/* ✅ 저장 완료 모달 (생성 / 수정에 따라 타이틀 분기) */}
+      <ConfirmModal
+        isOpen={isConfirmOpen}
+        title={
+          isEditing
+            ? "변경사항을 성공적으로 저장했어요"
+            : "고인정보등록을 완료했어요"
+        }
+        image={IconCheck}
+        confirmText="확인"
+        onConfirm={() => {
+          setIsConfirmOpen(false);
+          goSentLetterBox();
+        }}
+        onCancel={() => setIsConfirmOpen(false)}
       />
     </Container>
   );
@@ -312,7 +352,7 @@ const Title = styled.div`
   color: ${color("black.100")};
 `;
 
-/* ✅ 이미 설정된 경우 보여줄 박스 */
+/* 안 쓰고 있지만 혹시 몰라 남겨둔 스타일 */
 const AlreadySetBox = styled.div`
   padding: 3.25rem;
   border-radius: 1.25rem;

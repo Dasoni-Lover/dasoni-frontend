@@ -168,3 +168,7 @@ export const getLetterSettings = async (hallId) => {
     throw e;
   }
 };
+
+// 고인 정보 수정
+export const updateLetterSettings = (hallId, body) =>
+  client.post(`/api/halls/${hallId}/letters/settings/update`, body);
