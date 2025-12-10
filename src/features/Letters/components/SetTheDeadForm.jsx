@@ -14,6 +14,8 @@ import SetStep6 from "./SetStep6";
 
 export default function SetTheDeadForm({
   step = 1,
+  maxStep = 6, // 🔹 총 단계 수 (관리자 6, 방문자 5)
+  isManager = true, // 🔹 관리자 여부
   onStepValidChange,
   formData,
   setFormData,
@@ -27,13 +29,16 @@ export default function SetTheDeadForm({
     }
   }, [step, onStepValidChange]);
 
+  // 진행바용 배열 (1~maxStep)
+  const stepsArray = Array.from({ length: maxStep }, (_, i) => i + 1);
+
   return (
     <Wrapper>
       {/* 상단 흰색 카드 */}
       <WhiteBox>
         {/* 상단 진행바 */}
         <Row $gap={"0.58rem"} style={{ marginBottom: "1rem" }}>
-          {[1, 2, 3, 4, 5, 6].map((i) => (
+          {stepsArray.map((i) => (
             <ProgressBar key={i} $active={step >= i} />
           ))}
         </Row>
@@ -74,7 +79,9 @@ export default function SetTheDeadForm({
             setFormData={setFormData}
           />
         )}
-        {step === 6 && (
+
+        {/* ✅ 관리자일 때만 6단계 렌더링 */}
+        {isManager && step === 6 && (
           <SetStep6
             onValidChange={onStepValidChange}
             formData={formData}
@@ -124,7 +131,6 @@ const Wrapper = styled.div`
 
 const WhiteBox = styled.div`
   display: flex;
-
   padding: 3.25rem;
   flex-direction: column;
   justify-content: center;

@@ -19,16 +19,20 @@ export default function SetTheDeadPage() {
   const navigate = useNavigate();
 
   const hallId = location.state?.hallId;
-  const page = location.state?.page;
+  const page = location.state?.page; // "admin" | "follower" (현재 구조상 me는 안 옴)
+
+  // 👇 역할 플래그
+  const isManager = page === "admin";
 
   const [hallName, setHallName] = useState("");
   const [step, setStep] = useState(1);
-  const MAX_STEP = 6;
+  // ✅ 관리자면 6단계, 방문자면 5단계
+  const MAX_STEP = isManager ? 6 : 5;
 
   const [isStepValid, setIsStepValid] = useState(false);
   const [isCanceled, setIsCanceled] = useState(false);
 
-  // 전체 폼 데이터 (필요하면 나중에 API payload로 사용)
+  // 전체 폼 데이터
   const [formData, setFormData] = useState({
     relation: "",
     nickname: "",
@@ -64,8 +68,9 @@ export default function SetTheDeadPage() {
       return;
     }
 
-    // ✅ TODO: 마지막 단계(완료)에서 저장 API 연동
+    // ✅ 마지막 단계(관리자는 6, 방문자는 5)에서 저장 처리
     console.log("🔍 최종 고인 정보 formData:", formData);
+    // TODO: 저장 API 연결
   };
 
   const handlePrevOrCancel = () => {
@@ -107,6 +112,8 @@ export default function SetTheDeadPage() {
         <Row $justify={"space-between"} $align={"flex-start"}>
           <SetTheDeadForm
             step={step}
+            maxStep={MAX_STEP} // 🔹 총 단계 수 전달
+            isManager={isManager} // 🔹 관리자 여부 전달
             onStepValidChange={setIsStepValid}
             formData={formData}
             setFormData={setFormData}
@@ -132,6 +139,7 @@ export default function SetTheDeadPage() {
           </Column>
         </Row>
       </MainWrapper>
+
       {/*  그만두기 클릭 시 */}
       <ConfirmModal
         isOpen={isCanceled}
@@ -139,7 +147,7 @@ export default function SetTheDeadPage() {
         description="작성한 내용은 저장되지 않고 사라져요"
         confirmText="그만두기"
         cancelText="취소"
-        onConfirm=""
+        onConfirm={() => navigate("/home")}
         onCancel={() => {
           setIsCanceled(false);
         }}
@@ -168,7 +176,6 @@ const NavWrapper = styled.div`
   margin-bottom: 4.69rem;
 `;
 
-// 왼쪽 상단에 Title
 const Title = styled.div`
   ${typo("h3")};
   color: ${color("black.100")};
