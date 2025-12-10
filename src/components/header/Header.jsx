@@ -13,7 +13,6 @@ import MiniProfile from "./MiniProflie";
 import AlarmPanel from "../alarm/AlarmPanel";
 import alarm from "../../assets/bell-icon-gray.svg";
 import alarmclick from "../../assets/bell-icon-yellow.svg";
-
 import LogoutBox from "./LogoutBox";
 
 export default function Header({ showAuthButtons }) {
@@ -32,8 +31,8 @@ export default function Header({ showAuthButtons }) {
   };
 
   useEffect(() => {
-      loadNotifications();
-    }, []);
+    loadNotifications();
+  }, []);
 
   const [profileInfo, setProfileInfo] = useState({
     name: "로그인",
@@ -43,7 +42,7 @@ export default function Header({ showAuthButtons }) {
 
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [isAlarmOpen, setIsAlarmOpen] = useState(false);
-  const [isLogoutBoxOpen, setIsLogoutBoxOpen] = useState(false); // ⭐ 추가
+  const [isLogoutBoxOpen, setIsLogoutBoxOpen] = useState(false);
 
   const fetchProfileInfo = async () => {
     const token = getAccessToken();
@@ -85,12 +84,10 @@ export default function Header({ showAuthButtons }) {
     const handleAuthChanged = () => {
       fetchProfileInfo();
     };
-
     window.addEventListener("authChanged", handleAuthChanged);
     return () => window.removeEventListener("authChanged", handleAuthChanged);
   }, []);
 
-  // ⭐ 프로필 이미지 업데이트
   useEffect(() => {
     const handleProfileUpdated = (e) => {
       const newUrl = e.detail?.profileUrl;
@@ -133,27 +130,23 @@ export default function Header({ showAuthButtons }) {
     }
   };
 
-  // Alarm 아이콘 토글
   const handleAlarmClick = () => {
     setIsAlarmOpen((prev) => !prev);
     setIsLogoutBoxOpen(false);
   };
 
-  // MiniProfile 클릭 → LogoutBox 토글
   const handleProfileClick = () => {
     if (!isLoggedIn) return;
     setIsLogoutBoxOpen((prev) => !prev);
     setIsAlarmOpen(false);
   };
 
-  // 부모(Header)의 상태 변화 시 LogoutBox 자동 닫기
   useEffect(() => {
     if (isAlarmOpen) {
       setIsLogoutBoxOpen(false);
     }
   }, [isAlarmOpen]);
 
-  // 라우트 변경 시 닫기
   useEffect(() => {
     setIsLogoutBoxOpen(false);
     setIsAlarmOpen(false);
@@ -179,39 +172,43 @@ export default function Header({ showAuthButtons }) {
                 ))}
               </Row>
             </Box>
+
             <div style={{ width: "6.8rem" }} />
+
             <OpenBox>
-  <AlarmWrapper>
-    <AlarmIcon
-      src={isAlarmOpen ? alarmclick : alarm}
-      onClick={handleAlarmClick}
-      data-ignore-close="true"
-    />
-    {/* 알림 개수가 0보다 클 때만 빨간 뱃지 표시 */}
-    {notifications.length > 0 && <AlarmBadge></AlarmBadge>}
+              <AlarmWrapper>
+                <AlarmIcon
+                  src={isAlarmOpen ? alarmclick : alarm}
+                  onClick={handleAlarmClick}
+                  data-ignore-close="true"
+                />
 
-    {isAlarmOpen &&
-      ReactDOM.createPortal(
-        <AlarmPanel onClose={() => setIsAlarmOpen(false)} />,
-        document.getElementById("portal-root")
-      )}
-  </AlarmWrapper>
+                {/* 알림이 있을 때만 빨간 점 표시 */}
+                {notifications.length > 0 && <AlarmBadge />}
 
-  <div onClick={handleProfileClick} data-ignore-close="true">
-    <MiniProfile
-      name={isLoggedIn ? profileInfo.name : "로그인 해주세요"}
-      profileImg={profileInfo.myProfile}
-      isLogin={isLoggedIn}
-    />
-  </div>
-</OpenBox>
+                {isAlarmOpen &&
+                  ReactDOM.createPortal(
+                    <AlarmPanel onClose={() => setIsAlarmOpen(false)} />,
+                    document.getElementById("portal-root")
+                  )}
+              </AlarmWrapper>
 
+              <div onClick={handleProfileClick} data-ignore-close="true">
+                <MiniProfile
+                  name={isLoggedIn ? profileInfo.name : "로그인 해주세요"}
+                  profileImg={profileInfo.myProfile}
+                  isLogin={isLoggedIn}
+                />
+              </div>
+            </OpenBox>
           </>
         )}
 
         {showAuthButtons && (
           <ButtonGroup>
-            <LoginButton onClick={() => navigate("/login")}>로그인</LoginButton>
+            <LoginButton onClick={() => navigate("/login")}>
+              로그인
+            </LoginButton>
             <RegisterButton onClick={() => navigate("/register")}>
               회원가입
             </RegisterButton>
@@ -219,31 +216,32 @@ export default function Header({ showAuthButtons }) {
         )}
       </Wrapper>
 
-      {/* MiniProfile 아래에 LogoutBox 표시 */}
       {isLogoutBoxOpen &&
         ReactDOM.createPortal(
-        <LogoutBox
-          name={profileInfo.name}
-          profileImg={profileInfo.myProfile}
-          onLogout={async () => {
-            try {
-              await logoutUser();
-            } catch (e) {
-              console.error("로그아웃 실패:", e);
-            } finally {
-              clearAuthTokens();
-              window.dispatchEvent(new Event("authChanged"));
-              navigate("/");
-              alert("로그아웃 되었습니다.");
-            }
-          }}
-          onClose={() => setIsLogoutBoxOpen(false)}
-        />,
-        document.getElementById("portal-root")
-      )}
+          <LogoutBox
+            name={profileInfo.name}
+            profileImg={profileInfo.myProfile}
+            onLogout={async () => {
+              try {
+                await logoutUser();
+              } catch (e) {
+                console.error("로그아웃 실패:", e);
+              } finally {
+                clearAuthTokens();
+                window.dispatchEvent(new Event("authChanged"));
+                navigate("/");
+                alert("로그아웃 되었습니다.");
+              }
+            }}
+            onClose={() => setIsLogoutBoxOpen(false)}
+          />,
+          document.getElementById("portal-root")
+        )}
     </>
   );
 }
+
+/* ================== styled-components ================== */
 
 const Wrapper = styled.header`
   position: fixed;
@@ -254,7 +252,7 @@ const Wrapper = styled.header`
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 0 2.25rem 0 2.25rem;
+  padding: 0 2.25rem;
   background: white;
   z-index: 10;
   border-bottom: 1px solid var(--5, #e9e9e9);
@@ -265,6 +263,7 @@ const Logo = styled.img`
   height: 2.76788rem;
   cursor: pointer;
 `;
+
 const Box = styled.div`
   margin: 0 2rem;
 `;
@@ -309,7 +308,8 @@ const RegisterButton = styled.button`
 
 const NavButton = styled.div`
   ${typo("h4")};
-  color: ${({ $active }) => ($active ? color("black.80") : color("black.30"))};
+  color: ${({ $active }) =>
+    $active ? color("black.80") : color("black.30")};
   cursor: pointer;
   white-space: nowrap;
   transition: color 0.25s ease;
@@ -333,22 +333,18 @@ const OpenBox = styled.div`
     display: none;
   }
 `;
+
 const AlarmWrapper = styled.div`
   position: relative;
 `;
 
+/* ✅ 텍스트 없는 빨간 점 뱃지 */
 const AlarmBadge = styled.div`
   position: absolute;
-  top: 0.21rem;   // 위쪽 안쪽에서 0.21rem
-  right: 0.21rem; // 오른쪽 안쪽에서 0.21rem
+  top: 0.21rem;
+  right: 0.21rem;
   width: 0.625rem;
   height: 0.625rem;
-  background-color: #D74D4D;
+  background-color: #d74d4d;
   border-radius: 50%;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  color: white;
-  font-size: 0.625rem;
-  font-weight: 700;
 `;

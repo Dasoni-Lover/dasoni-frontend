@@ -1,7 +1,7 @@
 // src/components/header/MiniProflie.jsx
 import React from "react";
 import styled from "styled-components";
-import profiledefaultimg from "../../assets/icon-profile-default.svg";
+import profiledefaultimg from "../../assets/icon-profile-default.png";
 import { color, typo } from "../../styles/tokens";
 
 // 로그인 안 되어 있으면 기본값(name='로그인 해주세요', profileImg=null)

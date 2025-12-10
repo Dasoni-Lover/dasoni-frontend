@@ -4,7 +4,7 @@ import styled from "styled-components";
 import { color, typo } from "../../styles/tokens";
 import logout from "../../assets/icon-logout.svg";
 import edit from "../../assets/edit-btn.svg";
-import profiledefaultimg from "../../assets/icon-profile-default.svg";
+import profiledefaultimg from "../../assets/icon-profile-default.png";
 import { getPresignedUrlForImage, uploadFileToS3 } from "../../api/files";
 import { updateMyProfileImage } from "../../api/user";
 
