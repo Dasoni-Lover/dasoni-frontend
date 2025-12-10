@@ -7,21 +7,9 @@ import Button from "../../../components/Button";
 import Icon from "../assets/icon-search2.svg";
 import deleteicon from "../../../assets/icon-delete.svg";
 
-export const MemorialHallCount = ({ count = 0, tab = 0, onSearch }) => {
+export const MemorialHallCount = ({ myCount = 0, managedCount = 0, onSearch }) => {
   const nav = useNavigate();
   const [keyword, setKeyword] = useState("");
-
-  const text =
-    tab === 0
-      ? `${count}곳의 추모관에 입장해 있어요`
-      : `${count}곳의 추모관을 개설했어요`;
-
-  const buttonText = tab === 0 ? "추모관 입장하기" : "새 추모관 개설하기";
-  const buttonRoute = tab === 0 ? "/enter" : "/open";
-
-  const handleClick = () => {
-    nav(buttonRoute);
-  };
 
   const handleSearch = () => {
     onSearch(keyword.trim());
@@ -31,16 +19,35 @@ export const MemorialHallCount = ({ count = 0, tab = 0, onSearch }) => {
 
   return (
     <Wrapper>
-      <Text>{text}</Text>
-
+      <ButtonRow>
+          <Button
+            text="추모관 입장하기"
+            size="M"
+            width="13.75rem"
+            color="white"
+            icon="add2"
+            height="2.75rem"
+            onClick={() => nav("/enter")}
+          />
+          <Button
+            text="새 추모관 개설하기"
+            size="M"
+            width="13.75rem"
+            color="white"
+            icon="add2"
+            height="2.75rem"
+            onClick={() => nav("/open")}
+          />
+        </ButtonRow>
       <Container>
+        {/* 검색 영역 */}
         <InputWrapper>
           <StyledInput
             placeholder="이름을 입력하세요"
             value={keyword}
             onChange={(e) => setKeyword(e.target.value)}
           />
-          
+
           <ButtonWrapper>
             <ResetButton
               onClick={() => {
@@ -57,22 +64,12 @@ export const MemorialHallCount = ({ count = 0, tab = 0, onSearch }) => {
             </SearchButton>
           </ButtonWrapper>
         </InputWrapper>
-        <ButtonBox>
-            <Button
-              text={buttonText}
-              size="M"
-              onClick={handleClick}
-              width="13.75rem"
-              color="white"
-              icon="add2"
-              height="2.75rem"
-            />
-        </ButtonBox>
       </Container>
     </Wrapper>
   );
 };
 
+/* ===== styles ===== */
 
 const Wrapper = styled.div`
   width: 100%;
@@ -80,13 +77,12 @@ const Wrapper = styled.div`
   flex-direction: row;
   align-items: center;
   justify-content: space-between;
-  gap: 1rem;
+  margin-bottom: 2.5rem;
 `;
 
 const Container = styled.div`
   display: flex;
   flex-direction: row;
-  justify-content: flex-end;
   align-items: center;
   gap: 1.25rem;
 `;
@@ -104,14 +100,13 @@ const InputWrapper = styled.div`
   align-items: center;
   justify-content: space-between;
   border-radius: 0.375rem;
-  border: 2px solid var(--5, #E9E9E9);
+  border: 2px solid #e9e9e9;
   background: #fff;
   box-sizing: border-box;
-
 `;
 
 const StyledInput = styled.input`
-  width: 13.5626rem;
+  width: 13.5rem;
   height: 100%;
   border: none;
   background: transparent;
@@ -132,32 +127,22 @@ const ButtonWrapper = styled.div`
 const SearchButton = styled.button`
   border: none;
   background: transparent;
-  display: flex;
   padding: 0.375rem;
-  align-items: center;
-  gap: 0.625rem;
-  align-items: center;
+  display: flex;
   justify-content: center;
+  align-items: center;
   cursor: pointer;
 
   img {
-    object-fit: contain;
-    display: block;
-    display: flex;
     width: 1.5rem;
     height: 1.5rem;
-    justify-content: center;
-    align-items: center;
   }
 `;
 
-// 자리 유지 + 보이기/숨기기 처리
 const ResetButton = styled.div`
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 0.625rem;
-  box-sizing: border-box;
   cursor: pointer;
   visibility: ${(props) => (props.$visible ? "visible" : "hidden")};
 `;
@@ -165,7 +150,9 @@ const ResetButton = styled.div`
 const Reset = styled.img`
   width: 2rem;
   height: 2rem;
-  aspect-ratio: 1/1;
 `;
 
-const ButtonBox=styled.div``
+const ButtonRow = styled.div`
+  display: flex;
+  gap: 0.75rem;
+`;
