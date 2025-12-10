@@ -51,23 +51,31 @@ export const HomePage = () => {
   const myList = filteredMyHalls ?? myHalls;
   const managedList = filteredManagedHalls ?? managedHalls;
 
+  // ✅ 둘 다 0인지 체크
+  const isEmptyAll =
+    (myHalls.length === 0) && (managedHalls.length === 0);
+
   return (
     <Wrapper>
       <Title>홈</Title>
 
-      {/* 상단 검색 + 버튼 영역 */}
-      <MemorialHallCount
-        myCount={myHalls.length}
-        managedCount={managedHalls.length}
-        onSearch={handleSearch}
-      />
+      {/* ✅ 상단 영역: 모두 0이면 NoneList, 아니면 MemorialHallCount */}
+      {isEmptyAll ? (
+        <NoneList />
+      ) : (
+        <MemorialHallCount
+          myCount={myHalls.length}
+          managedCount={managedHalls.length}
+          onSearch={handleSearch}
+        />
+      )}
 
       {/* 개설한 추모관 토글 */}
       <ToggleSection>
         <ToggleHeader onClick={() => setOpenManaged((prev) => !prev)}>
           <Text>
-          <span>개설한 추모관</span>
-          <Count>{managedList.length}</Count>
+            <span>개설한 추모관</span>
+            <Count>{managedList.length}</Count>
           </Text>
           <RightBox>
             <Arrow>{openManaged ? "▲" : "▼"}</Arrow>
@@ -77,7 +85,7 @@ export const HomePage = () => {
         {openManaged && (
           <>
             {managedList.length === 0 ? (
-              <NoneList tab={1} />
+              <></>
             ) : (
               <CardList halls={managedList} type="managed" />
             )}
@@ -89,8 +97,8 @@ export const HomePage = () => {
       <ToggleSection>
         <ToggleHeader onClick={() => setOpenMy((prev) => !prev)}>
           <Text>
-          <span>입장한 추모관</span>
-          <Count>{myList.length}</Count>
+            <span>입장한 추모관</span>
+            <Count>{myList.length}</Count>
           </Text>
           <RightBox>
             <Arrow>{openMy ? "▲" : "▼"}</Arrow>
@@ -100,7 +108,7 @@ export const HomePage = () => {
         {openMy && (
           <>
             {myList.length === 0 ? (
-              <NoneList tab={0} />
+              <></>
             ) : (
               <CardList halls={myList} type="my" />
             )}
@@ -110,7 +118,6 @@ export const HomePage = () => {
     </Wrapper>
   );
 };
-
 
 const Wrapper = styled.div`
   display: flex;
@@ -129,14 +136,14 @@ const ToggleSection = styled.div`
   margin-bottom: 1.25rem;
 `;
 
-const Text=styled.div`
+const Text = styled.div`
   display: flex;
   flex-direction: row;
   justify-content: flex-start;
   align-items: center;
   gap: 0.75rem;
   margin-left: 1rem;
-`
+`;
 
 const ToggleHeader = styled.div`
   ${typo("h2")};

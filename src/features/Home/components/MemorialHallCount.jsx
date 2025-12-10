@@ -7,7 +7,7 @@ import Button from "../../../components/Button";
 import Icon from "../assets/icon-search2.svg";
 import deleteicon from "../../../assets/icon-delete.svg";
 
-export const MemorialHallCount = ({ myCount = 0, managedCount = 0, onSearch }) => {
+export const MemorialHallCount = ({onSearch }) => {
   const nav = useNavigate();
   const [keyword, setKeyword] = useState("");
 
