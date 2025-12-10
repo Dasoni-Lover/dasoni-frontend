@@ -1,7 +1,7 @@
 // src/pages/SentLetterBoxPage.jsx
 import React, { useState, useEffect } from "react";
 import styled from "styled-components";
-import { useLocation, useNavigate } from "react-router-dom";
+import { useLocation} from "react-router-dom";
 
 import { color, typo } from "../styles/tokens";
 import BarNavigate from "../components/BarNavigate";
@@ -17,7 +17,6 @@ import clickcalendaricon from "../assets/click-calendar-icon.svg";
 
 export const SentLetterBoxPage = () => {
   const location = useLocation();
-  const navigate = useNavigate();
 
   const hallId = location.state?.hallId;
   const page = location.state?.page;
@@ -74,11 +73,6 @@ export const SentLetterBoxPage = () => {
 
   const hallTitle = hallName ? `故 ${hallName}의 추모관` : "故 추모관";
 
-  const goSavedLetterBox = () => {
-    navigate("/saved-letterbox", {
-      state: { hallId, page },
-    });
-  };
 
   return (
     <Background>
@@ -94,7 +88,6 @@ export const SentLetterBoxPage = () => {
         <Title>총 {letters.length}개의 보낸 편지가 있어요</Title>
 
         <Box>
-          <SavedButton onClick={goSavedLetterBox}>임시보관함</SavedButton>
 
           <CalendarWrapper onClick={() => setCalendarOpen(!calendarOpen)}>
             <CalendarBorder active={calendarOpen}>
