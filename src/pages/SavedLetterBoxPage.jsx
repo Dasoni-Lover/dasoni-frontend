@@ -130,14 +130,21 @@ export const SavedLetterBoxPage = () => {
 };
 
 
-const Background=styled.div`
+const Background = styled.div`
   width: 100vw;
   height: 100vh;
   display: flex;
   flex-direction: column;
   align-items: center;
-  background: linear-gradient(90deg, #FFF1F2 9.13%, #FFF6EB 76.44%, #FFEFE5 100%);
-`
+
+  background: linear-gradient(
+    90deg,
+    rgba(255, 241, 242, 0.5) 9.13%,
+    rgba(255, 246, 235, 0.5) 76.44%,
+    rgba(255, 239, 229, 0.5) 100%
+  );
+`;
+
 
 const Wrapper = styled.div`
   display: flex;
