@@ -1,5 +1,6 @@
 // src/pages/LeaveLetterPage.jsx
 import React, { useState } from "react";
+import { useEffect } from "react";
 import styled from "styled-components";
 import { useNavigate, useLocation } from "react-router-dom";
 import { color, typo } from "../styles/tokens";
@@ -9,6 +10,8 @@ import Button from "../components/Button";
 import ConfirmModal from "../components/ConfirmModal";
 import { sendLetter } from "../api/letters";
 import SideCategoryBox from "../features/Letters/components/SideCategoryBox";
+import { getHallInfo } from "../api/memorial";
+import bgicon from "../features/Letters/assets/bg-icon.svg";
 
 export const LeaveLetterPage = () => {
     const location = useLocation();
@@ -27,7 +30,7 @@ export const LeaveLetterPage = () => {
     const [modalType, setModalType] = useState("");
 
     const isActive =
-        letterText.trim().length >= 50 &&
+        letterText.trim().length > 0 &&
         toName.trim().length > 0 &&
         fromName.trim().length > 0;
 
@@ -35,6 +38,29 @@ export const LeaveLetterPage = () => {
         setModalType(type);
         setIsModalOpen(true);
     };
+
+    const [hallName, setHallName] = useState("");
+
+    useEffect(() => {
+        if (!hallId) {
+            alert("유효하지 않은 추모관입니다.");
+            navigate(-1);
+            return;
+        }
+
+        const fetchHallName = async () => {
+            try {
+                const info = await getHallInfo(hallId);
+                const name = info?.data?.name || info?.name || "";
+                setHallName(name);
+            } catch (err) {
+                console.error("추모관 이름 조회 실패:", err);
+            }
+        };
+
+        fetchHallName();
+    }, [hallId, navigate]);
+
 
     // ===== 전달하기 =====
     const handleSendLetter = async () => {
@@ -93,9 +119,19 @@ export const LeaveLetterPage = () => {
 
 
     return (
+        <Background>
+            <BGIcon src={bgicon} alt="" />
         <Wrapper>
             <NavWrapper>
-                <BarNavigate paths={["나의 추모관", "편지쓰기"]} />
+                <BarNavigate 
+                paths={["나의 추모관", "편지쓰기"]} 
+                onPathClick={(path) => {
+                if (path === "나의 추모관") {
+                    // hallId 유지하면서 홈으로 이동
+                    navigate("/memorial", { state: { hallId } });
+                }
+                }}
+            />
             </NavWrapper>
 
             <TextWrapper>
@@ -110,7 +146,7 @@ export const LeaveLetterPage = () => {
                 <DescriptionHover>
                     <HoverToolTip>
                         <UnorderedList>
-                            <li>박영진님의 기일을 챙기는 방식에 대해 적어보세요</li>
+                            <li>{hallName}님의 기일을 챙기는 방식에 대해 적어보세요</li>
                             <li>미처 사과하지 못했거나 풀고 싶은 마음에 대해 적어보세요</li>
                         </UnorderedList>
                     </HoverToolTip>
@@ -147,8 +183,36 @@ export const LeaveLetterPage = () => {
 
             <SideCategoryBox hallId={hallId} page={page} />
         </Wrapper>
+        </Background>
     );
 };
+
+const Background = styled.div`
+  width: 100vw;
+  height: 100vh;
+  position: relative;  /* ⭐ bgicon 기준 */
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+
+  background: linear-gradient(
+    90deg,
+    rgba(255, 241, 242, 0.5) 9.13%,
+    rgba(255, 246, 235, 0.5) 76.44%,
+    rgba(255, 239, 229, 0.5) 100%
+  );
+`;
+
+const BGIcon = styled.img`
+  position: fixed;  
+  bottom: 3.5rem;
+  right: 2.5rem;
+  width: 22.00006rem;
+  height: 11.62256rem;
+  opacity: 0.7;
+  pointer-events: none;
+`;
+
 
 const Wrapper = styled.div`
     display: flex;

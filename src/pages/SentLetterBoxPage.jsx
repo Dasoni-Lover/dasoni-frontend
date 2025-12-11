@@ -1,7 +1,8 @@
 // src/pages/SentLetterBoxPage.jsx
 import React, { useState, useEffect } from "react";
 import styled from "styled-components";
-import { useLocation, useNavigate } from "react-router-dom";
+import { useLocation} from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 
 import { color, typo } from "../styles/tokens";
 import BarNavigate from "../components/BarNavigate";
@@ -14,6 +15,7 @@ import SideCategoryBox from "../features/Letters/components/SideCategoryBox";
 
 import calendaricon from "../assets/calendar-icon.svg";
 import clickcalendaricon from "../assets/click-calendar-icon.svg";
+import bgicon from "../features/Letters/assets/bg-icon.svg";
 
 export const SentLetterBoxPage = () => {
   const location = useLocation();
@@ -74,18 +76,23 @@ export const SentLetterBoxPage = () => {
 
   const hallTitle = hallName ? `故 ${hallName}의 추모관` : "故 추모관";
 
-  const goSavedLetterBox = () => {
-    navigate("/saved-letterbox", {
-      state: { hallId, page },
-    });
-  };
 
   return (
+    <Background>
+      <BGIcon src={bgicon} alt="" />
     <Wrapper>
       <NavWrapper>
         <BarNavigate
           paths={["홈", hallTitle, "보낸 편지함"]}
           title="보낸 편지함"
+          onPathClick={(path) => {
+            if (path === "홈") {
+              // hallId 유지하면서 홈으로 이동
+              navigate("/home", { state: { hallId } });
+            }else if (path === hallTitle){
+              navigate("/memorial", { state: { hallId } });
+            }
+          }}
         />
       </NavWrapper>
 
@@ -93,7 +100,6 @@ export const SentLetterBoxPage = () => {
         <Title>총 {letters.length}개의 보낸 편지가 있어요</Title>
 
         <Box>
-          <SavedButton onClick={goSavedLetterBox}>임시보관함</SavedButton>
 
           <CalendarWrapper onClick={() => setCalendarOpen(!calendarOpen)}>
             <CalendarBorder active={calendarOpen}>
@@ -128,9 +134,34 @@ export const SentLetterBoxPage = () => {
 
       <SideCategoryBox hallId={hallId} page={page} />
     </Wrapper>
+    </Background>
   );
 };
+const Background = styled.div`
+  width: 100vw;
+  height: 100vh;
+  position: relative;  /* ⭐ bgicon 기준 */
+  display: flex;
+  flex-direction: column;
+  align-items: center;
 
+  background: linear-gradient(
+    90deg,
+    rgba(255, 241, 242, 0.5) 9.13%,
+    rgba(255, 246, 235, 0.5) 76.44%,
+    rgba(255, 239, 229, 0.5) 100%
+  );
+`;
+
+const BGIcon = styled.img`
+  position: fixed;  
+  bottom: 3.5rem;
+  right: 2.5rem;
+  width: 22.00006rem;
+  height: 11.62256rem;
+  opacity: 0.7;
+  pointer-events: none;
+`;
 
 const Wrapper = styled.div`
   display: flex;
@@ -139,6 +170,7 @@ const Wrapper = styled.div`
   align-items: center;
   margin-top: 1.81rem;
   position: relative;
+  
 `;
 
 const NavWrapper = styled.div`

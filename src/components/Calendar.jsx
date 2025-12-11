@@ -132,7 +132,6 @@ export default Calendar;
 const CalendarContainer = styled.div`
   box-sizing: border-box;
   width: 38.9rem;
-  background: ${color ? color("white") : "#fff"};
 `;
 
 const Header = styled.div`
@@ -192,10 +191,19 @@ const DateBox = styled.div`
   flex-direction: column;
   align-items: center;
   justify-content: flex-start;
-  background-color: ${({ hasLetter }) => (hasLetter ? "#FFF4E6" : "transparent")};
+
+  background-color: ${({ hasLetter }) =>
+    hasLetter ? "#FFF4E6" : "transparent"};
+
   color: ${({ isCurrent }) => (isCurrent ? "#ACACAC" : "#ddd")};
+
+  /* ✅ hasLetter일 때만 테두리 적용 */
+  border: ${({ hasLetter }) =>
+    hasLetter ? "1px solid #F8E4CA" : "none"};
+
   ${typo("bodyb")};
 `;
+
 
 const LetterIcon = styled.img`
   width: 3.75rem;

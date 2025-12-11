@@ -4,15 +4,22 @@ import styled from "styled-components";
 import { color, typo } from "../styles/tokens";
 import { Column } from "../styles/flex";
 
-
-const BarNavigate = ({ paths = ["홈", "故 박영수의 추모관"], title }) => {
+const BarNavigate = ({
+  paths = ["홈", "故 박영수의 추모관"],
+  title,
+  onPathClick, // 부모에서 경로 이동을 처리하는 콜백
+}) => {
   return (
     <Column>
       <Wrapper>
         {paths.map((path, index) => (
           <React.Fragment key={index}>
-            <Text>{path}</Text>
-            {index < paths.length - 1 && <Next src={nextbtn} alt=">" />}
+            <ClickableText onClick={() => onPathClick?.(path, index)}>
+              {path}
+            </ClickableText>
+            {index < paths.length - 1 && (
+              <Next src={nextbtn} alt=">" />
+            )}
           </React.Fragment>
         ))}
       </Wrapper>
@@ -29,9 +36,11 @@ const Wrapper = styled.div`
   align-self: stretch;
 `;
 
-const Text = styled.div`
+const ClickableText = styled.div`
   ${typo("bodym")};
   color: ${color("black.50")};
+  cursor: pointer;
+
 `;
 
 const Next = styled.img`
@@ -47,4 +56,23 @@ const Title = styled.div`
 
 export default BarNavigate;
 
-//<BarNavigate paths={["홈", "故 박영수의 추모관", "편지쓰기"]} title="편지쓰기"/>
+
+
+
+// const MyPage = () => {
+//   const navigate = useNavigate();
+
+//   const handlePathClick = (path, index) => {
+//     // 원하는 로직으로 자유롭게 처리
+//     if (path === "홈") navigate("/");
+//     else navigate(`/memorial/${index}`);
+//   };
+
+//   return (
+//     <BarNavigate
+//       paths={["홈", "故 박영수의 추모관"]}
+//       title="추모관 홈"
+//       onPathClick={handlePathClick}
+//     />
+//   );
+// };

@@ -22,7 +22,7 @@ export const EnterModal = ({ hall, onClose }) => {
   return (
     <Wrapper onClick={onClose}>
       <Box onClick={(e) => e.stopPropagation()}>
-        <Text>故{hall.name} 에 입장 요청을 보낼까요?</Text>
+        <Text>故{hall.name} 추모관에 입장 요청을 보낼까요?</Text>
         <ButtonWrapper>
           <Button text="요청하기" onClick={handleRequest} />
           <Button text="취소" color="white" onClick={handleCancel} />

@@ -21,7 +21,6 @@ export default function AIGenerateForm({ onGenerate }) {
   const [isCanceled, setIsCanceled] = useState(false);
 
   const handleCancelProcess = () => setIsCanceled(true);
-  const goHome = () => nav("/home");
 
   // 파일 → base64 변환
   const fileToBase64 = (file) =>
@@ -119,10 +118,11 @@ export default function AIGenerateForm({ onGenerate }) {
 
       <ConfirmModal
         isOpen={isCanceled}
-        title="추모관 개설을 그만둘까요?"
+        title="작성을 그만둘까요?"
+        description="작성한 내용은 저장되지 않고 사라져요"
         confirmText="그만두기"
         cancelText="취소"
-        onConfirm={goHome}
+        onConfirm={goBack}
         onCancel={() => setIsCanceled(false)}
       />
     </div>

@@ -91,7 +91,7 @@ export default function RequestEntryPage() {
             <Subtitle>
               {`입장 요청을 위한 정보를 입력해 주세요.\n추모관 관리자가 볼 수 있는 정보예요.`}
             </Subtitle>
-            <CancelProcessButton onClick={() => setIsCanceled(true)} />
+            <CancelProcessButton title="입장 그만두기" onClick={() => setIsCanceled(true)} />
           </Row>
         </Column>
       </BarWrapper>

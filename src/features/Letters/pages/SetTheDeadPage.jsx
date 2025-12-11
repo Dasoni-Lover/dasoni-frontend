@@ -82,6 +82,7 @@ export default function SetTheDeadPage() {
   };
 
   return (
+    <Background>
     <Container>
       {/* 왼쪽 사이드 카테고리 */}
       <SideCategoryBox hallId={hallId} page={page} />
@@ -145,8 +146,18 @@ export default function SetTheDeadPage() {
         }}
       />
     </Container>
+    </Background>
   );
 }
+
+const Background=styled.div`
+  width: 100vw;
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  background: linear-gradient(90deg, #FFF1F2 9.13%, #FFF6EB 76.44%, #FFEFE5 100%);
+`
 
 const Container = styled.div`
   display: flex;

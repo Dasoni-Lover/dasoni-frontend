@@ -50,7 +50,7 @@ export const SentLetter = ({
 
       <InputBox>
         <Input
-          placeholder="50자 이상 입력해 주세요"
+          placeholder="전하고 싶은 이야기를 적어주세요."
           value={value}
           onChange={(e) => onValueChange(e.target.value)}
           maxLength={999}

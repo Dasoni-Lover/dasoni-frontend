@@ -18,6 +18,7 @@ export default function MyMemorialModal({ isOpen, onCreateClick }) {
         </SubText>
         <ButtonContainer>
           <Button onClick={onCreateClick} text="나의 추모관 개설하기" />
+          <Button text="예시 추모관 둘러보기" color="white"/>
         </ButtonContainer>
       </ModalContainer>
     </Overlay>
@@ -27,7 +28,7 @@ export default function MyMemorialModal({ isOpen, onCreateClick }) {
 const Overlay = styled.div`
   position: fixed;
   inset: 0;
-  background: rgba(0, 0, 0, 0.45);
+  background: linear-gradient(90deg, #FFF1F2 9.13%, #FFF6EB 76.44%, #FFEFE5 100%), #FFF;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -47,14 +48,12 @@ const ModalContainer = styled.div`
 
 const Title = styled.h2`
   ${typo("h2")}
-  color: white;
   margin-bottom: 0.44rem;
   text-align: center;
 `;
 
 const SubText = styled.p`
   ${typo("bodym2")}
-  color: white;
   margin-bottom: 2rem;
   text-align: center;
 `;
@@ -64,4 +63,5 @@ const ButtonContainer = styled.div`
   flex-direction: column;
   align-items: center;
   width: 24.5rem;
+  gap: 0.75rem;
 `;
