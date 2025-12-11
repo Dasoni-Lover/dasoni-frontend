@@ -13,8 +13,9 @@ import {
   fetchTempLetterDetail,
   deleteTempLetter 
 } from "../api/letters";
-
 import { getHallInfo } from "../api/memorial";
+
+import bgicon from "../features/Letters/assets/bg-icon.svg";
 
 export const SavedLetterBoxPage = () => {
   const location = useLocation();
@@ -25,9 +26,7 @@ export const SavedLetterBoxPage = () => {
   const [letters, setLetters] = useState([]);
   const [hallName, setHallName] = useState("");
 
-  // -------------------------
   // 📌 추모관 정보 조회
-  // -------------------------
   useEffect(() => {
     if (page !== "me" && hallId) loadHallInfo();
   }, [page, hallId]);
@@ -36,15 +35,12 @@ export const SavedLetterBoxPage = () => {
     try {
       const res = await getHallInfo(hallId);
       setHallName(res?.data?.name || "추모관");
-    } catch (err) {
-      console.error("❌ 추모관 정보 불러오기 실패:", err);
+    } catch {
       setHallName("추모관");
     }
   };
 
-  // -------------------------
   // 📌 임시보관함 리스트 로드
-  // -------------------------
   useEffect(() => {
     if (hallId) loadTempLetters();
   }, [hallId]);
@@ -58,45 +54,38 @@ export const SavedLetterBoxPage = () => {
     }
   };
 
-// -------------------------
-// 📌 편지 클릭 → 페이지 이동
-// -------------------------
-const handleSelectLetter = async (letterId) => {
-  try {
-    const detail = await fetchTempLetterDetail(hallId, letterId);
-
-    navigate("/saved-letter", {
-      state: {
-        hallId,
-        page,
-        letterData: {
-          toName: detail.toName,
-          fromName: detail.fromName,
-          content: detail.content,
-        },
-      },
-    });
-  } catch (err) {
-    console.error("❌ 상세 조회 실패:", err);
-  }
-};
-
-
-  // -------------------------
-  // ⭐ 임시 저장 편지 삭제 기능
-  // -------------------------
-  const handleDeleteLetter = async (letterId) => {
+  // 📌 편지 클릭 → 페이지 이동
+  const handleSelectLetter = async (letterId) => {
     try {
-      await deleteTempLetter(hallId, letterId);
-      await loadTempLetters(); // 삭제 후 리스트 업데이트
-    } catch (err) {
-      console.error("❌ 임시편지 삭제 실패:", err);
+      const detail = await fetchTempLetterDetail(hallId, letterId);
+
+      navigate("/saved-letter", {
+        state: {
+          hallId,
+          page,
+          letterData: {
+            toName: detail.toName,
+            fromName: detail.fromName,
+            content: detail.content,
+          },
+        },
+      });
+    } catch {
+      console.error("❌ 상세 조회 실패");
     }
   };
 
-  // -------------------------
+  // ⭐ 임시 저장 편지 삭제 기능
+  const handleDeleteLetter = async (letterId) => {
+    try {
+      await deleteTempLetter(hallId, letterId);
+      await loadTempLetters();
+    } catch {
+      console.error("❌ 임시편지 삭제 실패");
+    }
+  };
+
   // ⭐ BarNavigate 경로
-  // -------------------------
   const paths =
     page === "me"
       ? ["나의 추모관", "임시보관함"]
@@ -104,45 +93,42 @@ const handleSelectLetter = async (letterId) => {
 
   return (
     <Background>
-    <Wrapper>
-      <NavWrapper>
-        <BarNavigate paths={paths}
-        onPathClick={(path) => {
-          if (path === "홈") {
-            // hallId 유지하면서 홈으로 이동
-            navigate("/home", { state: { hallId } });
-          }
-          else if (path === "나의 추모관"){
-            navigate("/memorial", { state: { hallId } });
-          }else if (path === `故 ${hallName}의 추모관`){
-            navigate("/memorial", { state: { hallId } });
-          }
-        }}
-      />
-      </NavWrapper>
+      <BGIcon src={bgicon} alt="" />
+      
+      <Wrapper>
+        <NavWrapper>
+          <BarNavigate
+            paths={paths}
+            onPathClick={(path) => {
+              if (path === "홈") navigate("/home", { state: { hallId } });
+              else if (path === "나의 추모관") navigate("/memorial", { state: { hallId } });
+              else if (path === `故 ${hallName}의 추모관`) navigate("/memorial", { state: { hallId } });
+            }}
+          />
+        </NavWrapper>
 
-      <Title>총 {letters.length}개의 임시 저장된 편지가 있어요</Title>
+        <Title>총 {letters.length}개의 임시 저장된 편지가 있어요</Title>
 
-      <LetterListWrapper>
-        <LetterList
-          letters={letters}
-          onItemClick={handleSelectLetter}
-          onDelete={handleDeleteLetter}    // ⭐ 여기 연결
-          showDelete={true}
-          page={page}
-        />
-      </LetterListWrapper>
+        <LetterListWrapper>
+          <LetterList
+            letters={letters}
+            onItemClick={handleSelectLetter}
+            onDelete={handleDeleteLetter}
+            showDelete={true}
+            page={page}
+          />
+        </LetterListWrapper>
 
-      <SideCategoryBox hallId={hallId} page={page} />
-    </Wrapper>
+        <SideCategoryBox hallId={hallId} page={page} />
+      </Wrapper>
     </Background>
   );
 };
 
-
 const Background = styled.div`
   width: 100vw;
   height: 100vh;
+  position: relative;  /* ⭐ bgicon 기준 */
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -153,6 +139,16 @@ const Background = styled.div`
     rgba(255, 246, 235, 0.5) 76.44%,
     rgba(255, 239, 229, 0.5) 100%
   );
+`;
+
+const BGIcon = styled.img`
+  position: fixed;  
+  bottom: 3.5rem;
+  right: 2.5rem;
+  width: 22.00006rem;
+  height: 11.62256rem;
+  opacity: 0.7;
+  pointer-events: none;
 `;
 
 
@@ -168,9 +164,6 @@ const Wrapper = styled.div`
 const NavWrapper = styled.div`
   width: 100%;
   margin-bottom: 4.5rem;
-  display: flex;
-  flex-direction: row;
-  justify-content: flex-start;
 `;
 
 const Title = styled.div`
