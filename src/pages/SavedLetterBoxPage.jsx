@@ -58,30 +58,28 @@ export const SavedLetterBoxPage = () => {
     }
   };
 
-  // -------------------------
-  // 📌 편지 클릭 → 페이지 분기 이동
-  // -------------------------
-  const handleSelectLetter = async (letterId) => {
-    try {
-      const detail = await fetchTempLetterDetail(hallId, letterId);
+// -------------------------
+// 📌 편지 클릭 → 페이지 이동
+// -------------------------
+const handleSelectLetter = async (letterId) => {
+  try {
+    const detail = await fetchTempLetterDetail(hallId, letterId);
 
-      const targetPath =  "/saved-letter" ;
-
-      navigate(targetPath, {
-        state: {
-          hallId,
-          page,
-          letterData: {
-            toName: detail.toName,
-            fromName: detail.fromName,
-            content: detail.content,
-          },
+    navigate("/saved-letter", {
+      state: {
+        hallId,
+        page,
+        letterData: {
+          toName: detail.toName,
+          fromName: detail.fromName,
+          content: detail.content,
         },
-      });
-    } catch (err) {
-      console.error("❌ 상세 조회 실패:", err);
-    }
-  };
+      },
+    });
+  } catch (err) {
+    console.error("❌ 상세 조회 실패:", err);
+  }
+};
 
 
   // -------------------------
