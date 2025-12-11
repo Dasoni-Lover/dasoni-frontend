@@ -10,6 +10,8 @@ import ConfirmModal from "../components/ConfirmModal";
 import { sendLetter } from "../api/letters";
 import { getHallInfo } from "../api/memorial";
 import SideCategoryBox from "../features/Letters/components/SideCategoryBox";
+import bgicon from "../features/Letters/assets/bg-icon.svg";
+
 
 export const SentLetterPage = () => {
     const location = useLocation();
@@ -127,6 +129,7 @@ export const SentLetterPage = () => {
 
     return (
         <Background>
+            <BGIcon src={bgicon} alt="" />
         <Wrapper>
             <NavWrapper>
                 <BarNavigate 
@@ -215,6 +218,7 @@ export const SentLetterPage = () => {
 const Background = styled.div`
   width: 100vw;
   height: 100vh;
+  position: relative;  /* ⭐ bgicon 기준 */
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -225,6 +229,16 @@ const Background = styled.div`
     rgba(255, 246, 235, 0.5) 76.44%,
     rgba(255, 239, 229, 0.5) 100%
   );
+`;
+
+const BGIcon = styled.img`
+  position: fixed;  
+  bottom: 3.5rem;
+  right: 2.5rem;
+  width: 22.00006rem;
+  height: 11.62256rem;
+  opacity: 0.7;
+  pointer-events: none;
 `;
 
 
