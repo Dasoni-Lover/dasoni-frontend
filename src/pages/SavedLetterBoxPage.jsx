@@ -65,7 +65,7 @@ export const SavedLetterBoxPage = () => {
     try {
       const detail = await fetchTempLetterDetail(hallId, letterId);
 
-      const targetPath = page === "me" ? "/leave-letter" : "/sent-letter";
+      const targetPath =  "/saved-letter" ;
 
       navigate(targetPath, {
         state: {
@@ -101,14 +101,26 @@ export const SavedLetterBoxPage = () => {
   // -------------------------
   const paths =
     page === "me"
-      ? ["나의 추모관", "보낸 편지함", "임시보관함"]
+      ? ["나의 추모관", "임시보관함"]
       : ["홈", `故 ${hallName}의 추모관`, "임시보관함"];
 
   return (
     <Background>
     <Wrapper>
       <NavWrapper>
-        <BarNavigate paths={paths} />
+        <BarNavigate paths={paths}
+        onPathClick={(path) => {
+          if (path === "홈") {
+            // hallId 유지하면서 홈으로 이동
+            navigate("/home", { state: { hallId } });
+          }
+          else if (path === "나의 추모관"){
+            navigate("/memorial", { state: { hallId } });
+          }else if (path === `故 ${hallName}의 추모관`){
+            navigate("/memorial", { state: { hallId } });
+          }
+        }}
+      />
       </NavWrapper>
 
       <Title>총 {letters.length}개의 임시 저장된 편지가 있어요</Title>

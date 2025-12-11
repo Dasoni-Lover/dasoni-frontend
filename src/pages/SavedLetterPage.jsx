@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { useEffect } from "react";
 import styled from "styled-components";
 import { useNavigate, useLocation } from "react-router-dom";
 import { color, typo } from "../styles/tokens";
@@ -7,10 +8,12 @@ import { SentLetter } from "../features/Letters/components/SentLetter";
 import Button from "../components/Button";
 import ConfirmModal from "../components/ConfirmModal";
 import { sendLetter } from "../api/letters";
+import { getHallInfo } from "../api/memorial";
 
 export const SavedLetterPage = () => {
   const location = useLocation();
   const hallId = location.state?.hallId; 
+  const page = location.state?.page; 
   const navigate = useNavigate();
 
   const [letterText, setLetterText] = useState("");
@@ -18,6 +21,7 @@ export const SavedLetterPage = () => {
   const [fromName, setFromName] = useState("");
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [modalType, setModalType] = useState(""); 
+  const [hallName, setHallName] = useState("");
 
 
   const isActive =
@@ -61,11 +65,47 @@ export const SavedLetterPage = () => {
     navigate("/leave-letterbox", { state: { hallId } });
   };
 
+   // -------------------------
+    // 📌 추모관 정보 조회
+    // -------------------------
+    useEffect(() => {
+      if (page !== "me" && hallId) loadHallInfo();
+    }, [page, hallId]);
+  
+    const loadHallInfo = async () => {
+      try {
+        const res = await getHallInfo(hallId);
+        setHallName(res?.data?.name || "추모관");
+      } catch (err) {
+        console.error("❌ 추모관 정보 불러오기 실패:", err);
+        setHallName("추모관");
+      }
+    };
+  
+
+  const paths =
+    page === "me"
+      ? ["나의 추모관", "임시보관함","편지쓰기"]
+      : ["홈", `故 ${hallName}의 추모관`, "편지쓰기"];
+
   return (
     <Background>
     <Wrapper>
       <NavWrapper>
-        <BarNavigate paths={["나의 추모관", "임시보관함","편지쓰기"]} />
+        <BarNavigate 
+        paths={paths} 
+        onPathClick={(path) => {
+          if (path === "나의 추모관") {
+            navigate("/memorial", { state: { hallId } });
+          }else if (path === "임시보관함"){
+            navigate("/saved-letterbox", { state: { hallId,page } });
+          }else if (path === "홈"){
+            navigate("/home", { state: { hallId} });
+          }else if (path === `故 ${hallName}의 추모관`){
+            navigate("/memorial", { state: { hallId} });
+          }
+        }}
+      />
       </NavWrapper>
 
       <TextWrapper>

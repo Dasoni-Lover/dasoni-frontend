@@ -2,6 +2,7 @@
 import React, { useState, useEffect } from "react";
 import styled from "styled-components";
 import { useLocation} from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 
 import { color, typo } from "../styles/tokens";
 import BarNavigate from "../components/BarNavigate";
@@ -17,6 +18,7 @@ import clickcalendaricon from "../assets/click-calendar-icon.svg";
 
 export const SentLetterBoxPage = () => {
   const location = useLocation();
+  const navigate = useNavigate();
 
   const hallId = location.state?.hallId;
   const page = location.state?.page;
@@ -81,6 +83,14 @@ export const SentLetterBoxPage = () => {
         <BarNavigate
           paths={["홈", hallTitle, "보낸 편지함"]}
           title="보낸 편지함"
+          onPathClick={(path) => {
+            if (path === "홈") {
+              // hallId 유지하면서 홈으로 이동
+              navigate("/home", { state: { hallId } });
+            }else if (path === hallTitle){
+              navigate("/memorial", { state: { hallId } });
+            }
+          }}
         />
       </NavWrapper>
 

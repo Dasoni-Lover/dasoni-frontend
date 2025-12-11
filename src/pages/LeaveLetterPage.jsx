@@ -121,7 +121,15 @@ export const LeaveLetterPage = () => {
         <Background>
         <Wrapper>
             <NavWrapper>
-                <BarNavigate paths={["나의 추모관", "편지쓰기"]} />
+                <BarNavigate 
+                paths={["나의 추모관", "편지쓰기"]} 
+                onPathClick={(path) => {
+                if (path === "나의 추모관") {
+                    // hallId 유지하면서 홈으로 이동
+                    navigate("/memorial", { state: { hallId } });
+                }
+                }}
+            />
             </NavWrapper>
 
             <TextWrapper>

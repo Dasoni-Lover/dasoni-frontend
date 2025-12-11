@@ -129,7 +129,17 @@ export const SentLetterPage = () => {
         <Background>
         <Wrapper>
             <NavWrapper>
-                <BarNavigate paths={["홈", hallTitle, "편지쓰기"]} />
+                <BarNavigate 
+                paths={["홈", hallTitle, "편지쓰기"]} 
+                onPathClick={(path) => {
+                if (path === "홈") {
+                    // hallId 유지하면서 홈으로 이동
+                    navigate("/home", { state: { hallId } });
+                }else if (path === hallTitle){
+                    navigate("/memorial", { state: { hallId } });
+                }
+                }}
+            />
             </NavWrapper>
 
             <TextWrapper>

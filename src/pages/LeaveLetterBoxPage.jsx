@@ -5,6 +5,7 @@ import { useLocation} from "react-router-dom";
 
 import { color, typo } from "../styles/tokens";
 import BarNavigate from "../components/BarNavigate";
+import { useNavigate } from "react-router-dom";
 import { LetterList } from "../features/Letters/components/LetterList";
 import LetterModal from "../features/Letters/components/LetterModal";
 import Calendar from "../components/Calendar";
@@ -23,6 +24,7 @@ import {
 
 export const LeaveLetterBoxPage = () => {
   const location = useLocation();
+  const navigate = useNavigate();
 
   const hallId = location.state?.hallId;
   const page = location.state?.page;
@@ -117,7 +119,13 @@ const handleConfirmDelete = async () => {
         <BarNavigate
           paths={["나의 추모관", "보낸 편지함"]}
           title="보낸 편지함"
-        />
+        onPathClick={(path) => {
+          if (path === "나의 추모관") {
+            // hallId 유지하면서 홈으로 이동
+            navigate("/memorial", { state: { hallId } });
+          }
+        }}
+      />
       </NavWrapper>
 
       <TitleAndCalendar>

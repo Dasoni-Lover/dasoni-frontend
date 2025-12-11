@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import styled from 'styled-components';
 import { useLocation } from 'react-router-dom';
+import { useNavigate } from "react-router-dom";
 
 import BarNavigate from '../components/BarNavigate';
 import { color, typo } from '../styles/tokens';
@@ -15,6 +16,7 @@ import letterIcon2 from "../features/Letters/assets/notread-letter-icon.svg";
 
 const RecievedLetterBoxPage = () => {
   const location = useLocation();
+  const navigate = useNavigate();
   const hallId = location.state?.hallId;
   const page = location.state?.page;
 
@@ -70,7 +72,17 @@ const RecievedLetterBoxPage = () => {
     <Background>
     <Wrapper>
       <NavWrapper>
-        <BarNavigate paths={["홈", `故 ${hallName}의 추모관`, "받은 편지함"]} />
+        <BarNavigate 
+        paths={["홈", `故 ${hallName}의 추모관`, "받은 편지함"]} 
+        onPathClick={(path) => {
+          if (path === "홈") {
+            // hallId 유지하면서 홈으로 이동
+            navigate("/home", { state: { hallId } });
+          }else if (path === `故 ${hallName}의 추모관`){
+            navigate("/memorial", { state: { hallId } });
+          }
+        }}
+      />
       </NavWrapper>
 
       <TextWrapper>
