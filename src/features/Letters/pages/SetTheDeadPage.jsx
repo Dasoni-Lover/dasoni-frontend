@@ -90,7 +90,10 @@ export default function SetTheDeadPage() {
       {/* 오른쪽 메인 영역 */}
       <MainWrapper>
         <NavWrapper>
-          <BarNavigate paths={["홈", hallTitle, "고인 정보 설정"]} />
+          <BarNavigate 
+          paths={["홈", hallTitle, "고인 정보 설정"]} 
+          
+          />
           <Row
             $justify={"space-between"}
             $align={"center"}

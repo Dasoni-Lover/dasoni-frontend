@@ -120,7 +120,7 @@ const handleConfirmDelete = async () => {
       <NavWrapper>
         <BarNavigate
           paths={["나의 추모관", "보낸 편지함"]}
-          title="보낸 편지함"
+          
         onPathClick={(path) => {
           if (path === "나의 추모관") {
             // hallId 유지하면서 홈으로 이동

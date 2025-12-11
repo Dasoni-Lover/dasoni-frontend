@@ -84,7 +84,7 @@ export const SentLetterBoxPage = () => {
       <NavWrapper>
         <BarNavigate
           paths={["홈", hallTitle, "보낸 편지함"]}
-          title="보낸 편지함"
+          
           onPathClick={(path) => {
             if (path === "홈") {
               // hallId 유지하면서 홈으로 이동
