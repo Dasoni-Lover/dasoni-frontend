@@ -135,9 +135,9 @@ const Background = styled.div`
 
   background: linear-gradient(
     90deg,
-    rgba(255, 241, 242, 0.5) 9.13%,
-    rgba(255, 246, 235, 0.5) 76.44%,
-    rgba(255, 239, 229, 0.5) 100%
+    rgba(255, 241, 242, 0.3) 9.13%,
+    rgba(255, 246, 235, 0.3) 76.44%,
+    rgba(255, 239, 229, 0.3) 100%
   );
 `;
 
