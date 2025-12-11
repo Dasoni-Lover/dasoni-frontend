@@ -21,18 +21,6 @@ export default function Header({ showAuthButtons }) {
 
   const [notifications, setNotifications] = useState([]);
 
-  const loadNotifications = async () => {
-    try {
-      const data = await fetchNotifications();
-      setNotifications(data.notifications || []);
-    } catch (err) {
-      console.error("알림 불러오기 실패:", err);
-    }
-  };
-
-  useEffect(() => {
-    loadNotifications();
-  }, []);
 
   const [profileInfo, setProfileInfo] = useState({
     name: "로그인",
@@ -76,6 +64,7 @@ export default function Header({ showAuthButtons }) {
     }
   };
 
+
   useEffect(() => {
     fetchProfileInfo();
   }, [location.pathname]);
@@ -110,6 +99,19 @@ export default function Header({ showAuthButtons }) {
     { label: "추모관 개설하기", path: "/open" },
     { label: "나의 추모관", path: "/memorial" },
   ];
+
+      const loadNotifications = async () => {
+    try {
+      const data = await fetchNotifications();
+      setNotifications(data.notifications || []);
+    } catch (err) {
+      console.error("알림 불러오기 실패:", err);
+    }
+  };
+
+  useEffect(() => {
+    loadNotifications();
+  }, []);
 
   const getIsActive = (item) => {
     if (item.label === "홈") {
