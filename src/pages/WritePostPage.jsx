@@ -1,5 +1,6 @@
 // src/pages/WritePostPage.jsx
 import React, { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import styled from "styled-components";
 import BarNavigate from "../components/BarNavigate";
 import WritePostForm from "../features/WritePost/components/WritePostForm";
@@ -8,6 +9,7 @@ import { getHallInfo } from "../api/memorial";
 
 export default function WritePostPage() {
   const location = useLocation();
+  const navigate = useNavigate();
   const {
     hallId,
     isEdit = false,
@@ -47,10 +49,20 @@ export default function WritePostPage() {
   return (
     <div>
       <BarWrapper>
-        <BarNavigate
-          paths={paths}
-          title={isEdit ? "게시글 수정" : "게시물 작성"}
-        />
+      <BarNavigate
+        paths={paths}
+        title="게시물 작성"
+        onPathClick={(path) => {
+          if (path === "홈") {
+            // hallId 유지하면서 홈으로 이동
+            navigate("/home", { state: { hallId } });
+          }else if (path === hallTitle){
+            navigate("/memorial", { state: { hallId } });
+          }else if (path === "나의 추모관"){
+            navigate("/memorial", { state: { hallId } });
+          }
+        }}
+      />
       </BarWrapper>
 
       <WritePostForm

@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import AIGenerateForm from "../features/AIGenerate/components/AIGenerateForm";
 import BarNavigate from "../components/BarNavigate";
 import styled from "styled-components";
@@ -14,6 +15,7 @@ export default function AIGeneratePage() {
   const [generatedImage, setGeneratedImage] = useState(null);
   const [hallInfo, setHallInfo] = useState(null);
 
+  const navigate = useNavigate();
   const location = useLocation();
   const hallId = location.state?.hallId ?? 1;
 
@@ -79,10 +81,18 @@ export default function AIGeneratePage() {
   return (
     <PageWrapper>
       <BarWrapper>
-        <BarNavigate
-          paths={["홈", hallTitle, "AI 이미지 생성"]}
-          title="AI 이미지 생성"
-        />
+      <BarNavigate
+        paths={["홈", hallTitle, "AI 이미지 생성"]}
+        title="AI 이미지 생성"
+        onPathClick={(path) => {
+          if (path === "홈") {
+            // hallId 유지하면서 홈으로 이동
+            navigate("/home", { state: { hallId } });
+          }else if (path === hallTitle){
+            navigate("/memorial", { state: { hallId } });
+          }
+        }}
+      />
       </BarWrapper>
 
       {isGenerated ? (

@@ -380,7 +380,14 @@ export default function MemorialHallPage() {
             {isMe ? (
               <Title>나의 추모관</Title>
             ) : (
-              <BarNavigate paths={["홈", hallTitle]} />
+              <BarNavigate 
+              paths={["홈", hallTitle]} 
+              onPathClick={(path) => {
+                if (path === "홈") {
+                  // hallId 유지하면서 홈으로 이동
+                  nav("/home", { state: { hallIdFromState } });
+                }
+              }}/>
             )}
           </BarWrapper>
 
