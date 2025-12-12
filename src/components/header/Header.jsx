@@ -1,5 +1,5 @@
 // src/components/header/Header.jsx
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useCallback } from "react";
 import ReactDOM from "react-dom";
 import styled from "styled-components";
 import { useLocation, useNavigate } from "react-router-dom";
@@ -21,7 +21,6 @@ export default function Header({ showAuthButtons }) {
 
   const [notifications, setNotifications] = useState([]);
 
-
   const [profileInfo, setProfileInfo] = useState({
     name: "로그인",
     myProfile: null,
@@ -32,16 +31,37 @@ export default function Header({ showAuthButtons }) {
   const [isAlarmOpen, setIsAlarmOpen] = useState(false);
   const [isLogoutBoxOpen, setIsLogoutBoxOpen] = useState(false);
 
+  // 알림을 불러오는 함수 (재사용을 위해 useCallback으로 감쌈)
+  const loadNotifications = useCallback(async () => {
+    // 토큰이 없으면 요청할 필요가 없으므로 바로 종료
+    if (!getAccessToken()) {
+      setNotifications([]);
+      return;
+    }
+    
+    try {
+      const data = await fetchNotifications();
+      // 알림이 성공적으로 로드되면 상태 업데이트
+      setNotifications(data.notifications || []);
+    } catch (err) {
+      console.error("알림 불러오기 실패:", err);
+      // 실패 시 알림 상태를 초기화하거나 빈 배열로 설정
+      setNotifications([]);
+    }
+  }, []); // 의존성 배열은 비워둠
+
   const fetchProfileInfo = async () => {
     const token = getAccessToken();
 
     if (!token) {
+      // 로그아웃 상태
       setIsLoggedIn(false);
       setProfileInfo({
         name: "로그인",
         myProfile: null,
         notiCount: 0,
       });
+      setNotifications([]); // ✅ 로그아웃 시 알림 초기화
       return;
     }
 
@@ -53,14 +73,20 @@ export default function Header({ showAuthButtons }) {
         notiCount: typeof data?.notiCount === "number" ? data.notiCount : 0,
       });
       setIsLoggedIn(true);
+      
+      // ✅ 프로필 로드 성공 후 알림 로드 함수 호출
+      loadNotifications(); 
+      
     } catch (error) {
       console.warn("헤더 프로필 정보 불러오기 실패:", error);
+      // 로그인 실패/토큰 만료 시
       setProfileInfo({
         name: "로그인",
         myProfile: null,
         notiCount: 0,
       });
       setIsLoggedIn(false);
+      setNotifications([]); // ✅ 실패 시 알림 초기화
     }
   };
 
@@ -69,6 +95,7 @@ export default function Header({ showAuthButtons }) {
     fetchProfileInfo();
   }, [location.pathname]);
 
+  // 'authChanged' 이벤트 발생 시 프로필 및 알림 정보를 다시 불러옵니다.
   useEffect(() => {
     const handleAuthChanged = () => {
       fetchProfileInfo();
@@ -92,6 +119,8 @@ export default function Header({ showAuthButtons }) {
     return () =>
       window.removeEventListener("myProfileUpdated", handleProfileUpdated);
   }, []);
+  
+
 
   const menuItems = [
     { label: "홈", path: "/home" },
@@ -99,20 +128,7 @@ export default function Header({ showAuthButtons }) {
     { label: "추모관 개설하기", path: "/open" },
     { label: "나의 추모관", path: "/memorial" },
   ];
-
-      const loadNotifications = async () => {
-    try {
-      const data = await fetchNotifications();
-      setNotifications(data.notifications || []);
-    } catch (err) {
-      console.error("알림 불러오기 실패:", err);
-    }
-  };
-
-  useEffect(() => {
-    loadNotifications();
-  }, []);
-
+  
   const getIsActive = (item) => {
     if (item.label === "홈") {
       return location.pathname === "/" || location.pathname === "/home";
@@ -138,7 +154,10 @@ export default function Header({ showAuthButtons }) {
   };
 
   const handleProfileClick = () => {
-    if (!isLoggedIn) return;
+    if (!isLoggedIn) {
+      navigate("/login"); // 로그인 상태가 아니면 로그인 페이지로 이동
+      return;
+    }
     setIsLogoutBoxOpen((prev) => !prev);
     setIsAlarmOpen(false);
   };
@@ -190,14 +209,17 @@ export default function Header({ showAuthButtons }) {
 
                 {isAlarmOpen &&
                   ReactDOM.createPortal(
-                    <AlarmPanel onClose={() => setIsAlarmOpen(false)} />,
+                    <AlarmPanel 
+                      notifications={notifications} // 알림 목록을 AlarmPanel로 전달할 수 있습니다.
+                      onClose={() => setIsAlarmOpen(false)} 
+                    />,
                     document.getElementById("portal-root")
                   )}
               </AlarmWrapper>
 
               <div onClick={handleProfileClick} data-ignore-close="true">
                 <MiniProfile
-                  name={isLoggedIn ? profileInfo.name : "로그인 해주세요"}
+                  name={profileInfo.name} // 로그인 상태에 따라 이름 표시
                   profileImg={profileInfo.myProfile}
                   isLogin={isLoggedIn}
                 />
@@ -230,7 +252,7 @@ export default function Header({ showAuthButtons }) {
                 console.error("로그아웃 실패:", e);
               } finally {
                 clearAuthTokens();
-                window.dispatchEvent(new Event("authChanged"));
+                window.dispatchEvent(new Event("authChanged")); // 'authChanged' 이벤트를 발생시켜 Header 컴포넌트가 상태를 재확인하도록 함
                 navigate("/");
                 alert("로그아웃 되었습니다.");
               }
