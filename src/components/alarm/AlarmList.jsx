@@ -12,7 +12,9 @@ export const AlarmList = ({ notifications, onUpdateNotifications }) => {
   const firstItemRef = useRef(null);
   const scrollbarRef = useRef(null);
 
-  const [scrollbarHeight] = useState(10.4375 * 16); // rem → px 변환
+  const [scrollbarHeight] = useState(10.4375 * 16); // rem → px
+  const [isScrollable, setIsScrollable] = useState(false);
+
   const isDragging = useRef(false);
   const dragStartY = useRef(0);
   const scrollStartTop = useRef(0);
@@ -20,8 +22,8 @@ export const AlarmList = ({ notifications, onUpdateNotifications }) => {
   const navigate = useNavigate();
 
   /* 스크롤바 이동가능 영역 margin */
-  const topMargin = 16; // 1rem
-  const bottomMargin = -20; // 1rem
+  const topMargin = 16;
+  const bottomMargin = -20;
 
   /* 알림 삭제 */
   const handleDelete = async (id) => {
@@ -81,6 +83,8 @@ export const AlarmList = ({ notifications, onUpdateNotifications }) => {
     if (!container || !scrollbar) return;
 
     const syncScroll = () => {
+      if (!isScrollable) return;
+
       const maxTop =
         container.clientHeight - scrollbarHeight - topMargin - bottomMargin;
 
@@ -93,12 +97,13 @@ export const AlarmList = ({ notifications, onUpdateNotifications }) => {
     };
 
     container.addEventListener("scroll", syncScroll);
-
     return () => container.removeEventListener("scroll", syncScroll);
-  }, [scrollbarHeight]);
+  }, [scrollbarHeight, isScrollable]);
 
   /* custom scrollbar drag */
   const startDrag = (e) => {
+    if (!isScrollable) return;
+
     isDragging.current = true;
     dragStartY.current = e.clientY;
 
@@ -109,7 +114,7 @@ export const AlarmList = ({ notifications, onUpdateNotifications }) => {
   };
 
   const onDrag = (e) => {
-    if (!isDragging.current) return;
+    if (!isDragging.current || !isScrollable) return;
 
     const container = containerRef.current;
     const scrollbar = scrollbarRef.current;
@@ -124,7 +129,6 @@ export const AlarmList = ({ notifications, onUpdateNotifications }) => {
     newTop = Math.max(topMargin, Math.min(newTop, maxTop + topMargin));
     scrollbar.style.top = `${newTop}px`;
 
-    // 리스트 스크롤 반영
     const ratio = (newTop - topMargin) / maxTop;
     container.scrollTop =
       ratio * (container.scrollHeight - container.clientHeight);
@@ -144,24 +148,30 @@ export const AlarmList = ({ notifications, onUpdateNotifications }) => {
     };
   }, []);
 
-  /* 자동 높이 계산 */
+  /* 자동 높이 계산 + 스크롤 필요 여부 판단 */
   useEffect(() => {
-    if (!containerRef.current || notifications.length === 0) return;
+    if (!containerRef.current || notifications.length === 0) {
+      setIsScrollable(false);
+      return;
+    }
+
     const firstItem = firstItemRef.current;
     if (!firstItem) return;
 
     const itemHeight = firstItem.offsetHeight;
     const maxVisibleCount = 6;
+    const maxHeight = itemHeight * maxVisibleCount;
 
-    containerRef.current.style.maxHeight = `${itemHeight * maxVisibleCount}px`;
+    const container = containerRef.current;
+    container.style.maxHeight = `${maxHeight}px`;
+
+    setIsScrollable(container.scrollHeight > container.clientHeight);
   }, [notifications]);
 
   return (
     <Wrapper>
       <Container ref={containerRef}>
-        {notifications.length === 0 && (
-          <Empty>새로운 알림이 없어요.</Empty>
-        )}
+        {notifications.length === 0 && <Empty>새로운 알림이 없어요.</Empty>}
 
         {notifications.map((item, idx) => (
           <div key={item.notificationId} ref={idx === 0 ? firstItemRef : null}>
@@ -177,11 +187,14 @@ export const AlarmList = ({ notifications, onUpdateNotifications }) => {
         ))}
       </Container>
 
-      {/* custom scrollbar */}
+      {/* custom scrollbar: 스크롤 가능할 때만 보임 */}
       <Scrollbar
         ref={scrollbarRef}
         onMouseDown={startDrag}
-        style={{ top: `${topMargin}px` }} // 초기 위치 margin 적용
+        style={{
+          top: `${topMargin}px`,
+          display: isScrollable ? "block" : "none",
+        }}
       />
     </Wrapper>
   );
