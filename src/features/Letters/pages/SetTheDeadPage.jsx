@@ -2,7 +2,6 @@
 import React, { useEffect, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import styled from "styled-components";
-import { color, typo } from "../../../styles/tokens";
 
 import SideCategoryBox from "../components/SideCategoryBox";
 import BarNavigate from "../../../components/BarNavigate";
@@ -99,7 +98,7 @@ export default function SetTheDeadPage() {
             $align={"center"}
             style={{ marginTop: "4.5rem" }}
           >
-            <Title>고인 정보 설정</Title>
+            <br/>
             <CancelProcessButton
               title="작성 그만두기"
               onClick={handleCancelProcess}
@@ -182,8 +181,3 @@ const NavWrapper = styled.div`
   margin-bottom: 4.69rem;
 `;
 
-// 왼쪽 상단에 Title
-const Title = styled.div`
-  ${typo("h3")};
-  color: ${color("black.100")};
-`;
