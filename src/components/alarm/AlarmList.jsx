@@ -1,45 +1,38 @@
 // AlarmList.jsx
-import React, { useEffect, useState, useRef } from "react";
+import React, { useEffect, useRef } from "react"; // ⚠️ useState, loadNotifications, 마운트 useEffect 제거
 import styled from "styled-components";
 import { useNavigate } from "react-router-dom";
 import { color, typo } from "../../styles/tokens";
 import { AlarmListitem } from "./AlarmListitem";
-import { fetchNotifications, closeNotification } from "../../api/notification";
+import { closeNotification } from "../../api/notification";
 
-export const AlarmList = () => {
-  const [notifications, setNotifications] = useState([]);
+// Props로 notifications와 onUpdateNotifications를 받습니다.
+export const AlarmList = ({ notifications, onUpdateNotifications }) => {
   const containerRef = useRef(null);
   const firstItemRef = useRef(null);
   const navigate = useNavigate();
 
-  const loadNotifications = async () => {
-    try {
-      const data = await fetchNotifications();
-      setNotifications(data.notifications || []);
-    } catch (err) {
-      console.error("알림 불러오기 실패:", err);
-    }
-  };
+  // ⚠️ 자체 loadNotifications 함수는 더 이상 사용하지 않습니다.
 
+  // 알림 삭제 함수
   const handleDelete = async (id) => {
     try {
       await closeNotification(id);
-      setNotifications((prev) =>
-        prev.filter((item) => item.notificationId !== id)
-      );
+      // 알림 삭제 API 성공 후, Header의 상태를 갱신하도록 요청
+      onUpdateNotifications();
     } catch (err) {
       console.error("알림 삭제 실패:", err);
     }
   };
 
+  // 아이템 클릭 함수
   const handleItemClick = async (item) => {
     const id = item.notificationId;
 
     try {
       await closeNotification(id);
-      setNotifications((prev) =>
-        prev.filter((noti) => noti.notificationId !== id)
-      );
+      // 알림 닫기 API 성공 후, Header의 상태를 갱신하도록 요청
+      onUpdateNotifications();
     } catch (err) {
       console.error("알림 닫기 실패:", err);
     }
@@ -76,23 +69,23 @@ export const AlarmList = () => {
     navigate(path, { state });
   };
 
-  useEffect(() => {
-    loadNotifications();
-  }, []);
+  // ⚠️ 마운트 시 알림을 로드하던 useEffect는 제거되었습니다.
 
+  // 알림 목록 높이 제어 로직
   useEffect(() => {
-    if (!containerRef.current) return;
+    if (!containerRef.current || notifications.length === 0) return;
 
     const firstItem = firstItemRef.current;
     if (!firstItem) return;
 
+    // 첫 번째 아이템의 높이를 기준으로 최대 높이를 계산
     const itemHeight = firstItem.offsetHeight;
     const maxVisibleCount = 6;
 
     containerRef.current.style.maxHeight = `${
       itemHeight * maxVisibleCount
     }px`;
-  }, [notifications]);
+  }, [notifications]); // ✅ Props로 받은 notifications를 의존성 배열로 사용
 
   return (
     <Container ref={containerRef}>

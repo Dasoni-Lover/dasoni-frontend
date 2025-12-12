@@ -5,7 +5,8 @@ import Button from "../Button";
 import { color, typo } from "../../styles/tokens";
 import { AlarmList } from "./AlarmList";
 
-const AlarmPanel = ({ onClose }) => {
+// Props로 notifications와 onUpdateNotifications를 받습니다.
+const AlarmPanel = ({ onClose, notifications, onUpdateNotifications }) => {
   const panelRef = useRef(null);
 
   useEffect(() => {
@@ -40,7 +41,11 @@ const AlarmPanel = ({ onClose }) => {
         />
       </Header>
       <Wrapper>
-        <AlarmList />
+        {/* AlarmList에 Props를 전달합니다. */}
+        <AlarmList
+          notifications={notifications}
+          onUpdateNotifications={onUpdateNotifications}
+        />
       </Wrapper>
     </Panel>
   );

@@ -38,7 +38,7 @@ export default function Header({ showAuthButtons }) {
       setNotifications([]);
       return;
     }
-    
+
     try {
       const data = await fetchNotifications();
       // 알림이 성공적으로 로드되면 상태 업데이트
@@ -73,10 +73,10 @@ export default function Header({ showAuthButtons }) {
         notiCount: typeof data?.notiCount === "number" ? data.notiCount : 0,
       });
       setIsLoggedIn(true);
-      
+
       // ✅ 프로필 로드 성공 후 알림 로드 함수 호출
-      loadNotifications(); 
-      
+      loadNotifications();
+
     } catch (error) {
       console.warn("헤더 프로필 정보 불러오기 실패:", error);
       // 로그인 실패/토큰 만료 시
@@ -119,7 +119,6 @@ export default function Header({ showAuthButtons }) {
     return () =>
       window.removeEventListener("myProfileUpdated", handleProfileUpdated);
   }, []);
-  
 
 
   const menuItems = [
@@ -128,7 +127,7 @@ export default function Header({ showAuthButtons }) {
     { label: "추모관 개설하기", path: "/open" },
     { label: "나의 추모관", path: "/memorial" },
   ];
-  
+
   const getIsActive = (item) => {
     if (item.label === "홈") {
       return location.pathname === "/" || location.pathname === "/home";
@@ -209,9 +208,10 @@ export default function Header({ showAuthButtons }) {
 
                 {isAlarmOpen &&
                   ReactDOM.createPortal(
-                    <AlarmPanel 
-                      notifications={notifications} // 알림 목록을 AlarmPanel로 전달할 수 있습니다.
-                      onClose={() => setIsAlarmOpen(false)} 
+                    <AlarmPanel
+                      notifications={notifications} // ✅ 현재 알림 상태 전달
+                      onUpdateNotifications={loadNotifications} // ✅ 알림 갱신 함수 전달
+                      onClose={() => setIsAlarmOpen(false)}
                     />,
                     document.getElementById("portal-root")
                   )}
