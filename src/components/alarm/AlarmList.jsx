@@ -1,37 +1,44 @@
 // AlarmList.jsx
-import React, { useEffect, useRef } from "react"; // ⚠️ useState, loadNotifications, 마운트 useEffect 제거
+
+import React, { useEffect, useRef, useState } from "react";
 import styled from "styled-components";
 import { useNavigate } from "react-router-dom";
 import { color, typo } from "../../styles/tokens";
 import { AlarmListitem } from "./AlarmListitem";
 import { closeNotification } from "../../api/notification";
 
-// Props로 notifications와 onUpdateNotifications를 받습니다.
 export const AlarmList = ({ notifications, onUpdateNotifications }) => {
   const containerRef = useRef(null);
   const firstItemRef = useRef(null);
+  const scrollbarRef = useRef(null);
+
+  const [scrollbarHeight] = useState(10.4375 * 16); // rem → px 변환
+  const isDragging = useRef(false);
+  const dragStartY = useRef(0);
+  const scrollStartTop = useRef(0);
+
   const navigate = useNavigate();
 
-  // ⚠️ 자체 loadNotifications 함수는 더 이상 사용하지 않습니다.
+  /* 스크롤바 이동가능 영역 margin */
+  const topMargin = 16; // 1rem
+  const bottomMargin = -20; // 1rem
 
-  // 알림 삭제 함수
+  /* 알림 삭제 */
   const handleDelete = async (id) => {
     try {
       await closeNotification(id);
-      // 알림 삭제 API 성공 후, Header의 상태를 갱신하도록 요청
       onUpdateNotifications();
     } catch (err) {
       console.error("알림 삭제 실패:", err);
     }
   };
 
-  // 아이템 클릭 함수
+  /* 알림 클릭 */
   const handleItemClick = async (item) => {
     const id = item.notificationId;
 
     try {
       await closeNotification(id);
-      // 알림 닫기 API 성공 후, Header의 상태를 갱신하도록 요청
       onUpdateNotifications();
     } catch (err) {
       console.error("알림 닫기 실패:", err);
@@ -61,69 +68,153 @@ export const AlarmList = ({ notifications, onUpdateNotifications }) => {
         break;
 
       default:
-        path = "/";
-        state = {};
         break;
     }
 
     navigate(path, { state });
   };
 
-  // ⚠️ 마운트 시 알림을 로드하던 useEffect는 제거되었습니다.
+  /* 리스트 스크롤 → 스크롤바 위치 sync */
+  useEffect(() => {
+    const container = containerRef.current;
+    const scrollbar = scrollbarRef.current;
+    if (!container || !scrollbar) return;
 
-  // 알림 목록 높이 제어 로직
+    const syncScroll = () => {
+      const maxTop =
+        container.clientHeight - scrollbarHeight - topMargin - bottomMargin;
+
+      const ratio =
+        container.scrollTop /
+        (container.scrollHeight - container.clientHeight);
+
+      const newTop = topMargin + ratio * maxTop;
+      scrollbar.style.top = `${newTop}px`;
+    };
+
+    container.addEventListener("scroll", syncScroll);
+
+    return () => container.removeEventListener("scroll", syncScroll);
+  }, [scrollbarHeight]);
+
+  /* custom scrollbar drag */
+  const startDrag = (e) => {
+    isDragging.current = true;
+    dragStartY.current = e.clientY;
+
+    const currentTop = parseFloat(scrollbarRef.current.style.top || topMargin);
+    scrollStartTop.current = currentTop;
+
+    e.preventDefault();
+  };
+
+  const onDrag = (e) => {
+    if (!isDragging.current) return;
+
+    const container = containerRef.current;
+    const scrollbar = scrollbarRef.current;
+
+    const delta = e.clientY - dragStartY.current;
+
+    const maxTop =
+      container.clientHeight - scrollbarHeight - topMargin - bottomMargin;
+
+    let newTop = scrollStartTop.current + delta;
+
+    newTop = Math.max(topMargin, Math.min(newTop, maxTop + topMargin));
+    scrollbar.style.top = `${newTop}px`;
+
+    // 리스트 스크롤 반영
+    const ratio = (newTop - topMargin) / maxTop;
+    container.scrollTop =
+      ratio * (container.scrollHeight - container.clientHeight);
+  };
+
+  const endDrag = () => {
+    isDragging.current = false;
+  };
+
+  useEffect(() => {
+    document.addEventListener("mousemove", onDrag);
+    document.addEventListener("mouseup", endDrag);
+
+    return () => {
+      document.removeEventListener("mousemove", onDrag);
+      document.removeEventListener("mouseup", endDrag);
+    };
+  }, []);
+
+  /* 자동 높이 계산 */
   useEffect(() => {
     if (!containerRef.current || notifications.length === 0) return;
-
     const firstItem = firstItemRef.current;
     if (!firstItem) return;
 
-    // 첫 번째 아이템의 높이를 기준으로 최대 높이를 계산
     const itemHeight = firstItem.offsetHeight;
     const maxVisibleCount = 6;
 
-    containerRef.current.style.maxHeight = `${
-      itemHeight * maxVisibleCount
-    }px`;
-  }, [notifications]); // ✅ Props로 받은 notifications를 의존성 배열로 사용
+    containerRef.current.style.maxHeight = `${itemHeight * maxVisibleCount}px`;
+  }, [notifications]);
 
   return (
-    <Container ref={containerRef}>
-      {notifications.length === 0 && <Empty>새로운 알림이 없어요.</Empty>}
+    <Wrapper>
+      <Container ref={containerRef}>
+        {notifications.length === 0 && (
+          <Empty>새로운 알림이 없어요.</Empty>
+        )}
 
-      {notifications.map((item, idx) => (
-        <div key={item.notificationId} ref={idx === 0 ? firstItemRef : null}>
-          <AlarmListitem
-            tagText={item.kind}
-            title={item.title}
-            content={item.body}
-            hallId={item.hallId}
-            onDelete={() => handleDelete(item.notificationId)}
-            onClick={() => handleItemClick(item)}
-          />
-        </div>
-      ))}
-    </Container>
+        {notifications.map((item, idx) => (
+          <div key={item.notificationId} ref={idx === 0 ? firstItemRef : null}>
+            <AlarmListitem
+              tagText={item.kind}
+              title={item.title}
+              content={item.body}
+              hallId={item.hallId}
+              onDelete={() => handleDelete(item.notificationId)}
+              onClick={() => handleItemClick(item)}
+            />
+          </div>
+        ))}
+      </Container>
+
+      {/* custom scrollbar */}
+      <Scrollbar
+        ref={scrollbarRef}
+        onMouseDown={startDrag}
+        style={{ top: `${topMargin}px` }} // 초기 위치 margin 적용
+      />
+    </Wrapper>
   );
 };
 
 /* ========== styles ========== */
 
+const Wrapper = styled.div`
+  width: 100%;
+  position: relative;
+  background: #fff4e6;
+  border-radius: 0 0 1.875rem 1.875rem;
+`;
+
 const Container = styled.div`
   width: 100%;
-  overflow-y: auto;
+  overflow-y: scroll;
+  padding-right: 0.5rem;
 
   &::-webkit-scrollbar {
-    width: 0.375rem;
-    background: transparent;
+    display: none;
   }
+`;
 
-  &::-webkit-scrollbar-thumb {
-    border-radius: 1.25rem;
-    background: var(--50, #7a7a7a);
-  }
-
-  border-radius: 0 0 1.875rem 1.875rem;
+const Scrollbar = styled.div`
+  position: absolute;
+  right: 0.31rem;
+  width: 0.375rem;
+  height: 10.4375rem;
+  background: #7a7a7a;
+  border-radius: 1.25rem;
+  cursor: pointer;
+  z-index: 10;
 `;
 
 const Empty = styled.div`
@@ -134,11 +225,10 @@ const Empty = styled.div`
   justify-content: center;
   align-items: center;
   gap: 1.1875rem;
-  border-radius: 0 0 1.875rem 1.875rem;
-  border: 1px solid #e9e9e9;
-  background: #fff4e6;
-  box-shadow: 0 0 12px rgba(0, 0, 0, 0.02);
   ${typo("h4")}
   color: ${color("black.50")};
+  background: #fff4e6;
+  border: 1px solid #e9e9e9;
+  box-shadow: 0 0 12px rgba(0, 0, 0, 0.02);
   box-sizing: border-box;
 `;
