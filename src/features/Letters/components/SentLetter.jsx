@@ -11,22 +11,57 @@ export const SentLetter = ({
   onFromChange,
   onValueChange,
 }) => {
-  const [toWidth, setToWidth] = useState(0);
-  const [fromWidth, setFromWidth] = useState(0);
+  // 초기 너비의 기본값을 null로 설정하여 렌더링 시 180px 기본값을 명시적으로 사용하게 합니다.
+  const [toWidth, setToWidth] = useState(null);
+  const [fromWidth, setFromWidth] = useState(null);
 
   const toMeasureRef = useRef(null);
   const fromMeasureRef = useRef(null);
 
+  // To. 입력 필드 너비 계산 로직
   useEffect(() => {
-    if (toMeasureRef.current) {
-      setToWidth(toMeasureRef.current.offsetWidth + 8);
-    }
+    let animationFrameId;
+    
+    const measureWidth = () => {
+      if (toMeasureRef.current) {
+        // requestAnimationFrame을 사용하여 DOM이 완전히 업데이트된 후 측정
+        animationFrameId = requestAnimationFrame(() => {
+          // 8px는 padding/margin 등을 고려한 최소 간격
+          setToWidth(toMeasureRef.current.offsetWidth + 8);
+        });
+      }
+    };
+    
+    measureWidth();
+    
+    return () => {
+      if (animationFrameId) {
+        cancelAnimationFrame(animationFrameId);
+      }
+    };
   }, [to]);
 
+  // From. 입력 필드 너비 계산 로직 (수정 적용)
   useEffect(() => {
-    if (fromMeasureRef.current) {
-      setFromWidth(fromMeasureRef.current.offsetWidth + 8);
-    }
+    let animationFrameId;
+    
+    const measureWidth = () => {
+      if (fromMeasureRef.current) {
+        // requestAnimationFrame을 사용하여 DOM이 완전히 업데이트된 후 측정
+        animationFrameId = requestAnimationFrame(() => {
+          // 8px는 padding/margin 등을 고려한 최소 간격
+          setFromWidth(fromMeasureRef.current.offsetWidth + 8);
+        });
+      }
+    };
+    
+    measureWidth();
+    
+    return () => {
+      if (animationFrameId) {
+        cancelAnimationFrame(animationFrameId);
+      }
+    };
   }, [from]);
 
   return (
@@ -42,7 +77,8 @@ export const SentLetter = ({
             placeholder="이름을 입력해 주세요"
             value={to}
             onChange={(e) => onToChange(e.target.value)}
-            style={{ width: `${toWidth || 180}px` }}
+            // 너비가 null일 경우 기본값 180px 사용
+            style={{ width: `${toWidth !== null ? toWidth : 180}px` }}
             maxLength={15}
           />
         </InputWrapper>
@@ -69,7 +105,8 @@ export const SentLetter = ({
             placeholder="이름을 입력해 주세요"
             value={from}
             onChange={(e) => onFromChange(e.target.value)}
-            style={{ width: `${fromWidth || 180}px`, textAlign: "right" }}
+            // 너비가 null일 경우 기본값 180px 사용
+            style={{ width: `${fromWidth !== null ? fromWidth : 180}px`, textAlign: "right" }}
             maxLength={15}
           />
         </InputWrapper>
@@ -99,13 +136,16 @@ const Container = styled.div`
 const Row1 = styled.div`
   display: flex;
   align-items: center;
-  gap: 0.3rem;
+  /* Label과 Input 사이의 간격을 좁힘 */
+  gap: 0.3rem; 
 `;
 
 const Row2 = styled.div`
   display: flex;
   align-items: center;
   justify-content: flex-end;
+  /* From.과 InputWrapper 사이의 간격을 좁힘 */
+  gap: 0.3rem;
 `;
 
 const Label = styled.div`
@@ -120,13 +160,16 @@ const InputWrapper = styled.div`
   display: inline-block;
 `;
 
-// 실제 너비 계산용 숨겨진 span
+// 실제 너비 계산용 숨겨진 span (안정성 향상)
 const MeasureSpan = styled.span`
-  visibility: hidden;
+  /* visibility: hidden 대신 opacity: 0와 pointer-events: none 사용 */
+  opacity: 0;
+  pointer-events: none;
   position: absolute;
   white-space: pre;
   font-family: "Nanum OeHarMeoNiGeurSsi";
   font-size: 2rem;
+  /* 폰트 렌더링에 영향을 주지 않으면서 숨김 */
 `;
 
 const NameInput = styled.input`
