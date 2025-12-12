@@ -111,24 +111,16 @@ export default function SideCategoryBox({ hallId, page }) {
     return (
         <>
             <Container>
-
-                {/* 맨 위로 분리된 고인 정보 수정 버튼 + 편지함 아이콘 */}
-                {(page === "admin" || page === "follower") && (
-                    <Box>
+                <Box>
+                    {(page === "admin" || page === "follower") ? (
                         <WhiteButton onClick={handleClickEditHallInfo}>
-                            고인 정보 수정
+                        고인 정보 설정
                         </WhiteButton>
-                        <LetterBox src={letterbox}/>
-                    </Box>
-
-                )}
-                {(page === "me") && (
-                    <Box>
+                    ) : (
                         <br/>
-                        <LetterBox src={letterbox}/>
-                    </Box>
-
-                )}
+                    )}
+                    <LetterBox src={letterbox} />
+                </Box>
 
                 {/* 보낸 편지함 */}
                 <SideCategoryBoxItem
