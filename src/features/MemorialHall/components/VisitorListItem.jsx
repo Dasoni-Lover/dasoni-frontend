@@ -113,7 +113,7 @@ export default function VisitorListItem({
 
       {/* ⭐ 항상 렌더해두고 max-height / opacity / transform으로 애니메이션 */}
       <ContentWrapper $isOpen={isOpen} style={{ width: contentWidth }}>
-        <VisitorListItemContent item={item} />
+        <VisitorListItemContent item={item} hallId={hallId}/>
       </ContentWrapper>
 
       <ConfirmModal
