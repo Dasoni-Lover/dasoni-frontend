@@ -39,7 +39,7 @@ export const checkLetterSentToday = async (hallId) => {
     const data = res.data || {};
 
     return {
-      isSendToday: data.isSendToday ?? false,
+      isSendToday: data.sendToday ?? false,
     };
   } catch (err) {
     console.error("❌ 오늘 편지 전송 여부 체크 실패:", {
