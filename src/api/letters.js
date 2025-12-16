@@ -183,3 +183,24 @@ export const deleteTempLetter = async (hallId, letterId) => {
     throw err;
   }
 };
+
+// 나(me)에게 편지 남기기
+export const sendMyLetter = async (body) => {
+  try {
+    console.log("📨 sendMyLetter 요청:", body);
+
+    const res = await client.post(
+      "/api/halls/me/letters/send",
+      body
+    );
+
+    console.log("📨 sendMyLetter 응답:", res.data);
+    return res.data;
+  } catch (err) {
+    console.error("❌ sendMyLetter 에러:", {
+      status: err.response?.status,
+      data: err.response?.data,
+    });
+    throw err;
+  }
+};

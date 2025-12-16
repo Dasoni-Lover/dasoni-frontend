@@ -26,41 +26,44 @@ export default function SideCategoryBox({ hallId, page }) {
   const closeEditBlockedModal = () => setShowEditBlockedModal(false);
   const closeAlreadySentModal = () => setShowAlreadySentModal(false);
 
-  // ==========================
-  // 편지 쓰기 클릭
-  // ==========================
-  const handleClickWriteLetter = async () => {
-    setActiveMenu("write");
+  
+console.log("📌 SavedLetterPage page:", page);
+console.log("📌 SavedLetterPage location.state:", location.state);
+// ==========================
+// 편지 쓰기 클릭
+// ==========================
+const handleClickWriteLetter = async () => {
+  setActiveMenu("write");
 
-    try {
-      const { isSendToday } = await checkLetterSentToday(hallId);
+  // ✅ page === "me" → 오늘 편지 여부 체크 안 함
+  if (page === "me") {
+    navigate("/leave-letter", {
+      state: {
+        hallId,
+        page,
+        activeMenu: "write",
+      },
+    });
+    return;
+  }
 
-      // 오늘 이미 보낸 경우
-      if (isSendToday) {
-        setShowAlreadySentModal(true);
-        return;
-      }
+  try {
+    const { isSendToday } = await checkLetterSentToday(hallId);
 
-      // ✅ page === "me" → 모달 없이 바로 이동
-      if (page === "me") {
-        navigate("/leave-letter", {
-          state: {
-            hallId,
-            page,
-            activeMenu: "write",
-            isWanted: false, // 기본값
-          },
-        });
-        return;
-      }
-
-      // 그 외 페이지 → 모달
-      setShowModal(true);
-    } catch (error) {
-      console.error("오늘 편지 전송 여부 조회 실패:", error);
-      alert("편지 작성 가능 여부를 확인하는 중 오류가 발생했어요.");
+    // 오늘 이미 보낸 경우
+    if (isSendToday) {
+      setShowAlreadySentModal(true);
+      return;
     }
-  };
+
+    // 그 외 페이지 → 모달
+    setShowModal(true);
+  } catch (error) {
+    console.error("오늘 편지 전송 여부 조회 실패:", error);
+    alert("편지 작성 가능 여부를 확인하는 중 오류가 발생했어요.");
+  }
+};
+
 
   // ==========================
   // 모달 내 확인 처리

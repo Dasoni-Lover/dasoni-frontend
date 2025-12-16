@@ -6,7 +6,8 @@ import BarNavigate from "../components/BarNavigate";
 import { SentLetter } from "../features/Letters/components/SentLetter";
 import Button from "../components/Button";
 import ConfirmModal from "../components/ConfirmModal";
-import { sendLetter, deleteTempLetter } from "../api/letters";
+import SideCategoryBox from "../features/Letters/components/SideCategoryBox";
+import { sendLetter, sendMyLetter, deleteTempLetter } from "../api/letters";
 import { getHallInfo } from "../api/memorial";
 
 import bgicon from "../features/Letters/assets/bg-icon.svg";
@@ -18,7 +19,10 @@ export const SavedLetterPage = () => {
   const hallId = location.state?.hallId;
   const letterId = location.state?.letterId;
   const page = location.state?.page;
+  const isWanted = location.state?.isWanted;
   const letterData = location.state?.letterData;
+
+  
 
   const [letterText, setLetterText] = useState("");
   const [toName, setToName] = useState("");
@@ -43,28 +47,49 @@ export const SavedLetterPage = () => {
 
 
 
-  const handleSendLetter = async () => {
-    if (!isActive) return alert("편지를 올바르게 작성해 주세요.");
+const handleSendLetter = async () => {
+  if (!isActive) return alert("편지를 올바르게 작성해 주세요.");
 
-    try {
-      await sendLetter(hallId, {
-        letterId:null,
+  try {
+    // ✅ page === "me" → 전용 API
+    if (page === "me") {
+      await sendMyLetter({
         toName,
         fromName,
         content: letterText,
-        isCompleted: true,
       });
 
+      // ✅ 임시저장 편지였다면 삭제 (유지)
       if (letterId) {
-      await deleteTempLetter(hallId, letterId);
-    }
+        await deleteTempLetter(hallId, letterId);
+      }
 
       setModalType("submit");
       setIsModalOpen(true);
-    } catch {
-      alert("편지 보내기 실패");
+      return;
     }
-  };
+
+    // ✅ 그 외 (admin / follower)
+    await sendLetter(hallId, {
+      letterId: null,
+      toName,
+      fromName,
+      content: letterText,
+      isCompleted: true,
+      isWanted: isWanted,
+    });
+
+    if (letterId) {
+      await deleteTempLetter(hallId, letterId);
+    }
+
+    setModalType("submit");
+    setIsModalOpen(true);
+  } catch {
+    alert("편지 보내기 실패");
+  }
+};
+
 
   const handleSaveLetter = async () => {
     try {
@@ -74,9 +99,10 @@ export const SavedLetterPage = () => {
         fromName,
         content: letterText,
         isCompleted: false,
+        isWanted :isWanted,
       });
 
-      setModalType("submit");
+      setModalType("save");
       setIsModalOpen(true);
     } catch {
       alert("편지 보내기 실패");
@@ -87,7 +113,7 @@ export const SavedLetterPage = () => {
 
   const handleModalConfirm = () => {
     setIsModalOpen(false);
-    navigate("/leave-letterbox", { state: { hallId } });
+    navigate("/leave-letterbox", { state: { hallId,page } });
   };
 
   // 📌 추모관 정보
@@ -106,7 +132,7 @@ export const SavedLetterPage = () => {
 
   const paths =
     page === "me"
-      ? ["나의 추모관", "임시보관함", "편지쓰기"]
+      ? ["나의 추모관", "편지쓰기"]
       : ["홈", `故 ${hallName}의 추모관`, "편지쓰기"];
 
   return (
@@ -195,18 +221,33 @@ export const SavedLetterPage = () => {
 
         <ConfirmModal
           isOpen={isModalOpen}
-          title={modalType === "cancel" ? "작성을 그만둘까요?" : "편지를 전달했어요"}
+          title={
+            modalType === "cancel"
+              ? "작성을 그만둘까요?"
+              : modalType === "save"
+              ? "편지를 임시 보관했어요"
+              : "편지를 전달했어요"
+          }
           description={
             modalType === "cancel"
               ? "작성한 내용은 저장되지 않고 사라져요"
+              : modalType === "save"
+              ? "임시 보관함에서 확인할 수 있어요"
               : "조금만 기다리면 답장이 올 거예요"
           }
-          confirmText={modalType === "cancel" ? "그만 두기" : "확인"}
+          confirmText={
+            modalType === "cancel"
+              ? "그만 두기"
+              : "확인"
+          }
           cancelText={modalType === "cancel" ? "취소" : null}
           onConfirm={handleModalConfirm}
           onCancel={() => setIsModalOpen(false)}
         />
+
       </Wrapper>
+      
+      <SideCategoryBox hallId={hallId} page={page} />
     </Background>
   );
 };
