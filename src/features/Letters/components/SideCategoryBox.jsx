@@ -121,8 +121,12 @@ export default function SideCategoryBox({ hallId, page }) {
         {/* 맨 위로 분리된 고인 정보 수정 버튼 + 편지함 아이콘 */}
         {(page === "admin" || page === "follower") && (
           <Box>
-            <WhiteButton onClick={handleClickEditHallInfo}>
-              고인 정보 수정
+            <WhiteButton
+              onClick={handleClickEditHallInfo}
+              $bgcolor={activeMenu === "edit" ? "#FFF4E6" : undefined}
+              $border={activeMenu === "edit" ? "1px solid #FFBC67" : undefined}
+            >
+              고인 정보 설정
             </WhiteButton>
             <LetterBox src={letterbox} />
           </Box>
@@ -184,15 +188,6 @@ export default function SideCategoryBox({ hallId, page }) {
           border={activeMenu === "write" ? "1px solid #FFBC67" : undefined}
           onClick={handleClickWriteLetter}
         />
-
-        {(page === "admin" || page === "follower") && (
-          <SideCategoryBoxItem
-            text="고인 정보 수정"
-            bgcolor={activeMenu === "edit" ? "#FFF4E6" : undefined}
-            border={activeMenu === "edit" ? "1px solid #FFBC67" : undefined}
-            onClick={handleClickEditHallInfo}
-          />
-        )}
       </Container>
 
       {showModal && (
@@ -262,12 +257,13 @@ const WhiteButton = styled.button`
   cursor: pointer;
   margin-bottom: 0.37rem;
 
+  background: ${({ $bgcolor }) => $bgcolor ?? "#fff"};
+  border: ${({ $border }) => $border ?? "1px solid var(--10, #ddd)"};
+
   border-radius: 6.25rem;
-  border: 1px solid var(--10, #ddd);
-  background: #fff;
 
   ${typo("bodyb")};
-  color: ${color("black.50")};
+  color: #${color("black.50")};
 
   &:hover {
     background: #fafafa;
