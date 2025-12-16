@@ -273,6 +273,9 @@ const WhiteButton = styled.button`
   color: ${color("black.50")};
 
   &:hover {
-    background: #fafafa;
+    background: #FFF4E6;
+    border: 1px solid #FFBC67;
+    ${typo("bodyb")};
+    color: ${color("black.70")};
   }
 `;
