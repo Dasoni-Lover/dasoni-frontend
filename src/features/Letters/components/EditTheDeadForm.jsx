@@ -270,7 +270,7 @@ const ToneButtonRow = styled.div`
 
 const ToneButton = styled.button`
   display: flex;
-  width: 11.6875rem;
+  width: 100%;
   height: 2.75rem;
   padding: 0.8125rem 1.875rem;
   justify-content: center;
