@@ -85,7 +85,7 @@ export default function SetTheDeadPage() {
       try {
         const data = await getLetterSettings(hallId);
 
-        // ✅ 응답 전체가 null 값인지 검사
+        // ✅ "등록된 설정인지" 판단 (역할별 분기)
         const hasAnyValue =
           data &&
           (data.detail != null ||
@@ -93,10 +93,9 @@ export default function SetTheDeadPage() {
             data.isPolite != null ||
             data.calledName != null ||
             data.speakHabit != null ||
-            data.voiceUrl != null);
+            (isManager ? data.voiceUrl != null : false));
 
         if (hasAnyValue) {
-          // ⭐ 실제 값이 하나라도 있으면 "수정 모드"
           setExistingSettings(data);
 
           setFormData((prev) => ({
@@ -110,7 +109,7 @@ export default function SetTheDeadPage() {
             voiceFile: null,
           }));
         } else {
-          // ⭐ 모두 null이면 "처음 작성"으로 간주
+          // ✅ 방문자: voiceUrl만 있는 케이스도 여기로 떨어짐 (SetTheDeadForm)
           setExistingSettings(null);
           setFormData({
             relation: "",
@@ -129,7 +128,7 @@ export default function SetTheDeadPage() {
     };
 
     fetchSettings();
-  }, [hallId]);
+  }, [hallId, isManager]);
 
   const submitSettings = async () => {
     if (!hallId) {
