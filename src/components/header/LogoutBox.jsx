@@ -4,7 +4,7 @@ import styled from "styled-components";
 import { color, typo } from "../../styles/tokens";
 import logout from "../../assets/icon-logout.svg";
 import edit from "../../assets/edit-btn.svg";
-import profiledefaultimg from "../../assets/icon-profile-default.svg";
+import profiledefaultimg from "../../assets/icon-profile-default.png";
 import { getPresignedUrlForImage, uploadFileToS3 } from "../../api/files";
 import { updateMyProfileImage } from "../../api/user";
 
@@ -121,7 +121,7 @@ const Container = styled.div`
   border: 1px solid #f2e8df;
   background: #fff;
   box-shadow: -4px 18px 41.4px rgba(0, 0, 0, 0.11);
-  z-index: 20;
+  z-index: 30000;
 `;
 
 const Text = styled.div`
@@ -182,8 +182,6 @@ const Edit = styled.img`
   height: 1.5rem;
   justify-content: center;
   align-items: center;
-  aspect-ratio: 1/1;
-  box-shadow: 0 0 2px 0 rgba(0, 0, 0, 0.07);
 `;
 const Wrapper = styled.div`
   width: 100%;

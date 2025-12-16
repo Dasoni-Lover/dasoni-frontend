@@ -4,7 +4,7 @@ import { color, typo } from "../../styles/tokens";
 import { Tag } from "../Tag";
 import deleteicon from "../../assets/delete-icon.svg";
 
-export const AlarmListitem = ({ tagText, title, content, onDelete, onClick, hallId }) => {
+export const AlarmListitem = ({ tagText, title, content, onDelete, onClick}) => {
   return (
     <Wrapper >
       <Left onClick={onClick}>
@@ -29,7 +29,7 @@ export const AlarmListitem = ({ tagText, title, content, onDelete, onClick, hall
 
 const Wrapper = styled.div`
   display: flex;
-  width: 27.4375rem;
+  width: 100%;
   padding: 1rem 1.625rem;
   gap: 1.25rem;
   justify-content: space-between;

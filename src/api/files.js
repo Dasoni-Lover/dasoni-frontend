@@ -23,8 +23,13 @@ export const getFileContentType = (file) => {
       return "image/gif";
     case "bmp":
       return "image/bmp";
+    case "webp":
+      return "image/webp";
+    case "heic":
+      return "image/heic";
+    case "heif":
+      return "image/heif";
     case "svg":
-    case "svg+xml":
       return "image/svg+xml";
     case "pdf":
       return "application/pdf";

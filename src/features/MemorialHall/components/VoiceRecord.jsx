@@ -57,13 +57,8 @@ export default function VoiceRecord({
       return;
     }
 
-    try {
-      await audioRef.current.play();
-      setIsPlaying(true);
-    } catch (err) {
-      // 자동재생 정책 등으로 실패할 수 있음
-      setIsPlaying(false);
-    }
+    await audioRef.current.play();
+    setIsPlaying(true);
   };
 
   useEffect(() => {

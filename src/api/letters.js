@@ -55,31 +55,44 @@ export const deleteLetter = async (hallId, letterId) => {
   return client.post(`/api/halls/${hallId}/letters/${letterId}/delete`);
 };
 
-// 받은 편지함 조회 (Reply List)
+// 받은 편지함 전체 조회
 export const fetchReceivedReplies = async (hallId) => {
   try {
     const res = await client.get(`/api/halls/${hallId}/letters/reply/list`);
-
-    console.log("📨 받은 편지함 조회:", res.data);
-
-    const { count, replies } = res.data || {};
+    const { totalCount, unreadCount, readCount, replies } = res.data || {};
 
     return {
-      count: count ?? 0,
+      totalCount: totalCount ?? 0,
+      unreadCount: unreadCount ?? 0,
+      readCount: readCount ?? 0,
       replies:
         replies?.map((r) => ({
           replyId: r.replyId,
-          userName: r.userName,
-          subjectName: r.subjectName, // 고인 이름
           createdAt: r.createdAt,
           isChecked: r.isChecked,
         })) || [],
     };
   } catch (err) {
-    console.error("❌ 받은 편지함 조회 실패:", {
-      status: err.response?.status,
-      data: err.response?.data,
-    });
+    console.error("❌ 받은 편지함 조회 실패:", err.response?.data || err);
+    throw err;
+  }
+};
+
+// 받은 편지 상세 조회
+export const fetchReceivedReplyDetail = async (hallId, replyId) => {
+  try {
+    const res = await client.get(
+      `/api/halls/${hallId}/letters/reply/${replyId}`
+    );
+    return {
+      toName: res.data?.toName || "",
+      fromName: res.data?.fromName || "",
+      content: res.data?.content || "",
+      audioUrl: res.data?.audioUrl || null,
+      createdAt: res.data?.date || "",
+    };
+  } catch (err) {
+    console.error("❌ 받은 편지 상세 조회 실패:", err.response?.data || err);
     throw err;
   }
 };

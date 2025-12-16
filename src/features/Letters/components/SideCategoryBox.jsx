@@ -2,10 +2,12 @@
 import React, { useState } from "react";
 import styled from "styled-components";
 import { useNavigate, useLocation } from "react-router-dom";
+import { color, typo } from "../../../styles/tokens";
 import SideCategoryBoxItem from "./SideCategoryBoxItem";
 import { CheckReturnModal } from "./CheckReturnModal";
-import ConfirmModal from "../../../components/ConfirmModal"; // ConfirmModal 임포트 유지
+import ConfirmModal from "../../../components/ConfirmModal";
 import { getLetterStatus } from "../../../api/letters";
+import letterbox from "../assets/letter-box-icon.svg";
 
 export default function SideCategoryBox({ hallId, page }) {
   const navigate = useNavigate();
@@ -116,15 +118,32 @@ export default function SideCategoryBox({ hallId, page }) {
   return (
     <>
       <Container>
+        {/* 맨 위로 분리된 고인 정보 수정 버튼 + 편지함 아이콘 */}
+        {(page === "admin" || page === "follower") && (
+          <Box>
+            <WhiteButton onClick={handleClickEditHallInfo}>
+              고인 정보 수정
+            </WhiteButton>
+            <LetterBox src={letterbox} />
+          </Box>
+        )}
+        {page === "me" && (
+          <Box>
+            <br />
+            <LetterBox src={letterbox} />
+          </Box>
+        )}
+
+        {/* 보낸 편지함 */}
         <SideCategoryBoxItem
           text="보낸 편지함"
           bgcolor={activeMenu === "sent" ? "#FFF4E6" : undefined}
           border={activeMenu === "sent" ? "1px solid #FFBC67" : undefined}
           onClick={() => {
             setActiveMenu("sent");
-            // ⭐ 수정: page === "me" 일 때 경로 분기
             const targetPath =
               page === "me" ? "/leave-letterbox" : "/sent-letterbox";
+
             navigate(targetPath, {
               state: { hallId, page, activeMenu: "sent" },
             });
@@ -145,6 +164,20 @@ export default function SideCategoryBox({ hallId, page }) {
           />
         )}
 
+        {/* ✅ 임시보관함 (모든 page에 노출) */}
+        <SideCategoryBoxItem
+          text="임시보관함"
+          bgcolor={activeMenu === "saved" ? "#FFF4E6" : undefined}
+          border={activeMenu === "saved" ? "1px solid #FFBC67" : undefined}
+          onClick={() => {
+            setActiveMenu("saved");
+            navigate("/saved-letterbox", {
+              state: { hallId, page, activeMenu: "saved" },
+            });
+          }}
+        />
+
+        {/* 편지 쓰기 */}
         <SideCategoryBoxItem
           text="편지 쓰기"
           bgcolor={activeMenu === "write" ? "#FFF4E6" : undefined}
@@ -187,6 +220,10 @@ export default function SideCategoryBox({ hallId, page }) {
   );
 }
 
+// ==================
+// 스타일
+// ==================
+
 const Container = styled.div`
   position: fixed;
   top: 20.63rem;
@@ -198,5 +235,41 @@ const Container = styled.div`
 
   @media (max-width: 1200px) {
     display: none;
+  }
+`;
+
+const Box = styled.div`
+  width: 14.8125rem;
+  height: 4.5625rem;
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: flex-end;
+`;
+
+const LetterBox = styled.img`
+  height: 100%;
+`;
+
+const WhiteButton = styled.button`
+  display: flex;
+  width: 7.5rem;
+  height: 2.5rem;
+  padding: 0.4375rem 0.5rem;
+  justify-content: center;
+  align-items: center;
+  gap: 0.625rem;
+  cursor: pointer;
+  margin-bottom: 0.37rem;
+
+  border-radius: 6.25rem;
+  border: 1px solid var(--10, #ddd);
+  background: #fff;
+
+  ${typo("bodyb")};
+  color: ${color("black.50")};
+
+  &:hover {
+    background: #fafafa;
   }
 `;

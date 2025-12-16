@@ -1,103 +1,110 @@
 // src/pages/HomePage.jsx
 import React, { useEffect, useState } from "react";
 import styled from "styled-components";
-import HallTab from "../features/MemorialHall/components/HallTab";
 import { CardList } from "../features/Home/components/CardList";
 import { MemorialHallCount } from "../features/Home/components/MemorialHallCount";
 import { NoneList } from "../features/Home/components/NoneList";
 import { color, typo } from "../styles/tokens";
 import { fetchMyHalls, fetchManagedHalls } from "../api/user";
 
+import up from "../features/Home/assets/icon-up.svg";
+import down from "../features/Home/assets/icon-down.svg";
+
 export const HomePage = () => {
   const [myHalls, setMyHalls] = useState([]);
   const [managedHalls, setManagedHalls] = useState([]);
-  const [filteredHalls, setFilteredHalls] = useState(null);
-  const [activeTab, setActiveTab] = useState(0);
 
-  const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState(null);
+  const [filteredMyHalls, setFilteredMyHalls] = useState(null);
+  const [filteredManagedHalls, setFilteredManagedHalls] = useState(null);
 
-  // 🔹 fetch
+  const [openMy, setOpenMy] = useState(true);
+  const [openManaged, setOpenManaged] = useState(true);
+
+  // 데이터 불러오기
   useEffect(() => {
     const loadHalls = async () => {
-      try {
-        setIsLoading(true);
-        setError(null);
+      const [my, managed] = await Promise.all([
+        fetchMyHalls(),
+        fetchManagedHalls(),
+      ]);
 
-        const [my, managed] = await Promise.all([
-          fetchMyHalls(),
-          fetchManagedHalls(),
-        ]);
-
-        setMyHalls(my?.halls || []);
-        setManagedHalls(managed?.halls || []);
-      } catch (e) {
-        console.error("추모관 목록 불러오기 실패:", e);
-        setError(e);
-      } finally {
-        setIsLoading(false);
-      }
+      setMyHalls(my?.halls || []);
+      setManagedHalls(managed?.halls || []);
     };
 
     loadHalls();
   }, []);
 
-  // 🔹 현재 탭 데이터
-  const originalHalls = activeTab === 0 ? myHalls : managedHalls;
-  const hallsToShow = filteredHalls ?? originalHalls;
-
-  const isOriginalEmpty = originalHalls.length === 0;
-  const isSearchEmpty = filteredHalls !== null && filteredHalls.length === 0;
-
-  // 🔹 탭 바뀌면 검색 초기화
-  useEffect(() => {
-    setFilteredHalls(null);
-  }, [activeTab]);
-
-  // 🔹 검색 처리
+  // 검색
   const handleSearch = (keyword) => {
     if (!keyword) {
-      setFilteredHalls(null);
+      setFilteredMyHalls(null);
+      setFilteredManagedHalls(null);
       return;
     }
 
-    const filtered = originalHalls.filter((hall) =>
-      hall.name.includes(keyword)
+    setFilteredMyHalls(myHalls.filter((hall) => hall.name.includes(keyword)));
+    setFilteredManagedHalls(
+      managedHalls.filter((hall) => hall.name.includes(keyword))
     );
-
-    setFilteredHalls(filtered);
   };
+
+  const myList = filteredMyHalls ?? myHalls;
+  const managedList = filteredManagedHalls ?? managedHalls;
+
+  const isEmptyAll = myHalls.length === 0 && managedHalls.length === 0;
 
   return (
     <Wrapper>
-      <Text>홈</Text>
+      <Title>홈</Title>
 
-      <HallTab role="home" activeIndex={activeTab} onTabChange={setActiveTab} />
+      {isEmptyAll ? (
+        <NoneList />
+      ) : (
+        <MemorialHallCount
+          myCount={myHalls.length}
+          managedCount={managedHalls.length}
+          onSearch={handleSearch}
+        />
+      )}
 
-      <Content>
-        {!isOriginalEmpty && (
-          <MemorialHallCount
-            count={originalHalls.length}
-            tab={activeTab}
-            onSearch={handleSearch}
-          />
+      {/* 개설한 추모관 */}
+      <ToggleSection>
+        <ToggleHeader onClick={() => setOpenManaged((prev) => !prev)}>
+          <Text>
+            <span>개설한 추모관</span>
+            <Count>{managedList.length}</Count>
+          </Text>
+          <RightBox>
+            <ArrowIcon src={openManaged ? up : down} alt="toggle-icon" />
+          </RightBox>
+        </ToggleHeader>
+
+        {openManaged && (
+          <>
+            {managedList.length === 0 ? <></> : <CardList halls={managedList} type="managed" />}
+          </>
         )}
+      </ToggleSection>
 
-        {/* 🔹 원본이 완전히 없을 때만 NoneList 표시 */}
-        {isOriginalEmpty ? (
-          <NoneList tab={activeTab} />
-        ) : (
-          <CardList
-            halls={hallsToShow} // 검색 결과 0개면 [] 전달됨
-            type={activeTab === 1 ? "managed" : "my"}
-          />
-        )}
+      {/* 입장한 추모관 */}
+      <ToggleSection>
+        <ToggleHeader onClick={() => setOpenMy((prev) => !prev)}>
+          <Text>
+            <span>입장한 추모관</span>
+            <Count>{myList.length}</Count>
+          </Text>
+          <RightBox>
+            <ArrowIcon src={openMy ? up : down} alt="toggle-icon" />
+          </RightBox>
+        </ToggleHeader>
 
-        {/* 🔹 검색결과 0개면 아래처럼 아무 카드도 없지만 NoneList는 안 뜸 */}
-        {isSearchEmpty && (
-          <div style={{ marginTop: "1rem", color: color("black.20") }}></div>
+        {openMy && (
+          <>
+            {myList.length === 0 ? <></> : <CardList halls={myList} type="my" />}
+          </>
         )}
-      </Content>
+      </ToggleSection>
     </Wrapper>
   );
 };
@@ -108,17 +115,53 @@ const Wrapper = styled.div`
   flex-direction: column;
 `;
 
-const Text = styled.div`
+const Title = styled.div`
   ${typo("h1")};
   color: ${color("black.100")};
   margin: 2.5rem 0;
 `;
 
-const Content = styled.div`
+const ToggleSection = styled.div`
   width: 100%;
+  margin-bottom: 1.25rem;
+`;
+
+const Text = styled.div`
   display: flex;
-  flex-direction: column;
+  flex-direction: row;
+  justify-content: flex-start;
   align-items: center;
-  gap: 2rem;
-  margin-top: 2.5rem;
+  gap: 0.75rem;
+  margin-left: 1rem;
+`;
+
+const ToggleHeader = styled.div`
+  ${typo("h2")};
+  color: ${color("black.70")};
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  cursor: pointer;
+  border-radius: 1rem;
+  background: #fff4e6;
+  width: 82.5rem;
+  height: 4.6875rem;
+  padding: 0 0.75rem;
+  box-sizing: border-box;
+`;
+
+const RightBox = styled.div`
+  display: flex;
+  align-items: center;
+  margin-right: 1rem;
+`;
+
+const Count = styled.div`
+  ${typo("bodym2")};
+  color: ${color("black.30")};
+`;
+
+const ArrowIcon = styled.img`
+  width: 1.5rem;
+  height: 1.5rem;
 `;

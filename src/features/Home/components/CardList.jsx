@@ -19,5 +19,6 @@ const Wrapper = styled.div`
   justify-content: center;
   align-items: start;
   width: 100%;
-  margin-bottom: 18.3125rem;
+  margin-top: 1.25rem;
+  margin-bottom:5rem;
 `;

@@ -10,6 +10,8 @@ import ConfirmModal from "../components/ConfirmModal";
 import { sendLetter } from "../api/letters";
 import { getHallInfo } from "../api/memorial";
 import SideCategoryBox from "../features/Letters/components/SideCategoryBox";
+import bgicon from "../features/Letters/assets/bg-icon.svg";
+
 
 export const SentLetterPage = () => {
     const location = useLocation();
@@ -49,7 +51,7 @@ export const SentLetterPage = () => {
     }, [hallId, navigate]);
 
     const isActive =
-        letterText.trim().length >= 50 &&
+        letterText.trim().length >0 &&
         toName.trim().length > 0 &&
         fromName.trim().length > 0;
 
@@ -126,9 +128,21 @@ export const SentLetterPage = () => {
     const hallTitle = hallName ? `故 ${hallName}의 추모관` : "故 추모관";
 
     return (
+        <Background>
+            <BGIcon src={bgicon} alt="" />
         <Wrapper>
             <NavWrapper>
-                <BarNavigate paths={["홈", hallTitle, "편지쓰기"]} />
+                <BarNavigate 
+                paths={["홈", hallTitle, "편지쓰기"]} 
+                onPathClick={(path) => {
+                if (path === "홈") {
+                    // hallId 유지하면서 홈으로 이동
+                    navigate("/home", { state: { hallId } });
+                }else if (path === hallTitle){
+                    navigate("/memorial", { state: { hallId } });
+                }
+                }}
+            />
             </NavWrapper>
 
             <TextWrapper>
@@ -143,8 +157,8 @@ export const SentLetterPage = () => {
                 <DescriptionHover>
                     <HoverToolTip>
                         <UnorderedList>
-                            <li>{hallName}님의 기일을 챙기는 방식에 대해 적어보세요</li>
-                            <li>미처 사과하지 못했거나 풀고 싶은 마음에 대해 적어보세요</li>
+                            <li>{hallName}님과 함께한 소중한 추억에 대해 적어보세요</li>
+                            <li>{hallName}님에게 들려주고 싶은 나의 근황에 대해 적어보세요</li>
                         </UnorderedList>
                     </HoverToolTip>
                     <DescriptionText>무슨 이야기를 적어야 할지 고민되시나요?</DescriptionText>
@@ -197,10 +211,36 @@ export const SentLetterPage = () => {
 
             <SideCategoryBox hallId={hallId} page={page} activeMenu="sent" />
         </Wrapper>
+        </Background>
     );
 };
 
-// ----------------- styled -----------------
+const Background = styled.div`
+  width: 100vw;
+  height: 100vh;
+  position: relative;  /* ⭐ bgicon 기준 */
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+
+  background: linear-gradient(
+    90deg,
+    rgba(255, 241, 242, 0.5) 9.13%,
+    rgba(255, 246, 235, 0.5) 76.44%,
+    rgba(255, 239, 229, 0.5) 100%
+  );
+`;
+
+const BGIcon = styled.img`
+  position: fixed;  
+  bottom: 3.5rem;
+  right: 2.5rem;
+  width: 22.00006rem;
+  height: 11.62256rem;
+  opacity: 0.7;
+  pointer-events: none;
+`;
+
 
 const Wrapper = styled.div`
     display: flex;

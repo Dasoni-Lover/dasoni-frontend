@@ -1,38 +1,36 @@
 import React, { useEffect, useState } from 'react';
 import styled from 'styled-components';
-import { useLocation} from 'react-router-dom';
+import { useLocation } from 'react-router-dom';
+import { useNavigate } from "react-router-dom";
 
 import BarNavigate from '../components/BarNavigate';
 import { color, typo } from '../styles/tokens';
-
-import letterIcon1 from "../features/Letters/assets/read-letter-icon.svg";
-import letterIcon2 from "../features/Letters/assets/notread-letter-icon.svg"; 
-
 import SideCategoryBox from "../features/Letters/components/SideCategoryBox";
 import TapeModal from '../features/Letters/components/TapeModal';
 
-import { fetchReceivedReplies } from "../api/letters";
+import { fetchReceivedReplies, fetchReceivedReplyDetail } from "../api/letters";
 import { getHallInfo } from "../api/memorial";
+
+import letterIcon1 from "../features/Letters/assets/read-letter-icon.svg";
+import letterIcon2 from "../features/Letters/assets/notread-letter-icon.svg";
+import bgicon from "../features/Letters/assets/bg-icon.svg";
 
 const RecievedLetterBoxPage = () => {
   const location = useLocation();
-
+  const navigate = useNavigate();
   const hallId = location.state?.hallId;
   const page = location.state?.page;
 
-  const [replyCount, setReplyCount] = useState(0);
   const [replies, setReplies] = useState([]);
   const [hallName, setHallName] = useState("");
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedReply, setSelectedReply] = useState(null);
-
-
-  // 읽은 / 안읽은 편지 개수 상태 추가
   const [readCount, setReadCount] = useState(0);
   const [unreadCount, setUnreadCount] = useState(0);
 
-  // 추모관 정보 불러오기
+  // 추모관 정보
   useEffect(() => {
+    if (!hallId) return;
     const loadHallInfo = async () => {
       try {
         const data = await getHallInfo(hallId);
@@ -41,61 +39,58 @@ const RecievedLetterBoxPage = () => {
         console.error("추모관 정보 조회 실패:", err);
       }
     };
-
-    if (hallId) loadHallInfo();
+    loadHallInfo();
   }, [hallId]);
 
-  // 받은 편지 목록 불러오기
+  // 받은 편지 목록
   useEffect(() => {
+    if (!hallId) return;
     const loadReplies = async () => {
       try {
         const data = await fetchReceivedReplies(hallId);
-
-        setReplyCount(data.count);
         setReplies(data.replies);
-
-        // 읽은/안읽은 개수 자동 계산
-        const unread = data.replies.filter((r) => !r.isChecked).length;
-        const read = data.replies.filter((r) => r.isChecked).length;
-
-        setUnreadCount(unread);
-        setReadCount(read);
-
+        setUnreadCount(data.unreadCount);
+        setReadCount(data.readCount);
       } catch (err) {
         console.error("받은 편지함 조회 실패:", err);
       }
     };
-
-    if (hallId) loadReplies();
+    loadReplies();
   }, [hallId]);
 
-
-
-const handleIconClick = (item) => {  // item 전달!
-  setSelectedReply(item); 
-  setIsModalOpen(true);
-};
-
+  // 편지 클릭 시 상세 조회 후 모달 열기
+  const handleIconClick = async (reply) => {
+    try {
+      const detail = await fetchReceivedReplyDetail(hallId, reply.replyId);
+      setSelectedReply(detail);
+      setIsModalOpen(true);
+    } catch (err) {
+      console.error("편지 상세 조회 실패:", err);
+    }
+  };
 
   return (
+    <Background>
+      <BGIcon src={bgicon} alt="" />
     <Wrapper>
       <NavWrapper>
-        <BarNavigate
-          paths={["홈", `故 ${hallName}의 추모관`, "받은 편지함"]}
-        />
+        <BarNavigate 
+        paths={["홈", `故 ${hallName}의 추모관`, "받은 편지함"]} 
+        onPathClick={(path) => {
+          if (path === "홈") {
+            // hallId 유지하면서 홈으로 이동
+            navigate("/home", { state: { hallId } });
+          }else if (path === `故 ${hallName}의 추모관`){
+            navigate("/memorial", { state: { hallId } });
+          }
+        }}
+      />
       </NavWrapper>
 
       <TextWrapper>
-        <Count>총 {replyCount}개의 받은 편지가 있어요</Count>
-        <Text>
-          잠시 그리움에 머무르되, 이곳에 머물러 있지 말고 고인과 함께했던 기억을 품은 채 오늘의 삶으로 천천히 돌아가 주세요
-          <br />사랑은 사라지지 않고 여전히 당신 안에서, 따뜻한 온기로 오래도록 남아있을 거예요
-          <br />
-          <BoldText>*음성 편지는 생전 고인의 정보를 바탕으로 만든 가상의 AI 창작물이에요</BoldText>
-        </Text>
+        <Count>총 {readCount + unreadCount}개의 받은 편지가 있어요</Count>
       </TextWrapper>
 
-      {/* 읽은/안읽은 편지 수 표시 */}
       <StateBox>
         <StateContainer>
           <StateContent>읽지 않은 편지</StateContent>
@@ -111,34 +106,53 @@ const handleIconClick = (item) => {  // item 전달!
       <ContentWrapper>
         {replies.map((item) => (
           <Box key={item.replyId} onClick={() => handleIconClick(item)}>
-
-            {/* 읽음 여부에 따른 아이콘 변경 */}
-            <LetterIcon
-              src={item.isChecked ? letterIcon1 : letterIcon2}
-            />
+            <LetterIcon src={item.isChecked ? letterIcon1 : letterIcon2} />
             <Date>{item.createdAt}</Date>
           </Box>
         ))}
-        {/* <LetterIcon
-              src={letterIcon1}
-              onClick={handleIconClick}
-            /> 테스트용 */}
+
       </ContentWrapper>
 
       <SideCategoryBox hallId={hallId} page={page} />
-      {isModalOpen && (
+
+      {isModalOpen && selectedReply && (
         <TapeModal 
           onCancel={() => setIsModalOpen(false)}
           data={selectedReply}
         />
       )}
-
-
     </Wrapper>
+    </Background>
   );
 };
 
 export default RecievedLetterBoxPage;
+
+const Background = styled.div`
+  width: 100vw;
+  height: 100vh;
+  position: relative;  /* ⭐ bgicon 기준 */
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+
+  background: linear-gradient(
+    90deg,
+    rgba(255, 241, 242, 0.5) 9.13%,
+    rgba(255, 246, 235, 0.5) 76.44%,
+    rgba(255, 239, 229, 0.5) 100%
+  );
+`;
+
+const BGIcon = styled.img`
+  position: fixed;  
+  bottom: 3.5rem;
+  right: 2.5rem;
+  width: 22.00006rem;
+  height: 11.62256rem;
+  opacity: 0.7;
+  pointer-events: none;
+`;
 
 
 const Wrapper = styled.div`
@@ -237,7 +251,6 @@ const Date = styled.div`
   color: ${color("black.50")};
   margin-top: 0.25rem;
 `;
-
 
 const NewBadge = styled.div`
   position: absolute;

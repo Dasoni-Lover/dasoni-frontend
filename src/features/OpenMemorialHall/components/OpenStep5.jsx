@@ -40,9 +40,9 @@ export default function OpenStep5({ onValidChange, formData, setFormData }) {
             />
 
             <Column $gap={"0.25rem"}>
-              <RadioText>검색 허용하기</RadioText>
+              <RadioText>네, 허용할게요</RadioText>
               <RadioInfo>
-                다른 이용자가 고인의 이름으로 추모관을 검색해 방문할 수 있어요.
+                추모관 검색 시 모든 사용자에게 노출돼요
               </RadioInfo>
             </Column>
           </Row>
@@ -62,9 +62,9 @@ export default function OpenStep5({ onValidChange, formData, setFormData }) {
             />
 
             <Column $gap={"0.25rem"}>
-              <RadioText>검색 허용하지 않기</RadioText>
+              <RadioText>아니요, 허용하지 않을게요</RadioText>
               <RadioInfo>
-                초대 링크를 받은 사람만 추모관에 들어올 수 있어요.
+                추모관 검색 시 다른 사용자에게 노출되지 않아요
               </RadioInfo>
             </Column>
           </Row>
