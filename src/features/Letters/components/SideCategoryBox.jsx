@@ -20,8 +20,6 @@ export default function SideCategoryBox({ hallId, page }) {
 
   const [showModal, setShowModal] = useState(false);
   const [showEditBlockedModal, setShowEditBlockedModal] = useState(false);
-
-  // ⭐ 오늘 편지 이미 보냈을 때 모달
   const [showAlreadySentModal, setShowAlreadySentModal] = useState(false);
 
   const closeModal = () => setShowModal(false);
@@ -35,22 +33,28 @@ export default function SideCategoryBox({ hallId, page }) {
     setActiveMenu("write");
 
     try {
-      // ✅ 오늘 편지 전송 여부 체크
       const { isSendToday } = await checkLetterSentToday(hallId);
 
+      // 오늘 이미 보낸 경우
       if (isSendToday) {
         setShowAlreadySentModal(true);
         return;
       }
 
-      // 기존 로직 유지
+      // ✅ page === "me" → 모달 없이 바로 이동
       if (page === "me") {
         navigate("/leave-letter", {
-          state: { hallId, page, activeMenu: "write" },
+          state: {
+            hallId,
+            page,
+            activeMenu: "write",
+            isWanted: false, // 기본값
+          },
         });
         return;
       }
 
+      // 그 외 페이지 → 모달
       setShowModal(true);
     } catch (error) {
       console.error("오늘 편지 전송 여부 조회 실패:", error);
@@ -64,9 +68,17 @@ export default function SideCategoryBox({ hallId, page }) {
   const handleModalConfirm = async (selectedOption) => {
     setShowModal(false);
 
+    const isWanted = selectedOption === "yes";
+
+    // NO 선택 → 바로 편지 작성
     if (selectedOption === "no") {
       navigate("/sent-letter", {
-        state: { hallId, page, activeMenu: "write", selectedOption },
+        state: {
+          hallId,
+          page,
+          activeMenu: "write",
+          isWanted, // false
+        },
       });
       return;
     }
@@ -76,21 +88,41 @@ export default function SideCategoryBox({ hallId, page }) {
 
       if (isOpen === true && isSet === true) {
         navigate("/sent-letter", {
-          state: { hallId, page, activeMenu: "write", selectedOption },
+          state: {
+            hallId,
+            page,
+            activeMenu: "write",
+            isWanted, // true
+          },
         });
       } else if (isOpen === true && isSet === false) {
         if (page === "follower") {
           navigate("/edit-hallinfo", {
-            state: { hallId, page, activeMenu: "edit", selectedOption },
+            state: {
+              hallId,
+              page,
+              activeMenu: "edit",
+              isWanted,
+            },
           });
         } else {
           navigate("/sent-letter", {
-            state: { hallId, page, activeMenu: "write", selectedOption },
+            state: {
+              hallId,
+              page,
+              activeMenu: "write",
+              isWanted,
+            },
           });
         }
       } else if (isOpen === false) {
         navigate("/edit-hallinfo", {
-          state: { hallId, page, activeMenu: "edit", selectedOption },
+          state: {
+            hallId,
+            page,
+            activeMenu: "edit",
+            isWanted,
+          },
         });
       }
     } catch (error) {
@@ -182,7 +214,6 @@ export default function SideCategoryBox({ hallId, page }) {
         />
       </Container>
 
-      {/* 기존 모달 */}
       {showModal && (
         <CheckReturnModal
           onClose={closeModal}
@@ -207,7 +238,6 @@ export default function SideCategoryBox({ hallId, page }) {
         />
       )}
 
-      {/* ⭐ 오늘 이미 편지 보낸 경우 */}
       {showAlreadySentModal && (
         <ConfirmModal
           isOpen={showAlreadySentModal}
@@ -228,7 +258,6 @@ export default function SideCategoryBox({ hallId, page }) {
   );
 }
 
-/* ================== 스타일 ================== */
 
 const Container = styled.div`
   position: fixed;

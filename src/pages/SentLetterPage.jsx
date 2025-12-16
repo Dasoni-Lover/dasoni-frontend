@@ -16,6 +16,7 @@ import bgicon from "../features/Letters/assets/bg-icon.svg";
 export const SentLetterPage = () => {
     const location = useLocation();
     const hallId = location.state?.hallId;
+    const isWanted = location.state?.isWanted;
     const page = location.state?.page;
     const selectedOption = location.state?.selectedOption
     const navigate = useNavigate();
@@ -23,7 +24,7 @@ export const SentLetterPage = () => {
     const [letterText, setLetterText] = useState("");
     const [toName, setToName] = useState("");
     const [fromName, setFromName] = useState("");
-    const [isWanted] = useState(true);
+    
 
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [modalType, setModalType] = useState("");
