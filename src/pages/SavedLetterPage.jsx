@@ -144,13 +144,26 @@ export const SavedLetterPage = () => {
           <Button
             text="취소"
             size="M"
+            width="13.75rem"
             color="white"
             onClick={() => {
               setModalType("cancel");
               setIsModalOpen(true);
             }}
           />
-          <Button text="전달하기" size="M" active={isActive} onClick={handleSendLetter} />
+          <Button
+            text="임시 보관하기"
+            size="M"
+            width="13.75rem"
+            color="white"
+            onClick={()=>{}}
+          />
+          <Button 
+            text="전달하기" 
+            size="M"
+            width="13.75rem"
+            active={isActive} 
+            onClick={handleSendLetter} />
         </ButtonWrapper>
 
         <ConfirmModal
