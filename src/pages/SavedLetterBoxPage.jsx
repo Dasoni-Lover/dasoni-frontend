@@ -63,6 +63,7 @@ export const SavedLetterBoxPage = () => {
         state: {
           hallId,
           page,
+          letterId,
           letterData: {
             toName: detail.toName,
             fromName: detail.fromName,

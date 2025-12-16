@@ -6,7 +6,7 @@ import BarNavigate from "../components/BarNavigate";
 import { SentLetter } from "../features/Letters/components/SentLetter";
 import Button from "../components/Button";
 import ConfirmModal from "../components/ConfirmModal";
-import { sendLetter } from "../api/letters";
+import { sendLetter, deleteTempLetter } from "../api/letters";
 import { getHallInfo } from "../api/memorial";
 
 import bgicon from "../features/Letters/assets/bg-icon.svg";
@@ -16,6 +16,7 @@ export const SavedLetterPage = () => {
   const navigate = useNavigate();
 
   const hallId = location.state?.hallId;
+  const letterId = location.state?.letterId;
   const page = location.state?.page;
   const letterData = location.state?.letterData;
 
@@ -40,23 +41,49 @@ export const SavedLetterPage = () => {
     toName.trim().length > 0 &&
     fromName.trim().length > 0;
 
+
+
   const handleSendLetter = async () => {
     if (!isActive) return alert("편지를 올바르게 작성해 주세요.");
 
     try {
       await sendLetter(hallId, {
+        letterId:null,
         toName,
         fromName,
         content: letterText,
         isCompleted: true,
       });
 
+      if (letterId) {
+      await deleteTempLetter(hallId, letterId);
+    }
+
       setModalType("submit");
       setIsModalOpen(true);
-    } catch (err) {
+    } catch {
       alert("편지 보내기 실패");
     }
   };
+
+  const handleSaveLetter = async () => {
+    try {
+      await sendLetter(hallId, {
+        letterId:letterId,
+        toName,
+        fromName,
+        content: letterText,
+        isCompleted: false,
+      });
+
+      setModalType("submit");
+      setIsModalOpen(true);
+    } catch {
+      alert("편지 보내기 실패");
+    }
+  };
+
+
 
   const handleModalConfirm = () => {
     setIsModalOpen(false);
@@ -156,7 +183,7 @@ export const SavedLetterPage = () => {
             size="M"
             width="13.75rem"
             color="white"
-            onClick={()=>{}}
+            onClick={handleSaveLetter}
           />
           <Button 
             text="전달하기" 
