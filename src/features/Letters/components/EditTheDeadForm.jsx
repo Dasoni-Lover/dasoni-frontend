@@ -59,7 +59,7 @@ export default function EditTheDeadForm({
         <FieldCell>
           <InputField
             value={relation}
-            width="90%"
+            width="100%"
             onChange={handleChange("relation")}
             placeholder="예) 엄마, 할아버지, 대학교 친구"
           />
@@ -78,7 +78,7 @@ export default function EditTheDeadForm({
           <Textarea
             value={about}
             onChange={handleChange("about")}
-            placeholder="예) 농담을 자주 하고 분위기를 밝게 만드는 스타일이었어요"
+            placeholder={`예) 농담을 자주 하고 분위기를 밝게 만드는 스타일이었어요\n예) 항상 웃으면서 챙겨주던 따뜻한 사람이었어요`}
           />
         </FieldCell>
       </FormRow>
@@ -122,9 +122,9 @@ export default function EditTheDeadForm({
         <FieldCell>
           <InputField
             value={nickname}
-            width="90%"
+            width="100%"
             onChange={handleChange("nickname")}
-            placeholder="예) 울엄마, 우리 아들, 울 강아지"
+            placeholder="예) OO아, 우리 아들, 울 강아지"
           />
         </FieldCell>
       </FormRow>
@@ -141,7 +141,7 @@ export default function EditTheDeadForm({
           <Textarea
             value={frequentWords}
             onChange={handleChange("frequentWords")}
-            placeholder="예) 사랑해요, 밥은 먹었어?, 위험하니까 일찍 다녀, 괜찮아 다 잘될 거야"
+            placeholder="예) 밥은 먹었어?, 위험하니까 일찍 다녀, 사랑해, 괜찮아 다 잘될 거야"
           />
         </FieldCell>
       </FormRow>
@@ -178,6 +178,8 @@ export default function EditTheDeadForm({
                   url={!voiceFile ? voiceUrl : undefined}
                   onReupload={openFileDialog}
                   onDelete={handleDeleteVoice}
+                  showTime={false}
+                  showDelete={false}
                 />
               </VoicePlayerWrapper>
             )}
@@ -238,7 +240,7 @@ const RequiredDot = styled.img`
 
 const Textarea = styled.textarea`
   display: flex;
-  width: 90%;
+  width: 100%;
   height: 9.5rem;
   min-height: 9.5rem;
   padding: 1rem;
@@ -257,7 +259,7 @@ const Textarea = styled.textarea`
   color: ${color("black.70")};
 
   &::placeholder {
-    color: ${color("black.30")};
+    color: ${color("black.10")};
   }
 `;
 

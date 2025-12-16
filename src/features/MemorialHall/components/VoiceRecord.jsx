@@ -5,7 +5,14 @@ import playicon from "../assets/icon-play.svg";
 import pauseicon from "../assets/icon-pause.svg"; // 아직 미생성
 import { color, typo } from "../../../styles/tokens";
 
-export default function VoiceRecord({ file, url, onReupload, onDelete }) {
+export default function VoiceRecord({
+  file,
+  url,
+  onReupload,
+  onDelete,
+  showTime = true, // ✅ 시간 표시 숨김/표시
+  showDelete = true, // ✅ 삭제 버튼 숨김/표시
+}) {
   const audioRef = useRef(null);
   const [isPlaying, setIsPlaying] = useState(false);
   const [currentTime, setCurrentTime] = useState(0);
@@ -30,14 +37,33 @@ export default function VoiceRecord({ file, url, onReupload, onDelete }) {
     setFileUrl("");
   }, [file, url]);
 
-  const handlePlayPause = () => {
+  // ✅ 소스가 바뀌면 재생 상태/시간 초기화 (안전)
+  useEffect(() => {
+    setIsPlaying(false);
+    setCurrentTime(0);
+
+    if (audioRef.current) {
+      audioRef.current.pause();
+      audioRef.current.currentTime = 0;
+    }
+  }, [fileUrl]);
+
+  const handlePlayPause = async () => {
     if (!audioRef.current) return;
+
     if (isPlaying) {
       audioRef.current.pause();
-    } else {
-      audioRef.current.play();
+      setIsPlaying(false);
+      return;
     }
-    setIsPlaying(!isPlaying);
+
+    try {
+      await audioRef.current.play();
+      setIsPlaying(true);
+    } catch (err) {
+      // 자동재생 정책 등으로 실패할 수 있음
+      setIsPlaying(false);
+    }
   };
 
   useEffect(() => {
@@ -47,12 +73,19 @@ export default function VoiceRecord({ file, url, onReupload, onDelete }) {
     const updateTime = () => setCurrentTime(audio.currentTime);
     const setAudioData = () => setDuration(audio.duration || 0);
 
+    const handleEnded = () => {
+      setIsPlaying(false);
+      setCurrentTime(0);
+    };
+
     audio.addEventListener("timeupdate", updateTime);
     audio.addEventListener("loadedmetadata", setAudioData);
+    audio.addEventListener("ended", handleEnded);
 
     return () => {
       audio.removeEventListener("timeupdate", updateTime);
       audio.removeEventListener("loadedmetadata", setAudioData);
+      audio.removeEventListener("ended", handleEnded);
     };
   }, []);
 
@@ -68,10 +101,12 @@ export default function VoiceRecord({ file, url, onReupload, onDelete }) {
   };
 
   const handleProgressClick = (e) => {
+    if (!duration) return;
     const rect = e.currentTarget.getBoundingClientRect();
     const clickX = e.clientX - rect.left;
     const width = rect.width;
     const newTime = (clickX / width) * duration;
+
     if (audioRef.current) {
       audioRef.current.currentTime = newTime;
     }
@@ -79,25 +114,31 @@ export default function VoiceRecord({ file, url, onReupload, onDelete }) {
 
   return (
     <Wrapper>
-      <Box>
+      <Box $showTime={showTime}>
         <Play
           src={isPlaying ? pauseicon : playicon}
           alt="재생 버튼"
           onClick={handlePlayPause}
         />
-        <Time>
-          {formatTime(currentTime)} / {formatTime(duration)}
-        </Time>
+
+        {showTime && (
+          <Time>
+            {formatTime(currentTime)} / {formatTime(duration)}
+          </Time>
+        )}
+
         <ProgressWrapper onClick={handleProgressClick}>
           <Progress value={duration ? (currentTime / duration) * 100 : 0}>
             <ProgressCircle />
           </Progress>
         </ProgressWrapper>
+
         <audio ref={audioRef} src={fileUrl} preload="metadata" />
       </Box>
+
       <ButtonWrapper>
-        <Button onClick={onReupload}>재업로드</Button>
-        <Button onClick={onDelete}>삭제</Button>
+        {onReupload && <Button onClick={onReupload}>재업로드</Button>}
+        {showDelete && onDelete && <Button onClick={onDelete}>삭제</Button>}
       </ButtonWrapper>
     </Wrapper>
   );
@@ -116,7 +157,6 @@ const Wrapper = styled.div`
 `;
 
 const Box = styled.div`
-  width: 26rem;
   height: 4rem;
   display: flex;
   align-items: center;
@@ -131,7 +171,6 @@ const Play = styled.img`
   transform: rotate(360deg);
   flex-shrink: 0;
   margin-right: 1rem;
-  margin-left: 2rem;
   cursor: pointer;
 `;
 
