@@ -54,27 +54,34 @@ export const SavedLetterBoxPage = () => {
     }
   };
 
-  // 📌 편지 클릭 → 페이지 이동
-  const handleSelectLetter = async (letterId) => {
-    try {
-      const detail = await fetchTempLetterDetail(hallId, letterId);
+// 📌 편지 클릭 → 페이지 이동
+const handleSelectLetter = async (letterId) => {
+  try {
+    const detail = await fetchTempLetterDetail(hallId, letterId);
 
-      navigate("/saved-letter", {
-        state: {
-          hallId,
-          page,
-          letterId,
-          letterData: {
-            toName: detail.toName,
-            fromName: detail.fromName,
-            content: detail.content,
-          },
+    // ⭐ 클릭한 letter 찾기
+    const selectedLetter = letters.find(
+      (l) => l.letterId === letterId
+    );
+
+    navigate("/saved-letter", {
+      state: {
+        hallId,
+        page,
+        letterId,
+        isWanted: selectedLetter?.isWanted ?? false, // ✅ 추가
+        letterData: {
+          toName: detail.toName,
+          fromName: detail.fromName,
+          content: detail.content,
         },
-      });
-    } catch {
-      console.error("❌ 상세 조회 실패");
-    }
-  };
+      },
+    });
+  } catch {
+    console.error("❌ 상세 조회 실패");
+  }
+};
+
 
   // ⭐ 임시 저장 편지 삭제 기능
   const handleDeleteLetter = async (letterId) => {

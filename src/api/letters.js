@@ -134,9 +134,10 @@ export const fetchTempLettersList = async (hallId) => {
       console.log("🔍 each letter:", l);
       return {
         ...l,
-        letterId: l.letterId,   // ⭐ 여기 수정!
+        letterId: l.letterId, 
         createdAt: l.date,
         excerpt: l.content?.slice(0, 20) || "",  // 리스트 미리보기용(선택)
+        isWanted: l.isWanted,  
       };
     });
   } catch (err) {
