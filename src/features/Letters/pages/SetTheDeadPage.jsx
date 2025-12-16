@@ -156,7 +156,7 @@ export default function SetTheDeadPage() {
 
       const payload = {
         detail: formData.relation,
-        explain: formData.about,
+        explanation: formData.about,
         isPolite: formData.tone === "존댓말",
         calledName: formData.nickname,
         speakHabit: formData.frequentWords,
@@ -210,132 +210,137 @@ export default function SetTheDeadPage() {
 
   return (
     <Background>
-    <Container>
-      <SideCategoryBox hallId={hallId} page={page} />
+      <Container>
+        <SideCategoryBox hallId={hallId} page={page} />
 
-      <MainWrapper>
-        <NavWrapper>
-          <BarNavigate paths={["홈", hallTitle, "고인 정보 설정"]} />
+        <MainWrapper>
+          <NavWrapper>
+            <BarNavigate paths={["홈", hallTitle, "고인 정보 설정"]} />
 
-          {/* 새로 작성일 때만 상단 "작성 그만두기" 버튼 노출 */}
-          {!isEditing && (
-            <Row
-              $justify={"space-between"}
-              $align={"center"}
-              style={{ marginTop: "4.5rem" }}
-            >
-              <Title>고인 정보 설정</Title>
-              <CancelProcessButton
-                title="작성 그만두기"
-                onClick={handleCancelProcess}
+            {/* 새로 작성일 때만 상단 "작성 그만두기" 버튼 노출 */}
+            {!isEditing && (
+              <Row
+                $justify={"space-between"}
+                $align={"center"}
+                style={{ marginTop: "4.5rem" }}
+              >
+                <Title>고인 정보 설정</Title>
+                <CancelProcessButton
+                  title="작성 그만두기"
+                  onClick={handleCancelProcess}
+                />
+              </Row>
+            )}
+          </NavWrapper>
+
+          {/* ✅ 이미 설정된 경우: 수정 폼 */}
+          {isEditing ? (
+            <Row $justify={"space-between"} $align={"flex-start"}>
+              <EditTheDeadForm
+                formData={formData}
+                setFormData={setFormData}
+                isManager={isManager}
+                voiceUrl={existingSettings?.voiceUrl}
               />
-            </Row>
-          )}
-        </NavWrapper>
 
-        {/* ✅ 이미 설정된 경우: 수정 폼 */}
-        {isEditing ? (
-          <Row $justify={"space-between"} $align={"flex-start"}>
-            <EditTheDeadForm
-              formData={formData}
-              setFormData={setFormData}
-              isManager={isManager}
-              voiceUrl={existingSettings?.voiceUrl}
-            />
-
-            <Column $gap={"1rem"}>
-              <Button
-                size="M"
-                width="14rem"
-                text="저장하기"
-                onClick={submitSettings}
-                active={!isSubmitting}
-              />
-              <Button
-                size="M"
-                width="14rem"
-                color="white"
-                text="취소"
-                onClick={goSentLetterBox}
-              />
-            </Column>
-          </Row>
-        ) : (
-          // ✅ 설정이 없을 때만 단계형 폼 + 버튼
-          <Row $justify={"space-between"} $align={"flex-start"}>
-            <SetTheDeadForm
-              step={step}
-              maxStep={MAX_STEP}
-              isManager={isManager}
-              onStepValidChange={setIsStepValid}
-              formData={formData}
-              setFormData={setFormData}
-            />
-
-            <Column $gap={"1rem"}>
-              <Button
-                size="M"
-                width="14rem"
-                text={isLastStep ? "완료" : "다음"}
-                onClick={handleNext}
-                active={isStepValid && !isSubmitting}
-              />
-              {step !== 1 && (
+              <Column $gap={"1rem"}>
+                <Button
+                  size="M"
+                  width="14rem"
+                  text="저장하기"
+                  onClick={submitSettings}
+                  active={!isSubmitting}
+                />
                 <Button
                   size="M"
                   width="14rem"
                   color="white"
-                  text="뒤로"
-                  onClick={handlePrevOrCancel}
+                  text="취소"
+                  onClick={goSentLetterBox}
                 />
-              )}
-            </Column>
-          </Row>
-        )}
-      </MainWrapper>
+              </Column>
+            </Row>
+          ) : (
+            // ✅ 설정이 없을 때만 단계형 폼 + 버튼
+            <Row $justify={"space-between"} $align={"flex-start"}>
+              <SetTheDeadForm
+                step={step}
+                maxStep={MAX_STEP}
+                isManager={isManager}
+                onStepValidChange={setIsStepValid}
+                formData={formData}
+                setFormData={setFormData}
+              />
 
-      {/* 작성 그만두기 모달 */}
-      <ConfirmModal
-        isOpen={isCanceled}
-        title="작성을 그만둘까요?"
-        description="작성한 내용은 저장되지 않고 사라져요"
-        confirmText="그만두기"
-        cancelText="취소"
-        onConfirm={goSentLetterBox}
-        onCancel={() => {
-          setIsCanceled(false);
-        }}
-      />
+              <Column $gap={"1rem"}>
+                <Button
+                  size="M"
+                  width="14rem"
+                  text={isLastStep ? "완료" : "다음"}
+                  onClick={handleNext}
+                  active={isStepValid && !isSubmitting}
+                />
+                {step !== 1 && (
+                  <Button
+                    size="M"
+                    width="14rem"
+                    color="white"
+                    text="뒤로"
+                    onClick={handlePrevOrCancel}
+                  />
+                )}
+              </Column>
+            </Row>
+          )}
+        </MainWrapper>
 
-      {/* ✅ 저장 완료 모달 (생성 / 수정에 따라 타이틀 분기) */}
-      <ConfirmModal
-        isOpen={isConfirmOpen}
-        title={
-          isEditing
-            ? "변경사항을 성공적으로 저장했어요"
-            : "고인정보등록을 완료했어요"
-        }
-        image={IconCheck}
-        confirmText="확인"
-        onConfirm={() => {
-          setIsConfirmOpen(false);
-          goSentLetterBox();
-        }}
-        onCancel={() => setIsConfirmOpen(false)}
-      />
-    </Container>
+        {/* 작성 그만두기 모달 */}
+        <ConfirmModal
+          isOpen={isCanceled}
+          title="작성을 그만둘까요?"
+          description="작성한 내용은 저장되지 않고 사라져요"
+          confirmText="그만두기"
+          cancelText="취소"
+          onConfirm={goSentLetterBox}
+          onCancel={() => {
+            setIsCanceled(false);
+          }}
+        />
+
+        {/* ✅ 저장 완료 모달 (생성 / 수정에 따라 타이틀 분기) */}
+        <ConfirmModal
+          isOpen={isConfirmOpen}
+          title={
+            isEditing
+              ? "변경사항을 성공적으로 저장했어요"
+              : "고인정보등록을 완료했어요"
+          }
+          image={IconCheck}
+          confirmText="확인"
+          onConfirm={() => {
+            setIsConfirmOpen(false);
+            goSentLetterBox();
+          }}
+          onCancel={() => setIsConfirmOpen(false)}
+        />
+      </Container>
     </Background>
   );
 }
 
-const Background=styled.div`
+const Background = styled.div`
   width: 100vw;
   height: 100vh;
   display: flex;
   flex-direction: column;
   align-items: center;
-  background: linear-gradient(90deg, #FFF1F2 9.13%, #FFF6EB 76.44%, #FFEFE5 100%);
-`
+  background: linear-gradient(
+    90deg,
+    #fff1f2 9.13%,
+    #fff6eb 76.44%,
+    #ffefe5 100%
+  );
+`;
 
 const Container = styled.div`
   display: flex;

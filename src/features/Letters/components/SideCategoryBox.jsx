@@ -228,7 +228,7 @@ const Container = styled.div`
   flex-direction: column;
   gap: 0.625rem;
 
-  @media (max-width: 1200px) {
+  @media (max-width: 1350px) {
     display: none;
   }
 `;
