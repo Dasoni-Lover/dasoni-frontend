@@ -20,6 +20,7 @@ import bgicon from "../features/Letters/assets/bg-icon.svg";
 
 import { useWriteLetterFlow } from "../hooks/useWriteLetterFlow";
 import { CheckReturnModal } from '../features/Letters/components/CheckReturnModal';
+import CalendarList from "../features/Letters/components/CalendarList";
 
 
 import {
@@ -42,6 +43,9 @@ export const LeaveLetterBoxPage = () => {
   const [calendarOpen, setCalendarOpen] = useState(false);
   const [deleteTarget, setDeleteTarget] = useState(null);
 const [deleteModalOpen, setDeleteModalOpen] = useState(false);
+const [calendarListOpen, setCalendarListOpen] = useState(false);
+const [calendarLetters, setCalendarLetters] = useState([]);
+
 
   
 
@@ -92,6 +96,11 @@ const [deleteModalOpen, setDeleteModalOpen] = useState(false);
     }
   };
 
+const handleCalendarLetterClick = async () => {
+  const list = await fetchLettersList(hallId);
+  setCalendarLetters(list);
+  setCalendarListOpen(true);
+};
 
 
 // 삭제 핸들러
@@ -182,7 +191,7 @@ const {
               <>
                 <Divider />
                 <CalendarArea>
-                  <Calendar hallId={hallId} letterDates={letterDates} />
+                  <Calendar hallId={hallId} onClickLetter={handleCalendarLetterClick} />
                 </CalendarArea>
               </>
             )}
@@ -228,6 +237,22 @@ const {
                 />
               )}
     </Wrapper> 
+    {calendarListOpen && (
+  <CalendarListOverlay onClick={() => setCalendarListOpen(false)}>
+    <CalendarListModal onClick={(e) => e.stopPropagation()}>
+      <CalendarList
+        letters={calendarLetters}
+        onSelect={(letterId) => {
+          setCalendarListOpen(false);
+          openLetterDetail(letterId);
+        }}
+        onClose={() => setCalendarListOpen(false)}
+      />
+    </CalendarListModal>
+  </CalendarListOverlay>
+)}
+
+
     </Background>
   );
 };
@@ -360,4 +385,24 @@ const Divider = styled.div`
   height: 42.5rem;
   background-color: #ddd;
   margin: 0 0.5rem 0 2rem;
+`;
+
+const CalendarListOverlay = styled.div`
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.4);
+  z-index: 999;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+`;
+
+const CalendarListModal = styled.div`
+  background: #fff;
+  border-radius: 0.75rem;
+  padding: 1.5rem;
+  width: 32rem;
+  max-height: 70vh;
+  overflow-y: auto;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
 `;

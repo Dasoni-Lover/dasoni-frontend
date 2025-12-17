@@ -1,3 +1,4 @@
+// ❌ LetterModal 관련 전부 제거
 import React, { useState, useEffect } from "react";
 import styled from "styled-components";
 import { color, typo } from "../styles/tokens";
@@ -5,30 +6,23 @@ import nextbtn from "../assets/calendar-next-btn.svg";
 import falsebtn from "../assets/false-calendar-next-btn.svg";
 import prevbtn from "../assets/prev-btn.svg";
 import lettericon from "../features/Letters/assets/letter-icon.svg";
-import LetterModal from "../features/Letters/components/LetterModal";
-import { fetchLetterDetail, fetchLettersCalendar } from "../api/letters";
+import { fetchLettersCalendar } from "../api/letters";
 
 const weekDays = ["일", "월", "화", "수", "목", "금", "토"];
 
-const Calendar = ({ hallId }) => {
+const Calendar = ({ hallId, onClickLetter }) => {
   const [currentDate, setCurrentDate] = useState(new Date());
-  const [calendarLetters, setCalendarLetters] = useState([]); // 달력 편지 리스트
-  const [isModalOpen, setIsModalOpen] = useState(false);
-  const [selectedLetter, setSelectedLetter] = useState(null);
+  const [calendarLetters, setCalendarLetters] = useState([]);
 
   useEffect(() => {
     if (!hallId) return;
-    const loadCalendar = async () => {
-      try {
-        const year = currentDate.getFullYear();
-        const month = currentDate.getMonth() + 1;
-        const days = await fetchLettersCalendar(hallId, year, month);
-        setCalendarLetters(days); // [{ date, letterId }]
-      } catch (err) {
-        console.error("달력 편지 조회 실패:", err);
-      }
+    const load = async () => {
+      const year = currentDate.getFullYear();
+      const month = currentDate.getMonth() + 1;
+      const days = await fetchLettersCalendar(hallId, year, month);
+      setCalendarLetters(days);
     };
-    loadCalendar();
+    load();
   }, [currentDate, hallId]);
 
   const startOfMonth = new Date(currentDate.getFullYear(), currentDate.getMonth(), 1);
@@ -52,6 +46,7 @@ const Calendar = ({ hallId }) => {
   const prevEnd = new Date(currentDate.getFullYear(), currentDate.getMonth(), 0).getDate();
 
   const calendarDays = [];
+
   for (let i = startDay - 1; i >= 0; i--)
     calendarDays.push({ day: prevEnd - i, currentMonth: false, letterId: null });
 
@@ -60,7 +55,9 @@ const Calendar = ({ hallId }) => {
       2,
       "0"
     )}.${String(i).padStart(2, "0")}`;
+
     const letterObj = calendarLetters.find((l) => l.date === dayStr);
+
     calendarDays.push({
       day: i,
       currentMonth: true,
@@ -68,66 +65,47 @@ const Calendar = ({ hallId }) => {
     });
   }
 
-  const totalCells = Math.ceil(calendarDays.length / 7) * 7;
-  for (let i = 1; calendarDays.length < totalCells; i++)
-    calendarDays.push({ day: i, currentMonth: false, letterId: null });
-
-  const handleLetterClick = async (letterId) => {
-    if (!letterId) return;
-    try {
-      const detail = await fetchLetterDetail(hallId, letterId);
-      setSelectedLetter(detail);
-      setIsModalOpen(true);
-    } catch (err) {
-      console.error("편지 상세 조회 실패:", err);
-    }
-  };
+  while (calendarDays.length % 7 !== 0)
+    calendarDays.push({ day: "", currentMonth: false, letterId: null });
 
   return (
-    <>
-      <CalendarContainer>
-        <Header>
-          <NavButton src={prevbtn} onClick={prevMonth} />
-          <MonthLabel>
-            {currentDate.getFullYear()}년 {currentDate.getMonth() + 1}월
-          </MonthLabel>
-          <NavButton
-            src={isNextMonthAvailable ? nextbtn : falsebtn}
-            onClick={nextMonth}
-            style={{ cursor: isNextMonthAvailable ? "pointer" : "default" }}
-          />
-        </Header>
+    <CalendarContainer>
+      <Header>
+        <NavButton src={prevbtn} onClick={prevMonth} />
+        <MonthLabel>
+          {currentDate.getFullYear()}년 {currentDate.getMonth() + 1}월
+        </MonthLabel>
+        <NavButton
+          src={isNextMonthAvailable ? nextbtn : falsebtn}
+          onClick={nextMonth}
+          style={{ cursor: isNextMonthAvailable ? "pointer" : "default" }}
+        />
+      </Header>
 
-        <WeekRow>{weekDays.map((d) => <WeekDay key={d}>{d}</WeekDay>)}</WeekRow>
+      <WeekRow>{weekDays.map((d) => <WeekDay key={d}>{d}</WeekDay>)}</WeekRow>
 
-        <DatesGrid>
-          {calendarDays.map((d, idx) => (
-            <DateBox key={idx} isCurrent={d.currentMonth} hasLetter={!!d.letterId}>
-              <span>{d.day}</span>
-              {d.letterId && (
-                <LetterIcon
-                  src={lettericon}
-                  alt="편지 아이콘"
-                  onClick={() => handleLetterClick(d.letterId)}
-                />
-              )}
-            </DateBox>
-          ))}
-        </DatesGrid>
-      </CalendarContainer>
-
-      <LetterModal
-        isOpen={isModalOpen}
-        data={selectedLetter}
-        onCancel={() => setIsModalOpen(false)}
-      />
-    </>
+      <DatesGrid>
+        {calendarDays.map((d, idx) => (
+          <DateBox key={idx} hasLetter={!!d.letterId}>
+            <span>{d.day}</span>
+            {d.letterId && (
+              <LetterIcon
+                src={lettericon}
+                onClick={() => onClickLetter(d.letterId)}
+              />
+            )}
+          </DateBox>
+        ))}
+      </DatesGrid>
+    </CalendarContainer>
   );
 };
 
 export default Calendar;
 
-// Styled Components
+/* styled-components 동일 */
+
+
 
 const CalendarContainer = styled.div`
   box-sizing: border-box;

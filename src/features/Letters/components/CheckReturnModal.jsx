@@ -1,11 +1,8 @@
-// src/components/CheckReturnModal.jsx
 import React, { useState } from "react";
 import ReactDOM from "react-dom";
 import styled from "styled-components";
 import { color, typo } from "../../../styles/tokens";
 import Button from "../../../components/Button";
-
-// src/components/CheckReturnModal.jsx
 
 export const CheckReturnModal = ({ onClose, onConfirm, disableYes }) => {
   const [selectedOption, setSelectedOption] = useState("no");
