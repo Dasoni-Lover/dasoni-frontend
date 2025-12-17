@@ -4,7 +4,7 @@ import { color, typo } from "../../styles/tokens";
 import { Tag } from "../Tag";
 import deleteicon from "../../assets/delete-icon.svg";
 
-export const AlarmListitem = ({ tagText, title, content, onDelete, onClick}) => {
+export const AlarmListitem = ({ tagText, title, content, date, onDelete, onClick}) => {
   return (
     <Wrapper >
       <Left onClick={onClick}>
@@ -13,6 +13,7 @@ export const AlarmListitem = ({ tagText, title, content, onDelete, onClick}) => 
           <Title>{title}</Title>
         </Box>
         <Content>{content}</Content>
+        <Date>{date}</Date>
       </Left>
 
       <Icon
@@ -65,6 +66,13 @@ const Title = styled.div`
 const Content = styled.div`
   ${typo("bodym")};
   color: ${color("black.50")};
+  white-space: pre-line;
+`;
+
+const Date = styled.div`
+  ${typo("bodym")};
+  color: ${color("black.30")};
+  margin-top: 0.25rem;
 `;
 
 const Icon = styled.img`

@@ -179,6 +179,7 @@ export const AlarmList = ({ notifications, onUpdateNotifications }) => {
               tagText={item.kind}
               title={item.title}
               content={item.body}
+              date={item.date}
               hallId={item.hallId}
               onDelete={() => handleDelete(item.notificationId)}
               onClick={() => handleItemClick(item)}

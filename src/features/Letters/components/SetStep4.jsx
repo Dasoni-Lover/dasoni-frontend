@@ -19,7 +19,7 @@ export default function SetStep4({ onValidChange, formData, setFormData }) {
 
   return (
     <Wrapper>
-      <Title>고인이 자주 불러주던 호칭이나 애칭이 있으신가요?</Title>
+      <Title>고인이 자주 불러주던 호칭을 알려주세요</Title>
       <InputField
         value={value}
         onChange={handleChange}
