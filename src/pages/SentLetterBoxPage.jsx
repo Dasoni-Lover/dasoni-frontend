@@ -12,10 +12,16 @@ import { fetchLettersList, fetchLetterDetail } from "../api/letters";
 import { getHallInfo } from "../api/memorial";
 import Calendar from "../components/Calendar";
 import SideCategoryBox from "../features/Letters/components/SideCategoryBox";
+import NoneLetter from "../features/Letters/components/NoneLetter";
 
 import calendaricon from "../assets/calendar-icon.svg";
 import clickcalendaricon from "../assets/click-calendar-icon.svg";
 import bgicon from "../features/Letters/assets/bg-icon.svg";
+
+import { useWriteLetterFlow } from "../hooks/useWriteLetterFlow";
+import { CheckReturnModal } from '../features/Letters/components/CheckReturnModal';
+import ConfirmModal from '../components/ConfirmModal';
+
 
 export const SentLetterBoxPage = () => {
   const location = useLocation();
@@ -74,6 +80,17 @@ export const SentLetterBoxPage = () => {
     }
   };
 
+
+const {
+  handleClickWriteLetter,
+  handleModalConfirm,
+  showModal,
+  showAlreadySentModal,
+  closeModal,
+  closeAlreadySentModal,
+} = useWriteLetterFlow({ hallId, page });
+
+
   const hallTitle = hallName ? `故 ${hallName}의 추모관` : "故 추모관";
 
 
@@ -84,7 +101,7 @@ export const SentLetterBoxPage = () => {
       <NavWrapper>
         <BarNavigate
           paths={["홈", hallTitle, "보낸 편지함"]}
-          title="보낸 편지함"
+          
           onPathClick={(path) => {
             if (path === "홈") {
               // hallId 유지하면서 홈으로 이동
@@ -98,9 +115,10 @@ export const SentLetterBoxPage = () => {
 
       <TitleAndCalendar>
         <Title>총 {letters.length}개의 보낸 편지가 있어요</Title>
-
+{letters.length === 0 ? (
+          <></>
+        ) : (
         <Box>
-
           <CalendarWrapper onClick={() => setCalendarOpen(!calendarOpen)}>
             <CalendarBorder active={calendarOpen}>
               <CalendarIcon
@@ -108,23 +126,38 @@ export const SentLetterBoxPage = () => {
               />
             </CalendarBorder>
           </CalendarWrapper>
-        </Box>
+        </Box>)}
       </TitleAndCalendar>
 
       <ContentWrapper>
-        <LetterArea calendarOpen={calendarOpen}>
-          <LetterList letters={letters} onItemClick={handleItemClick} isNarrow={calendarOpen} />
-        </LetterArea>
-
-        {calendarOpen && (
+        {letters.length === 0 ? (
+          <NoneLetter
+            text={"현재 보낸 편지가 없어요\n소중한 마음을 담아 편지를 써 보세요"}
+            showButton
+            onWriteLetter={handleClickWriteLetter}
+          />
+        ) : (
           <>
-            <Divider />
-            <CalendarArea>
-              <Calendar hallId={hallId} letterDates={letterDates} />
-            </CalendarArea>
+            <LetterArea calendarOpen={calendarOpen}>
+              <LetterList
+                letters={letters}
+                onItemClick={handleItemClick}
+                isNarrow={calendarOpen}
+              />
+            </LetterArea>
+
+            {calendarOpen && (
+              <>
+                <Divider />
+                <CalendarArea>
+                  <Calendar hallId={hallId} letterDates={letterDates} />
+                </CalendarArea>
+              </>
+            )}
           </>
         )}
       </ContentWrapper>
+
 
       <LetterModal
         isOpen={modalOpen}
@@ -133,7 +166,29 @@ export const SentLetterBoxPage = () => {
       />
 
       <SideCategoryBox hallId={hallId} page={page} />
+      {showModal && (
+                <CheckReturnModal
+                  onClose={closeModal}
+                  onConfirm={handleModalConfirm}
+                />
+              )}
+              {showAlreadySentModal && (
+                <ConfirmModal
+                  isOpen
+                  title="오늘은 이미 편지를 보냈어요"
+                  description={
+                    <>
+                      하루에 한 번만 편지를 작성할 수 있어요.
+                      <br />
+                      내일 다시 편지를 남겨주세요.
+                    </>
+                  }
+                  confirmText="확인"
+                  onConfirm={closeAlreadySentModal}
+                />
+              )}
     </Wrapper>
+  
     </Background>
   );
 };
@@ -147,9 +202,9 @@ const Background = styled.div`
 
   background: linear-gradient(
     90deg,
-    rgba(255, 241, 242, 0.5) 9.13%,
-    rgba(255, 246, 235, 0.5) 76.44%,
-    rgba(255, 239, 229, 0.5) 100%
+    rgba(255, 241, 242, 0.3) 9.13%,
+    rgba(255, 246, 235, 0.3) 76.44%,
+    rgba(255, 239, 229, 0.3) 100%
   );
 `;
 

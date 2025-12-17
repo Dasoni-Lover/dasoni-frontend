@@ -6,6 +6,7 @@ import Button from "../../../components/Button";
 import { useNavigate } from "react-router-dom";
 import CancelProcessButton from "../../../components/CancelProcessButton";
 import ConfirmModal from "../../../components/ConfirmModal";
+import aiBadge from "../assets/icon-ai.svg";
 
 export default function GenerateComplete({
   setIsGenerated,
@@ -15,12 +16,11 @@ export default function GenerateComplete({
   const nav = useNavigate();
 
   const [isCanceled, setIsCanceled] = useState(false);
-  const [badgedImage, setBadgedImage] = useState(null); // 뱃지 붙인 최종 이미지 (서비스 내부 표시용)
+  const [badgedImage, setBadgedImage] = useState(null);
 
   const goGenerate = () => setIsGenerated(false);
 
   const goWritePost = () => {
-    // ✅ 서비스 내부에서는 AI 뱃지가 붙은 이미지를 사용
     const imageToUse = badgedImage || generatedImage;
     nav("/write", {
       state: {
@@ -34,56 +34,51 @@ export default function GenerateComplete({
   const handleCancelProcess = () => setIsCanceled(true);
   const goHome = () => nav("/home");
 
-  // 이미지에 AI 뱃지 그려주는 함수 (서비스 내부 표시용)_1:1 버전
+  // ✅ AI 뱃지(svg) 붙이기
   const addAIBadgeToImage = (src) =>
     new Promise((resolve, reject) => {
       const img = new Image();
-      img.crossOrigin = "anonymous"; // CORS 허용된 경우 캔버스 사용 가능
+      const badge = new Image();
+
+      img.crossOrigin = "anonymous";
+      badge.crossOrigin = "anonymous";
 
       img.onload = () => {
-        // 1) 1:1 캔버스 만들기 (기준은 짧은 변)
-        const size = Math.min(img.width, img.height);
-        const canvas = document.createElement("canvas");
-        canvas.width = size;
-        canvas.height = size;
+        badge.onload = () => {
+          const size = Math.min(img.width, img.height);
+          const canvas = document.createElement("canvas");
+          canvas.width = size;
+          canvas.height = size;
 
-        const ctx = canvas.getContext("2d");
+          const ctx = canvas.getContext("2d");
 
-        // 2) 원본 이미지에서 중앙 부분을 1:1로 crop
-        const sx = (img.width - size) / 2;
-        const sy = (img.height - size) / 2;
+          // 1️⃣ 중앙 1:1 crop
+          const sx = (img.width - size) / 2;
+          const sy = (img.height - size) / 2;
+          ctx.drawImage(img, sx, sy, size, size, 0, 0, size, size);
 
-        ctx.drawImage(img, sx, sy, size, size, 0, 0, size, size);
+          // 2️⃣ AI 뱃지 크기 (height 기준, 비율 유지)
+          const badgeHeight = 7.6 * 16; // 66px
+          const badgeWidth = badgeHeight * (1.5 / 1.77013); // 약 55.93px
+          const padding = size * 0.064;
 
-        // 3) AI 뱃지 붙이기
-        const badgeRadius = size * 0.07; // 1:1 기준 비율
-        const padding = badgeRadius * 0.6;
 
-        const cx = size - badgeRadius - padding;
-        const cy = size - badgeRadius - padding;
+          const x = size - badgeWidth - padding;
+          const y = size - badgeHeight - padding;
 
-        // 배경 원
-        ctx.beginPath();
-        ctx.arc(cx, cy, badgeRadius, 0, Math.PI * 2);
-        ctx.fillStyle = "#000";
-        ctx.fill();
-        ctx.stroke();
+          ctx.drawImage(badge, x, y, badgeWidth, badgeHeight);
 
-        // AI 텍스트
-        ctx.fillStyle = "#fff";
-        ctx.font = `${badgeRadius * 1.1}px Pretendard, system-ui, sans-serif`;
-        ctx.textAlign = "center";
-        ctx.textBaseline = "middle";
-        ctx.fillText("AI", cx, cy + 1);
+          resolve(canvas.toDataURL("image/png"));
+        };
 
-        resolve(canvas.toDataURL("image/png"));
+        badge.onerror = reject;
+        badge.src = aiBadge;
       };
 
-      img.onerror = (e) => reject(e);
+      img.onerror = reject;
       img.src = src;
     });
 
-  // 컴포넌트 마운트/생성 이미지 변경 시, AI 뱃지 버전 생성 (서비스 내부용)
   useEffect(() => {
     if (!generatedImage) return;
 
@@ -91,13 +86,10 @@ export default function GenerateComplete({
 
     addAIBadgeToImage(generatedImage)
       .then((url) => {
-        if (!cancelled) {
-          setBadgedImage(url);
-        }
+        if (!cancelled) setBadgedImage(url);
       })
       .catch((err) => {
         console.error("AI 뱃지 생성 실패:", err);
-        // 실패해도 최소한 원본 이미지는 계속 사용 가능
       });
 
     return () => {
@@ -105,12 +97,12 @@ export default function GenerateComplete({
     };
   }, [generatedImage]);
 
-  // ✅ 생성된 이미지 "다운로드"는 항상 원본(generatedImage)만 사용
+  // 다운로드는 항상 원본 이미지
   const handleDownload = () => {
     if (!generatedImage) return;
 
     const a = document.createElement("a");
-    a.href = generatedImage; // <- 뱃지 안 붙인 원본만 다운로드
+    a.href = generatedImage;
 
     const inputName = prompt("저장할 파일명을 입력하세요", "memorial-image");
     if (!inputName) return;
@@ -121,13 +113,12 @@ export default function GenerateComplete({
     document.body.removeChild(a);
   };
 
-  // 서비스 화면에 표시할 이미지는 뱃지 버전 우선
   const displayImage = badgedImage || generatedImage;
 
   return (
     <div>
       <Column>
-        <Row $justify={"end"} style={{ marginBottom: "3.38rem" }}>
+        <Row $justify="end" style={{ marginBottom: "3.38rem" }}>
           <CancelProcessButton
             title="작성 그만두기"
             onClick={handleCancelProcess}
@@ -136,9 +127,9 @@ export default function GenerateComplete({
 
         <Row $justify="space-around" style={{ marginBottom: "13rem" }}>
           <GeneratedImg src={displayImage} alt="생성된 이미지" />
-          <Column style={{ width: "24.5rem" }} $justify={"space-between"}>
-            <InformText></InformText>
-            <Column $gap={"1.25rem"}>
+          <Column style={{ width: "24.5rem" }} $justify="space-between">
+            <InformText />
+            <Column $gap="1.25rem">
               <Button
                 size="L"
                 color="main"
@@ -163,6 +154,7 @@ export default function GenerateComplete({
           </Column>
         </Row>
       </Column>
+
       <ConfirmModal
         isOpen={isCanceled}
         title="추모관 개설을 그만둘까요?"
@@ -181,9 +173,9 @@ const GeneratedImg = styled.img`
   width: 32.5rem;
   height: 32.5rem;
   border-radius: 0.4375rem;
-  border: 3px solid var(--5, #e9e9e9);
+  border: 3px solid #e9e9e9;
   background: lightgray 50% / cover no-repeat;
-  box-shadow: 0 4px 22.6px 0 rgba(0, 0, 0, 0.25);
+  box-shadow: 0 4px 22.6px rgba(0, 0, 0, 0.25);
   object-fit: cover;
 `;
 

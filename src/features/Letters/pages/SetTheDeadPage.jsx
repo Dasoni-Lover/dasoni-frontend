@@ -2,7 +2,6 @@
 import React, { useEffect, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import styled from "styled-components";
-import { color, typo } from "../../../styles/tokens";
 
 import SideCategoryBox from "../components/SideCategoryBox";
 import BarNavigate from "../../../components/BarNavigate";
@@ -13,6 +12,8 @@ import { Row, Column } from "../../../styles/flex";
 import { getHallInfo } from "../../../api/memorial";
 import SetTheDeadForm from "../components/SetTheDeadForm";
 import ConfirmModal from "../../../components/ConfirmModal";
+import bgicon from "../assets/bg-icon.svg";
+
 
 export default function SetTheDeadPage() {
   const location = useLocation();
@@ -83,6 +84,7 @@ export default function SetTheDeadPage() {
 
   return (
     <Background>
+    <BGIcon src={bgicon} alt="" />
     <Container>
       {/* 왼쪽 사이드 카테고리 */}
       <SideCategoryBox hallId={hallId} page={page} />
@@ -90,13 +92,16 @@ export default function SetTheDeadPage() {
       {/* 오른쪽 메인 영역 */}
       <MainWrapper>
         <NavWrapper>
-          <BarNavigate paths={["홈", hallTitle, "고인 정보 설정"]} />
+          <BarNavigate 
+          paths={["홈", hallTitle, "고인 정보 설정"]} 
+          
+          />
           <Row
             $justify={"space-between"}
             $align={"center"}
             style={{ marginTop: "4.5rem" }}
           >
-            <Title>고인 정보 설정</Title>
+            <br/>
             <CancelProcessButton
               title="작성 그만두기"
               onClick={handleCancelProcess}
@@ -150,14 +155,31 @@ export default function SetTheDeadPage() {
   );
 }
 
-const Background=styled.div`
+const Background = styled.div`
   width: 100vw;
   height: 100vh;
+  position: relative;  /* ⭐ bgicon 기준 */
   display: flex;
   flex-direction: column;
   align-items: center;
-  background: linear-gradient(90deg, #FFF1F2 9.13%, #FFF6EB 76.44%, #FFEFE5 100%);
-`
+
+  background: linear-gradient(
+    90deg,
+    rgba(255, 241, 242, 0.3) 9.13%,
+    rgba(255, 246, 235, 0.3) 76.44%,
+    rgba(255, 239, 229, 0.3) 100%
+  );
+`;
+
+const BGIcon = styled.img`
+  position: fixed;  
+  bottom: 3.5rem;
+  right: 2.5rem;
+  width: 22.00006rem;
+  height: 11.62256rem;
+  opacity: 0.7;
+  pointer-events: none;
+`;
 
 const Container = styled.div`
   display: flex;
@@ -179,8 +201,3 @@ const NavWrapper = styled.div`
   margin-bottom: 4.69rem;
 `;
 
-// 왼쪽 상단에 Title
-const Title = styled.div`
-  ${typo("h3")};
-  color: ${color("black.100")};
-`;

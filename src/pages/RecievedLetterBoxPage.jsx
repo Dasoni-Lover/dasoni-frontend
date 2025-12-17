@@ -7,6 +7,7 @@ import BarNavigate from '../components/BarNavigate';
 import { color, typo } from '../styles/tokens';
 import SideCategoryBox from "../features/Letters/components/SideCategoryBox";
 import TapeModal from '../features/Letters/components/TapeModal';
+import NoneLetter from '../features/Letters/components/NoneLetter';
 
 import { fetchReceivedReplies, fetchReceivedReplyDetail } from "../api/letters";
 import { getHallInfo } from "../api/memorial";
@@ -14,6 +15,10 @@ import { getHallInfo } from "../api/memorial";
 import letterIcon1 from "../features/Letters/assets/read-letter-icon.svg";
 import letterIcon2 from "../features/Letters/assets/notread-letter-icon.svg";
 import bgicon from "../features/Letters/assets/bg-icon.svg";
+
+import { useWriteLetterFlow } from "../hooks/useWriteLetterFlow";
+import { CheckReturnModal } from '../features/Letters/components/CheckReturnModal';
+import ConfirmModal from '../components/ConfirmModal';
 
 const RecievedLetterBoxPage = () => {
   const location = useLocation();
@@ -69,6 +74,15 @@ const RecievedLetterBoxPage = () => {
     }
   };
 
+  const {
+    handleClickWriteLetter,
+    handleModalConfirm,
+    showModal,
+    showAlreadySentModal,
+    closeModal,
+    closeAlreadySentModal,
+  } = useWriteLetterFlow({ hallId, page });
+
   return (
     <Background>
       <BGIcon src={bgicon} alt="" />
@@ -104,24 +118,61 @@ const RecievedLetterBoxPage = () => {
       </StateBox>
 
       <ContentWrapper>
-        {replies.map((item) => (
-          <Box key={item.replyId} onClick={() => handleIconClick(item)}>
-            <LetterIcon src={item.isChecked ? letterIcon1 : letterIcon2} />
-            <Date>{item.createdAt}</Date>
-          </Box>
-        ))}
+        {replies.length === 0 ? (
+          <NoneLetter
+            text={
+              "현재 받은 편지가 없어요\n" +
+              "편지를 쓰고 조금만 기다리면\n" +
+              "고인의 목소리가 담긴 편지가 도착할 거예요"
+            }
+            showButton
+            onWriteLetter={handleClickWriteLetter}
+            marginTop="0"
+          />
+        ) : (
+          replies.map((item) => (
+            <Box key={item.replyId} onClick={() => handleIconClick(item)}>
+              <LetterIcon src={item.isChecked ? letterIcon1 : letterIcon2} />
+              <Date>{item.createdAt}</Date>
+            </Box>
+          ))
+        )}
 
       </ContentWrapper>
 
+
       <SideCategoryBox hallId={hallId} page={page} />
 
-      {isModalOpen && selectedReply && (
-        <TapeModal 
-          onCancel={() => setIsModalOpen(false)}
-          data={selectedReply}
-        />
-      )}
-    </Wrapper>
+        {isModalOpen && selectedReply && (
+          <TapeModal 
+            onCancel={() => setIsModalOpen(false)}
+            data={selectedReply}
+          />
+        )}
+      </Wrapper>
+        {showModal && (
+          <CheckReturnModal
+            onClose={closeModal}
+            onConfirm={handleModalConfirm}
+          />
+        )}
+        {showAlreadySentModal && (
+          <ConfirmModal
+            isOpen
+            title="오늘은 이미 편지를 보냈어요"
+            description={
+              <>
+                하루에 한 번만 편지를 작성할 수 있어요.
+                <br />
+                내일 다시 편지를 남겨주세요.
+              </>
+            }
+            confirmText="확인"
+            onConfirm={closeAlreadySentModal}
+          />
+        )}
+
+
     </Background>
   );
 };
@@ -138,9 +189,9 @@ const Background = styled.div`
 
   background: linear-gradient(
     90deg,
-    rgba(255, 241, 242, 0.5) 9.13%,
-    rgba(255, 246, 235, 0.5) 76.44%,
-    rgba(255, 239, 229, 0.5) 100%
+    rgba(255, 241, 242, 0.3) 9.13%,
+    rgba(255, 246, 235, 0.3) 76.44%,
+    rgba(255, 239, 229, 0.3) 100%
   );
 `;
 
