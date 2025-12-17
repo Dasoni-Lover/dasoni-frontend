@@ -98,7 +98,7 @@ export default function SideCategoryBox({ hallId, page }) {
         });
       } else if (isOpen === true && isSet === false) {
         if (page === "follower") {
-          navigate("/edit-hallinfo", {
+          navigate("/set-the-dead", {
             state: {
               hallId,
               page,
@@ -117,7 +117,7 @@ export default function SideCategoryBox({ hallId, page }) {
           });
         }
       } else if (isOpen === false) {
-        navigate("/edit-hallinfo", {
+        navigate("/set-the-dead", {
           state: {
             hallId,
             page,
