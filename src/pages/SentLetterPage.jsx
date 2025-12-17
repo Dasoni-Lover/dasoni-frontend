@@ -18,7 +18,6 @@ export const SentLetterPage = () => {
     const hallId = location.state?.hallId;
     const isWanted = location.state?.isWanted;
     const page = location.state?.page;
-    const selectedOption = location.state?.selectedOption
     const navigate = useNavigate();
 
     const [letterText, setLetterText] = useState("");
@@ -200,7 +199,7 @@ export const SentLetterPage = () => {
                 description={
                     modalType === "temp"
                         ? "임시보관함에서 확인할 수 있어요"
-                        : selectedOption === "no"
+                        : isWanted === false
                             ? "소중한 마음을 전해드릴게요"
                             : "조금만 기다리면 답장이 올 거예요"
                 }

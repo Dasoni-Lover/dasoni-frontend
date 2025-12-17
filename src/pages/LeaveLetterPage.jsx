@@ -175,7 +175,7 @@ export const LeaveLetterPage = () => {
                 description={
                     modalType === "temp"
                         ? "임시 보관함에서 확인할 수 있어요"
-                        : "조금만 기다리면 답장이 올 거예요"
+                        : "소중한 마음을 전해드릴게요"
                 }
                 confirmText={"확인"}
                 onConfirm={handleModalConfirm}

@@ -63,7 +63,7 @@ export function useWriteLetterFlow({ hallId, page, initialActiveMenu }) {
         });
       } else if (isOpen && !isSet) {
         if (page === "follower") {
-          navigate("/edit-hallinfo", {
+          navigate("/set-the-dead", {
             state: { hallId, page, activeMenu: "edit", isWanted },
           });
         } else {
@@ -72,7 +72,7 @@ export function useWriteLetterFlow({ hallId, page, initialActiveMenu }) {
           });
         }
       } else {
-        navigate("/edit-hallinfo", {
+        navigate("/set-the-dead", {
           state: { hallId, page, activeMenu: "edit", isWanted },
         });
       }
