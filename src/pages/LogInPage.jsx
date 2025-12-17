@@ -13,7 +13,8 @@ export default function LogInPage() {
   const navigate = useNavigate();
   const location = useLocation();
 
-  const redirect = new URLSearchParams(location.search).get("redirect");
+  const redirectRaw = new URLSearchParams(location.search).get("redirect");
+  const redirect = redirectRaw ? decodeURIComponent(redirectRaw) : null;
 
   const [logId, setLogId] = useState("");
   const [password, setPassword] = useState("");
