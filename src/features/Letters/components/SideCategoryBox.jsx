@@ -1,4 +1,5 @@
 // src/components/SideCategoryBox.jsx
+
 import React, { useState } from "react";
 import styled from "styled-components";
 import { useNavigate, useLocation } from "react-router-dom";
@@ -6,7 +7,7 @@ import { color, typo } from "../../../styles/tokens";
 import SideCategoryBoxItem from "./SideCategoryBoxItem";
 import { CheckReturnModal } from "./CheckReturnModal";
 import ConfirmModal from "../../../components/ConfirmModal";
-import { getLetterStatus } from "../../../api/letters";
+import { getLetterStatus, checkLetterSentToday } from "../../../api/letters";
 import letterbox from "../assets/letter-box-icon.svg";
 
 export default function SideCategoryBox({ hallId, page }) {
@@ -18,27 +19,48 @@ export default function SideCategoryBox({ hallId, page }) {
   );
 
   const [showModal, setShowModal] = useState(false);
-  const [showEditBlockedModal, setShowEditBlockedModal] = useState(false); // 고인 정보 수정 불가 모달 상태
-  const closeModal = () => setShowModal(false);
-  const closeEditBlockedModal = () => setShowEditBlockedModal(false); // 고인 정보 수정 불가 모달 닫기
+  const [showEditBlockedModal, setShowEditBlockedModal] = useState(false);
+  const [showAlreadySentModal, setShowAlreadySentModal] = useState(false);
 
+  const closeModal = () => setShowModal(false);
+  const closeEditBlockedModal = () => setShowEditBlockedModal(false);
+  const closeAlreadySentModal = () => setShowAlreadySentModal(false);
+
+  console.log("📌 SavedLetterPage page:", page);
+  console.log("📌 SavedLetterPage location.state:", location.state);
   // ==========================
-  // 편지 쓰기 클릭 (경로 수정)
+  // 편지 쓰기 클릭
   // ==========================
-  const handleClickWriteLetter = () => {
+  const handleClickWriteLetter = async () => {
     setActiveMenu("write");
 
-    // ✔ page가 "me"일 경우 → 모달 없이 즉시 이동
+    // ✅ page === "me" → 오늘 편지 여부 체크 안 함
     if (page === "me") {
-      // ⭐ 수정: me 페이지일 때 leave-letter로 이동
       navigate("/leave-letter", {
-        state: { hallId, page, activeMenu: "write" },
+        state: {
+          hallId,
+          page,
+          activeMenu: "write",
+        },
       });
       return;
     }
 
-    // ✔ admin / follower → 기존 모달 열림
-    setShowModal(true);
+    try {
+      const { isSendToday } = await checkLetterSentToday(hallId);
+
+      // 오늘 이미 보낸 경우
+      if (isSendToday) {
+        setShowAlreadySentModal(true);
+        return;
+      }
+
+      // 그 외 페이지 → 모달
+      setShowModal(true);
+    } catch (error) {
+      console.error("오늘 편지 전송 여부 조회 실패:", error);
+      alert("편지 작성 가능 여부를 확인하는 중 오류가 발생했어요.");
+    }
   };
 
   // ==========================
@@ -47,42 +69,62 @@ export default function SideCategoryBox({ hallId, page }) {
   const handleModalConfirm = async (selectedOption) => {
     setShowModal(false);
 
-    // CASE 1: "아니오" → 무조건 sent-letter 이동
+    const isWanted = selectedOption === "yes";
+
+    // NO 선택 → 바로 편지 작성
     if (selectedOption === "no") {
       navigate("/sent-letter", {
-        state: { hallId, page, activeMenu: "write", selectedOption },
+        state: {
+          hallId,
+          page,
+          activeMenu: "write",
+          isWanted, // false
+        },
       });
       return;
     }
 
-    // CASE 2: "예" → API 조회
     try {
       const { isOpen, isSet } = await getLetterStatus(hallId);
 
       if (isOpen === true && isSet === true) {
         navigate("/sent-letter", {
-          state: { hallId, page, activeMenu: "write", selectedOption },
+          state: {
+            hallId,
+            page,
+            activeMenu: "write",
+            isWanted, // true
+          },
         });
       } else if (isOpen === true && isSet === false) {
         if (page === "follower") {
-          navigate("/set-the-dead", {
-            state: { hallId, page, activeMenu: "edit", selectedOption },
+          navigate("/edit-hallinfo", {
+            state: {
+              hallId,
+              page,
+              activeMenu: "edit",
+              isWanted,
+            },
           });
         } else {
           navigate("/sent-letter", {
-            state: { hallId, page, activeMenu: "write", selectedOption },
+            state: {
+              hallId,
+              page,
+              activeMenu: "write",
+              isWanted,
+            },
           });
         }
       } else if (isOpen === false) {
-        if (page === "admin") {
-          navigate("/set-the-dead", {
-            state: { hallId, page, activeMenu: "edit", selectedOption },
-          });
-        } else {
-          navigate("/set-the-dead", {
-            state: { hallId, page, activeMenu: "write", selectedOption },
-          });
-        }
+        navigate("/edit-hallinfo", {
+          state: {
+            hallId,
+            page,
+            activeMenu: "edit",
+            isWanted,
+          },
+        });
       }
     } catch (error) {
       console.error("편지 작성 가능 여부 조회 실패:", error);
@@ -99,7 +141,6 @@ export default function SideCategoryBox({ hallId, page }) {
       const { isOpen } = await getLetterStatus(hallId);
 
       if (page === "follower" && isOpen === false) {
-        // follower이면서 isOpen이 false일 때, 모달 띄우고 페이지 이동 막음
         setShowEditBlockedModal(true);
         return;
       }
@@ -168,7 +209,6 @@ export default function SideCategoryBox({ hallId, page }) {
           />
         )}
 
-        {/* ✅ 임시보관함 (모든 page에 노출) */}
         <SideCategoryBoxItem
           text="임시보관함"
           bgcolor={activeMenu === "saved" ? "#FFF4E6" : undefined}
@@ -181,7 +221,6 @@ export default function SideCategoryBox({ hallId, page }) {
           }}
         />
 
-        {/* 편지 쓰기 */}
         <SideCategoryBoxItem
           text="편지 쓰기"
           bgcolor={activeMenu === "write" ? "#FFF4E6" : undefined}
@@ -194,7 +233,6 @@ export default function SideCategoryBox({ hallId, page }) {
         <CheckReturnModal onClose={closeModal} onConfirm={handleModalConfirm} />
       )}
 
-      {/* 고인 정보 수정 불가 모달 */}
       {showEditBlockedModal && (
         <ConfirmModal
           isOpen={showEditBlockedModal}
@@ -211,13 +249,26 @@ export default function SideCategoryBox({ hallId, page }) {
           onCancel={closeEditBlockedModal}
         />
       )}
+
+      {showAlreadySentModal && (
+        <ConfirmModal
+          isOpen={showAlreadySentModal}
+          title="오늘은 이미 편지를 보냈어요"
+          description={
+            <>
+              하루에 한 번만 편지를 작성할 수 있어요.
+              <br />
+              내일 다시 편지를 남겨주세요.
+            </>
+          }
+          confirmText="확인"
+          onConfirm={closeAlreadySentModal}
+          onCancel={closeAlreadySentModal}
+        />
+      )}
     </>
   );
 }
-
-// ==================
-// 스타일
-// ==================
 
 const Container = styled.div`
   position: fixed;
@@ -266,6 +317,9 @@ const WhiteButton = styled.button`
   color: #${color("black.50")};
 
   &:hover {
-    background: #fafafa;
+    background: #fff4e6;
+    border: 1px solid #ffbc67;
+    ${typo("bodyb")};
+    color: ${color("black.70")};
   }
 `;

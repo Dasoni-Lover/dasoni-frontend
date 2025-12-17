@@ -2,7 +2,6 @@
 import React, { useEffect, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import styled from "styled-components";
-import { color, typo } from "../../../styles/tokens";
 
 import SideCategoryBox from "../components/SideCategoryBox";
 import BarNavigate from "../../../components/BarNavigate";
@@ -20,8 +19,10 @@ import IconCheck from "../../../assets/icon-check.svg";
 import { uploadVoiceFile } from "../../../api/voice";
 import SetTheDeadForm from "../components/SetTheDeadForm";
 import ConfirmModal from "../../../components/ConfirmModal";
+import bgicon from "../assets/bg-icon.svg";
 
 import EditTheDeadForm from "../components/EditTheDeadForm";
+import { color, typo } from "../../../styles/tokens";
 
 export default function SetTheDeadPage() {
   const location = useLocation();
@@ -210,7 +211,9 @@ export default function SetTheDeadPage() {
 
   return (
     <Background>
+      <BGIcon src={bgicon} alt="" />
       <Container>
+        {/* 왼쪽 사이드 카테고리 */}
         <SideCategoryBox hallId={hallId} page={page} />
 
         <MainWrapper>
@@ -224,7 +227,7 @@ export default function SetTheDeadPage() {
                 $align={"center"}
                 style={{ marginTop: "4.5rem" }}
               >
-                <Title>고인 정보 설정</Title>
+                <Title />
                 <CancelProcessButton
                   title="작성 그만두기"
                   onClick={handleCancelProcess}
@@ -331,15 +334,27 @@ export default function SetTheDeadPage() {
 const Background = styled.div`
   width: 100vw;
   height: 100vh;
+  position: relative; /* ⭐ bgicon 기준 */
   display: flex;
   flex-direction: column;
   align-items: center;
+
   background: linear-gradient(
     90deg,
-    #fff1f2 9.13%,
-    #fff6eb 76.44%,
-    #ffefe5 100%
+    rgba(255, 241, 242, 0.3) 9.13%,
+    rgba(255, 246, 235, 0.3) 76.44%,
+    rgba(255, 239, 229, 0.3) 100%
   );
+`;
+
+const BGIcon = styled.img`
+  position: fixed;
+  bottom: 3.5rem;
+  right: 2.5rem;
+  width: 22.00006rem;
+  height: 11.62256rem;
+  opacity: 0.7;
+  pointer-events: none;
 `;
 
 const Container = styled.div`
@@ -365,17 +380,4 @@ const NavWrapper = styled.div`
 const Title = styled.div`
   ${typo("h3")};
   color: ${color("black.100")};
-`;
-
-/* 안 쓰고 있지만 혹시 몰라 남겨둔 스타일 */
-const AlreadySetBox = styled.div`
-  padding: 3.25rem;
-  border-radius: 1.25rem;
-  background: #fff;
-  box-shadow: 0 2px 8.2px 0 rgba(0, 0, 0, 0.15);
-`;
-
-const AlreadySetText = styled.div`
-  ${typo("h3")};
-  color: ${color("black.70")};
 `;

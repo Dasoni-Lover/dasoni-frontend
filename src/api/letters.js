@@ -1,6 +1,8 @@
+//letters.js
+
 import client from "./client";
 
-// 편지 보내기
+// 편지 보내기/임시저장하기
 export const sendLetter = async (hallId, body) => {
   try {
     console.log("📨 sendLetter 요청:", { hallId, body });
@@ -25,6 +27,25 @@ export const getLetterStatus = async (hallId) => {
     isOpen: data.open ?? false,
     isSet: data.set ?? false,
   };
+};
+
+// 오늘 편지 보냈는지 여부 체크
+export const checkLetterSentToday = async (hallId) => {
+  try {
+    const res = await client.get(`/api/halls/${hallId}/letters/check`);
+
+    const data = res.data || {};
+
+    return {
+      isSendToday: data.sendToday ?? false,
+    };
+  } catch (err) {
+    console.error("❌ 오늘 편지 전송 여부 체크 실패:", {
+      status: err.response?.status,
+      data: err.response?.data,
+    });
+    throw err;
+  }
 };
 
 // 보낸 편지 리스트 조회
@@ -111,9 +132,10 @@ export const fetchTempLettersList = async (hallId) => {
       console.log("🔍 each letter:", l);
       return {
         ...l,
-        letterId: l.letterId, // ⭐ 여기 수정!
+        letterId: l.letterId,
         createdAt: l.date,
         excerpt: l.content?.slice(0, 20) || "", // 리스트 미리보기용(선택)
+        isWanted: l.isWanted,
       };
     });
   } catch (err) {
@@ -152,6 +174,24 @@ export const deleteTempLetter = async (hallId, letterId) => {
     return res.data;
   } catch (err) {
     console.error("❌ 임시보관함 편지 삭제 실패:", {
+      status: err.response?.status,
+      data: err.response?.data,
+    });
+    throw err;
+  }
+};
+
+// 나(me)에게 편지 남기기
+export const sendMyLetter = async (body) => {
+  try {
+    console.log("📨 sendMyLetter 요청:", body);
+
+    const res = await client.post("/api/halls/me/letters/send", body);
+
+    console.log("📨 sendMyLetter 응답:", res.data);
+    return res.data;
+  } catch (err) {
+    console.error("❌ sendMyLetter 에러:", {
       status: err.response?.status,
       data: err.response?.data,
     });

@@ -11,11 +11,16 @@ import LetterModal from "../features/Letters/components/LetterModal";
 import Calendar from "../components/Calendar";
 import SideCategoryBox from "../features/Letters/components/SideCategoryBox";
 import ConfirmModal from "../components/ConfirmModal";
+import NoneLetter from "../features/Letters/components/NoneLetter";
 import { deleteLetter } from "../api/letters";
 
 import calendaricon from "../assets/calendar-icon.svg";
 import clickcalendaricon from "../assets/click-calendar-icon.svg";
 import bgicon from "../features/Letters/assets/bg-icon.svg";
+
+import { useWriteLetterFlow } from "../hooks/useWriteLetterFlow";
+import { CheckReturnModal } from '../features/Letters/components/CheckReturnModal';
+
 
 import {
   fetchLettersList,
@@ -111,7 +116,14 @@ const handleConfirmDelete = async () => {
 };
 
 
-
+const {
+  handleClickWriteLetter,
+  handleModalConfirm,
+  showModal,
+  showAlreadySentModal,
+  closeModal,
+  closeAlreadySentModal,
+} = useWriteLetterFlow({ hallId, page });
 
   return (
     <Background>
@@ -120,7 +132,7 @@ const handleConfirmDelete = async () => {
       <NavWrapper>
         <BarNavigate
           paths={["나의 추모관", "보낸 편지함"]}
-          title="보낸 편지함"
+          
         onPathClick={(path) => {
           if (path === "나의 추모관") {
             // hallId 유지하면서 홈으로 이동
@@ -132,7 +144,9 @@ const handleConfirmDelete = async () => {
 
       <TitleAndCalendar>
         <Title>총 {letters.length}개의 보낸 편지가 있어요</Title>
-
+        {letters.length === 0 ? (
+                  <></>
+                ) : (
         <Box>
 
           <CalendarWrapper onClick={() => setCalendarOpen(!calendarOpen)}>
@@ -142,30 +156,40 @@ const handleConfirmDelete = async () => {
               />
             </CalendarBorder>
           </CalendarWrapper>
-        </Box>
+        </Box>)}
       </TitleAndCalendar>
 
       <ContentWrapper>
-        <LetterArea calendarOpen={calendarOpen}>
-          <LetterList
-            letters={letters}
-            onItemClick={openLetterDetail}
-            onDelete={handleDeleteClick} // ✅ 삭제 클릭 함수 전달
-            isNarrow={calendarOpen}
-            showDelete={true}            // ✅ 삭제 버튼 항상 보이도록
+        {letters.length === 0 ? (
+          <NoneLetter
+            text={"현재 보낸 편지가 없어요\n소중한 마음을 담아 편지를 써 보세요"}
+            showButton
+            onWriteLetter={handleClickWriteLetter}
           />
-
-        </LetterArea>
-
-        {calendarOpen && (
+                ) : (
           <>
-            <Divider />
-            <CalendarArea>
-              <Calendar hallId={hallId} letterDates={letterDates} />
-            </CalendarArea>
+            <LetterArea calendarOpen={calendarOpen}>
+              <LetterList
+                letters={letters}
+                onItemClick={openLetterDetail}
+                onDelete={handleDeleteClick}
+                isNarrow={calendarOpen}
+                showDelete={true}
+              />
+            </LetterArea>
+
+            {calendarOpen && (
+              <>
+                <Divider />
+                <CalendarArea>
+                  <Calendar hallId={hallId} letterDates={letterDates} />
+                </CalendarArea>
+              </>
+            )}
           </>
         )}
       </ContentWrapper>
+
 
       <LetterModal
         isOpen={modalOpen}
@@ -181,10 +205,29 @@ const handleConfirmDelete = async () => {
         onConfirm={handleConfirmDelete}
         onCancel={() => setDeleteModalOpen(false)}
       />
-
-
       <SideCategoryBox hallId={hallId} page={page} />
-    </Wrapper>
+      {showModal && (
+                <CheckReturnModal
+                  onClose={closeModal}
+                  onConfirm={handleModalConfirm}
+                />
+              )}
+              {showAlreadySentModal && (
+                <ConfirmModal
+                  isOpen
+                  title="오늘은 이미 편지를 보냈어요"
+                  description={
+                    <>
+                      하루에 한 번만 편지를 작성할 수 있어요.
+                      <br />
+                      내일 다시 편지를 남겨주세요.
+                    </>
+                  }
+                  confirmText="확인"
+                  onConfirm={closeAlreadySentModal}
+                />
+              )}
+    </Wrapper> 
     </Background>
   );
 };
@@ -201,9 +244,9 @@ const Background = styled.div`
 
   background: linear-gradient(
     90deg,
-    rgba(255, 241, 242, 0.5) 9.13%,
-    rgba(255, 246, 235, 0.5) 76.44%,
-    rgba(255, 239, 229, 0.5) 100%
+    rgba(255, 241, 242, 0.3) 9.13%,
+    rgba(255, 246, 235, 0.3) 76.44%,
+    rgba(255, 239, 229, 0.3) 100%
   );
 `;
 

@@ -54,26 +54,34 @@ export const SavedLetterBoxPage = () => {
     }
   };
 
-  // 📌 편지 클릭 → 페이지 이동
-  const handleSelectLetter = async (letterId) => {
-    try {
-      const detail = await fetchTempLetterDetail(hallId, letterId);
+// 📌 편지 클릭 → 페이지 이동
+const handleSelectLetter = async (letterId) => {
+  try {
+    const detail = await fetchTempLetterDetail(hallId, letterId);
 
-      navigate("/saved-letter", {
-        state: {
-          hallId,
-          page,
-          letterData: {
-            toName: detail.toName,
-            fromName: detail.fromName,
-            content: detail.content,
-          },
+    // ⭐ 클릭한 letter 찾기
+    const selectedLetter = letters.find(
+      (l) => l.letterId === letterId
+    );
+
+    navigate("/saved-letter", {
+      state: {
+        hallId,
+        page,
+        letterId,
+        isWanted: selectedLetter?.isWanted ?? false, // ✅ 추가
+        letterData: {
+          toName: detail.toName,
+          fromName: detail.fromName,
+          content: detail.content,
         },
-      });
-    } catch {
-      console.error("❌ 상세 조회 실패");
-    }
-  };
+      },
+    });
+  } catch {
+    console.error("❌ 상세 조회 실패");
+  }
+};
+
 
   // ⭐ 임시 저장 편지 삭제 기능
   const handleDeleteLetter = async (letterId) => {
@@ -135,9 +143,9 @@ const Background = styled.div`
 
   background: linear-gradient(
     90deg,
-    rgba(255, 241, 242, 0.5) 9.13%,
-    rgba(255, 246, 235, 0.5) 76.44%,
-    rgba(255, 239, 229, 0.5) 100%
+    rgba(255, 241, 242, 0.3) 9.13%,
+    rgba(255, 246, 235, 0.3) 76.44%,
+    rgba(255, 239, 229, 0.3) 100%
   );
 `;
 
