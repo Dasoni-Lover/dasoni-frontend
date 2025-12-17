@@ -8,6 +8,8 @@ import { getPhotos, getHallInfo, getPhotoDetail } from "../api/memorial";
 import { createMyHall, getMyHall, updateMyHallProfile } from "../api/my-hall";
 import { getPresignedUrlForImage, uploadFileToS3 } from "../api/files";
 
+import { createShareLink } from "../api/share-link";
+
 import BarNavigate from "../components/BarNavigate";
 
 import Profile from "../features/MemorialHall/components/Profile";
@@ -348,13 +350,21 @@ export default function MemorialHallPage() {
 
   // ===================== 🔗 링크 공유 =====================
   const handleLinkShareClick = async () => {
-    const currentUrl = window.location.href;
+    if (!effectiveHallId) {
+      alert("추모관 정보를 불러오지 못했습니다. 잠시 후 다시 시도해 주세요.");
+      return;
+    }
     try {
-      if (navigator.clipboard?.writeText)
-        await navigator.clipboard.writeText(currentUrl);
-      else {
+      // 1) 공유링크 발급
+      const { shareUrl } = await createShareLink(Number(effectiveHallId));
+      if (!shareUrl) throw new Error("shareUrl이 응답에 없습니다.");
+
+      // 2) shareUrl 클립보드 복사
+      if (navigator.clipboard?.writeText) {
+        await navigator.clipboard.writeText(shareUrl);
+      } else {
         const textarea = document.createElement("textarea");
-        textarea.value = currentUrl;
+        textarea.value = shareUrl;
         textarea.style.position = "fixed";
         textarea.style.left = "-9999px";
         document.body.appendChild(textarea);
@@ -364,7 +374,7 @@ export default function MemorialHallPage() {
       }
     } catch (err) {
       console.error("클립보드 복사 실패:", err);
-      alert("링크 복사에 실패했습니다. 직접 주소를 복사해 주세요.");
+      alert("공유 링크 발급/복사에 실패했습니다. 잠시 후 다시 시도해 주세요.");
       return;
     }
     setIsLinkShareModalOpen(true);
@@ -380,14 +390,15 @@ export default function MemorialHallPage() {
             {isMe ? (
               <Title>나의 추모관</Title>
             ) : (
-              <BarNavigate 
-              paths={["홈", hallTitle]} 
-              onPathClick={(path) => {
-                if (path === "홈") {
-                  // hallId 유지하면서 홈으로 이동
-                  nav("/home", { state: { hallIdFromState } });
-                }
-              }}/>
+              <BarNavigate
+                paths={["홈", hallTitle]}
+                onPathClick={(path) => {
+                  if (path === "홈") {
+                    // hallId 유지하면서 홈으로 이동
+                    nav("/home", { state: { hallIdFromState } });
+                  }
+                }}
+              />
             )}
           </BarWrapper>
 

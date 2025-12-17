@@ -43,7 +43,7 @@ export const EnterMemorialHallPage = () => {
 
   return (
     <Wrapper>
-      <Text>추모관 입장하기</Text>
+      <Text>추모관 검색</Text>
       <SearchTab onSearchResult={setSearchResults} />
       <Content>
         {loadingInitial ? (

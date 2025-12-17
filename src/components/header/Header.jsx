@@ -120,14 +120,14 @@ export default function Header({ showAuthButtons }) {
 
   const menuItems = [
     { label: "홈", path: "/home" },
-    { label: "추모관 검색하기", path: "/enter" },
-    { label: "추모관 개설하기", path: "/open" },
+    { label: "추모관 검색", path: "/enter" },
+    { label: "추모관 개설", path: "/open" },
     { label: "나의 추모관", path: "/memorial" },
   ];
 
   const getIsActive = (item) => {
     if (item.label === "홈") {
-      return location.pathname === "/" || location.pathname === "/home";
+      return location.pathname === "/home";
     }
     if (item.label === "나의 추모관") {
       const fromMyHall = location.state?.from === "myHall";

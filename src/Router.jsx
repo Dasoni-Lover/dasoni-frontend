@@ -16,6 +16,8 @@ import { ProfileEditPage } from "./features/MemorialHall/pages/ProfileEditPage";
 import OpenMemorialHallPage from "./pages/OpenMemorialHallPage";
 import { EnterMemorialHallPage } from "./pages/EnterMemorialHallPage";
 import RequestEntryPage from "./pages/RequestEntryPage";
+import ShareLinkEntryPage from "./pages/ShareLinkEntryPage";
+import ExampleHallPage from "./pages/ExampleHallPage";
 
 /* 글 작성 */
 import WritePostPage from "./pages/WritePostPage";
@@ -43,6 +45,9 @@ const router = createBrowserRouter([
       { path: "/login", element: <LogInPage /> },
       { path: "/register", element: <RegisterPage /> },
 
+      /* 공유링크 진입 (로그인 필요 없음) */
+      { path: "/share-links/:code", element: <ShareLinkEntryPage /> },
+
       /* 로그인 필요 페이지들 */
       { path: "/home", element: <HomePage />, loader: authGuard },
 
@@ -60,6 +65,9 @@ const router = createBrowserRouter([
         element: <RequestEntryPage />,
         loader: authGuard,
       },
+
+      /* 예시 추모관 (목데이터) */
+      { path: "/example", element: <ExampleHallPage /> },
 
       /* 글 작성 */
       { path: "/write", element: <WritePostPage />, loader: authGuard },

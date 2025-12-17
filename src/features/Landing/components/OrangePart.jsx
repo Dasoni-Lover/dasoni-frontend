@@ -52,7 +52,7 @@ export default function OrangePart() {
           }
         });
       },
-      { threshold: 0.5 }
+      { threshold: 0.2 }
     );
 
     observer.observe(target);
@@ -327,11 +327,11 @@ export default function OrangePart() {
           <MockupImg src={ImgMockup} />
         </AbsoluteFade>
 
-        <AbsoluteFade $visible={isLinkVisible} $delay="0.75s" $z={4}>
+        <AbsoluteFade $visible={isLinkVisible} $delay="0.7s" $z={4}>
           <LinkBubbleImg src={ImgLinkBubble} />
         </AbsoluteFade>
 
-        <AbsoluteFade $visible={isLinkVisible} $delay="0.9s" $z={4}>
+        <AbsoluteFade $visible={isLinkVisible} $delay="0.7s" $z={4}>
           <SnsImg src={ImgSns} />
         </AbsoluteFade>
       </LinkShareSection>
