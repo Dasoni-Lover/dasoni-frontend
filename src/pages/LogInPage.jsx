@@ -1,7 +1,7 @@
 // src/pages/LogInPage.jsx
 import React, { useState } from "react";
 import styled from "styled-components";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import { color, typo } from "../styles/tokens";
 import Button from "../components/Button";
 import { InputFieldWhite } from "../components/InputFieldWhite";
@@ -11,6 +11,9 @@ import ImgRainbowHouse from "../features/Onboarding/assets/img-rainbow-house.svg
 
 export default function LogInPage() {
   const navigate = useNavigate();
+  const location = useLocation();
+
+  const redirect = new URLSearchParams(location.search).get("redirect");
 
   const [logId, setLogId] = useState("");
   const [password, setPassword] = useState("");
@@ -45,7 +48,8 @@ export default function LogInPage() {
       window.dispatchEvent(new Event("authChanged"));
 
       alert("로그인에 성공했습니다.");
-      navigate("/home");
+      if (redirect) navigate(redirect, { replace: true });
+      else navigate("/home", { replace: true });
     } catch (error) {
       console.error(error);
       setError(true);
