@@ -60,6 +60,24 @@ export const getPresignedUrlForImage = async (file) => {
   };
 };
 
+// 오디오전용
+export const getPresignedUrlForAudio = async (file) => {
+  if (!file) throw new Error("파일이 없습니다.");
+
+  const contentType = getFileContentType(file);
+
+  const res = await client.post("/api/files/audios/presigned-url", {
+    filename: file.name,
+    contentType,
+    fileSize: file.size,
+  });
+
+  return {
+    ...res.data, // uploadUrl, fileUrl, s3Key, expirationMinutes
+    contentType,
+  };
+};
+
 /**
  * presigned-url로 S3에 실제 업로드
  */

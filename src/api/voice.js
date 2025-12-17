@@ -1,6 +1,6 @@
 // src/api/voice.js
 import client from "./client";
-import { getPresignedUrlForImage, uploadFileToS3 } from "./files";
+import { getPresignedUrlForAudio, uploadFileToS3 } from "./files";
 
 /**
  * 음성 파일 업로드
@@ -13,7 +13,7 @@ export const uploadVoiceFile = async (hallId, file) => {
   if (!file) throw new Error("파일이 없습니다.");
 
   // 1️⃣ presigned URL 받기
-  const { uploadUrl, fileUrl, contentType } = await getPresignedUrlForImage(
+  const { uploadUrl, fileUrl, contentType } = await getPresignedUrlForAudio(
     file
   );
 
@@ -49,7 +49,7 @@ export const updateVoiceFile = async (hallId, file) => {
   if (!file) throw new Error("파일이 없습니다.");
 
   // 1️⃣ presigned URL + fileUrl 받기
-  const { uploadUrl, fileUrl, contentType } = await getPresignedUrlForImage(
+  const { uploadUrl, fileUrl, contentType } = await getPresignedUrlForAudio(
     file
   );
 

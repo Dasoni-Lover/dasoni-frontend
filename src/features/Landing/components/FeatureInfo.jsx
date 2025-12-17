@@ -8,12 +8,15 @@ export default function FeatureInfo({
   main,
   sub,
   align,
+  subcolor,
 }) {
   return (
     <Wrapper $align={align}>
       <Title $highlight={highlight}>{title}</Title>
       <MainText>{main}</MainText>
-      <SubText $align={align}>{sub}</SubText>
+      <SubText $align={align} $subcolor={subcolor}>
+        {sub}
+      </SubText>
     </Wrapper>
   );
 }
@@ -53,7 +56,7 @@ const MainText = styled.div`
 `;
 
 const SubText = styled.div`
-  color: var(--50, #7a7a7a);
+  color: ${({ $subcolor }) => ($subcolor === "white" ? "#fff" : "#7a7a7a")};
   text-align: ${({ $align }) => ($align === "left" ? "left" : "center")};
   font-family: Pretendard;
   font-size: 1.5rem;

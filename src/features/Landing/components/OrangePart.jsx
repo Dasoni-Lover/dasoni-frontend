@@ -1,14 +1,119 @@
 // src/features/Landing/components/OrangePart.jsx
 import React from "react";
-import styled from "styled-components";
+import styled, { keyframes } from "styled-components";
 import FeatureInfo from "./FeatureInfo";
 import ShareAlbumCarousel from "./ShareAlbumCarousel";
 
 import ImgRequest1 from "../assets/img-request-example-1.svg";
+import ImgRequest2 from "../assets/img-request-example-2.svg";
 import ImgResponse1 from "../assets/img-response-example-1.svg";
+import ImgResponse2 from "../assets/img-response-example-2.svg";
+
+import ImgMockup from "../assets/img-mockup.png";
+import ImgLinkBubble from "../assets/img-link-share-bubble.png";
+import ImgSns from "../assets/img-sns.png";
+
+import ImgSpeechBubble from "../assets/img-speech-bubble.svg";
+import ImgSpeechBubble2 from "../assets/img-speech-bubble-2.svg";
+
 import { color, typo } from "../../../styles/tokens";
 
 export default function OrangePart() {
+  // ✅ 말풍선 개수 / 위치 / 속도 / 딜레이 / 크기 / 이미지(src) 커스텀
+  //  - ImgSpeechBubble / ImgSpeechBubble2 섞어서 자연스럽게
+  //  - 큰 말풍선은 느리게, 작은 말풍선은 조금 빠르게(깊이감)
+  const bubbles = [
+    {
+      left: "4%",
+      size: "7.0rem",
+      duration: "7.2s",
+      delay: "0.6s",
+      src: ImgSpeechBubble,
+    },
+    {
+      left: "10%",
+      size: "12.8rem",
+      duration: "12.6s",
+      delay: "2.2s",
+      src: ImgSpeechBubble2,
+    },
+
+    {
+      left: "18%",
+      size: "8.6rem",
+      duration: "8.6s",
+      delay: "1.3s",
+      src: ImgSpeechBubble,
+    },
+    {
+      left: "26%",
+      size: "15.2rem",
+      duration: "14.0s",
+      delay: "0.2s",
+      src: ImgSpeechBubble2,
+    },
+
+    {
+      left: "36%",
+      size: "6.2rem",
+      duration: "7.0s",
+      delay: "3.0s",
+      src: ImgSpeechBubble2,
+    },
+    {
+      left: "44%",
+      size: "10.4rem",
+      duration: "10.2s",
+      delay: "1.0s",
+      src: ImgSpeechBubble,
+    },
+
+    {
+      left: "54%",
+      size: "16.0rem",
+      duration: "15.0s",
+      delay: "2.8s",
+      src: ImgSpeechBubble,
+    },
+    {
+      left: "62%",
+      size: "8.0rem",
+      duration: "8.1s",
+      delay: "4.2s",
+      src: ImgSpeechBubble2,
+    },
+
+    {
+      left: "70%",
+      size: "13.4rem",
+      duration: "12.4s",
+      delay: "1.7s",
+      src: ImgSpeechBubble,
+    },
+    {
+      left: "78%",
+      size: "6.8rem",
+      duration: "7.4s",
+      delay: "3.6s",
+      src: ImgSpeechBubble2,
+    },
+
+    {
+      left: "86%",
+      size: "17.2rem",
+      duration: "16.0s",
+      delay: "0.8s",
+      src: ImgSpeechBubble2,
+    },
+    {
+      left: "92%",
+      size: "9.2rem",
+      duration: "9.0s",
+      delay: "2.4s",
+      src: ImgSpeechBubble,
+    },
+  ];
+
   return (
     <>
       {/* 공유앨범 섹션 */}
@@ -40,10 +145,10 @@ export default function OrangePart() {
             </ResponseImgWrapper>
           </ResponseBox>
 
-          <RequestImg src={ImgRequest1} />
+          <RequestImg src={ImgRequest2} />
           <ResponseBox>
             <ResponseImgWrapper>
-              <ResponseImg src={ImgResponse1} />
+              <ResponseImg src={ImgResponse2} />
             </ResponseImgWrapper>
           </ResponseBox>
         </ExampleWrapper>
@@ -51,11 +156,31 @@ export default function OrangePart() {
 
       {/* 링크 공유 */}
       <LinkShareSection>
+        {/* ✅ 배경 말풍선 레이어 */}
+        <BubblesLayer aria-hidden="true">
+          {bubbles.map((b, idx) => (
+            <FloatingBubble
+              key={idx}
+              src={b.src}
+              alt=""
+              $left={b.left}
+              $size={b.size}
+              $duration={b.duration}
+              $delay={b.delay}
+            />
+          ))}
+        </BubblesLayer>
+
         <FeatureInfo
           title="링크 공유"
           main="추모관 링크를 공유해 주세요"
-          sub={`지인들과 함께 추모할 수 있어요 \n그리움은 나눌수록 따뜻한 위로가 됩니다`}
+          sub={`추모관 링크를 공유해, 고인을 사랑했던 이들과 소중한 추억을 함께 모아보세요.\n기억을 나누는 순간들이 서로에게 따뜻한 위로가 되어줄 거예요`}
+          subcolor="white"
         />
+
+        <MockupImg src={ImgMockup} />
+        <LinkBubbleImg src={ImgLinkBubble} />
+        <SnsImg src={ImgSns} />
       </LinkShareSection>
     </>
   );
@@ -141,8 +266,85 @@ const ResponseImg = styled.img`
   object-fit: cover;
 `;
 
+/* ✅ 링크 공유 섹션 */
 const LinkShareSection = styled.div`
+  position: relative;
+  width: 100%;
   height: 51.875rem;
   display: flex;
-  background: #fff;
+  flex-direction: column;
+  background: #ffbc67;
+  align-items: center;
+  overflow: hidden; /* ⭐ 말풍선이 밖으로 나가면 안 보이게 */
+`;
+
+/* ✅ 말풍선 레이어(배경) */
+const BubblesLayer = styled.div`
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+`;
+
+/* ✅ 아래에서 위로 올라오며 나타났다 사라지는 애니메이션 */
+const floatUp = keyframes`
+  0% {
+    transform: translateY(0) scale(0.85);
+    opacity: 0;
+  }
+  10% {
+    opacity: 0.18; /* 10~20% 느낌 */
+    transform: translateY(-20px) scale(1);
+  }
+  70% {
+    opacity: 0.14;
+  }
+  100% {
+    transform: translateY(-520px) scale(1);
+    opacity: 0;
+  }
+`;
+
+/* ✅ 크기/속도/딜레이/좌표만으로 다양하게 보이게 */
+const FloatingBubble = styled.img`
+  position: absolute;
+  bottom: -140px;
+  left: ${({ $left }) => $left};
+  width: ${({ $size }) => $size};
+  height: auto;
+
+  opacity: 0.14;
+  filter: blur(0px);
+
+  animation-name: ${floatUp};
+  animation-duration: ${({ $duration }) => $duration};
+  animation-delay: ${({ $delay }) => $delay};
+  animation-timing-function: ease-in-out;
+  animation-iteration-count: infinite;
+
+  will-change: transform, opacity;
+`;
+
+/* ✅ 기존 컨텐츠는 말풍선보다 위 */
+const MockupImg = styled.img`
+  position: absolute;
+  width: 51rem;
+  margin-right: 450px;
+  bottom: 0;
+  z-index: 1;
+`;
+
+const LinkBubbleImg = styled.img`
+  width: 32.0625rem;
+  position: absolute;
+  bottom: 10%;
+  z-index: 2;
+`;
+
+const SnsImg = styled.img`
+  width: 9rem;
+  bottom: 9%;
+  margin-right: 100px;
+  position: absolute;
+  z-index: 3;
 `;
