@@ -26,44 +26,42 @@ export default function SideCategoryBox({ hallId, page }) {
   const closeEditBlockedModal = () => setShowEditBlockedModal(false);
   const closeAlreadySentModal = () => setShowAlreadySentModal(false);
 
-  
-console.log("📌 SavedLetterPage page:", page);
-console.log("📌 SavedLetterPage location.state:", location.state);
-// ==========================
-// 편지 쓰기 클릭
-// ==========================
-const handleClickWriteLetter = async () => {
-  setActiveMenu("write");
+  console.log("📌 SavedLetterPage page:", page);
+  console.log("📌 SavedLetterPage location.state:", location.state);
+  // ==========================
+  // 편지 쓰기 클릭
+  // ==========================
+  const handleClickWriteLetter = async () => {
+    setActiveMenu("write");
 
-  // ✅ page === "me" → 오늘 편지 여부 체크 안 함
-  if (page === "me") {
-    navigate("/leave-letter", {
-      state: {
-        hallId,
-        page,
-        activeMenu: "write",
-      },
-    });
-    return;
-  }
-
-  try {
-    const { isSendToday } = await checkLetterSentToday(hallId);
-
-    // 오늘 이미 보낸 경우
-    if (isSendToday) {
-      setShowAlreadySentModal(true);
+    // ✅ page === "me" → 오늘 편지 여부 체크 안 함
+    if (page === "me") {
+      navigate("/leave-letter", {
+        state: {
+          hallId,
+          page,
+          activeMenu: "write",
+        },
+      });
       return;
     }
 
-    // 그 외 페이지 → 모달
-    setShowModal(true);
-  } catch (error) {
-    console.error("오늘 편지 전송 여부 조회 실패:", error);
-    alert("편지 작성 가능 여부를 확인하는 중 오류가 발생했어요.");
-  }
-};
+    try {
+      const { isSendToday } = await checkLetterSentToday(hallId);
 
+      // 오늘 이미 보낸 경우
+      if (isSendToday) {
+        setShowAlreadySentModal(true);
+        return;
+      }
+
+      // 그 외 페이지 → 모달
+      setShowModal(true);
+    } catch (error) {
+      console.error("오늘 편지 전송 여부 조회 실패:", error);
+      alert("편지 작성 가능 여부를 확인하는 중 오류가 발생했어요.");
+    }
+  };
 
   // ==========================
   // 모달 내 확인 처리
@@ -147,11 +145,13 @@ const handleClickWriteLetter = async () => {
         return;
       }
 
-      navigate("/edit-hallinfo", {
+      // 나머지 경우는 페이지 이동
+      navigate("/set-the-dead", {
         state: { hallId, page, activeMenu: "edit" },
       });
     } catch (error) {
       console.error("고인 정보 수정 가능 여부 조회 실패:", error);
+      // 에러 발생 시에도 일단 페이지 이동을 시킬지, 에러 메시지를 띄울지 결정 필요
       alert("정보 조회 중 오류가 발생했습니다.");
     }
   };
@@ -159,27 +159,39 @@ const handleClickWriteLetter = async () => {
   return (
     <>
       <Container>
-        <Box>
-          {(page === "admin" || page === "follower") ? (
-            <WhiteButton onClick={handleClickEditHallInfo}>
+        {/* 맨 위로 분리된 고인 정보 수정 버튼 + 편지함 아이콘 */}
+        {(page === "admin" || page === "follower") && (
+          <Box>
+            <WhiteButton
+              onClick={handleClickEditHallInfo}
+              $bgcolor={activeMenu === "edit" ? "#FFF4E6" : undefined}
+              $border={activeMenu === "edit" ? "1px solid #FFBC67" : undefined}
+            >
               고인 정보 설정
             </WhiteButton>
-          ) : (
+            <LetterBox src={letterbox} />
+          </Box>
+        )}
+        {page === "me" && (
+          <Box>
             <br />
-          )}
-          <LetterBox src={letterbox} />
-        </Box>
+            <LetterBox src={letterbox} />
+          </Box>
+        )}
 
+        {/* 보낸 편지함 */}
         <SideCategoryBoxItem
           text="보낸 편지함"
           bgcolor={activeMenu === "sent" ? "#FFF4E6" : undefined}
           border={activeMenu === "sent" ? "1px solid #FFBC67" : undefined}
           onClick={() => {
             setActiveMenu("sent");
-            navigate(
-              page === "me" ? "/leave-letterbox" : "/sent-letterbox",
-              { state: { hallId, page, activeMenu: "sent" } }
-            );
+            const targetPath =
+              page === "me" ? "/leave-letterbox" : "/sent-letterbox";
+
+            navigate(targetPath, {
+              state: { hallId, page, activeMenu: "sent" },
+            });
           }}
         />
 
@@ -218,10 +230,7 @@ const handleClickWriteLetter = async () => {
       </Container>
 
       {showModal && (
-        <CheckReturnModal
-          onClose={closeModal}
-          onConfirm={handleModalConfirm}
-        />
+        <CheckReturnModal onClose={closeModal} onConfirm={handleModalConfirm} />
       )}
 
       {showEditBlockedModal && (
@@ -261,7 +270,6 @@ const handleClickWriteLetter = async () => {
   );
 }
 
-
 const Container = styled.div`
   position: fixed;
   top: 20.63rem;
@@ -271,7 +279,7 @@ const Container = styled.div`
   flex-direction: column;
   gap: 0.625rem;
 
-  @media (max-width: 1200px) {
+  @media (max-width: 1350px) {
     display: none;
   }
 `;
@@ -280,6 +288,7 @@ const Box = styled.div`
   width: 14.8125rem;
   height: 4.5625rem;
   display: flex;
+  flex-direction: row;
   justify-content: space-between;
   align-items: flex-end;
 `;
@@ -292,21 +301,24 @@ const WhiteButton = styled.button`
   display: flex;
   width: 7.5rem;
   height: 2.5rem;
+  padding: 0.4375rem 0.5rem;
   justify-content: center;
   align-items: center;
+  gap: 0.625rem;
   cursor: pointer;
   margin-bottom: 0.37rem;
 
+  background: ${({ $bgcolor }) => $bgcolor ?? "#fff"};
+  border: ${({ $border }) => $border ?? "1px solid var(--10, #ddd)"};
+
   border-radius: 6.25rem;
-  border: 1px solid #ddd;
-  background: #fff;
 
   ${typo("bodyb")};
-  color: ${color("black.50")};
+  color: #${color("black.50")};
 
   &:hover {
-    background: #FFF4E6;
-    border: 1px solid #FFBC67;
+    background: #fff4e6;
+    border: 1px solid #ffbc67;
     ${typo("bodyb")};
     color: ${color("black.70")};
   }

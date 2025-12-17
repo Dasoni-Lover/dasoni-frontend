@@ -7,15 +7,11 @@ export const InputField = ({
   value,
   onChange,
   width = "50%",
-  borderColor = "#e9e9e9",   // ⭐ 디폴트 기존값
-  bgColor = "#f8f8f8",        // ⭐ 디폴트 기존값
+  borderColor = "#e9e9e9", // ⭐ 디폴트 기존값
+  bgColor = "#f8f8f8", // ⭐ 디폴트 기존값
 }) => {
   return (
-    <Wrapper
-      $width={width}
-      $borderColor={borderColor}
-      $bgColor={bgColor}
-    >
+    <Wrapper $width={width} $borderColor={borderColor} $bgColor={bgColor}>
       <StyledInput
         type="text"
         placeholder={placeholder}
@@ -53,12 +49,10 @@ const StyledInput = styled.input`
   outline: none;
 
   &::placeholder {
-    ${typo("bodym")};
+    ${typo("h4")};
     color: ${color("black.10")};
   }
 `;
-
-
 
 //<InputField placeholder="고인의 이름을 입력하세요" />
 //<InputField placeholder="아이디를 입력하세요" width="100%" borderColor="#ddd" bgColor="#fff"/>

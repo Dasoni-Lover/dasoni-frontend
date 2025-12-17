@@ -32,9 +32,7 @@ export const getLetterStatus = async (hallId) => {
 // 오늘 편지 보냈는지 여부 체크
 export const checkLetterSentToday = async (hallId) => {
   try {
-    const res = await client.get(
-      `/api/halls/${hallId}/letters/check`
-    );
+    const res = await client.get(`/api/halls/${hallId}/letters/check`);
 
     const data = res.data || {};
 
@@ -49,7 +47,6 @@ export const checkLetterSentToday = async (hallId) => {
     throw err;
   }
 };
-
 
 // 보낸 편지 리스트 조회
 export const fetchLettersList = async (hallId) => {
@@ -89,11 +86,12 @@ export const fetchReceivedReplies = async (hallId) => {
       totalCount: totalCount ?? 0,
       unreadCount: unreadCount ?? 0,
       readCount: readCount ?? 0,
-      replies: replies?.map((r) => ({
-        replyId: r.replyId,
-        createdAt: r.createdAt,
-        isChecked: r.isChecked,
-      })) || [],
+      replies:
+        replies?.map((r) => ({
+          replyId: r.replyId,
+          createdAt: r.createdAt,
+          isChecked: r.isChecked,
+        })) || [],
     };
   } catch (err) {
     console.error("❌ 받은 편지함 조회 실패:", err.response?.data || err);
@@ -104,7 +102,9 @@ export const fetchReceivedReplies = async (hallId) => {
 // 받은 편지 상세 조회
 export const fetchReceivedReplyDetail = async (hallId, replyId) => {
   try {
-    const res = await client.get(`/api/halls/${hallId}/letters/reply/${replyId}`);
+    const res = await client.get(
+      `/api/halls/${hallId}/letters/reply/${replyId}`
+    );
     return {
       toName: res.data?.toName || "",
       fromName: res.data?.fromName || "",
@@ -117,8 +117,6 @@ export const fetchReceivedReplyDetail = async (hallId, replyId) => {
     throw err;
   }
 };
-
-
 
 //임시보관함
 
@@ -134,10 +132,10 @@ export const fetchTempLettersList = async (hallId) => {
       console.log("🔍 each letter:", l);
       return {
         ...l,
-        letterId: l.letterId, 
+        letterId: l.letterId,
         createdAt: l.date,
-        excerpt: l.content?.slice(0, 20) || "",  // 리스트 미리보기용(선택)
-        isWanted: l.isWanted,  
+        excerpt: l.content?.slice(0, 20) || "", // 리스트 미리보기용(선택)
+        isWanted: l.isWanted,
       };
     });
   } catch (err) {
@@ -148,8 +146,6 @@ export const fetchTempLettersList = async (hallId) => {
     throw err;
   }
 };
-
-
 
 // 임시보관함 편지 상세 조회
 export const fetchTempLetterDetail = async (hallId, letterId) => {
@@ -190,10 +186,7 @@ export const sendMyLetter = async (body) => {
   try {
     console.log("📨 sendMyLetter 요청:", body);
 
-    const res = await client.post(
-      "/api/halls/me/letters/send",
-      body
-    );
+    const res = await client.post("/api/halls/me/letters/send", body);
 
     console.log("📨 sendMyLetter 응답:", res.data);
     return res.data;
@@ -205,3 +198,30 @@ export const sendMyLetter = async (body) => {
     throw err;
   }
 };
+
+// 초기 고인 정보 설정 생성
+export const createLetterSettings = async (hallId, payload) => {
+  const res = await client.post(
+    `/api/halls/${hallId}/letters/settings/create`,
+    payload
+  );
+  return res.data;
+};
+
+//고인 정보 설정 조회
+export const getLetterSettings = async (hallId) => {
+  try {
+    const res = await client.get(`/api/halls/${hallId}/letters/settings`);
+    return res.data; // 설정 있으면 위 명세 예시 형태
+  } catch (e) {
+    // 설정이 아예 없는 경우 404로 내려올 수 있으니 안전하게 null 반환
+    if (e.response && e.response.status === 404) {
+      return null;
+    }
+    throw e;
+  }
+};
+
+// 고인 정보 수정
+export const updateLetterSettings = (hallId, body) =>
+  client.post(`/api/halls/${hallId}/letters/settings/update`, body);
