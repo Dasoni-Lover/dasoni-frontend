@@ -60,7 +60,7 @@ export const getPresignedUrlForImage = async (file) => {
   };
 };
 
-// 오디오전용
+// 오디오 전용
 export const getPresignedUrlForAudio = async (file) => {
   if (!file) throw new Error("파일이 없습니다.");
 

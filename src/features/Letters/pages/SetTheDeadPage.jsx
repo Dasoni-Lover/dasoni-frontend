@@ -147,8 +147,6 @@ export default function SetTheDeadPage() {
         // 관리자라면: 새로 업로드한 파일이 있으면 업로드, 없으면 기존 값 유지
         if (formData.voiceFile) {
           voiceUrl = await uploadVoiceFile(hallId, formData.voiceFile);
-        } else {
-          voiceUrl = existingSettings?.voiceUrl || null;
         }
       } else {
         // 방문자/친구(me, follower)는 voiceUrl을 보내지 않거나 null로 보냄
@@ -161,7 +159,7 @@ export default function SetTheDeadPage() {
         isPolite: formData.tone === "존댓말",
         calledName: formData.nickname,
         speakHabit: formData.frequentWords,
-        voiceUrl: voiceUrl,
+        ...(isManager && formData.voiceFile ? { voiceUrl } : {}), // ✅ 새 파일 업로드한 경우에만 포함
       };
 
       // 🔹 최초 생성 vs 수정 분기

@@ -32,6 +32,7 @@ export default function EditTheDeadForm({
 
   // 파일 업로드
   const openFileDialog = () => {
+    if (fileInputRef.current) fileInputRef.current.value = ""; // ✅ 같은 파일 재선택해도 onChange 타게
     fileInputRef.current?.click();
   };
 

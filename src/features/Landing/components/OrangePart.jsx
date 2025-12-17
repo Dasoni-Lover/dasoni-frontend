@@ -1,5 +1,5 @@
 // src/features/Landing/components/OrangePart.jsx
-import React from "react";
+import React, { useEffect, useRef, useState } from "react";
 import styled, { keyframes } from "styled-components";
 import FeatureInfo from "./FeatureInfo";
 import ShareAlbumCarousel from "./ShareAlbumCarousel";
@@ -19,9 +19,88 @@ import ImgSpeechBubble2 from "../assets/img-speech-bubble-2.svg";
 import { color, typo } from "../../../styles/tokens";
 
 export default function OrangePart() {
+  // ✅ 섹션별 애니메이션 트리거
+  const [isShareVisible, setIsShareVisible] = useState(false);
+  const [isAIVisible, setIsAIVisible] = useState(false);
+  const [isLinkVisible, setIsLinkVisible] = useState(false);
+
+  const shareRef = useRef(null);
+  const aiRef = useRef(null);
+  const linkRef = useRef(null);
+
+  useEffect(() => {
+    const target = shareRef.current;
+    if (!target) return;
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((e) => {
+          if (e.isIntersecting) {
+            setIsShareVisible(true);
+            observer.unobserve(e.target);
+          }
+        });
+      },
+      { threshold: 0.3 }
+    );
+
+    observer.observe(target);
+
+    return () => {
+      if (target) observer.unobserve(target);
+      observer.disconnect();
+    };
+  }, []);
+
+  useEffect(() => {
+    const target = aiRef.current;
+    if (!target) return;
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((e) => {
+          if (e.isIntersecting) {
+            setIsAIVisible(true);
+            observer.unobserve(e.target);
+          }
+        });
+      },
+      { threshold: 0.3 }
+    );
+
+    observer.observe(target);
+
+    return () => {
+      if (target) observer.unobserve(target);
+      observer.disconnect();
+    };
+  }, []);
+
+  useEffect(() => {
+    const target = linkRef.current;
+    if (!target) return;
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((e) => {
+          if (e.isIntersecting) {
+            setIsLinkVisible(true);
+            observer.unobserve(e.target);
+          }
+        });
+      },
+      { threshold: 0.3 }
+    );
+
+    observer.observe(target);
+
+    return () => {
+      if (target) observer.unobserve(target);
+      observer.disconnect();
+    };
+  }, []);
+
   // ✅ 말풍선 개수 / 위치 / 속도 / 딜레이 / 크기 / 이미지(src) 커스텀
-  //  - ImgSpeechBubble / ImgSpeechBubble2 섞어서 자연스럽게
-  //  - 큰 말풍선은 느리게, 작은 말풍선은 조금 빠르게(깊이감)
   const bubbles = [
     {
       left: "4%",
@@ -37,7 +116,6 @@ export default function OrangePart() {
       delay: "2.2s",
       src: ImgSpeechBubble2,
     },
-
     {
       left: "18%",
       size: "8.6rem",
@@ -48,11 +126,10 @@ export default function OrangePart() {
     {
       left: "26%",
       size: "15.2rem",
-      duration: "14.0s",
+      duration: "11.0s",
       delay: "0.2s",
       src: ImgSpeechBubble2,
     },
-
     {
       left: "36%",
       size: "6.2rem",
@@ -67,11 +144,10 @@ export default function OrangePart() {
       delay: "1.0s",
       src: ImgSpeechBubble,
     },
-
     {
       left: "54%",
       size: "16.0rem",
-      duration: "15.0s",
+      duration: "12.0s",
       delay: "2.8s",
       src: ImgSpeechBubble,
     },
@@ -82,7 +158,6 @@ export default function OrangePart() {
       delay: "4.2s",
       src: ImgSpeechBubble2,
     },
-
     {
       left: "70%",
       size: "13.4rem",
@@ -97,11 +172,10 @@ export default function OrangePart() {
       delay: "3.6s",
       src: ImgSpeechBubble2,
     },
-
     {
       left: "86%",
       size: "17.2rem",
-      duration: "16.0s",
+      duration: "13.0s",
       delay: "0.8s",
       src: ImgSpeechBubble2,
     },
@@ -117,45 +191,64 @@ export default function OrangePart() {
   return (
     <>
       {/* 공유앨범 섹션 */}
-      <ShareAlbumSection>
+      <ShareAlbumSection ref={shareRef}>
         <ShareAlbumInner>
-          <FeatureInfo
-            title="공유앨범"
-            main="고인과의 추억이 담긴 사진을 앨범에 올려주세요"
-            sub="추모관에 방문한 추모객들과 함께 따뜻했던 추억을 나눌 수 있어요"
-          />
-          <ShareAlbumCarousel />
+          <FadeInItem $visible={isShareVisible} $delay="0s">
+            <FeatureInfo
+              title="공유앨범"
+              main="고인과의 추억이 담긴 사진을 앨범에 올려주세요"
+              sub="추모관에 방문한 추모객들과 함께 따뜻했던 추억을 나눌 수 있어요"
+            />
+          </FadeInItem>
+
+          <FadeInItem $visible={isShareVisible} $delay="0.12s">
+            <ShareAlbumCarousel />
+          </FadeInItem>
         </ShareAlbumInner>
       </ShareAlbumSection>
 
       {/* AI 사진 생성 */}
-      <AIGenerationSection>
-        <FeatureInfo
-          highlight={true}
-          title="AI 사진 생성"
-          main="함께한 순간의 사진이 남아있지 않아 아쉬우신가요?"
-          sub={`혹은 함께하지 못해 상상만 했던 순간이 있나요? \n 기억 속의 장면을 AI로 직접 만들어 보세요.`}
-        />
+      <AIGenerationSection ref={aiRef}>
+        <FadeInItem $visible={isAIVisible} $delay="0s">
+          <FeatureInfo
+            highlight={true}
+            title="AI 사진 생성"
+            main="함께한 순간의 사진이 남아있지 않아 아쉬우신가요?"
+            sub={`혹은 함께하지 못해 상상만 했던 순간이 있나요? \n 기억 속의 장면을 AI로 직접 만들어 보세요.`}
+          />
+        </FadeInItem>
 
-        <ExampleWrapper>
-          <RequestImg src={ImgRequest1} />
-          <ResponseBox>
-            <ResponseImgWrapper>
-              <ResponseImg src={ImgResponse1} />
-            </ResponseImgWrapper>
-          </ResponseBox>
+        <FadeInItem $visible={isAIVisible} $delay="0.14s">
+          <ExampleWrapper>
+            <FadeInItem $visible={isAIVisible} $delay="0.18s">
+              <RequestImg src={ImgRequest1} />
+            </FadeInItem>
 
-          <RequestImg src={ImgRequest2} />
-          <ResponseBox>
-            <ResponseImgWrapper>
-              <ResponseImg src={ImgResponse2} />
-            </ResponseImgWrapper>
-          </ResponseBox>
-        </ExampleWrapper>
+            <FadeInItem $visible={isAIVisible} $delay="0.26s">
+              <ResponseBox>
+                <ResponseImgWrapper>
+                  <ResponseImg src={ImgResponse1} />
+                </ResponseImgWrapper>
+              </ResponseBox>
+            </FadeInItem>
+
+            <FadeInItem $visible={isAIVisible} $delay="0.34s">
+              <RequestImg src={ImgRequest2} />
+            </FadeInItem>
+
+            <FadeInItem $visible={isAIVisible} $delay="0.42s">
+              <ResponseBox>
+                <ResponseImgWrapper>
+                  <ResponseImg src={ImgResponse2} />
+                </ResponseImgWrapper>
+              </ResponseBox>
+            </FadeInItem>
+          </ExampleWrapper>
+        </FadeInItem>
       </AIGenerationSection>
 
       {/* 링크 공유 */}
-      <LinkShareSection>
+      <LinkShareSection ref={linkRef}>
         {/* ✅ 배경 말풍선 레이어 */}
         <BubblesLayer aria-hidden="true">
           {bubbles.map((b, idx) => (
@@ -171,22 +264,46 @@ export default function OrangePart() {
           ))}
         </BubblesLayer>
 
-        <FeatureInfo
-          title="링크 공유"
-          main="추모관 링크를 공유해 주세요"
-          sub={`추모관 링크를 공유해, 고인을 사랑했던 이들과 소중한 추억을 함께 모아보세요.\n기억을 나누는 순간들이 서로에게 따뜻한 위로가 되어줄 거예요`}
-          subcolor="white"
-        />
+        <FadeInItem $visible={isLinkVisible} $delay="0s" $z={4}>
+          <FeatureInfo
+            title="링크 공유"
+            main="추모관 링크를 공유해 주세요"
+            sub={`추모관 링크를 공유해, 고인을 사랑했던 이들과 소중한 추억을 함께 모아보세요.\n기억을 나누는 순간들이 서로에게 따뜻한 위로가 되어줄 거예요`}
+            subcolor="white"
+          />
+        </FadeInItem>
 
-        <MockupImg src={ImgMockup} />
-        <LinkBubbleImg src={ImgLinkBubble} />
-        <SnsImg src={ImgSns} />
+        <FadeInItem $visible={isLinkVisible} $delay="0.14s" $z={4}>
+          <MockupImg src={ImgMockup} />
+        </FadeInItem>
+
+        <FadeInItem $visible={isLinkVisible} $delay="0.24s" $z={4}>
+          <LinkBubbleImg src={ImgLinkBubble} />
+        </FadeInItem>
+
+        <FadeInItem $visible={isLinkVisible} $delay="0.34s" $z={4}>
+          <SnsImg src={ImgSns} />
+        </FadeInItem>
       </LinkShareSection>
     </>
   );
 }
 
 /* ---------------- styled ---------------- */
+
+const FadeInItem = styled.div`
+  opacity: ${({ $visible }) => ($visible ? 1 : 0)};
+  transform: translateY(${({ $visible }) => ($visible ? "0" : "18px")});
+  transition: opacity 0.6s ease-out ${({ $delay }) => $delay || "0s"},
+    transform 0.6s ease-out ${({ $delay }) => $delay || "0s"};
+
+  ${({ $z }) =>
+    $z &&
+    `
+    position: relative;
+    z-index: ${$z};
+  `}
+`;
 
 const ShareAlbumSection = styled.div`
   height: 57rem;
@@ -293,7 +410,7 @@ const floatUp = keyframes`
     opacity: 0;
   }
   10% {
-    opacity: 0.18; /* 10~20% 느낌 */
+    opacity: 0.18;
     transform: translateY(-20px) scale(1);
   }
   70% {
