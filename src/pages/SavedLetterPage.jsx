@@ -233,7 +233,9 @@ const handleSendLetter = async () => {
               ? "작성한 내용은 저장되지 않고 사라져요"
               : modalType === "save"
               ? "임시 보관함에서 확인할 수 있어요"
-              : "조금만 기다리면 답장이 올 거예요"
+              : isWanted === true
+              ? "조금만 기다리면 답장이 올 거예요"
+              : "소중한 마음을 전해드릴게요"
           }
           confirmText={
             modalType === "cancel"
