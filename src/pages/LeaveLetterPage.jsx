@@ -73,6 +73,7 @@ export const LeaveLetterPage = () => {
                 toName,
                 fromName,
                 content: letterText,
+                isCompleted: true,
             });
 
             handleOpenModal("submit");
