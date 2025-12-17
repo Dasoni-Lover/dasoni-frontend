@@ -1,9 +1,10 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import styled, { createGlobalStyle } from "styled-components";
 import Footer from "../components/Footer";
 import { useLocation } from "react-router-dom";
 import NanumOeHarMeoNiGeurSsi from "../assets/fonts/NanumOeHarMeoNiGeurSsi.ttf";
 import Header from "../components/header/Header";
+import { getAccessToken } from "../api/auth";
 
 export default function GlobalStyle({ children }) {
   const location = useLocation();
@@ -22,7 +23,26 @@ export default function GlobalStyle({ children }) {
   const isLoginPage = location.pathname === "/login";
   const isRegisterPage = location.pathname === "/register";
 
-  const showAuthButtons = isLandingPage || isLoginPage || isRegisterPage;
+  // ✅ 로그인 상태를 state로 들고가야 "로그인 직후" UI가 즉시 반영됨
+  const [isLoggedIn, setIsLoggedIn] = useState(Boolean(getAccessToken()));
+
+  useEffect(() => {
+    // 라우트 바뀔 때도 한 번 동기화
+    setIsLoggedIn(Boolean(getAccessToken()));
+  }, [location.pathname]);
+
+  useEffect(() => {
+    // Header에서 쓰는 것처럼 authChanged 이벤트에 반응
+    const handleAuthChanged = () => {
+      setIsLoggedIn(Boolean(getAccessToken()));
+    };
+
+    window.addEventListener("authChanged", handleAuthChanged);
+    return () => window.removeEventListener("authChanged", handleAuthChanged);
+  }, []);
+
+  // ✅ 로그인 안 되어있을 때만 true
+  const showAuthButtons = !isLoggedIn;
 
   return (
     <>
@@ -30,7 +50,6 @@ export default function GlobalStyle({ children }) {
       <Wrapper>
         <Header showAuthButtons={showAuthButtons} />
 
-        {/* ⭐ LandingPage('/')일 때는 MainContent를 적용하지 않는다 */}
         {isLandingPage ? (
           <>{children}</>
         ) : (
@@ -87,11 +106,10 @@ const ContentWrapper = styled.div`
   width: 100%;
   max-width: ${({ $contentMaxWidth }) => `${$contentMaxWidth}rem`};
   margin: 0 auto;
-
   margin-top: 6.25rem;
 `;
 
 const FooterWrapper = styled.footer`
   position: relative;
-  margin-top: auto; /* ⭐ 컨텐츠가 적을 땐 바닥으로, 많으면 아래로 밀리게 */
+  margin-top: auto;
 `;

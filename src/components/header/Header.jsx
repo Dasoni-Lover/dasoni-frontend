@@ -76,7 +76,6 @@ export default function Header({ showAuthButtons }) {
 
       // ✅ 프로필 로드 성공 후 알림 로드 함수 호출
       loadNotifications();
-
     } catch (error) {
       console.warn("헤더 프로필 정보 불러오기 실패:", error);
       // 로그인 실패/토큰 만료 시
@@ -89,7 +88,6 @@ export default function Header({ showAuthButtons }) {
       setNotifications([]); // ✅ 실패 시 알림 초기화
     }
   };
-
 
   useEffect(() => {
     fetchProfileInfo();
@@ -119,7 +117,6 @@ export default function Header({ showAuthButtons }) {
     return () =>
       window.removeEventListener("myProfileUpdated", handleProfileUpdated);
   }, []);
-
 
   const menuItems = [
     { label: "홈", path: "/home" },
@@ -175,7 +172,7 @@ export default function Header({ showAuthButtons }) {
   return (
     <>
       <Wrapper>
-        <Logo src={logo} onClick={() => navigate("/home")} />
+        <Logo src={logo} onClick={() => navigate("/")} />
 
         {!showAuthButtons && (
           <>
@@ -230,9 +227,7 @@ export default function Header({ showAuthButtons }) {
 
         {showAuthButtons && (
           <ButtonGroup>
-            <LoginButton onClick={() => navigate("/login")}>
-              로그인
-            </LoginButton>
+            <LoginButton onClick={() => navigate("/login")}>로그인</LoginButton>
             <RegisterButton onClick={() => navigate("/register")}>
               회원가입
             </RegisterButton>
@@ -332,8 +327,7 @@ const RegisterButton = styled.button`
 
 const NavButton = styled.div`
   ${typo("h4")};
-  color: ${({ $active }) =>
-    $active ? color("black.80") : color("black.30")};
+  color: ${({ $active }) => ($active ? color("black.80") : color("black.30"))};
   cursor: pointer;
   white-space: nowrap;
   transition: color 0.25s ease;
