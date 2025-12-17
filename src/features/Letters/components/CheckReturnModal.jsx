@@ -5,42 +5,45 @@ import styled from "styled-components";
 import { color, typo } from "../../../styles/tokens";
 import Button from "../../../components/Button";
 
-export const CheckReturnModal = ({ onClose, onConfirm }) => {
-  const [selectedOption, setSelectedOption] = useState("yes");
+// src/components/CheckReturnModal.jsx
 
-  const handleBackdropClick = (e) => {
-    if (e.target === e.currentTarget) onClose();
-  };
+export const CheckReturnModal = ({ onClose, onConfirm, disableYes }) => {
+  const [selectedOption, setSelectedOption] = useState("no");
 
   const modalContent = (
-    <Wrapper onClick={handleBackdropClick}>
+    <Wrapper>
       <Box>
         <Text>고인의 목소리로 답장을 받아보시겠어요?</Text>
 
         <RadioWrapper>
-          <RadioItem onClick={() => setSelectedOption("yes")}>
-            <HiddenRadio
-              type="radio"
-              checked={selectedOption === "yes"}
-              onChange={() => setSelectedOption("yes")}
-            />
-            <CustomRadio checked={selectedOption === "yes"} />
+          {/* YES */}
+          <RadioItem
+            disabled={disableYes}
+            onClick={() => {
+              if (!disableYes) setSelectedOption("yes");
+            }}
+          >
+            <HiddenRadio checked={selectedOption === "yes"} />
+            <CustomRadio checked={selectedOption === "yes"} disabled={disableYes} />
             <Description>
-                <RadioLabel>네, 답장을 받을게요</RadioLabel>
-                <RadioLabe2>고인 정보 설정 후 이용할 수 있어요</RadioLabe2>
+              <RadioLabel>네, 답장을 받을게요</RadioLabel>
+              <RadioLabe2>
+                {disableYes
+                  ? "오늘은 이미 편지를 작성했어요"
+                  : "고인 정보 설정 후 이용할 수 있어요"}
+              </RadioLabe2>
             </Description>
           </RadioItem>
 
+          {/* NO */}
           <RadioItem onClick={() => setSelectedOption("no")}>
-            <HiddenRadio
-              type="radio"
-              checked={selectedOption === "no"}
-              onChange={() => setSelectedOption("no")}
-            />
+            <HiddenRadio checked={selectedOption === "no"} />
             <CustomRadio checked={selectedOption === "no"} />
             <Description>
-                <RadioLabel>괜찮아요, 편지만 보낼게요</RadioLabel>
-                <RadioLabe2>답장을 받지 않아도 ‘보낸 편지함’에 소중히 보관돼요</RadioLabe2>
+              <RadioLabel>괜찮아요, 편지만 보낼게요</RadioLabel>
+              <RadioLabe2>
+                답장을 받지 않아도 보낸 편지함에 보관돼요
+              </RadioLabe2>
             </Description>
           </RadioItem>
         </RadioWrapper>
@@ -53,11 +56,9 @@ export const CheckReturnModal = ({ onClose, onConfirm }) => {
     </Wrapper>
   );
 
-  // Portal로 body 최상단에 렌더
   return ReactDOM.createPortal(modalContent, document.body);
 };
 
-/* ---------- 스타일 ---------- */
 const Wrapper = styled.div`
   width: 100vw;
   height: 100vh;
@@ -97,13 +98,14 @@ const RadioWrapper = styled.div`
 `;
 
 const RadioItem = styled.div`
-display: flex;
-padding: 0.75rem;
-align-items: flex-start;
-gap: 1rem;
-align-self: stretch;
-  cursor: pointer;
+  display: flex;
+  gap: 1rem;
+  opacity: ${({ disabled }) => (disabled ? 0.4 : 1)};
+  pointer-events: ${({ disabled }) => (disabled ? "none" : "auto")};
 `;
+
+
+
 
 const HiddenRadio = styled.input`
   display: none;

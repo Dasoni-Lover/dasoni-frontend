@@ -20,11 +20,12 @@ export default function SideCategoryBox({ hallId, page }) {
 
   const [showModal, setShowModal] = useState(false);
   const [showEditBlockedModal, setShowEditBlockedModal] = useState(false);
-  const [showAlreadySentModal, setShowAlreadySentModal] = useState(false);
+  
+  const [isSendToday, setIsSendToday] = useState(false);
 
   const closeModal = () => setShowModal(false);
   const closeEditBlockedModal = () => setShowEditBlockedModal(false);
-  const closeAlreadySentModal = () => setShowAlreadySentModal(false);
+  
 
   console.log("📌 SavedLetterPage page:", page);
   console.log("📌 SavedLetterPage location.state:", location.state);
@@ -48,15 +49,8 @@ export default function SideCategoryBox({ hallId, page }) {
 
     try {
       const { isSendToday } = await checkLetterSentToday(hallId);
-
-      // 오늘 이미 보낸 경우
-      if (isSendToday) {
-        setShowAlreadySentModal(true);
-        return;
-      }
-
-      // 그 외 페이지 → 모달
-      setShowModal(true);
+      setIsSendToday(isSendToday);
+      setShowModal(true); 
     } catch (error) {
       console.error("오늘 편지 전송 여부 조회 실패:", error);
       alert("편지 작성 가능 여부를 확인하는 중 오류가 발생했어요.");
@@ -117,6 +111,7 @@ export default function SideCategoryBox({ hallId, page }) {
           });
         }
       } else if (isOpen === false) {
+        if (page === "admin") {
         navigate("/set-the-dead", {
           state: {
             hallId,
@@ -125,7 +120,11 @@ export default function SideCategoryBox({ hallId, page }) {
             isWanted,
           },
         });
+      }else{
+        setShowEditBlockedModal(true);
+        return;
       }
+    }
     } catch (error) {
       console.error("편지 작성 가능 여부 조회 실패:", error);
     }
@@ -144,7 +143,6 @@ export default function SideCategoryBox({ hallId, page }) {
         setShowEditBlockedModal(true);
         return;
       }
-
       // 나머지 경우는 페이지 이동
       navigate("/set-the-dead", {
         state: { hallId, page, activeMenu: "edit" },
@@ -230,7 +228,11 @@ export default function SideCategoryBox({ hallId, page }) {
       </Container>
 
       {showModal && (
-        <CheckReturnModal onClose={closeModal} onConfirm={handleModalConfirm} />
+        <CheckReturnModal 
+        onClose={closeModal} 
+        onConfirm={handleModalConfirm} 
+        disableYes={isSendToday}
+        />
       )}
 
       {showEditBlockedModal && (
@@ -250,22 +252,6 @@ export default function SideCategoryBox({ hallId, page }) {
         />
       )}
 
-      {showAlreadySentModal && (
-        <ConfirmModal
-          isOpen={showAlreadySentModal}
-          title="오늘은 이미 편지를 보냈어요"
-          description={
-            <>
-              하루에 한 번만 편지를 작성할 수 있어요.
-              <br />
-              내일 다시 편지를 남겨주세요.
-            </>
-          }
-          confirmText="확인"
-          onConfirm={closeAlreadySentModal}
-          onCancel={closeAlreadySentModal}
-        />
-      )}
     </>
   );
 }
