@@ -17,6 +17,7 @@ import OpenMemorialHallPage from "./pages/OpenMemorialHallPage";
 import { EnterMemorialHallPage } from "./pages/EnterMemorialHallPage";
 import RequestEntryPage from "./pages/RequestEntryPage";
 import ShareLinkEntryPage from "./pages/ShareLinkEntryPage";
+import ExampleHallPage from "./pages/ExampleHallPage";
 
 /* 글 작성 */
 import WritePostPage from "./pages/WritePostPage";
@@ -64,6 +65,9 @@ const router = createBrowserRouter([
         element: <RequestEntryPage />,
         loader: authGuard,
       },
+
+      /* 예시 추모관 (목데이터) */
+      { path: "/example", element: <ExampleHallPage /> },
 
       /* 글 작성 */
       { path: "/write", element: <WritePostPage />, loader: authGuard },
