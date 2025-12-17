@@ -21,12 +21,23 @@ import { color, typo } from "../../../styles/tokens";
 export default function OrangePart() {
   // ✅ 섹션별 애니메이션 트리거
   const [isShareVisible, setIsShareVisible] = useState(false);
-  const [isAIVisible, setIsAIVisible] = useState(false);
+  const [isAIHeaderVisible, setIsAIHeaderVisible] = useState(false); // ✅ AI 섹션 "헤더(FeatureInfo)"용
   const [isLinkVisible, setIsLinkVisible] = useState(false);
 
   const shareRef = useRef(null);
-  const aiRef = useRef(null);
+  const aiHeaderRef = useRef(null); // ✅ AI 헤더 감지
   const linkRef = useRef(null);
+
+  // ✅ ExampleWrapper 내부 요소별 트리거
+  const [ex1Visible, setEx1Visible] = useState(false);
+  const [ex2Visible, setEx2Visible] = useState(false);
+  const [ex3Visible, setEx3Visible] = useState(false);
+  const [ex4Visible, setEx4Visible] = useState(false);
+
+  const ex1Ref = useRef(null);
+  const ex2Ref = useRef(null);
+  const ex3Ref = useRef(null);
+  const ex4Ref = useRef(null);
 
   useEffect(() => {
     const target = shareRef.current;
@@ -41,7 +52,7 @@ export default function OrangePart() {
           }
         });
       },
-      { threshold: 0.3 }
+      { threshold: 0.5 }
     );
 
     observer.observe(target);
@@ -52,20 +63,21 @@ export default function OrangePart() {
     };
   }, []);
 
+  // ✅ AI 섹션 헤더(FeatureInfo)만 진입 시 뜨게
   useEffect(() => {
-    const target = aiRef.current;
+    const target = aiHeaderRef.current;
     if (!target) return;
 
     const observer = new IntersectionObserver(
       (entries) => {
         entries.forEach((e) => {
           if (e.isIntersecting) {
-            setIsAIVisible(true);
+            setIsAIHeaderVisible(true);
             observer.unobserve(e.target);
           }
         });
       },
-      { threshold: 0.3 }
+      { threshold: 0.5 }
     );
 
     observer.observe(target);
@@ -73,6 +85,43 @@ export default function OrangePart() {
     return () => {
       if (target) observer.unobserve(target);
       observer.disconnect();
+    };
+  }, []);
+
+  // ✅ ExampleWrapper 내부 4개 요소 각각 "도달할 때" 등장
+  useEffect(() => {
+    const makeObserver = (setter) =>
+      new IntersectionObserver(
+        (entries, obs) => {
+          entries.forEach((e) => {
+            if (e.isIntersecting) {
+              setter(true);
+              obs.unobserve(e.target);
+            }
+          });
+        },
+        { threshold: 0.5 } // 요소가 절반 정도 보이면 등장
+      );
+
+    const o1 = makeObserver(setEx1Visible);
+    const o2 = makeObserver(setEx2Visible);
+    const o3 = makeObserver(setEx3Visible);
+    const o4 = makeObserver(setEx4Visible);
+
+    if (ex1Ref.current) o1.observe(ex1Ref.current);
+    if (ex2Ref.current) o2.observe(ex2Ref.current);
+    if (ex3Ref.current) o3.observe(ex3Ref.current);
+    if (ex4Ref.current) o4.observe(ex4Ref.current);
+
+    return () => {
+      if (ex1Ref.current) o1.unobserve(ex1Ref.current);
+      if (ex2Ref.current) o2.unobserve(ex2Ref.current);
+      if (ex3Ref.current) o3.unobserve(ex3Ref.current);
+      if (ex4Ref.current) o4.unobserve(ex4Ref.current);
+      o1.disconnect();
+      o2.disconnect();
+      o3.disconnect();
+      o4.disconnect();
     };
   }, []);
 
@@ -193,7 +242,7 @@ export default function OrangePart() {
       {/* 공유앨범 섹션 */}
       <ShareAlbumSection ref={shareRef}>
         <ShareAlbumInner>
-          <FadeInItem $visible={isShareVisible} $delay="0s">
+          <FadeInItem $visible={isShareVisible} $delay="0.3s">
             <FeatureInfo
               title="공유앨범"
               main="고인과의 추억이 담긴 사진을 앨범에 올려주세요"
@@ -201,15 +250,18 @@ export default function OrangePart() {
             />
           </FadeInItem>
 
-          <FadeInItem $visible={isShareVisible} $delay="0.12s">
+          <FadeInItem $visible={isShareVisible} $delay="0.7s">
             <ShareAlbumCarousel />
           </FadeInItem>
         </ShareAlbumInner>
       </ShareAlbumSection>
 
       {/* AI 사진 생성 */}
-      <AIGenerationSection ref={aiRef}>
-        <FadeInItem $visible={isAIVisible} $delay="0s">
+      <AIGenerationSection>
+        {/* ✅ 헤더 감지를 위한 anchor */}
+        <AIHeaderAnchor ref={aiHeaderRef} />
+
+        <FadeInItem $visible={isAIHeaderVisible} $delay="0.5s">
           <FeatureInfo
             highlight={true}
             title="AI 사진 생성"
@@ -218,33 +270,32 @@ export default function OrangePart() {
           />
         </FadeInItem>
 
-        <FadeInItem $visible={isAIVisible} $delay="0.14s">
-          <ExampleWrapper>
-            <FadeInItem $visible={isAIVisible} $delay="0.18s">
-              <RequestImg src={ImgRequest1} />
-            </FadeInItem>
+        {/* ✅ ExampleWrapper는 정렬 유지 위해 그대로 두고, 내부 항목만 개별 트리거 */}
+        <ExampleWrapper>
+          <FadeInBlock ref={ex1Ref} $visible={ex1Visible} $align="right">
+            <RequestImg src={ImgRequest1} />
+          </FadeInBlock>
 
-            <FadeInItem $visible={isAIVisible} $delay="0.26s">
-              <ResponseBox>
-                <ResponseImgWrapper>
-                  <ResponseImg src={ImgResponse1} />
-                </ResponseImgWrapper>
-              </ResponseBox>
-            </FadeInItem>
+          <FadeInBlock ref={ex2Ref} $visible={ex2Visible}>
+            <ResponseBox>
+              <ResponseImgWrapper>
+                <ResponseImg src={ImgResponse1} />
+              </ResponseImgWrapper>
+            </ResponseBox>
+          </FadeInBlock>
 
-            <FadeInItem $visible={isAIVisible} $delay="0.34s">
-              <RequestImg src={ImgRequest2} />
-            </FadeInItem>
+          <FadeInBlock ref={ex3Ref} $visible={ex3Visible} $align="right">
+            <RequestImg src={ImgRequest2} />
+          </FadeInBlock>
 
-            <FadeInItem $visible={isAIVisible} $delay="0.42s">
-              <ResponseBox>
-                <ResponseImgWrapper>
-                  <ResponseImg src={ImgResponse2} />
-                </ResponseImgWrapper>
-              </ResponseBox>
-            </FadeInItem>
-          </ExampleWrapper>
-        </FadeInItem>
+          <FadeInBlock ref={ex4Ref} $visible={ex4Visible}>
+            <ResponseBox>
+              <ResponseImgWrapper>
+                <ResponseImg src={ImgResponse2} />
+              </ResponseImgWrapper>
+            </ResponseBox>
+          </FadeInBlock>
+        </ExampleWrapper>
       </AIGenerationSection>
 
       {/* 링크 공유 */}
@@ -264,7 +315,7 @@ export default function OrangePart() {
           ))}
         </BubblesLayer>
 
-        <FadeInItem $visible={isLinkVisible} $delay="0s" $z={4}>
+        <FadeInItem $visible={isLinkVisible} $delay="0.4s" $z={4}>
           <FeatureInfo
             title="링크 공유"
             main="추모관 링크를 공유해 주세요"
@@ -272,18 +323,17 @@ export default function OrangePart() {
             subcolor="white"
           />
         </FadeInItem>
-
-        <FadeInItem $visible={isLinkVisible} $delay="0.14s" $z={4}>
+        <AbsoluteFade $visible={isLinkVisible} $delay="0.6s" $z={4}>
           <MockupImg src={ImgMockup} />
-        </FadeInItem>
+        </AbsoluteFade>
 
-        <FadeInItem $visible={isLinkVisible} $delay="0.24s" $z={4}>
+        <AbsoluteFade $visible={isLinkVisible} $delay="0.75s" $z={4}>
           <LinkBubbleImg src={ImgLinkBubble} />
-        </FadeInItem>
+        </AbsoluteFade>
 
-        <FadeInItem $visible={isLinkVisible} $delay="0.34s" $z={4}>
+        <AbsoluteFade $visible={isLinkVisible} $delay="0.9s" $z={4}>
           <SnsImg src={ImgSns} />
-        </FadeInItem>
+        </AbsoluteFade>
       </LinkShareSection>
     </>
   );
@@ -303,6 +353,32 @@ const FadeInItem = styled.div`
     position: relative;
     z-index: ${$z};
   `}
+`;
+
+/**
+ * ✅ ExampleWrapper 안에서 "정렬/레이아웃" 안 깨지게:
+ * - display: block 유지
+ * - transform/opacity만 적용
+ * - 필요 시 width/align-self는 내부 요소(RequestImg / ResponseBox)가 그대로 담당
+ */
+const FadeInBlock = styled.div`
+  opacity: ${({ $visible }) => ($visible ? 1 : 0)};
+  transform: translateY(${({ $visible }) => ($visible ? "0" : "18px")});
+  transition: opacity 0.6s ease-out, transform 0.6s ease-out;
+  will-change: transform, opacity;
+
+  ${({ $align }) =>
+    $align === "right" &&
+    `
+      width: 100%;
+      display: flex;
+      justify-content: flex-end;
+    `}
+`;
+
+const AIHeaderAnchor = styled.div`
+  width: 100%;
+  height: 1px;
 `;
 
 const ShareAlbumSection = styled.div`
@@ -340,7 +416,7 @@ const ExampleWrapper = styled.div`
 const RequestImg = styled.img`
   width: 44.75rem;
   height: 23.3125rem;
-  align-self: end;
+  align-self: flex-end;
 `;
 
 const ResponseBox = styled.div`
@@ -392,7 +468,7 @@ const LinkShareSection = styled.div`
   flex-direction: column;
   background: #ffbc67;
   align-items: center;
-  overflow: hidden; /* ⭐ 말풍선이 밖으로 나가면 안 보이게 */
+  overflow: hidden;
 `;
 
 /* ✅ 말풍선 레이어(배경) */
@@ -405,21 +481,10 @@ const BubblesLayer = styled.div`
 
 /* ✅ 아래에서 위로 올라오며 나타났다 사라지는 애니메이션 */
 const floatUp = keyframes`
-  0% {
-    transform: translateY(0) scale(0.85);
-    opacity: 0;
-  }
-  10% {
-    opacity: 0.18;
-    transform: translateY(-20px) scale(1);
-  }
-  70% {
-    opacity: 0.14;
-  }
-  100% {
-    transform: translateY(-520px) scale(1);
-    opacity: 0;
-  }
+  0% { transform: translateY(0) scale(0.85); opacity: 0; }
+  10% { opacity: 0.18; transform: translateY(-20px) scale(1); }
+  70% { opacity: 0.14; }
+  100% { transform: translateY(-520px) scale(1); opacity: 0; }
 `;
 
 /* ✅ 크기/속도/딜레이/좌표만으로 다양하게 보이게 */
@@ -446,9 +511,10 @@ const FloatingBubble = styled.img`
 const MockupImg = styled.img`
   position: absolute;
   width: 51rem;
-  margin-right: 450px;
   bottom: 0;
   z-index: 1;
+  left: 50%;
+  transform: translateX(-85%);
 `;
 
 const LinkBubbleImg = styled.img`
@@ -456,12 +522,37 @@ const LinkBubbleImg = styled.img`
   position: absolute;
   bottom: 10%;
   z-index: 2;
+  left: 50%;
+  transform: translateX(-50%);
 `;
 
 const SnsImg = styled.img`
   width: 9rem;
   bottom: 9%;
-  margin-right: 100px;
   position: absolute;
   z-index: 3;
+  left: 50%;
+  transform: translateX(-90%);
+`;
+
+const AbsoluteFade = styled.div`
+  position: absolute;
+  inset: 0; /* ⭐ LinkShareSection 기준으로 overlay */
+  pointer-events: none;
+
+  opacity: ${({ $visible }) => ($visible ? 1 : 0)};
+  transform: translateY(${({ $visible }) => ($visible ? "0" : "18px")});
+  transition: opacity 0.6s ease-out ${({ $delay }) => $delay || "0s"},
+    transform 0.6s ease-out ${({ $delay }) => $delay || "0s"};
+
+  ${({ $z }) =>
+    $z &&
+    `
+    z-index: ${$z};
+  `}
+
+  /* ⭐ 안에 있는 absolute 요소들은 원래대로 LinkShareSection 기준 좌표 유지 */
+  & > * {
+    pointer-events: auto;
+  }
 `;
