@@ -1,6 +1,6 @@
 // src/pages/LandingPage.jsx
 import React, { useState } from "react";
-import styled, { css } from "styled-components";
+import styled, { css, keyframes } from "styled-components";
 import Footer from "../components/Footer";
 import Button from "../components/Button";
 import { Column } from "../styles/flex";
@@ -26,43 +26,51 @@ export default function LandingPage() {
         <BackgroundLayer $variant="blue" $active={bgMode === "blue"} />
         <BackgroundLayer $variant="post" $active={bgMode === "post"} />
 
-        {/* 메인 소개 */}
-        <InfoSection>
-          <FrameImg src={ImgFrame} />
-          <Column $gap={"2.25rem"}>
-            <InfoText>
-              순우리말로 ‘사랑하는 사람’을 뜻하는 다소니는
-              <br />
-              사랑하는 사람을 추모하는 <b>온라인 추모 공간</b>입니다
-            </InfoText>
-            <Button width="24.5rem" text="예시 추모관 둘러보기" />
-          </Column>
-        </InfoSection>
+        {/* 1) InfoSection 먼저 페이드인 */}
+        <IntroFade>
+          <InfoSection>
+            <FrameImg src={ImgFrame} alt="frame" />
+            <Column $gap={"2.25rem"}>
+              <InfoText>
+                순우리말로 ‘사랑하는 사람’을 뜻하는 다소니는
+                <br />
+                사랑하는 사람을 추모하는 <b>온라인 추모 공간</b>입니다
+              </InfoText>
+              <Button width="24.5rem" text="예시 추모관 둘러보기" />
+            </Column>
+          </InfoSection>
+        </IntroFade>
 
-        <HoverGuideText>마우스를 올려보세요!</HoverGuideText>
+        {/* 2) HoverGuideText + HoverSection을 묶어서 "시간차 페이드인" */}
+        <HoverGroupFade>
+          <HoverGuideText>마우스를 올려보세요!</HoverGuideText>
 
-        {/* 상단 호버 UI */}
-        <HoverSection>
-          <RainbowImg src={ImgRainbow} />
+          {/* 상단 호버 UI */}
+          <HoverSection>
+            <RainbowImg src={ImgRainbow} alt="rainbow" />
 
-          <BlueHouseImg
-            src={ImgBlueHouse}
-            $active={bgMode === "blue"}
-            onMouseEnter={() => setBgMode("blue")}
-          />
+            <BlueHouseImg
+              src={ImgBlueHouse}
+              alt="blue-house"
+              $active={bgMode === "blue"}
+              onMouseEnter={() => setBgMode("blue")}
+            />
 
-          <OrangeHouseImg
-            src={ImgOrangeHouse}
-            $active={bgMode === "orange"}
-            onMouseEnter={() => setBgMode("orange")}
-          />
+            <OrangeHouseImg
+              src={ImgOrangeHouse}
+              alt="orange-house"
+              $active={bgMode === "orange"}
+              onMouseEnter={() => setBgMode("orange")}
+            />
 
-          <PostBoxImg
-            src={ImgPostBox}
-            $active={bgMode === "post"}
-            onMouseEnter={() => setBgMode("post")}
-          />
-        </HoverSection>
+            <PostBoxImg
+              src={ImgPostBox}
+              alt="post-box"
+              $active={bgMode === "post"}
+              onMouseEnter={() => setBgMode("post")}
+            />
+          </HoverSection>
+        </HoverGroupFade>
 
         {/* 선택된 배경에 따라 섹션 렌더링 */}
         {bgMode === "orange" && <OrangePart />}
@@ -75,6 +83,26 @@ export default function LandingPage() {
 }
 
 /* --------- styled-components --------- */
+
+const introFadeIn = keyframes`
+  from { opacity: 0; transform: translateY(14px); }
+  to   { opacity: 1; transform: translateY(0); }
+`;
+
+const hoverFadeIn = keyframes`
+  from { opacity: 0; transform: translateY(14px); }
+  to   { opacity: 1; transform: translateY(0); }
+`;
+
+const floaty = keyframes`
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-8px); }
+`;
+
+const guideGlow = keyframes`
+  0%, 100% { opacity: 0.55; }
+  50% { opacity: 1; }
+`;
 
 const Container = styled.div`
   position: relative;
@@ -92,14 +120,13 @@ const Container = styled.div`
   background: transparent;
 `;
 
-/*  배경 레이어 - opacity로 페이드 전환 + 1920x6195 기준 그라디언트 */
+/* 배경 레이어 - opacity로 페이드 전환 */
 const BackgroundLayer = styled.div`
   position: absolute;
   inset: 0;
   z-index: -1;
   pointer-events: none;
 
-  /* 100vw x 6195 기준 사이즈로 그라데이션 지정 */
   background-repeat: no-repeat;
   background-size: 100vw 6195px;
   background-position: top center;
@@ -141,6 +168,28 @@ const BackgroundLayer = styled.div`
   transition: opacity 0.3s ease-in-out;
 `;
 
+/* InfoSection 페이드인 래퍼 */
+const IntroFade = styled.div`
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+
+  animation: ${introFadeIn} 0.7s ease-out both;
+`;
+
+/* ✅ HoverGuideText + HoverSection 묶음 페이드인(시간차) */
+const HoverGroupFade = styled.div`
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+
+  opacity: 0;
+  animation: ${hoverFadeIn} 0.7s ease-out both;
+  animation-delay: 0.55s; /* ✅ 여기 값으로 시간차 조절 */
+`;
+
 const FrameImg = styled.img`
   width: 21rem;
   height: 21rem;
@@ -162,20 +211,27 @@ const InfoText = styled.div`
   line-height: 150%;
 `;
 
-const HoverSection = styled.div`
-  position: relative;
-  display: flex;
-  justify-content: center;
-  margin-top: 5rem;
-  margin-bottom: 30rem;
-`;
-
 const HoverGuideText = styled.div`
   color: #7a7a7a;
   font-family: Pretendard;
   font-size: 1.25rem;
   font-weight: 500;
   line-height: 162%;
+
+  animation: ${guideGlow} 1.8s ease-in-out infinite;
+`;
+
+/* 상단 호버 UI */
+const HoverSection = styled.div`
+  position: relative;
+  display: flex;
+  justify-content: center;
+  margin-top: 5rem;
+  margin-bottom: 30rem;
+
+  /* ✅ HoverSection 자체가 위아래로 둥둥 */
+  animation: ${floaty} 3.6s ease-in-out infinite;
+  will-change: transform;
 `;
 
 /* 호버 세 개의 공통 로직 */
