@@ -2,9 +2,12 @@ import React from "react";
 import styled from "styled-components";
 import { typo } from "../../../styles/tokens";
 import Button from "../../../components/Button";
+import { useNavigate } from "react-router-dom";
 
 export default function MyMemorialModal({ isOpen, onCreateClick }) {
   if (!isOpen) return null;
+
+  const nav = useNavigate();
 
   return (
     <Overlay>
@@ -18,7 +21,13 @@ export default function MyMemorialModal({ isOpen, onCreateClick }) {
         </SubText>
         <ButtonContainer>
           <Button onClick={onCreateClick} text="나의 추모관 개설하기" />
-          <Button text="예시 추모관 둘러보기" color="white"/>
+          <Button
+            onClick={() => {
+              nav("/example");
+            }}
+            text="예시 추모관 둘러보기"
+            color="white"
+          />
         </ButtonContainer>
       </ModalContainer>
     </Overlay>
@@ -28,7 +37,13 @@ export default function MyMemorialModal({ isOpen, onCreateClick }) {
 const Overlay = styled.div`
   position: fixed;
   inset: 0;
-  background: linear-gradient(90deg, #FFF1F2 9.13%, #FFF6EB 76.44%, #FFEFE5 100%), #FFF;
+  background: linear-gradient(
+      90deg,
+      #fff1f2 9.13%,
+      #fff6eb 76.44%,
+      #ffefe5 100%
+    ),
+    #fff;
   display: flex;
   align-items: center;
   justify-content: center;
