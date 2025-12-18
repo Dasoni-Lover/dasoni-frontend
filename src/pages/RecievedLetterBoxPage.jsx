@@ -64,24 +64,48 @@ const RecievedLetterBoxPage = () => {
   }, [hallId]);
 
   // 편지 클릭 시 상세 조회 후 모달 열기
-  const handleIconClick = async (reply) => {
-    try {
-      const detail = await fetchReceivedReplyDetail(hallId, reply.replyId);
-      setSelectedReply(detail);
-      setIsModalOpen(true);
-    } catch (err) {
-      console.error("편지 상세 조회 실패:", err);
-    }
-  };
+const handleIconClick = async (reply) => {
+  try {
+    const detail = await fetchReceivedReplyDetail(hallId, reply.replyId);
 
-  const {
+    setSelectedReply(detail);
+    setIsModalOpen(true);
+
+    // ✅ 이미 읽은 편지가 아니라면 상태 업데이트
+    if (!reply.isChecked) {
+      setReplies((prev) =>
+        prev.map((item) =>
+          item.replyId === reply.replyId
+            ? { ...item, isChecked: true }
+            : item
+        )
+      );
+
+      setUnreadCount((prev) => Math.max(prev - 1, 0));
+      setReadCount((prev) => prev + 1);
+    }
+  } catch (err) {
+    console.error("편지 상세 조회 실패:", err);
+  }
+};
+
+
+const {
+ // 상태
+    isSendToday,
+    showModal,
+    showEditBlockedModal,
+
+    // 액션
     handleClickWriteLetter,
     handleModalConfirm,
-    showModal,
-    showAlreadySentModal,
+
+    // 닫기
     closeModal,
-    closeAlreadySentModal,
-  } = useWriteLetterFlow({ hallId, page });
+    closeEditBlockedModal,
+
+    // 메뉴 제어
+} = useWriteLetterFlow({ hallId, page });
 
   return (
     <Background>
@@ -151,26 +175,29 @@ const RecievedLetterBoxPage = () => {
         )}
       </Wrapper>
         {showModal && (
-          <CheckReturnModal
-            onClose={closeModal}
-            onConfirm={handleModalConfirm}
-          />
-        )}
-        {showAlreadySentModal && (
-          <ConfirmModal
-            isOpen
-            title="오늘은 이미 편지를 보냈어요"
-            description={
-              <>
-                하루에 한 번만 편지를 작성할 수 있어요.
-                <br />
-                내일 다시 편지를 남겨주세요.
-              </>
-            }
-            confirmText="확인"
-            onConfirm={closeAlreadySentModal}
-          />
-        )}
+                      <CheckReturnModal 
+                      onClose={closeModal} 
+                      onConfirm={handleModalConfirm} 
+                      disableYes={isSendToday}
+                      />
+                    )}
+              
+                    {showEditBlockedModal && (
+                      <ConfirmModal
+                        isOpen={showEditBlockedModal}
+                        title="지금은 고인 정보를 설정할 수 없어요"
+                        description={
+                          <>
+                            추모관 관리자가 고인 정보 설정을 완료하면
+                            <br />
+                            설정할 수 있어요
+                          </>
+                        }
+                        confirmText="확인"
+                        onConfirm={closeEditBlockedModal}
+                        onCancel={closeEditBlockedModal}
+                      />
+                    )}
 
 
     </Background>

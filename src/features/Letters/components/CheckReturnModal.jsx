@@ -1,11 +1,8 @@
-// src/components/CheckReturnModal.jsx
 import React, { useState } from "react";
 import ReactDOM from "react-dom";
 import styled from "styled-components";
 import { color, typo } from "../../../styles/tokens";
 import Button from "../../../components/Button";
-
-// src/components/CheckReturnModal.jsx
 
 export const CheckReturnModal = ({ onClose, onConfirm, disableYes }) => {
   const [selectedOption, setSelectedOption] = useState("no");
@@ -28,9 +25,8 @@ export const CheckReturnModal = ({ onClose, onConfirm, disableYes }) => {
             <Description>
               <RadioLabel>네, 답장을 받을게요</RadioLabel>
               <RadioLabe2>
-                {disableYes
-                  ? "오늘은 이미 편지를 작성했어요"
-                  : "고인 정보 설정 후 이용할 수 있어요"}
+                고인의 목소리로 AI 음성 답장을 보내 드려요<br/>
+                <Bold>답장을 받는 편지는 하루에 한 번만 쓸 수 있어요</Bold>
               </RadioLabe2>
             </Description>
           </RadioItem>
@@ -89,6 +85,11 @@ const Text = styled.div`
   color: ${color("black.80")};
   text-align: center;
 `;
+
+const Bold=styled.span`
+  font-weight: 650;
+  color: #7e7e7e;
+`
 
 const RadioWrapper = styled.div`
   display: flex;

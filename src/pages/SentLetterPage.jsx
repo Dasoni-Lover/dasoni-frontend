@@ -23,6 +23,8 @@ export const SentLetterPage = () => {
     const [letterText, setLetterText] = useState("");
     const [toName, setToName] = useState("");
     const [fromName, setFromName] = useState("");
+    const [isSubmitting, setIsSubmitting] = useState(false);
+
     
 
     const [isModalOpen, setIsModalOpen] = useState(false);
@@ -80,10 +82,9 @@ export const SentLetterPage = () => {
     };
 
     const handleSendLetter = async () => {
-        if (!isActive) {
-            alert("편지를 올바르게 작성해 주세요.");
-            return;
-        }
+        if (!isActive || isSubmitting) return;
+
+        setIsSubmitting(true); // 🔒 버튼 즉시 비활성
 
         try {
             await sendLetter(hallId, {
@@ -103,8 +104,11 @@ export const SentLetterPage = () => {
             } else {
                 alert(msg || "편지 보내기 실패");
             }
+
+            setIsSubmitting(false); // ❗ 실패 시 다시 활성화
         }
     };
+
 
     const handleModalConfirm = () => {
         setIsModalOpen(false);
@@ -183,12 +187,13 @@ export const SentLetterPage = () => {
                     onClick={handleTempSave}
                 />
 
-                <Button
-                    text="전달하기"
-                    size="M"
-                    active={isActive}
-                    onClick={handleSendLetter}
-                />
+            <Button
+                text="전달하기"
+                size="M"
+                active={isActive && !isSubmitting}
+                onClick={handleSendLetter}
+            />
+
             </ButtonWrapper>
 
             <ConfirmModal
