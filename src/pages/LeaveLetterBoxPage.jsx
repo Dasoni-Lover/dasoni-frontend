@@ -20,6 +20,7 @@ import bgicon from "../features/Letters/assets/bg-icon.svg";
 
 import { useWriteLetterFlow } from "../hooks/useWriteLetterFlow";
 import { CheckReturnModal } from '../features/Letters/components/CheckReturnModal';
+import CalendarList from "../features/Letters/components/CalendarList";
 
 
 import {
@@ -42,6 +43,9 @@ export const LeaveLetterBoxPage = () => {
   const [calendarOpen, setCalendarOpen] = useState(false);
   const [deleteTarget, setDeleteTarget] = useState(null);
 const [deleteModalOpen, setDeleteModalOpen] = useState(false);
+const [calendarListOpen, setCalendarListOpen] = useState(false);
+const [calendarLetters, setCalendarLetters] = useState([]);
+
 
   
 
@@ -92,6 +96,35 @@ const [deleteModalOpen, setDeleteModalOpen] = useState(false);
     }
   };
 
+const handleCalendarLetterClick = async ({ date, letterId }) => {
+  if (!hallId) return;
+
+  try {
+    const list = await fetchLettersList(hallId);
+
+    // ✅ 해당 날짜 편지만 필터링
+    const filtered = list.filter(
+      (letter) =>
+        letter.completedAt
+          ?.replace(/[-/]/g, ".")
+          .startsWith(date)
+    );
+
+    // ✅ 1개면 바로 상세
+    if (filtered.length === 1) {
+      openLetterDetail(filtered[0].letterId);
+      return;
+    }
+
+    // ✅ 여러 개면 CalendarList
+    setCalendarLetters(filtered);
+    setCalendarListOpen(true);
+  } catch (err) {
+    console.error("캘린더 편지 조회 실패:", err);
+  }
+};
+
+
 
 
 // 삭제 핸들러
@@ -117,13 +150,11 @@ const handleConfirmDelete = async () => {
 
 
 const {
-  handleClickWriteLetter,
-  handleModalConfirm,
-  showModal,
-  showAlreadySentModal,
-  closeModal,
-  closeAlreadySentModal,
+    // 액션
+    handleClickWriteLetter,
+
 } = useWriteLetterFlow({ hallId, page });
+
 
   return (
     <Background>
@@ -182,7 +213,7 @@ const {
               <>
                 <Divider />
                 <CalendarArea>
-                  <Calendar hallId={hallId} letterDates={letterDates} />
+                  <Calendar hallId={hallId} onClickLetter={handleCalendarLetterClick} />
                 </CalendarArea>
               </>
             )}
@@ -206,28 +237,24 @@ const {
         onCancel={() => setDeleteModalOpen(false)}
       />
       <SideCategoryBox hallId={hallId} page={page} />
-      {showModal && (
-                <CheckReturnModal
-                  onClose={closeModal}
-                  onConfirm={handleModalConfirm}
-                />
-              )}
-              {showAlreadySentModal && (
-                <ConfirmModal
-                  isOpen
-                  title="오늘은 이미 편지를 보냈어요"
-                  description={
-                    <>
-                      하루에 한 번만 편지를 작성할 수 있어요.
-                      <br />
-                      내일 다시 편지를 남겨주세요.
-                    </>
-                  }
-                  confirmText="확인"
-                  onConfirm={closeAlreadySentModal}
-                />
-              )}
+      
     </Wrapper> 
+    {calendarListOpen && (
+  <CalendarListOverlay onClick={() => setCalendarListOpen(false)}>
+    <CalendarListModal onClick={(e) => e.stopPropagation()}>
+      <CalendarList
+        letters={calendarLetters}
+        onSelect={(letterId) => {
+          setCalendarListOpen(false);
+          openLetterDetail(letterId);
+        }}
+        onClose={() => setCalendarListOpen(false)}
+      />
+    </CalendarListModal>
+  </CalendarListOverlay>
+)}
+
+
     </Background>
   );
 };
@@ -360,4 +387,26 @@ const Divider = styled.div`
   height: 42.5rem;
   background-color: #ddd;
   margin: 0 0.5rem 0 2rem;
+`;
+
+const CalendarListOverlay = styled.div`
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.4);
+  z-index: 999;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+`;
+
+const CalendarListModal = styled.div`
+  background: #fff;
+  border-radius: 0.75rem;
+  width: 73.5rem;
+  height: 29.8125rem;
+  box-sizing: border-box;
+    display: flex;
+  justify-content: center;
+  align-items: center;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
 `;
