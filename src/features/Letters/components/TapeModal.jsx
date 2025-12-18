@@ -1,10 +1,13 @@
 import React, { useState, useRef, useEffect } from "react";
-import styled from "styled-components";
+import styled, { keyframes, css } from "styled-components";
 import { color, typo } from "../../../styles/tokens";
 
 import { Letter } from "../components/Letter";
 import letterbox from "../assets/letter-wrapper.svg";
 import tape from "../assets/tape.svg";
+import ImgWheelLeft from "../assets/img-wheel-left.png";
+import ImgWheelRight from "../assets/img-wheel-right.png";
+
 import foldedletter from "../assets/folded-letter.svg";
 import playIcon from "../assets/play-icon.svg";
 import pauseIcon from "../assets/pause-icon.svg";
@@ -28,12 +31,13 @@ export default function TapeModal({ onCancel, data }) {
   // 오디오 재생/일시정지
   const togglePlay = () => {
     if (!audioRef.current) return;
+
     if (isPlaying) {
       audioRef.current.pause();
     } else {
       audioRef.current.play();
     }
-    setIsPlaying(!isPlaying);
+    setIsPlaying((prev) => !prev);
   };
 
   // 오디오 진행 상태 업데이트
@@ -47,7 +51,11 @@ export default function TapeModal({ onCancel, data }) {
       setProgress((audio.currentTime / (audio.duration || 1)) * 100);
     };
 
-    const handleEnded = () => setIsPlaying(false);
+    const handleEnded = () => {
+      setIsPlaying(false);
+      setCurrentTime(0);
+      setProgress(0);
+    };
 
     audio.addEventListener("timeupdate", updateProgress);
     audio.addEventListener("ended", handleEnded);
@@ -81,9 +89,31 @@ export default function TapeModal({ onCancel, data }) {
       <Box>
         <LetterWrapper>
           <LetterBox src={letterbox} />
-          {!isOpened && <Tape src={tape} />}
+
+          {!isOpened && (
+            <>
+              <Tape src={tape} />
+
+              {/* ✅ 재생 시 휠 회전 / 일시정지 시 멈춤 */}
+              <TapeWheelLeft
+                src={ImgWheelLeft}
+                alt="left-wheel"
+                $spinning={isPlaying}
+              />
+              <TapeWheelRight
+                src={ImgWheelRight}
+                alt="right-wheel"
+                $spinning={isPlaying}
+              />
+            </>
+          )}
+
           {isOpened && <TapeOpened src={tape} onClick={handleTapeClick} />}
-          {!isOpened && <FoldedLetter src={foldedletter} onClick={handleFoldClick} />}
+
+          {!isOpened && (
+            <FoldedLetter src={foldedletter} onClick={handleFoldClick} />
+          )}
+
           {isOpened && data && (
             <OpenedLetterWrapper>
               <Letter
@@ -101,18 +131,19 @@ export default function TapeModal({ onCancel, data }) {
 
         {data?.audioUrl && (
           <Bar>
-          <PlayButton onClick={togglePlay} isPlaying={isPlaying}>
-  <img src={isPlaying ? pauseIcon : playIcon} alt="play-pause" />
-</PlayButton>
-
+            <PlayButton onClick={togglePlay} isPlaying={isPlaying}>
+              <img src={isPlaying ? pauseIcon : playIcon} alt="play-pause" />
+            </PlayButton>
 
             <TimeText>
               {formatTime(currentTime)} / {formatTime(duration)}
             </TimeText>
+
             <ProgressBarWrapper onClick={handleProgressClick}>
               <ProgressBar style={{ width: `${progress}%` }} />
               <ProgressKnob style={{ left: `${progress}%` }} />
             </ProgressBarWrapper>
+
             <audio ref={audioRef} src={data.audioUrl} />
           </Bar>
         )}
@@ -174,7 +205,7 @@ const TapeOpened = styled.img`
   right: -10.63rem;
   width: 12.5rem;
   height: 8.95194rem;
-  aspect-ratio: 200.00/143.23;
+  aspect-ratio: 200/143.23;
   cursor: pointer;
   z-index: 30;
 `;
@@ -218,10 +249,9 @@ const PlayButton = styled.button`
   img {
     width: ${({ isPlaying }) => (isPlaying ? "3rem" : "100%")};
     height: ${({ isPlaying }) => (isPlaying ? "3rem" : "100%")};
-    object-fit: contain; // 영역을 벗어나지 않고 가운데 정렬
+    object-fit: contain;
   }
 `;
-
 
 const TimeText = styled.div`
   ${typo("bodym2")};
@@ -236,7 +266,7 @@ const ProgressBarWrapper = styled.div`
   overflow: hidden;
   position: relative;
   cursor: pointer;
-  width: 31.25rem;  
+  width: 31.25rem;
   height: 0.5rem;
   overflow: visible;
 `;
@@ -244,7 +274,7 @@ const ProgressBarWrapper = styled.div`
 const ProgressBar = styled.div`
   height: 100%;
   background: #acacac;
-   border-radius: 1rem;
+  border-radius: 1rem;
 `;
 
 const ProgressKnob = styled.div`
@@ -255,4 +285,53 @@ const ProgressKnob = styled.div`
   height: 1rem;
   border-radius: 50%;
   background: #313131;
+`;
+
+/* ---------------- 휠 회전 추가 ---------------- */
+
+const tapeWheelSpin = keyframes`
+  0% { transform: translate(-50%, -50%) rotate(0deg); }
+  100% { transform: translate(-50%, -50%) rotate(360deg); }
+`;
+
+/* ✅ Tape 위에 올리는 휠 (좌표는 "테이프 이미지" 기준으로 잡아줘야 해서 absolute) */
+/*  - 아래 right/top 값은 "대략"이 아니라, 지금 Tape 크기 그대로에서 보통 맞는 위치 범위로 둔 값이야.
+    - 필요하면 숫자만 아주 미세하게 조정하면 됨. (디자인 자체는 안 바뀜) */
+
+const TapeWheelLeft = styled.img`
+  position: absolute;
+  z-index: 12;
+
+  /* 테이프 영역 기준 */
+  top: calc(8.44rem + 15.666rem); /* Tape top + (Tape height / 2) 근사 */
+  left: 50.5%;
+
+  width: 6.2rem;
+
+  /* 왼쪽 휠이니까 왼쪽으로 이동 */
+  transform: translate(-50%, -50%);
+  margin-left: -9.2rem;
+
+  animation: ${tapeWheelSpin} 2.2s linear infinite;
+  animation-play-state: ${({ $spinning }) =>
+    $spinning ? "running" : "paused"};
+  will-change: transform;
+`;
+
+const TapeWheelRight = styled.img`
+  position: absolute;
+  z-index: 12;
+
+  top: calc(8.44rem + 15.666rem);
+  left: 52%;
+
+  width: 6.2rem;
+
+  transform: translate(-50%, -50%);
+  margin-left: 8.1rem;
+
+  animation: ${tapeWheelSpin} 2.2s linear infinite;
+  animation-play-state: ${({ $spinning }) =>
+    $spinning ? "running" : "paused"};
+  will-change: transform;
 `;

@@ -1,6 +1,7 @@
 // src/mock/exampleHall.js
 
 import { formatRelativeWithOptions } from "date-fns/fp";
+import Profile from "../assets/mock/profile.jpeg";
 import Photo001 from "../assets/mock/photo-001.jpeg";
 import Photo002 from "../assets/mock/photo-002.jpeg";
 import Photo003 from "../assets/mock/photo-003.jpeg";
@@ -22,7 +23,7 @@ export const exampleHallInfo = {
   phone: "010-1423-5324",
   adminName: "김옥선",
   // 이미지는 아무 URL이나 OK (샘플)
-  profile: null,
+  profile: Profile,
   review: "늘 환하게 웃어주던 우리 딸",
   nature: ["밝은", "지혜로운", "생각이 깊은", "너그러운"],
 };
