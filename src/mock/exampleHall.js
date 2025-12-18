@@ -33,7 +33,7 @@ export const examplePhotos = [
     id: 1,
     url: Photo001,
     thumbnail: Photo001,
-    isAI: formatRelativeWithOptions,
+    isAI: false,
     ts: Date.now() - 1000 * 60 * 60 * 1, // 1시간 전
   },
   {
