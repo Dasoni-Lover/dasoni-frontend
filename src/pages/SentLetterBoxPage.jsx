@@ -21,6 +21,7 @@ import bgicon from "../features/Letters/assets/bg-icon.svg";
 import { useWriteLetterFlow } from "../hooks/useWriteLetterFlow";
 import { CheckReturnModal } from '../features/Letters/components/CheckReturnModal';
 import ConfirmModal from '../components/ConfirmModal';
+import CalendarList from "../features/Letters/components/CalendarList";
 
 
 export const SentLetterBoxPage = () => {
@@ -36,6 +37,9 @@ export const SentLetterBoxPage = () => {
   const [hallName, setHallName] = useState("");
   const [calendarOpen, setCalendarOpen] = useState(false);
   const [letterDates, setLetterDates] = useState([]);
+
+  const [calendarListOpen, setCalendarListOpen] = useState(false);
+  const [calendarLetters, setCalendarLetters] = useState([]);
 
   useEffect(() => {
     const fetchHallName = async () => {
@@ -80,6 +84,46 @@ export const SentLetterBoxPage = () => {
     }
   };
 
+const handleCalendarLetterClick = async ({ date, letterId }) => {
+  if (!hallId) return;
+
+  try {
+    const list = await fetchLettersList(hallId);
+
+    // ✅ 해당 날짜 편지만 필터링
+    const filtered = list.filter(
+      (letter) =>
+        letter.completedAt
+          ?.replace(/[-/]/g, ".")
+          .startsWith(date)
+    );
+
+    // ✅ 1개면 바로 상세
+    if (filtered.length === 1) {
+      openLetterDetail(filtered[0].letterId);
+      return;
+    }
+
+    // ✅ 여러 개면 CalendarList
+    setCalendarLetters(filtered);
+    setCalendarListOpen(true);
+  } catch (err) {
+    console.error("캘린더 편지 조회 실패:", err);
+  }
+};
+
+
+  
+    // 3) 상세 조회 + 모달
+    const openLetterDetail = async (letterId) => {
+      try {
+        const data = await fetchLetterDetail(hallId, letterId);
+        setSelectedLetter(data);
+        setModalOpen(true);
+      } catch (err) {
+        console.error("편지 상세 조회 실패:", err);
+      }
+    };
 
 const {
   handleClickWriteLetter,
@@ -150,7 +194,7 @@ const {
               <>
                 <Divider />
                 <CalendarArea>
-                  <Calendar hallId={hallId} letterDates={letterDates} />
+                  <Calendar hallId={hallId}  onClickLetter={handleCalendarLetterClick} />
                 </CalendarArea>
               </>
             )}
@@ -188,10 +232,23 @@ const {
                 />
               )}
     </Wrapper>
-  
-    </Background>
-  );
-};
+    {calendarListOpen && (
+      <CalendarListOverlay onClick={() => setCalendarListOpen(false)}>
+        <CalendarListModal onClick={(e) => e.stopPropagation()}>
+          <CalendarList
+            letters={calendarLetters}
+            onSelect={(letterId) => {
+              setCalendarListOpen(false);
+              openLetterDetail(letterId);
+            }}
+            onClose={() => setCalendarListOpen(false)}
+          />
+        </CalendarListModal>
+      </CalendarListOverlay>
+    )}
+      </Background>
+    );
+  };
 const Background = styled.div`
   width: 100vw;
   height: 100vh;
@@ -320,4 +377,24 @@ const Divider = styled.div`
   height: 42.5rem;
   background-color: #ddd;
   margin: 0 0.5rem 0 2rem;
+`;
+const CalendarListOverlay = styled.div`
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.4);
+  z-index: 999;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+`;
+const CalendarListModal = styled.div`
+  background: #fff;
+  border-radius: 0.75rem;
+  width: 73.5rem;
+  height: 29.8125rem;
+  box-sizing: border-box;
+    display: flex;
+  justify-content: center;
+  align-items: center;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
 `;

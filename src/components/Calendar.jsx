@@ -91,7 +91,15 @@ const Calendar = ({ hallId, onClickLetter }) => {
             {d.letterId && (
               <LetterIcon
                 src={lettericon}
-                onClick={() => onClickLetter(d.letterId)}
+                onClick={() =>
+                  onClickLetter({
+                    date: `${currentDate.getFullYear()}.${String(
+                      currentDate.getMonth() + 1
+                    ).padStart(2, "0")}.${String(d.day).padStart(2, "0")}`,
+                    letterId: d.letterId,
+                  })
+                }
+
               />
             )}
           </DateBox>

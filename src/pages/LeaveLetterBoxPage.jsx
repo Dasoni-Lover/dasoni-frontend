@@ -96,11 +96,35 @@ const [calendarLetters, setCalendarLetters] = useState([]);
     }
   };
 
-const handleCalendarLetterClick = async () => {
-  const list = await fetchLettersList(hallId);
-  setCalendarLetters(list);
-  setCalendarListOpen(true);
+const handleCalendarLetterClick = async ({ date, letterId }) => {
+  if (!hallId) return;
+
+  try {
+    const list = await fetchLettersList(hallId);
+
+    // ✅ 해당 날짜 편지만 필터링
+    const filtered = list.filter(
+      (letter) =>
+        letter.completedAt
+          ?.replace(/[-/]/g, ".")
+          .startsWith(date)
+    );
+
+    // ✅ 1개면 바로 상세
+    if (filtered.length === 1) {
+      openLetterDetail(filtered[0].letterId);
+      return;
+    }
+
+    // ✅ 여러 개면 CalendarList
+    setCalendarLetters(filtered);
+    setCalendarListOpen(true);
+  } catch (err) {
+    console.error("캘린더 편지 조회 실패:", err);
+  }
 };
+
+
 
 
 // 삭제 핸들러
@@ -400,9 +424,11 @@ const CalendarListOverlay = styled.div`
 const CalendarListModal = styled.div`
   background: #fff;
   border-radius: 0.75rem;
-  padding: 1.5rem;
-  width: 32rem;
-  max-height: 70vh;
-  overflow-y: auto;
+  width: 73.5rem;
+  height: 29.8125rem;
+  box-sizing: border-box;
+    display: flex;
+  justify-content: center;
+  align-items: center;
   box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
 `;
