@@ -126,12 +126,20 @@ const handleCalendarLetterClick = async ({ date, letterId }) => {
     };
 
 const {
-  handleClickWriteLetter,
-  handleModalConfirm,
-  showModal,
-  showAlreadySentModal,
-  closeModal,
-  closeAlreadySentModal,
+ // 상태
+    isSendToday,
+    showModal,
+    showEditBlockedModal,
+
+    // 액션
+    handleClickWriteLetter,
+    handleModalConfirm,
+
+    // 닫기
+    closeModal,
+    closeEditBlockedModal,
+
+    // 메뉴 제어
 } = useWriteLetterFlow({ hallId, page });
 
 
@@ -211,26 +219,29 @@ const {
 
       <SideCategoryBox hallId={hallId} page={page} />
       {showModal && (
-                <CheckReturnModal
-                  onClose={closeModal}
-                  onConfirm={handleModalConfirm}
-                />
-              )}
-              {showAlreadySentModal && (
-                <ConfirmModal
-                  isOpen
-                  title="오늘은 이미 편지를 보냈어요"
-                  description={
-                    <>
-                      하루에 한 번만 편지를 작성할 수 있어요.
-                      <br />
-                      내일 다시 편지를 남겨주세요.
-                    </>
-                  }
-                  confirmText="확인"
-                  onConfirm={closeAlreadySentModal}
-                />
-              )}
+              <CheckReturnModal 
+              onClose={closeModal} 
+              onConfirm={handleModalConfirm} 
+              disableYes={isSendToday}
+              />
+            )}
+      
+            {showEditBlockedModal && (
+              <ConfirmModal
+                isOpen={showEditBlockedModal}
+                title="지금은 고인 정보를 설정할 수 없어요"
+                description={
+                  <>
+                    추모관 관리자가 고인 정보 설정을 완료하면
+                    <br />
+                    설정할 수 있어요
+                  </>
+                }
+                confirmText="확인"
+                onConfirm={closeEditBlockedModal}
+                onCancel={closeEditBlockedModal}
+              />
+            )}
     </Wrapper>
     {calendarListOpen && (
       <CalendarListOverlay onClick={() => setCalendarListOpen(false)}>

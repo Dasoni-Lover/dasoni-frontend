@@ -150,13 +150,11 @@ const handleConfirmDelete = async () => {
 
 
 const {
-  handleClickWriteLetter,
-  handleModalConfirm,
-  showModal,
-  showAlreadySentModal,
-  closeModal,
-  closeAlreadySentModal,
+    // 액션
+    handleClickWriteLetter,
+
 } = useWriteLetterFlow({ hallId, page });
+
 
   return (
     <Background>
@@ -239,27 +237,7 @@ const {
         onCancel={() => setDeleteModalOpen(false)}
       />
       <SideCategoryBox hallId={hallId} page={page} />
-      {showModal && (
-                <CheckReturnModal
-                  onClose={closeModal}
-                  onConfirm={handleModalConfirm}
-                />
-              )}
-              {showAlreadySentModal && (
-                <ConfirmModal
-                  isOpen
-                  title="오늘은 이미 편지를 보냈어요"
-                  description={
-                    <>
-                      하루에 한 번만 편지를 작성할 수 있어요.
-                      <br />
-                      내일 다시 편지를 남겨주세요.
-                    </>
-                  }
-                  confirmText="확인"
-                  onConfirm={closeAlreadySentModal}
-                />
-              )}
+      
     </Wrapper> 
     {calendarListOpen && (
   <CalendarListOverlay onClick={() => setCalendarListOpen(false)}>
