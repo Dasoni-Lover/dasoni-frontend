@@ -64,15 +64,31 @@ const RecievedLetterBoxPage = () => {
   }, [hallId]);
 
   // 편지 클릭 시 상세 조회 후 모달 열기
-  const handleIconClick = async (reply) => {
-    try {
-      const detail = await fetchReceivedReplyDetail(hallId, reply.replyId);
-      setSelectedReply(detail);
-      setIsModalOpen(true);
-    } catch (err) {
-      console.error("편지 상세 조회 실패:", err);
+const handleIconClick = async (reply) => {
+  try {
+    const detail = await fetchReceivedReplyDetail(hallId, reply.replyId);
+
+    setSelectedReply(detail);
+    setIsModalOpen(true);
+
+    // ✅ 이미 읽은 편지가 아니라면 상태 업데이트
+    if (!reply.isChecked) {
+      setReplies((prev) =>
+        prev.map((item) =>
+          item.replyId === reply.replyId
+            ? { ...item, isChecked: true }
+            : item
+        )
+      );
+
+      setUnreadCount((prev) => Math.max(prev - 1, 0));
+      setReadCount((prev) => prev + 1);
     }
-  };
+  } catch (err) {
+    console.error("편지 상세 조회 실패:", err);
+  }
+};
+
 
   const {
     handleClickWriteLetter,
